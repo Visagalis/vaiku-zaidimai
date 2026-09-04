@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>Žaidimai Vaikams</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
@@ -200,7 +203,10 @@
         const gameContainer = document.getElementById('game-container');
         const gameFrame = document.getElementById('game-frame');
         const currentGameTitle = document.getElementById('current-game-title');
-        let currentGamePath = '';
+        function getCacheBustedUrl(url) {
+            const sep = url.includes('?') ? '&' : '?';
+            return `${url}${sep}_t=${Date.now()}`;
+        }
 
         function showGame(path, title) {
             currentGamePath = path;
@@ -213,7 +219,7 @@
                 menu.style.display = 'none';
                 menu.classList.remove('fade-out');
                 
-                gameFrame.src = path;
+                gameFrame.src = getCacheBustedUrl(path);
                 
                 gameContainer.classList.remove('hidden');
                 gameContainer.style.display = 'flex';
@@ -227,10 +233,10 @@
 
         function reloadGame() {
             if (currentGamePath) {
-                gameFrame.src = '';
+                gameFrame.src = 'about:blank';
                 setTimeout(() => {
-                    gameFrame.src = currentGamePath;
-                }, 50);
+                    gameFrame.src = getCacheBustedUrl(currentGamePath);
+                }, 60);
             }
         }
 
@@ -241,7 +247,7 @@
                 gameContainer.classList.add('hidden');
                 gameContainer.style.display = 'none';
                 gameContainer.classList.remove('fade-out');
-                gameFrame.src = ''; // Clear iframe to stop game/audio
+                gameFrame.src = 'about:blank'; // Clear iframe to stop game/audio
                 currentGamePath = '';
                 
                 menu.classList.remove('hidden');
