@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>🗓️ Metų Laikai ir Kalendorius</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #ecfeff;
+            background-image: radial-gradient(#a5f3fc 20%, transparent 20%);
+            background-size: 20px 20px;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .btn-3d {
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+        }
+        .btn-3d:active {
+            transform: translateY(4px);
+        }
+
+        @keyframes bounce-scale {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+        .bounce-anim {
+            animation: bounce-scale 0.4s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+        .shake-anim {
+            animation: shake 0.4s ease-in-out;
+        }
+    </style>
+</head>
+<body class="h-screen max-h-screen flex items-center justify-center p-2 sm:p-4 overflow-hidden">
+
+    <div id="app" class="w-full max-w-2xl bg-white/95 backdrop-blur-md rounded-3xl shadow-xl flex flex-col relative border-4 border-cyan-300 overflow-hidden max-h-full">
+        <!-- Turinis bus atvaizduotas dinamiškai per JS -->
+    </div>
+
+    <script>
+        // Web Audio API
+        let audioCtx;
+        function getAudioCtx() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            return audioCtx;
+        }
+
+        function playTone(freq, type, duration, startTime=0) {
+            const ctx = getAudioCtx();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, ctx.currentTime + startTime);
+            gain.gain.setValueAtTime(0.15, ctx.currentTime + startTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + startTime + duration);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(ctx.currentTime + startTime);
+            osc.stop(ctx.currentTime + startTime + duration);
+        }
+
+        function playCorrectSound() {
+            playTone(440, 'sine', 0.15, 0);
+            playTone(554.37, 'sine', 0.15, 0.08);
+            playTone(659.25, 'sine', 0.25, 0.16);
+        }
+
+        function playWrongSound() {
+            playTone(280, 'sawtooth', 0.2, 0);
+            playTone(200, 'sawtooth', 0.25, 0.1);
+        }
+
+        function playWinSound() {
+            [440, 554, 659, 880].forEach((freq, idx) => {
+                playTone(freq, 'sine', 0.25, idx * 0.12);
+            });
+        }
+
+        // Duomenų bazė
+        const SEASONS_DATA = [
+            {
+                prompt: "Koks tai metų laikas? ⛄",
+                desc: "Lipdomas sniego senis, čiuožiama rogutėmis 🛷",
+                emoji: "⛄ ❄️ 🛷",
+                correct: "Žiema",
+                options: ["Žiema", "Pavasaris", "Vasara", "Ruduo"]
+            },
+            {
+                prompt: "Koks tai metų laikas? 🏖️",
+                desc: "Labai karšta, vaikai maudosi jūroje ir valgo ledus 🍦",
+                emoji: "🏖️ ☀️ 🍦",
+                correct: "Vasara",
+                options: ["Vasara", "Žiema", "Ruduo", "Pavasaris"]
+            },
+            {
+                prompt: "Koks tai metų laikas? 🍁",
+                desc: "Gelsta ir krenta medžių lapai, grybaujama miške 🍄",
+                emoji: "🍁 🍂 🍄",
+                correct: "Ruduo",
+                options: ["Ruduo", "Pavasaris", "Vasara", "Žiema"]
+            },
+            {
+                prompt: "Koks tai metų laikas? 🌸",
+                desc: "Tirpsta sniegas, parskrenda paukščiai, žydi snieguolės 🌱",
+                emoji: "🌸 🌱 🐦",
+                correct: "Pavasaris",
+                options: ["Pavasaris", "Vasara", "Ruduo", "Žiema"]
+            },
+            {
+                prompt: "Kada švenčiamos Kalėdos ir puošiama eglutė? 🎄",
+                desc: "Eglutė, šaltukas, dovanėlės ir fejerverkai 🎁",
+                emoji: "🎄 🎁 ❄️",
+                correct: "Žiemą",
+                options: ["Žiemą", "Vasarą", "Rudenį", "Pavasarį"]
+            },
+            {
+                prompt: "Kada prinoksta saldžios braškės? 🍓",
+                desc: "Šilta saulytė, atostogos ir saldžios uogos 🍓",
+                emoji: "🍓 🍉 ☀️",
+                correct: "Vasarą",
+                options: ["Vasarą", "Žiemą", "Rudenį", "Pavasarį"]
+            },
+            {
+                prompt: "Kada vaikai eina į mokyklą Rugsėjo 1-ąją? 🎒",
+                desc: "Nauji mokslo metai, kardeliai ir gelstantys medžiai 📚",
+                emoji: "🎒 📚 🍁",
+                correct: "Rudenį",
+                options: ["Rudenį", "Vasarą", "Pavasarį", "Žiemą"]
+            },
+            {
+                prompt: "Kada dažomi margučiai ir švenčiamos Velykos? 🐣",
+                desc: "Pabunda gamta, švenčiamas pavasario atgimimas 🥚",
+                emoji: "🐣 🥚 🌸",
+                correct: "Pavasarį",
+                options: ["Pavasarį", "Rudenį", "Žiemą", "Vasarą"]
+            },
+            {
+                prompt: "Kada reikia šiltos kepurės, pirštinių ir šaliko? 🧤",
+                desc: "Spaudžia šaltukas, krenta snaigės ❄️",
+                emoji: "🧤 🧣 ❄️",
+                correct: "Žiemą",
+                options: ["Žiemą", "Vasarą", "Pavasarį", "Rudenį"]
+            },
+            {
+                prompt: "Kada noksta didelės saulėgrąžos ir šviečia karščiausia saulė? 🌻",
+                desc: "Ilgiausios dienos ir trumpiausios naktys 🌞",
+                emoji: "🌻 🌞 🍉",
+                correct: "Vasarą",
+                options: ["Vasarą", "Žiemą", "Rudenį", "Pavasarį"]
+            }
+        ];
+
+        const CALENDAR_DATA = [
+            {
+                prompt: "Kokia diena eina po ANTRADIENIO? 📅",
+                desc: "Pirmadienis ➔ Antradienis ➔ ...",
+                emoji: "📅 ➡️",
+                correct: "Trečiadienis",
+                options: ["Trečiadienis", "Ketvirtadienis", "Pirmadienis", "Penktadienis"]
+            },
+            {
+                prompt: "Kokia diena eina po KETVIRTADIENIO? 📅",
+                desc: "Ketvirtadienis ➔ ...",
+                emoji: "📅 ➡️",
+                correct: "Penktadienis",
+                options: ["Penktadienis", "Šeštadienis", "Trečiadienis", "Sekmadienis"]
+            },
+            {
+                prompt: "Kokia diena eina prieš SEKMADIENĮ? 📅",
+                desc: "... ➔ Sekmadienis",
+                emoji: "⬅️ 📅",
+                correct: "Šeštadienis",
+                options: ["Šeštadienis", "Penktadienis", "Pirmadienis", "Ketvirtadienis"]
+            },
+            {
+                prompt: "Kokia diena pradeda savaitę? 🗓️",
+                desc: "Pirmoji savaitės diena yra...",
+                emoji: "1️⃣ 🗓️",
+                correct: "Pirmadienis",
+                options: ["Pirmadienis", "Sekmadienis", "Antradienis", "Šeštadienis"]
+            },
+            {
+                prompt: "Kuri iš šių dienų yra SAVAITGALIS? 🎈",
+                desc: "Diena, kai ilsimės nuo mokyklos:",
+                emoji: "🎈 🏡",
+                correct: "Sekmadienis",
+                options: ["Sekmadienis", "Trečiadienis", "Pirmadienis", "Ketvirtadienis"]
+            },
+            {
+                prompt: "Kuris mėnuo pradeda naujus metus? 🎆",
+                desc: "Pirmasis metų mėnuo:",
+                emoji: "🎆 ❄️",
+                correct: "Sausis",
+                options: ["Sausis", "Gruodis", "Kovas", "Rugsėjis"]
+            },
+            {
+                prompt: "Kuris mėnuo pradeda vasaros atostogas? ☀️",
+                desc: "Pirmasis vasaros mėnuo:",
+                emoji: "🏖️ ☀️",
+                correct: "Birželis",
+                options: ["Birželis", "Gegužė", "Liepa", "Rugpjūtis"]
+            },
+            {
+                prompt: "Kurį mėnesį prasideda mokslo metai? 🔔",
+                desc: "Rugsėjo 1-osios mėnuo:",
+                emoji: "🔔 🎒",
+                correct: "Rugsėjis",
+                options: ["Rugsėjis", "Spalis", "Rugpjūtis", "Birželis"]
+            },
+            {
+                prompt: "Kiek dienų turi viena savaitė? 🗓️",
+                desc: "Suskaičiuok: Pirm, Antr, Treč, Ketv, Penkt, Šešt, Sekm",
+                emoji: "7️⃣ 🗓️",
+                correct: "7 dienas",
+                options: ["7 dienas", "5 dienas", "10 dienų", "12 dienų"]
+            },
+            {
+                prompt: "Kiek metų laikų yra gamtoje? 🌍",
+                desc: "Pavasaris, Vasara, Ruduo, Žiema",
+                emoji: "🌍 🌸☀️🍁❄️",
+                correct: "4 metų laikai",
+                options: ["4 metų laikai", "3 metų laikai", "5 metų laikai", "12 metų laikų"]
+            }
+        ];
+
+        let state = {
+            mode: 'seasons',
+            questions: [],
+            currentIndex: 0,
+            score: 0,
+            streak: 0,
+            firstTry: true,
+            waiting: false
+        };
+
+        const appEl = document.getElementById('app');
+
+        function shuffle(arr) {
+            return [...arr].sort(() => Math.random() - 0.5);
+        }
+
+        function renderStartScreen() {
+            appEl.innerHTML = `
+                <div class="p-6 sm:p-8 flex flex-col items-center justify-center text-center">
+                    <div class="text-6xl sm:text-7xl mb-2 animate-bounce">🗓️</div>
+                    <h1 class="text-3xl sm:text-5xl font-black text-cyan-800 mb-2">Metų Laikai ir Kalendorius</h1>
+                    <p class="text-lg sm:text-xl font-bold text-slate-600 mb-6 sm:mb-8">Mokykis metų laikų, mėnesių ir savaitės dienų!</p>
+                    
+                    <div class="flex flex-col gap-3.5 sm:gap-4 w-full max-w-sm">
+                        <button onclick="startGame('seasons')" class="btn-3d py-3.5 sm:py-4 px-6 bg-cyan-500 hover:bg-cyan-600 text-white rounded-2xl text-xl sm:text-2xl font-black shadow-[0_6px_0_#0891b2] active:shadow-[0_0px_0_#0891b2] transition-all">
+                            🌸 Metų Laikai ❄️
+                        </button>
+                        <button onclick="startGame('calendar')" class="btn-3d py-3.5 sm:py-4 px-6 bg-teal-500 hover:bg-teal-600 text-white rounded-2xl text-xl sm:text-2xl font-black shadow-[0_6px_0_#0d9488] active:shadow-[0_0px_0_#0d9488] transition-all">
+                            📅 Dienos ir Mėnesiai
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function startGame(mode) {
+            getAudioCtx();
+            state.mode = mode;
+            state.score = 0;
+            state.streak = 0;
+            state.currentIndex = 0;
+            const pool = mode === 'seasons' ? SEASONS_DATA : CALENDAR_DATA;
+            state.questions = shuffle(pool).slice(0, 10);
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            if (state.currentIndex >= state.questions.length) {
+                renderEndScreen();
+                return;
+            }
+
+            state.firstTry = true;
+            state.waiting = false;
+            const q = state.questions[state.currentIndex];
+            const options = shuffle([...q.options]);
+
+            const optionsHtml = options.map((opt, idx) => `
+                <button id="btn-${idx}" onclick="handleAnswer('${opt.replace(/'/g, "\\'")}', this)" 
+                    class="btn-3d py-3 sm:py-4 px-3 bg-cyan-50 hover:bg-cyan-100 text-cyan-950 border-2 border-cyan-300 rounded-2xl text-base sm:text-xl font-black shadow-[0_5px_0_#a5f3fc] active:shadow-[0_0px_0_#a5f3fc] transition-all flex items-center justify-center text-center">
+                    ${opt}
+                </button>
+            `).join('');
+
+            appEl.innerHTML = `
+                <!-- Top Status Bar -->
+                <div class="bg-cyan-500 text-white px-4 py-2 sm:py-2.5 flex justify-between items-center font-bold text-sm sm:text-base shadow">
+                    <div>⭐ Taškai: <span class="text-yellow-200">${state.score}</span></div>
+                    <div class="bg-cyan-600 px-3 py-1 rounded-xl">Klausimas: ${state.currentIndex + 1} / 10</div>
+                    <div>🔥 Serija: <span class="text-orange-200">${state.streak}</span></div>
+                </div>
+
+                <div class="p-3 sm:p-5 flex-1 flex flex-col justify-between items-center">
+                    <h2 class="text-xl sm:text-2xl font-black text-slate-800 text-center mb-1">${q.prompt}</h2>
+
+                    <div class="my-auto py-3 px-6 flex flex-col items-center justify-center bg-cyan-50/80 rounded-3xl border-2 border-cyan-200 min-h-[110px] sm:min-h-[130px] shadow-inner text-center">
+                        <div class="text-5xl sm:text-6xl mb-1">${q.emoji}</div>
+                        <p class="text-base sm:text-lg font-bold text-cyan-900">${q.desc}</p>
+                    </div>
+
+                    <div id="feedback" class="h-6 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black my-1 opacity-0 transition-opacity">
+                        Pranešimas
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2.5 sm:gap-3.5 w-full mt-1">
+                        ${optionsHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        function handleAnswer(selected, btn) {
+            if (state.waiting) return;
+
+            const q = state.questions[state.currentIndex];
+            const feedback = document.getElementById('feedback');
+
+            if (selected === q.correct) {
+                state.waiting = true;
+                playCorrectSound();
+                if (state.firstTry) {
+                    state.score++;
+                    state.streak++;
+                }
+
+                btn.classList.remove('bg-cyan-50', 'text-cyan-950', 'border-cyan-300');
+                btn.classList.add('bg-green-500', 'text-white', 'border-green-600', 'shadow-[0_5px_0_#15803d]', 'bounce-anim');
+
+                feedback.textContent = `Puiku! Teisingai! 🎉`;
+                feedback.className = "h-6 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black my-1 text-green-600 opacity-100";
+
+                setTimeout(() => {
+                    state.currentIndex++;
+                    renderQuestion();
+                }, 1200);
+            } else {
+                state.firstTry = false;
+                state.streak = 0;
+                playWrongSound();
+
+                btn.classList.remove('bg-cyan-50', 'text-cyan-950');
+                btn.classList.add('bg-red-100', 'text-red-400', 'line-through', 'border-red-300', 'opacity-60', 'shake-anim');
+                btn.disabled = true;
+
+                feedback.textContent = "Bandyk dar kartą! 🤔";
+                feedback.className = "h-6 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black my-1 text-red-500 opacity-100";
+
+                setTimeout(() => {
+                    btn.classList.remove('shake-anim');
+                }, 400);
+            }
+        }
+
+        function renderEndScreen() {
+            playWinSound();
+            let stars = "⭐";
+            if (state.score >= 8) stars = "⭐⭐⭐";
+            else if (state.score >= 5) stars = "⭐⭐";
+
+            appEl.innerHTML = `
+                <div class="p-6 sm:p-8 flex flex-col items-center justify-center text-center">
+                    <div class="text-7xl mb-2">🎉</div>
+                    <h2 class="text-3xl sm:text-4xl font-black text-green-600 mb-2">Šaunuolis!</h2>
+                    <div class="text-5xl mb-4 tracking-wider">${stars}</div>
+                    <p class="text-xl font-bold text-slate-700 mb-1">Surinkai taškų:</p>
+                    <p class="text-4xl font-black text-cyan-600 mb-6">${state.score} / 10</p>
+                    
+                    <div class="flex flex-col sm:flex-row gap-3 w-full max-w-sm">
+                        <button onclick="startGame(state.mode)" class="btn-3d flex-1 py-3.5 bg-cyan-500 hover:bg-cyan-600 text-white rounded-2xl text-lg font-black shadow-[0_5px_0_#0891b2] active:shadow-[0_0px_0_#0891b2] transition-all">
+                            Dar kartą
+                        </button>
+                        <button onclick="renderStartScreen()" class="btn-3d flex-1 py-3.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-2xl text-lg font-black shadow-[0_5px_0_#94a3b8] active:shadow-[0_0px_0_#94a3b8] transition-all">
+                            Iš pradžių
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        renderStartScreen();
+    </script>
+</body>
+</html>

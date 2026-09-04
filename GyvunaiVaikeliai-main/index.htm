@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>🐾 Gyvūnai ir Vaikeliai</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #fffbeb;
+            background-image: radial-gradient(#fde68a 20%, transparent 20%);
+            background-size: 20px 20px;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .btn-3d {
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+        }
+        .btn-3d:active {
+            transform: translateY(4px);
+        }
+
+        @keyframes bounce-scale {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+        .bounce-anim {
+            animation: bounce-scale 0.4s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+        .shake-anim {
+            animation: shake 0.4s ease-in-out;
+        }
+    </style>
+</head>
+<body class="h-screen max-h-screen flex items-center justify-center p-2 sm:p-4 overflow-hidden">
+
+    <div id="app" class="w-full max-w-2xl bg-white/95 backdrop-blur-md rounded-3xl shadow-xl flex flex-col relative border-4 border-amber-300 overflow-hidden max-h-full">
+        <!-- Turinis bus atvaizduotas dinamiškai per JS -->
+    </div>
+
+    <script>
+        // Web Audio API
+        let audioCtx;
+        function getAudioCtx() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            return audioCtx;
+        }
+
+        function playTone(freq, type, duration, startTime=0) {
+            const ctx = getAudioCtx();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, ctx.currentTime + startTime);
+            gain.gain.setValueAtTime(0.15, ctx.currentTime + startTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + startTime + duration);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(ctx.currentTime + startTime);
+            osc.stop(ctx.currentTime + startTime + duration);
+        }
+
+        function playCorrectSound() {
+            playTone(440, 'sine', 0.15, 0);
+            playTone(554.37, 'sine', 0.15, 0.08);
+            playTone(659.25, 'sine', 0.25, 0.16);
+        }
+
+        function playWrongSound() {
+            playTone(280, 'sawtooth', 0.2, 0);
+            playTone(200, 'sawtooth', 0.25, 0.1);
+        }
+
+        function playWinSound() {
+            [440, 554, 659, 880].forEach((freq, idx) => {
+                playTone(freq, 'sine', 0.25, idx * 0.12);
+            });
+        }
+
+        // Duomenų bazė
+        const BABIES_DATA = [
+            { parent: "Karvė 🐄", prompt: "Kaip vadinasi karvės vaikelis?", correct: "Veršiukas", options: ["Veršiukas", "Kumeliukas", "Paršiukas", "Ėriukas"] },
+            { parent: "Arklys 🐎", prompt: "Kaip vadinasi arklio vaikelis?", correct: "Kumeliukas", options: ["Kumeliukas", "Veršiukas", "Šuniukas", "Ožiukas"] },
+            { parent: "Avis 🐑", prompt: "Kaip vadinasi avies vaikelis?", correct: "Ėriukas", options: ["Ėriukas", "Paršiukas", "Kačiukas", "Veršiukas"] },
+            { parent: "Kiaulė 🐖", prompt: "Kaip vadinasi kiaulės vaikelis?", correct: "Paršiukas", options: ["Paršiukas", "Veršiukas", "Ėriukas", "Kumeliukas"] },
+            { parent: "Šuo 🐕", prompt: "Kaip vadinasi šuns vaikelis?", correct: "Šuniukas", options: ["Šuniukas", "Kačiukas", "Lapiukas", "Meškiukas"] },
+            { parent: "Katė 🐈", prompt: "Kaip vadinasi katės vaikelis?", correct: "Kačiukas", options: ["Kačiukas", "Šuniukas", "Kiškiukas", "Peliukas"] },
+            { parent: "Višta 🐔", prompt: "Kaip vadinasi vištos vaikelis?", correct: "Viščiukas", options: ["Viščiukas", "Ančiukas", "Žąsiukas", "Pelėdžiukas"] },
+            { parent: "Antis 🦆", prompt: "Kaip vadinasi anties vaikelis?", correct: "Ančiukas", options: ["Ančiukas", "Viščiukas", "Žąsiukas", "Paukščiukas"] },
+            { parent: "Vilkas 🐺", prompt: "Kaip vadinasi vilko vaikelis?", correct: "Vilkiukas", options: ["Vilkiukas", "Lapiukas", "Meškiukas", "Šuniukas"] },
+            { parent: "Lapė 🦊", prompt: "Kaip vadinasi lapės vaikelis?", correct: "Lapiukas", options: ["Lapiukas", "Vilkiukas", "Kiškiukas", "Kačiukas"] },
+            { parent: "Meška 🐻", prompt: "Kaip vadinasi meškos vaikelis?", correct: "Meškiukas", options: ["Meškiukas", "Vilkiukas", "Ežiukas", "Lapiukas"] },
+            { parent: "Kiškis 🐇", prompt: "Kaip vadinasi kiškio vaikelis?", correct: "Kiškiukas", options: ["Kiškiukas", "Peliukas", "Kačiukas", "Voveriukas"] },
+            { parent: "Ožka 🐐", prompt: "Kaip vadinasi ožkos vaikelis?", correct: "Ožiukas", options: ["Ožiukas", "Ėriukas", "Veršiukas", "Kumeliukas"] },
+            { parent: "Žąsis 🪿", prompt: "Kaip vadinasi žąsies vaikelis?", correct: "Žąsiukas", options: ["Žąsiukas", "Viščiukas", "Ančiukas", "Paukščiukas"] }
+        ];
+
+        const HOMES_DATA = [
+            { parent: "Šuo 🐕", prompt: "Kur gyvena šuo?", correct: "Būdoje", options: ["Būdoje", "Lizde", "Avilyje", "Tvarte"] },
+            { parent: "Bitė 🐝", prompt: "Kur gyvena bitės?", correct: "Avilyje", options: ["Avilyje", "Būdoje", "Lizde", "Oloje"] },
+            { parent: "Paukštis 🐦", prompt: "Kur gyvena paukštelis?", correct: "Lizde", options: ["Lizde", "Avilyje", "Būdoje", "Užtvankoje"] },
+            { parent: "Voverė 🐿️", prompt: "Kur gyvena voveraitė?", correct: "Uokse", options: ["Uokse", "Būdoje", "Upėje", "Avilyje"] },
+            { parent: "Karvė 🐄", prompt: "Kur gyvena karvė?", correct: "Tvarte", options: ["Tvarte", "Oloje", "Būdoje", "Lizde"] },
+            { parent: "Arklys 🐎", prompt: "Kur gyvena arklys?", correct: "Arklidėje", options: ["Arklidėje", "Lizde", "Avilyje", "Būdoje"] },
+            { parent: "Bebras 🦫", prompt: "Kur gyvena bebras?", correct: "Užtvankoje", options: ["Užtvankoje", "Uokse", "Būdoje", "Arklidėje"] },
+            { parent: "Meška 🐻", prompt: "Kur žiemą miega meška?", correct: "Guolyje / Oloje", options: ["Guolyje / Oloje", "Lizde", "Avilyje", "Būdoje"] },
+            { parent: "Žuvis 🐟", prompt: "Kur gyvena žuvelė?", correct: "Vandenyje", options: ["Vandenyje", "Medyje", "Tvarte", "Būdoje"] },
+            { parent: "Kregždė 🐦", prompt: "Kur kregždė lipdo namelį?", correct: "Po stogu lizde", options: ["Po stogu lizde", "Vandenyje", "Avilyje", "Tvarte"] }
+        ];
+
+        let state = {
+            mode: 'babies',
+            questions: [],
+            currentIndex: 0,
+            score: 0,
+            streak: 0,
+            firstTry: true,
+            waiting: false
+        };
+
+        const appEl = document.getElementById('app');
+
+        function shuffle(arr) {
+            return [...arr].sort(() => Math.random() - 0.5);
+        }
+
+        function renderStartScreen() {
+            appEl.innerHTML = `
+                <div class="p-6 sm:p-8 flex flex-col items-center justify-center text-center">
+                    <div class="text-6xl sm:text-7xl mb-2 animate-bounce">🐾</div>
+                    <h1 class="text-3xl sm:text-5xl font-black text-amber-800 mb-2">Gyvūnai ir Vaikeliai</h1>
+                    <p class="text-lg sm:text-xl font-bold text-slate-600 mb-6 sm:mb-8">Mokykis gyvūnų, jauniklių ir jų namų!</p>
+                    
+                    <div class="flex flex-col gap-3.5 sm:gap-4 w-full max-w-sm">
+                        <button onclick="startGame('babies')" class="btn-3d py-3.5 sm:py-4 px-6 bg-amber-500 hover:bg-amber-600 text-white rounded-2xl text-xl sm:text-2xl font-black shadow-[0_6px_0_#b45309] active:shadow-[0_0px_0_#b45309] transition-all">
+                            🐮 Mamos ir Mažyliai
+                        </button>
+                        <button onclick="startGame('homes')" class="btn-3d py-3.5 sm:py-4 px-6 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl text-xl sm:text-2xl font-black shadow-[0_6px_0_#047857] active:shadow-[0_0px_0_#047857] transition-all">
+                            🏡 Kas kur gyvena?
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function startGame(mode) {
+            getAudioCtx();
+            state.mode = mode;
+            state.score = 0;
+            state.streak = 0;
+            state.currentIndex = 0;
+            const pool = mode === 'babies' ? BABIES_DATA : HOMES_DATA;
+            state.questions = shuffle(pool).slice(0, 10);
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            if (state.currentIndex >= state.questions.length) {
+                renderEndScreen();
+                return;
+            }
+
+            state.firstTry = true;
+            state.waiting = false;
+            const q = state.questions[state.currentIndex];
+            const options = shuffle([...q.options]);
+
+            const optionsHtml = options.map((opt, idx) => `
+                <button id="btn-${idx}" onclick="handleAnswer('${opt.replace(/'/g, "\\'")}', this)" 
+                    class="btn-3d py-3 sm:py-4 px-3 bg-amber-50 hover:bg-amber-100 text-amber-950 border-2 border-amber-300 rounded-2xl text-base sm:text-xl font-black shadow-[0_5px_0_#fcd34d] active:shadow-[0_0px_0_#fcd34d] transition-all flex items-center justify-center text-center">
+                    ${opt}
+                </button>
+            `).join('');
+
+            appEl.innerHTML = `
+                <!-- Top Status Bar -->
+                <div class="bg-amber-500 text-white px-4 py-2 sm:py-2.5 flex justify-between items-center font-bold text-sm sm:text-base shadow">
+                    <div>⭐ Taškai: <span class="text-yellow-200">${state.score}</span></div>
+                    <div class="bg-amber-600 px-3 py-1 rounded-xl">Klausimas: ${state.currentIndex + 1} / 10</div>
+                    <div>🔥 Serija: <span class="text-orange-200">${state.streak}</span></div>
+                </div>
+
+                <div class="p-3 sm:p-5 flex-1 flex flex-col justify-between items-center">
+                    <h2 class="text-xl sm:text-2xl font-black text-slate-800 text-center mb-2 sm:mb-3">${q.prompt}</h2>
+
+                    <div class="my-auto py-3 px-6 flex flex-col items-center justify-center bg-amber-100/60 rounded-3xl border-3 border-amber-200 min-h-[120px] sm:min-h-[140px] shadow-inner">
+                        <div class="text-6xl sm:text-8xl mb-1">${q.parent.split(' ').pop()}</div>
+                        <div class="text-2xl sm:text-3xl font-black text-amber-900">${q.parent.split(' ')[0]}</div>
+                    </div>
+
+                    <div id="feedback" class="h-6 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black my-1 opacity-0 transition-opacity">
+                        Pranešimas
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2.5 sm:gap-3.5 w-full mt-1">
+                        ${optionsHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        function handleAnswer(selected, btn) {
+            if (state.waiting) return;
+
+            const q = state.questions[state.currentIndex];
+            const feedback = document.getElementById('feedback');
+
+            if (selected === q.correct) {
+                state.waiting = true;
+                playCorrectSound();
+                if (state.firstTry) {
+                    state.score++;
+                    state.streak++;
+                }
+
+                btn.classList.remove('bg-amber-50', 'text-amber-950', 'border-amber-300');
+                btn.classList.add('bg-green-500', 'text-white', 'border-green-600', 'shadow-[0_5px_0_#15803d]', 'bounce-anim');
+
+                feedback.textContent = "Teisingai! Puiku! 🎉";
+                feedback.className = "h-6 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black my-1 text-green-600 opacity-100";
+
+                setTimeout(() => {
+                    state.currentIndex++;
+                    renderQuestion();
+                }, 1200);
+            } else {
+                state.firstTry = false;
+                state.streak = 0;
+                playWrongSound();
+
+                btn.classList.remove('bg-amber-50', 'text-amber-950');
+                btn.classList.add('bg-red-100', 'text-red-400', 'line-through', 'border-red-300', 'opacity-60', 'shake-anim');
+                btn.disabled = true;
+
+                feedback.textContent = "Bandyk dar kartą! 🤔";
+                feedback.className = "h-6 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black my-1 text-red-500 opacity-100";
+
+                setTimeout(() => {
+                    btn.classList.remove('shake-anim');
+                }, 400);
+            }
+        }
+
+        function renderEndScreen() {
+            playWinSound();
+            let stars = "⭐";
+            if (state.score >= 8) stars = "⭐⭐⭐";
+            else if (state.score >= 5) stars = "⭐⭐";
+
+            appEl.innerHTML = `
+                <div class="p-6 sm:p-8 flex flex-col items-center justify-center text-center">
+                    <div class="text-7xl mb-2">🎉</div>
+                    <h2 class="text-3xl sm:text-4xl font-black text-green-600 mb-2">Šaunuolis!</h2>
+                    <div class="text-5xl mb-4 tracking-wider">${stars}</div>
+                    <p class="text-xl font-bold text-slate-700 mb-1">Surinkai taškų:</p>
+                    <p class="text-4xl font-black text-amber-600 mb-6">${state.score} / 10</p>
+                    
+                    <div class="flex flex-col sm:flex-row gap-3 w-full max-w-sm">
+                        <button onclick="startGame(state.mode)" class="btn-3d flex-1 py-3.5 bg-amber-500 hover:bg-amber-600 text-white rounded-2xl text-lg font-black shadow-[0_5px_0_#b45309] active:shadow-[0_0px_0_#b45309] transition-all">
+                            Dar kartą
+                        </button>
+                        <button onclick="renderStartScreen()" class="btn-3d flex-1 py-3.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-2xl text-lg font-black shadow-[0_5px_0_#94a3b8] active:shadow-[0_0px_0_#94a3b8] transition-all">
+                            Iš pradžių
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        renderStartScreen();
+    </script>
+</body>
+</html>
