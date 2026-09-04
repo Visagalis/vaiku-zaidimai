@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linksmoji Matematika</title>
+    <!-- Pridedame Tailwind konfigūraciją, kad veiktų 'dark' klasė -->
+    <script>
+        tailwind = {
+            config: {
+                darkMode: 'class',
+            }
+        }
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap');
+        
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f0f9ff;
+            background-image: radial-gradient(#bae6fd 2px, transparent 2px);
+            background-size: 30px 30px;
+            touch-action: manipulation;
+            transition: background-color 0.3s, background-image 0.3s;
+        }
+
+        /* Tamsios temos fono taisyklės */
+        html.dark body {
+            background-color: #0f172a;
+            background-image: radial-gradient(#334155 2px, transparent 2px);
+        }
+
+        .bounce {
+            animation: bounce 0.6s cubic-bezier(0.28, 0.84, 0.42, 1);
+        }
+
+        @keyframes bounce {
+            0%   { transform: scale(1,1)      translateY(0); }
+            10%  { transform: scale(1.1,.9)   translateY(0); }
+            30%  { transform: scale(.9,1.1)   translateY(-30px); }
+            50%  { transform: scale(1.05,.95) translateY(0); }
+            57%  { transform: scale(1,1)      translateY(-7px); }
+            64%  { transform: scale(1,1)      translateY(0); }
+            100% { transform: scale(1,1)      translateY(0); }
+        }
+
+        .shake {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-8px, 0, 0); }
+            40%, 60% { transform: translate3d(8px, 0, 0); }
+        }
+
+        .btn-option {
+            transition: all 0.2s ease;
+        }
+        
+        .btn-option:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+    <!-- Temos perjungimo mygtukas -->
+    <button onclick="toggleTheme()" class="absolute top-4 right-4 p-3 bg-white dark:bg-slate-800 rounded-full shadow-lg text-2xl hover:scale-110 transition-transform border-2 border-sky-200 dark:border-slate-700 z-10 focus:outline-none">
+        <span id="theme-icon">🌙</span>
+    </button>
+
+    <div class="max-w-md w-full bg-white dark:bg-slate-800 rounded-[2rem] shadow-2xl overflow-hidden border-4 border-sky-200 dark:border-indigo-900 transition-colors duration-300">
+        
+        <!-- Antraštė ir taškai -->
+        <div class="bg-sky-400 dark:bg-indigo-600 p-6 text-center relative transition-colors duration-300">
+            <h1 class="text-3xl font-black text-white tracking-wide mb-2 drop-shadow-md">🔢 Matematika</h1>
+            <div class="inline-block bg-white/30 dark:bg-black/30 rounded-full px-6 py-2 backdrop-blur-sm transition-colors duration-300">
+                <span class="text-sky-900 dark:text-indigo-100 font-bold text-xl transition-colors duration-300">
+                    Taškai: <span id="score" class="text-2xl text-yellow-300 drop-shadow inline-block transition-transform duration-300">0</span> ⭐️
+                </span>
+            </div>
+            <div class="absolute -top-6 -right-4 text-6xl rotate-12 drop-shadow-lg">🦉</div>
+        </div>
+
+        <!-- Žaidimo laukas -->
+        <div class="p-4 sm:p-8 text-center">
+            
+            <!-- Matematikos uždavinys -->
+            <div id="problem-container" class="mb-8 flex items-center justify-center min-h-[80px]">
+                <h2 id="problem" class="text-5xl sm:text-6xl font-black text-slate-700 dark:text-slate-100 tracking-wider whitespace-nowrap transition-colors duration-300">
+                    <!-- Uždavinys atsiras čia -->
+                </h2>
+            </div>
+
+            <!-- Atsakymų mygtukai -->
+            <div id="options" class="grid grid-cols-2 gap-3 sm:gap-4">
+                <!-- Mygtukai bus sugeneruoti per JavaScript -->
+            </div>
+
+            <!-- Pranešimas vaikui -->
+            <div id="feedback" class="mt-6 sm:mt-8 h-8 sm:h-12 text-xl sm:text-2xl font-bold text-sky-500 dark:text-indigo-400 transition-opacity duration-300 opacity-0 flex items-center justify-center">
+                Puiku!
+            </div>
+        </div>
+        
+    </div>
+
+    <script>
+        const scoreEl = document.getElementById('score');
+        const problemEl = document.getElementById('problem');
+        const optionsEl = document.getElementById('options');
+        const feedbackEl = document.getElementById('feedback');
+        const problemContainer = document.getElementById('problem-container');
+        const themeIcon = document.getElementById('theme-icon');
+
+        let currentScore = 0;
+        let correctAnswer = 0;
+        let isWaitingForNext = false;
+        let wrongStreak = 0; // Skaičiuojame klaidas iš eilės
+
+        const praiseWords = ["Šaunuolis!", "Puiku!", "Teisingai!", "Nuostabu!", "Super!", "Genialu!"];
+
+        // Temos keitimo logika
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            if (document.documentElement.classList.contains('dark')) {
+                themeIcon.textContent = '☀️';
+            } else {
+                themeIcon.textContent = '🌙';
+            }
+        }
+
+        // Garso kontekstas
+        let audioCtx;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playTone(frequency, type, duration) {
+            if (!audioCtx) return;
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            oscillator.type = type;
+            oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+            
+            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + duration);
+        }
+
+        function playSound(type) {
+            initAudio();
+            if (type === 'correct') {
+                playTone(440, 'sine', 0.1);
+                setTimeout(() => playTone(554.37, 'sine', 0.1), 100);
+                setTimeout(() => playTone(659.25, 'sine', 0.2), 200);
+            } else if (type === 'wrong') {
+                playTone(250, 'sawtooth', 0.15);
+                setTimeout(() => playTone(200, 'sawtooth', 0.25), 150);
+            }
+        }
+
+        function randomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function generateProblem() {
+            isWaitingForNext = false;
+            feedbackEl.style.opacity = '0';
+            optionsEl.innerHTML = '';
+            problemContainer.classList.remove('bounce');
+
+            const isAddition = Math.random() > 0.5;
+            
+            // 75% tikimybė, kad generuosime skaičius tik iki 12.
+            // 25% tikimybė, kad generuosime iki 20.
+            const maxLimit = Math.random() < 0.75 ? 12 : 20;
+
+            let num1, num2;
+
+            if (isAddition) {
+                do {
+                    num1 = randomInt(0, maxLimit);
+                    num2 = randomInt(0, maxLimit);
+                } while (num1 + num2 > maxLimit); // Suma neviršys nustatytos ribos
+                
+                correctAnswer = num1 + num2;
+                problemEl.textContent = `${num1} + ${num2} = ?`;
+            } else {
+                do {
+                    num1 = randomInt(0, maxLimit);
+                    num2 = randomInt(0, maxLimit);
+                } while (num1 - num2 < 0); // Atsakymas nebus neigiamas
+                
+                correctAnswer = num1 - num2;
+                problemEl.textContent = `${num1} - ${num2} = ?`;
+            }
+
+            generateOptionButtons();
+        }
+
+        function generateOptionButtons() {
+            let options = [correctAnswer];
+
+            while (options.length < 4) {
+                let offset = randomInt(-4, 4);
+                if (offset === 0) offset = 5; 
+                
+                let wrongAnswer = correctAnswer + offset;
+                
+                if (wrongAnswer < 0) wrongAnswer = correctAnswer + randomInt(1, 5);
+                
+                if (!options.includes(wrongAnswer)) {
+                    options.push(wrongAnswer);
+                }
+            }
+
+            options.sort(() => Math.random() - 0.5);
+
+            options.forEach(option => {
+                const btn = document.createElement('button');
+                btn.textContent = option;
+                // Priskiriame stilius (tiek šviesiai, tiek tamsiai temai)
+                btn.className = 'btn-option bg-sky-100 dark:bg-slate-700 hover:bg-sky-200 dark:hover:bg-slate-600 text-sky-800 dark:text-indigo-200 text-3xl sm:text-4xl font-black py-4 sm:py-6 rounded-2xl shadow-sm border-b-4 border-sky-300 dark:border-slate-900 active:border-b-0 focus:outline-none';
+                btn.onclick = () => checkAnswer(btn, option);
+                optionsEl.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(btn, selectedAnswer) {
+            initAudio();
+
+            if (isWaitingForNext) return;
+
+            if (selectedAnswer === correctAnswer) {
+                // TEISINGAI
+                isWaitingForNext = true;
+                wrongStreak = 0; // Nunuliname klaidų skaitliuką
+                currentScore++;
+                scoreEl.textContent = currentScore;
+                
+                playSound('correct');
+
+                // Pakeičiame mygtuko stilių visiškai į žalią
+                btn.className = 'btn-option bg-green-400 text-white text-3xl sm:text-4xl font-black py-4 sm:py-6 rounded-2xl shadow-sm border-b-4 border-green-600 active:border-b-0 focus:outline-none';
+                
+                problemEl.textContent = problemEl.textContent.replace('?', correctAnswer);
+                problemContainer.classList.add('bounce');
+
+                feedbackEl.textContent = praiseWords[randomInt(0, praiseWords.length - 1)] + " 🌟";
+                feedbackEl.classList.remove('text-red-500', 'dark:text-red-400');
+                feedbackEl.classList.add('text-green-500', 'dark:text-green-400');
+                feedbackEl.style.opacity = '1';
+
+                fireConfetti();
+
+                setTimeout(generateProblem, 2200);
+
+            } else {
+                // NETEISINGAI
+                playSound('wrong');
+                wrongStreak++;
+
+                // Keičiame mygtuko stilių į raudoną (su purtymu)
+                btn.className = 'btn-option bg-red-200 dark:bg-red-900/60 text-red-600 dark:text-red-300 text-3xl sm:text-4xl font-black py-4 sm:py-6 rounded-2xl shadow-sm border-b-4 border-red-300 dark:border-red-800 opacity-50 shake active:border-b-0 focus:outline-none';
+                btn.disabled = true;
+
+                feedbackEl.classList.remove('text-green-500', 'dark:text-green-400');
+                feedbackEl.classList.add('text-red-500', 'dark:text-red-400');
+                feedbackEl.style.opacity = '1';
+
+                // Tikriname baudų sąlygą (2 iš eilės)
+                if (wrongStreak >= 2) {
+                    if (currentScore > 0) {
+                        currentScore--; // Atimame tašką
+                    }
+                    scoreEl.textContent = currentScore;
+                    feedbackEl.textContent = "Oj, praradai tašką! 📉";
+                    
+                    // Raudonas taškų mirktelėjimas
+                    scoreEl.classList.add('text-red-500', 'scale-150');
+                    setTimeout(() => scoreEl.classList.remove('text-red-500', 'scale-150'), 600);
+                    
+                    wrongStreak = 0; // Nunuliname, kad neprarastų vėl, jei spaus 3 kartą klaidingai
+                } else {
+                    feedbackEl.textContent = "Bandyk dar kartą! 💡";
+                }
+
+                setTimeout(() => btn.classList.remove('shake'), 500);
+            }
+        }
+
+        function fireConfetti() {
+            var defaults = { spread: 360, ticks: 80, gravity: 0.6, decay: 0.95, startVelocity: 30, shapes: ['star'], colors: ['#FFE400', '#FFBD00', '#E89400', '#FFCA6C', '#FDFFB8'], disableForReducedMotion: true };
+            function shoot() {
+                confetti({ ...defaults, particleCount: 40, scalar: 1.2, shapes: ['star'] });
+                confetti({ ...defaults, particleCount: 10, scalar: 0.75, shapes: ['circle'] });
+            }
+            setTimeout(shoot, 0);
+            setTimeout(shoot, 100);
+            setTimeout(shoot, 200);
+        }
+
+        window.onload = generateProblem;
+    </script>
+</body>
+</html>
+
+

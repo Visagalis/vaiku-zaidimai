@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Skaitymo Žaidimas Vaikams</title>
+  
+  <!-- Tailwind CSS stiliams -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- React ir Babel bibliotekos, kad kodas veiktų tiesiai naršyklėje -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* Vaikams draugiškos klaidos animacija */
+    @keyframes shake {
+      10%, 90% { transform: translate3d(-1px, 0, 0); }
+      20%, 80% { transform: translate3d(2px, 0, 0); }
+      30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+      40%, 60% { transform: translate3d(4px, 0, 0); }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useCallback, useRef } = React;
+
+    // Pilnas žodžių sąrašas su tiksliais skiemenimis
+    const WORDS_DATA = [
+      { word: "TELEFONAS", syllables: ["TE", "LE", "FO", "NAS"], emoji: "📱" },
+      { word: "DRUGELIS", syllables: ["DRU", "GE", "LIS"], emoji: "🦋" },
+      { word: "AGURKAS", syllables: ["A", "GUR", "KAS"], emoji: "🥒" },
+      { word: "ŠUO", syllables: ["ŠUO"], emoji: "🐶" },
+      { word: "PICA", syllables: ["PI", "CA"], emoji: "🍕" },
+      { word: "PASPIRTUKAS", syllables: ["PAS", "PIR", "TU", "KAS"], emoji: "🛴" },
+      { word: "TRAUKINYS", syllables: ["TRAU", "KI", "NYS"], emoji: "🚂" },
+      { word: "VAIVORYKŠTĖ", syllables: ["VAI", "VO", "RYKŠ", "TĖ"], emoji: "🌈" },
+      { word: "KATĖ", syllables: ["KA", "TĖ"], emoji: "🐱" },
+      { word: "RANKA", syllables: ["RAN", "KA"], emoji: "✋" },
+      { word: "EŽYS", syllables: ["E", "ŽYS"], emoji: "🦔" },
+      { word: "LANGAS", syllables: ["LAN", "GAS"], emoji: "🪟" },
+      { word: "MEDIS", syllables: ["ME", "DIS"], emoji: "🌳" },
+      { word: "APELSINAS", syllables: ["A", "PEL", "SI", "NAS"], emoji: "🍊" },
+      { word: "AKIS", syllables: ["A", "KIS"], emoji: "👁️" },
+      { word: "ŽIRAFA", syllables: ["ŽI", "RA", "FA"], emoji: "🦒" },
+      { word: "MAŠINA", syllables: ["MA", "ŠI", "NA"], emoji: "🚗" },
+      { word: "OŽYS", syllables: ["O", "ŽYS"], emoji: "🐐" },
+      { word: "KOJA", syllables: ["KO", "JA"], emoji: "🦵" },
+      { word: "PILIS", syllables: ["PI", "LIS"], emoji: "🏰" },
+      { word: "POMIDORAS", syllables: ["PO", "MI", "DO", "RAS"], emoji: "🍅" },
+      { word: "MEŠKA", syllables: ["MEŠ", "KA"], emoji: "🐻" },
+      { word: "PELĖ", syllables: ["PE", "LĖ"], emoji: "🐭" },
+      { word: "SNIEGAS", syllables: ["SNIE", "GAS"], emoji: "🌨️" },
+      { word: "LŪPA", syllables: ["LŪ", "PA"], emoji: "👄" },
+      { word: "BATAI", syllables: ["BA", "TAI"], emoji: "👟" },
+      { word: "ŽĄSIS", syllables: ["ŽĄ", "SIS"], emoji: "🦢" },
+      { word: "UOGA", syllables: ["UO", "GA"], emoji: "🫐" },
+      { word: "BEŽDŽIONĖ", syllables: ["BEŽ", "DŽIO", "NĖ"], emoji: "🐒" },
+      { word: "VAIKAS", syllables: ["VAI", "KAS"], emoji: "👶" },
+      { word: "VARLĖ", syllables: ["VAR", "LĖ"], emoji: "🐸" },
+      { word: "NAMAS", syllables: ["NA", "MAS"], emoji: "🏠" },
+      { word: "SAULĖ", syllables: ["SAU", "LĖ"], emoji: "☀️" },
+      { word: "SŪRIS", syllables: ["SŪ", "RIS"], emoji: "🧀" },
+      { word: "LEDAI", syllables: ["LE", "DAI"], emoji: "🍦" },
+      { word: "LĖKTUVAS", syllables: ["LĖK", "TU", "VAS"], emoji: "✈️" },
+      { word: "ŽVAIGŽDĖ", syllables: ["ŽVAIGŽ", "DĖ"], emoji: "⭐" },
+      { word: "DUONA", syllables: ["DUO", "NA"], emoji: "🍞" },
+      { word: "KĖDĖ", syllables: ["KĖ", "DĖ"], emoji: "🪑" },
+      { word: "PIENAS", syllables: ["PIE", "NAS"], emoji: "🥛" },
+      { word: "MUSĖ", syllables: ["MU", "SĖ"], emoji: "🪰" },
+      { word: "ROŽĖ", syllables: ["RO", "ŽĖ"], emoji: "🌹" },
+      { word: "ORAS", syllables: ["O", "RAS"], emoji: "💨" },
+      { word: "BITĖ", syllables: ["BI", "TĖ"], emoji: "🐝" },
+      { word: "JŪRA", syllables: ["JŪ", "RA"], emoji: "🌊" },
+      { word: "ŽUVIS", syllables: ["ŽU", "VIS"], emoji: "🐟" },
+      { word: "LOVA", syllables: ["LO", "VA"], emoji: "🛌" },
+      { word: "NOSIS", syllables: ["NO", "SIS"], emoji: "👃" },
+      { word: "LAMA", syllables: ["LA", "MA"], emoji: "🦙" },
+      { word: "ŠOKOLADAS", syllables: ["ŠO", "KO", "LA", "DAS"], emoji: "🍫" },
+      { word: "VILKAS", syllables: ["VIL", "KAS"], emoji: "🐺" },
+      { word: "DVIRATIS", syllables: ["DVI", "RA", "TIS"], emoji: "🚲" },
+      { word: "MORKA", syllables: ["MOR", "KA"], emoji: "🥕" },
+      { word: "UPĖ", syllables: ["U", "PĖ"], emoji: "🏞️" },
+      { word: "MAMA", syllables: ["MA", "MA"], emoji: "👩" },
+      { word: "LĖLĖ", syllables: ["LĖ", "LĖ"], emoji: "🎎" },
+      { word: "DURYS", syllables: ["DU", "RYS"], emoji: "🚪" },
+      { word: "BANANAS", syllables: ["BA", "NA", "NAS"], emoji: "🍌" },
+      { word: "CITRINA", syllables: ["CIT", "RI", "NA"], emoji: "🍋" },
+      { word: "OBUOLYS", syllables: ["O", "BUO", "LYS"], emoji: "🍎" },
+      { word: "KROKODILAS", syllables: ["KRO", "KO", "DI", "LAS"], emoji: "🐊" },
+      { word: "DRAMBLYS", syllables: ["DRAM", "BLYS"], emoji: "🐘" },
+      { word: "RAKETA", syllables: ["RA", "KE", "TA"], emoji: "🚀" },
+      { word: "BRAŠKĖ", syllables: ["BRAŠ", "KĖ"], emoji: "🍓" },
+      { word: "TIGRAS", syllables: ["TIG", "RAS"], emoji: "🐅" },
+      { word: "ZEBRAS", syllables: ["ZEB", "RAS"], emoji: "🦓" }
+    ];
+
+    // Ryškios ir vaikams draugiškos spalvos skiemenims
+    const SYLLABLE_COLORS = [
+      "text-red-600",     // Raudona
+      "text-blue-600",    // Mėlyna
+      "text-green-600",   // Žalia
+      "text-orange-500",  // Oranžinė
+      "text-purple-600",  // Violetinė
+      "text-pink-600"     // Rausva
+    ];
+
+    const PRAISE_WORDS = ["Puiku!", "Šaunuolis!", "Teisingai!", "Nuostabu!", "Labai gerai!"];
+
+    // Fisher-Yates maišymo algoritmas
+    const shuffleArray = (array) => {
+      const shuffled = [...array];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled;
+    };
+
+    function App() {
+      const [gameState, setGameState] = useState('start');
+      const [score, setScore] = useState(0);
+      const [streak, setStreak] = useState(0);
+      const [currentWord, setCurrentWord] = useState(null);
+      const [options, setOptions] = useState([]);
+      const [selectedEmoji, setSelectedEmoji] = useState(null);
+      const [feedback, setFeedback] = useState(null);
+      const [wrongAnswers, setWrongAnswers] = useState(new Set());
+      const [hasExtraChance, setHasExtraChance] = useState(true);
+      
+      const [wordPool, setWordPool] = useState([]);
+
+      const audioCtxRef = useRef(null);
+
+      const initAudio = () => {
+        if (!audioCtxRef.current) {
+          audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtxRef.current.state === 'suspended') {
+          audioCtxRef.current.resume();
+        }
+      };
+
+      const playTone = (freq, type, duration, startTimeOffset = 0) => {
+        if (!audioCtxRef.current) return;
+        const ctx = audioCtxRef.current;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, ctx.currentTime + startTimeOffset);
+        
+        gain.gain.setValueAtTime(0.1, ctx.currentTime + startTimeOffset);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + startTimeOffset + duration);
+        
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        
+        osc.start(ctx.currentTime + startTimeOffset);
+        osc.stop(ctx.currentTime + startTimeOffset + duration);
+      };
+
+      const playCorrectSound = () => {
+        playTone(440, 'sine', 0.1, 0);    
+        playTone(554.37, 'sine', 0.1, 0.1); 
+        playTone(659.25, 'sine', 0.3, 0.2); 
+      };
+
+      const playIncorrectSound = () => {
+        playTone(200, 'triangle', 0.3, 0); 
+        playTone(150, 'triangle', 0.4, 0.15);
+      };
+
+      const playSelectSound = () => {
+        playTone(600, 'sine', 0.05, 0);
+      };
+
+      const getNextWord = useCallback(() => {
+        let currentPool = [...wordPool];
+        
+        if (currentPool.length === 0) {
+          currentPool = shuffleArray(WORDS_DATA);
+        }
+        
+        const nextItem = currentPool.pop();
+        setWordPool(currentPool);
+        
+        return nextItem;
+      }, [wordPool]);
+
+      const generateRound = useCallback(() => {
+        const correctItem = getNextWord();
+        
+        const otherItems = WORDS_DATA.filter(item => item.word !== correctItem.word);
+        const shuffledOthers = shuffleArray(otherItems);
+        const wrongOptions = shuffledOthers.slice(0, 9).map(item => item.emoji);
+        
+        const allOptions = shuffleArray([correctItem.emoji, ...wrongOptions]);
+        
+        setCurrentWord(correctItem);
+        setOptions(allOptions);
+        setSelectedEmoji(null);
+        setFeedback(null);
+        setWrongAnswers(new Set());
+        setHasExtraChance(true); 
+
+      }, [getNextWord]);
+
+      const startGame = () => {
+        initAudio();
+        setScore(0);
+        setStreak(0);
+        setWordPool(shuffleArray(WORDS_DATA));
+        setGameState('playing');
+      };
+
+      useEffect(() => {
+        if (gameState === 'playing' && currentWord === null) {
+          generateRound();
+        }
+      }, [gameState, currentWord, generateRound]);
+
+      const handleEmojiClick = (emoji) => {
+        if (feedback?.type === 'success' || wrongAnswers.has(emoji)) return;
+        playSelectSound();
+        setSelectedEmoji(emoji);
+        
+        // Slinkimas į viršų, kad patvirtinimo mygtukas būtų centre
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      };
+
+      const handleConfirmGuess = () => {
+        if (!selectedEmoji) return;
+
+        if (selectedEmoji === currentWord.emoji) {
+          playCorrectSound();
+          
+          const newStreak = streak + 1;
+          const pointsEarned = 10 + (Math.floor(newStreak / 5) * 5);
+          
+          setScore(prev => prev + pointsEarned);
+          setStreak(newStreak);
+          
+          const praise = PRAISE_WORDS[Math.floor(Math.random() * PRAISE_WORDS.length)];
+          setFeedback({ text: `${praise} +${pointsEarned}`, type: 'success' });
+          
+          setTimeout(() => {
+            generateRound();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }, 1500);
+
+        } else {
+          playIncorrectSound();
+          
+          if (hasExtraChance) {
+            setHasExtraChance(false);
+            setFeedback({ text: "Ne tas! Bandyk dar kartą (Serija išsaugota)", type: 'error' });
+          } else {
+            setStreak(0); 
+            setFeedback({ text: "Suklydai! Serija nutrūko.", type: 'error' });
+          }
+
+          setWrongAnswers(prev => new Set([...prev, selectedEmoji]));
+          setSelectedEmoji(null);
+          
+          setTimeout(() => {
+            setFeedback(prev => prev?.type === 'error' ? null : prev);
+          }, 2000);
+        }
+      };
+
+      if (gameState === 'start') {
+        return (
+          <div className="min-h-screen bg-blue-100 flex flex-col items-center justify-center p-4 font-sans text-center select-none">
+            <h1 className="text-5xl md:text-6xl font-extrabold text-blue-600 mb-6 drop-shadow-sm">
+              Skaitymo Žaidimas
+            </h1>
+            <p className="text-xl md:text-2xl text-gray-700 mb-8 max-w-lg">
+              Perskaityk žodį, pažymėk paveikslėlį ir paspausk „Patvirtinti“!
+            </p>
+            
+            <div className="text-8xl mb-8 animate-bounce">
+              🐶🐱🚗
+            </div>
+
+            <button 
+              onClick={startGame}
+              className="bg-green-500 hover:bg-green-600 text-white text-3xl font-bold py-6 px-12 rounded-full shadow-[0_8px_0_rgb(21,128,61)] active:shadow-[0_0px_0_rgb(21,128,61)] active:translate-y-2 transition-all cursor-pointer"
+            >
+              PRADĖTI!
+            </button>
+          </div>
+        );
+      }
+
+      return (
+        <div className="min-h-screen bg-yellow-50 flex flex-col items-center p-4 md:p-8 font-sans selection:bg-transparent pb-32 select-none">
+          
+          {/* Informacinė juosta */}
+          <div className="w-full max-w-4xl flex justify-between items-center mb-6 bg-white p-4 rounded-3xl shadow-md border-4 border-yellow-200">
+            <div className="flex flex-col items-center flex-1">
+              <span className="text-gray-500 uppercase font-bold text-xs md:text-sm tracking-wider">Taškai</span>
+              <span className="text-2xl md:text-4xl font-extrabold text-blue-600">{score}</span>
+            </div>
+            
+            {/* Papildomas šansas */}
+            <div className="flex flex-col items-center flex-1 border-x-2 border-gray-100 px-2">
+               <span className="text-gray-500 uppercase font-bold text-xs md:text-sm tracking-wider text-center">Šansas klaidai</span>
+               <div className="h-10 flex items-center justify-center">
+                 <span className={`text-3xl transition-all duration-300 ${hasExtraChance ? 'opacity-100 scale-100' : 'opacity-20 scale-75 grayscale'}`}>
+                   ❤️
+                 </span>
+               </div>
+            </div>
+
+            <div className="flex flex-col items-center flex-1">
+              <span className="text-gray-500 uppercase font-bold text-xs md:text-sm tracking-wider">Serija</span>
+              <div className="flex items-center justify-center h-10 w-full">
+                {streak > 0 ? (
+                  <span className="text-xl md:text-2xl font-bold text-orange-500 flex items-center whitespace-nowrap">
+                    {streak} <span className="text-2xl ml-1 animate-pulse">⭐</span>
+                  </span>
+                ) : (
+                  <span className="text-xl text-gray-300">-</span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Žodis (suskirstytas spalvotais skiemenimis) */}
+          <div className="w-full max-w-4xl flex flex-col items-center mb-4">
+            <h2 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-wide text-center uppercase break-all flex flex-wrap justify-center drop-shadow-sm">
+              {currentWord?.syllables.map((syl, index) => (
+                <span key={index} className={SYLLABLE_COLORS[index % SYLLABLE_COLORS.length]}>
+                  {syl}
+                </span>
+              ))}
+            </h2>
+            
+            {/* Pasirinktas emoji ir pranešimai */}
+            <div className="mt-4 flex flex-col items-center justify-center w-full min-h-[120px]">
+              {/* Pasirinkto emoji rodymas */}
+              <div className="h-24 flex items-center justify-center mb-2 w-full">
+                {selectedEmoji ? (
+                  <div className="text-7xl md:text-8xl drop-shadow-md transition-all scale-110 animate-[bounce_0.3s_ease-out_1]">
+                    {selectedEmoji}
+                  </div>
+                ) : (
+                  <div className="w-20 h-20 border-4 border-dashed border-gray-300 rounded-3xl flex items-center justify-center text-gray-300 text-4xl opacity-50">
+                    ?
+                  </div>
+                )}
+              </div>
+
+              {/* Klaidos/Sėkmės pranešimas */}
+              <div className="h-10 mt-2 flex items-center justify-center w-full">
+                {feedback && (
+                  <div className={`text-xl md:text-2xl font-bold px-6 py-2 rounded-full text-center ${
+                    feedback.type === 'success' 
+                      ? 'bg-green-100 text-green-600 border-2 border-green-400 animate-bounce' 
+                      : 'bg-red-100 text-red-600 border-2 border-red-400'
+                  }`}>
+                    {feedback.text}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Patvirtinimo mygtukas */}
+          <div className="h-20 mb-6 flex items-center justify-center w-full">
+             <button
+                onClick={handleConfirmGuess}
+                disabled={!selectedEmoji || feedback?.type === 'success'}
+                className={`
+                  text-2xl md:text-3xl font-bold py-4 px-10 rounded-full transition-all w-full max-w-md
+                  ${selectedEmoji && feedback?.type !== 'success'
+                    ? 'bg-blue-500 hover:bg-blue-600 text-white shadow-[0_6px_0_rgb(29,78,216)] active:shadow-[0_0px_0_rgb(29,78,216)] active:translate-y-[6px] animate-pulse cursor-pointer' 
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-70'}
+                `}
+              >
+                PATVIRTINTI
+              </button>
+          </div>
+
+          {/* Tinklelis */}
+          <div className="w-full max-w-3xl grid grid-cols-2 sm:grid-cols-5 gap-4 md:gap-6 mt-2">
+            {options.map((emoji, index) => {
+              const isWrong = wrongAnswers.has(emoji);
+              const isSelected = selectedEmoji === emoji;
+              const isCorrectAndFound = feedback?.type === 'success' && emoji === currentWord?.emoji;
+              
+              return (
+                <button
+                  key={index}
+                  onClick={() => handleEmojiClick(emoji)}
+                  disabled={isWrong || feedback?.type === 'success'}
+                  className={`
+                    aspect-square flex items-center justify-center text-6xl md:text-7xl bg-white rounded-3xl shadow-md
+                    border-4 transition-all duration-200 cursor-pointer
+                    ${isWrong ? 'opacity-30 grayscale cursor-not-allowed scale-95 border-gray-200' : 'border-gray-100 hover:border-blue-200 hover:scale-[1.02]'}
+                    ${isSelected && !isCorrectAndFound ? 'border-blue-500 bg-blue-50 scale-105 shadow-lg shadow-blue-200 ring-4 ring-blue-300 ring-opacity-50' : ''}
+                    ${isCorrectAndFound ? 'scale-110 border-green-500 bg-green-50 shadow-green-200 shadow-xl z-10' : ''}
+                  `}
+                  style={{
+                    animation: isWrong && feedback?.type === 'error' ? 'shake 0.4s cubic-bezier(.36,.07,.19,.97) both' : 'none'
+                  }}
+                >
+                  {emoji}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      );
+    }
+
+    // Aplikacijos paleidimas
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
