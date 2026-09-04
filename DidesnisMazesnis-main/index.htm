@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Didesnis ar Mažesnis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+            background-color: #e0f2fe;
+            background-image: radial-gradient(#bae6fd 20%, transparent 20%);
+            background-size: 40px 40px;
+            overflow: hidden;
+        }
+        .bounce { animation: bounce 0.5s; }
+        .shake { animation: shake 0.5s; }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        .btn-hover:active { transform: scale(0.95); }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <!-- Start Screen -->
+    <div id="start-screen" class="bg-white rounded-3xl p-8 shadow-2xl text-center max-w-md w-full border-4 border-sky-300">
+        <h1 class="text-4xl md:text-5xl font-black text-sky-600 mb-2">⚖️ Didesnis ar Mažesnis</h1>
+        <p class="text-xl text-sky-500 mb-8 font-bold">Palygink skaičius!</p>
+        
+        <div class="space-y-4">
+            <button onclick="startGame(20)" class="w-full btn-hover bg-green-500 text-white text-2xl font-black py-4 rounded-2xl shadow-[0_6px_0_#16a34a] hover:bg-green-400 transition-colors">
+                Iki 20
+            </button>
+            <button onclick="startGame(100)" class="w-full btn-hover bg-orange-500 text-white text-2xl font-black py-4 rounded-2xl shadow-[0_6px_0_#ea580c] hover:bg-orange-400 transition-colors">
+                Iki 100
+            </button>
+        </div>
+    </div>
+
+    <!-- Game Screen -->
+    <div id="game-screen" class="hidden bg-white rounded-3xl p-6 md:p-8 shadow-2xl text-center max-w-lg w-full border-4 border-sky-300">
+        <div class="flex justify-between items-center mb-6">
+            <div class="text-2xl font-bold text-yellow-500">⭐ <span id="score">0</span></div>
+            <div class="text-xl font-bold text-sky-500">Klausimas: <span id="question-counter">1</span> / 15</div>
+            <div class="text-xl font-bold text-red-500">🔥 <span id="streak">0</span></div>
+        </div>
+
+        <div class="flex items-center justify-center gap-4 my-10">
+            <div id="num1" class="text-6xl md:text-8xl font-black text-sky-600 w-32 text-right">0</div>
+            <div id="operator" class="text-5xl md:text-7xl font-black text-gray-300 w-16 text-center">?</div>
+            <div id="num2" class="text-6xl md:text-8xl font-black text-sky-600 w-32 text-left">0</div>
+        </div>
+
+        <div id="feedback" class="text-2xl font-bold h-8 mb-4 opacity-0 transition-opacity">Puiku!</div>
+
+        <div class="flex justify-center gap-4 mb-4">
+            <button onclick="checkAnswer('<')" class="btn-hover flex-1 bg-purple-500 text-white text-5xl md:text-6xl font-black py-6 rounded-2xl shadow-[0_8px_0_#7e22ce] active:shadow-[0_0px_0_#7e22ce] active:translate-y-[8px] transition-all">&lt;</button>
+            <button onclick="checkAnswer('=')" class="btn-hover flex-1 bg-yellow-400 text-white text-5xl md:text-6xl font-black py-6 rounded-2xl shadow-[0_8px_0_#ca8a04] active:shadow-[0_0px_0_#ca8a04] active:translate-y-[8px] transition-all">=</button>
+            <button onclick="checkAnswer('>')" class="btn-hover flex-1 bg-pink-500 text-white text-5xl md:text-6xl font-black py-6 rounded-2xl shadow-[0_8px_0_#be185d] active:shadow-[0_0px_0_#be185d] active:translate-y-[8px] transition-all">&gt;</button>
+        </div>
+    </div>
+
+    <!-- End Screen -->
+    <div id="end-screen" class="hidden bg-white rounded-3xl p-8 shadow-2xl text-center max-w-md w-full border-4 border-sky-300">
+        <h2 class="text-4xl font-black text-sky-600 mb-4">Žaidimas baigtas!</h2>
+        <div id="stars" class="text-6xl mb-6 tracking-widest text-yellow-400">⭐⭐⭐</div>
+        <p class="text-2xl font-bold text-gray-700 mb-8">Teisingai: <span id="final-score" class="text-sky-500">15</span> / 15</p>
+        
+        <div class="space-y-4">
+            <button onclick="restartGame()" class="w-full btn-hover bg-sky-500 text-white text-2xl font-black py-4 rounded-2xl shadow-[0_6px_0_#0284c7] hover:bg-sky-400 transition-colors">
+                Dar kartą
+            </button>
+            <button onclick="goToMenu()" class="w-full btn-hover bg-gray-300 text-gray-700 text-2xl font-black py-4 rounded-2xl shadow-[0_6px_0_#9ca3af] hover:bg-gray-200 transition-colors">
+                Iš pradžių
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            if (type === 'correct') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'win') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(554, audioCtx.currentTime + 0.1);
+                osc.frequency.setValueAtTime(659, audioCtx.currentTime + 0.2);
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.3);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.6);
+            }
+        }
+
+        let maxNum = 20;
+        let score = 0;
+        let currentQuestion = 0;
+        const totalQuestions = 15;
+        let currentNum1 = 0;
+        let currentNum2 = 0;
+        let streak = 0;
+        let isWaiting = false;
+
+        const screens = {
+            start: document.getElementById('start-screen'),
+            game: document.getElementById('game-screen'),
+            end: document.getElementById('end-screen')
+        };
+
+        function showScreen(name) {
+            Object.values(screens).forEach(s => s.classList.add('hidden'));
+            screens[name].classList.remove('hidden');
+        }
+
+        function startGame(max) {
+            maxNum = max;
+            score = 0;
+            currentQuestion = 0;
+            streak = 0;
+            updateStats();
+            showScreen('game');
+            nextQuestion();
+        }
+
+        function restartGame() {
+            startGame(maxNum);
+        }
+
+        function goToMenu() {
+            showScreen('start');
+        }
+
+        function generateNumbers() {
+            if (Math.random() < 0.2) {
+                const n = Math.floor(Math.random() * (maxNum + 1));
+                return [n, n];
+            }
+            
+            let n1 = Math.floor(Math.random() * (maxNum + 1));
+            let n2 = Math.floor(Math.random() * (maxNum + 1));
+            
+            if (maxNum === 100 && Math.random() < 0.3) {
+                n2 = n1 + Math.floor(Math.random() * 11) - 5;
+                if (n2 < 0) n2 = 0;
+                if (n2 > 100) n2 = 100;
+            }
+            
+            while (n1 === n2) {
+                n2 = Math.floor(Math.random() * (maxNum + 1));
+            }
+            return [n1, n2];
+        }
+
+        function nextQuestion() {
+            if (currentQuestion >= totalQuestions) {
+                endGame();
+                return;
+            }
+            currentQuestion++;
+            updateStats();
+            
+            [currentNum1, currentNum2] = generateNumbers();
+            document.getElementById('num1').textContent = currentNum1;
+            document.getElementById('num2').textContent = currentNum2;
+            document.getElementById('operator').textContent = '?';
+            document.getElementById('operator').className = 'text-5xl md:text-7xl font-black text-gray-300 w-16 text-center';
+            document.getElementById('feedback').style.opacity = '0';
+            
+            document.getElementById('num1').classList.remove('shake', 'bounce', 'text-red-500', 'text-green-500');
+            document.getElementById('num2').classList.remove('shake', 'bounce', 'text-red-500', 'text-green-500');
+            document.getElementById('num1').classList.add('text-sky-600');
+            document.getElementById('num2').classList.add('text-sky-600');
+            
+            isWaiting = false;
+        }
+
+        function updateStats() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('question-counter').textContent = currentQuestion;
+            document.getElementById('streak').textContent = streak;
+        }
+
+        function checkAnswer(answer) {
+            if (isWaiting) return;
+            isWaiting = true;
+
+            let correct = false;
+            let correctAnswer = '';
+            
+            if (currentNum1 > currentNum2) correctAnswer = '>';
+            else if (currentNum1 < currentNum2) correctAnswer = '<';
+            else correctAnswer = '=';
+
+            correct = (answer === correctAnswer);
+
+            const feedback = document.getElementById('feedback');
+            const op = document.getElementById('operator');
+            
+            op.textContent = correct ? answer : correctAnswer;
+
+            if (correct) {
+                score++;
+                streak++;
+                playSound('correct');
+                feedback.textContent = ['Puiku!', 'Šaunuolis!', 'Teisingai!'][Math.floor(Math.random() * 3)];
+                feedback.className = 'text-2xl font-bold h-8 mb-4 text-green-500';
+                
+                document.getElementById('num1').classList.add('bounce', 'text-green-500');
+                document.getElementById('num2').classList.add('bounce', 'text-green-500');
+                document.getElementById('num1').classList.remove('text-sky-600');
+                document.getElementById('num2').classList.remove('text-sky-600');
+                op.className = 'text-5xl md:text-7xl font-black text-green-500 w-16 text-center bounce';
+            } else {
+                streak = 0;
+                playSound('wrong');
+                feedback.textContent = `${currentNum1} ${correctAnswer} ${currentNum2}`;
+                feedback.className = 'text-2xl font-bold h-8 mb-4 text-red-500';
+                
+                document.getElementById('num1').classList.add('shake', 'text-red-500');
+                document.getElementById('num2').classList.add('shake', 'text-red-500');
+                document.getElementById('num1').classList.remove('text-sky-600');
+                document.getElementById('num2').classList.remove('text-sky-600');
+                op.className = 'text-5xl md:text-7xl font-black text-red-500 w-16 text-center shake';
+            }
+            
+            feedback.style.opacity = '1';
+            updateStats();
+
+            setTimeout(nextQuestion, 1500);
+        }
+
+        function endGame() {
+            showScreen('end');
+            playSound('win');
+            document.getElementById('final-score').textContent = score;
+            
+            let starsStr = '';
+            if (score >= 13) starsStr = '⭐⭐⭐';
+            else if (score >= 10) starsStr = '⭐⭐';
+            else starsStr = '⭐';
+            
+            document.getElementById('stars').textContent = starsStr;
+        }
+    </script>
+</body>
+</html>

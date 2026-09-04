@@ -668,53 +668,53 @@
 
             {/* --- PLAY EKRANAS --- */}
             {gameState === 'play' && (
-              <div className="flex flex-col h-screen max-h-screen overflow-hidden animate-[fadeIn_0.3s_ease-out]">
-                <div className="bg-blue-500 text-white p-3 sm:p-4 rounded-b-3xl shadow-md flex flex-col gap-2 sm:gap-4 relative z-10 shrink-0 pt-safe">
+              <div className="flex flex-col h-screen max-h-screen justify-between overflow-y-auto animate-[fadeIn_0.3s_ease-out]">
+                <div className="bg-blue-500 text-white p-2 sm:p-3 rounded-b-2xl shadow-md flex flex-col gap-1.5 sm:gap-2 relative z-10 shrink-0">
                   <div className="flex justify-between items-center px-1 sm:px-2">
                     <button 
                       onClick={handleSetupClick}
-                      className="text-blue-100 hover:text-white flex items-center gap-1 text-xs sm:text-sm font-medium bg-blue-600 px-3 py-1.5 rounded-full relative pr-6"
+                      className="text-blue-100 hover:text-white flex items-center gap-1 text-xs sm:text-sm font-medium bg-blue-600 px-2.5 py-1 rounded-full relative pr-5"
                     >
-                      <Icon name="settings" className="w-3 h-3 sm:w-4 sm:h-4 inline" /> Tėveliams
-                      <Icon name="lock" className="w-2.5 h-2.5 sm:w-3 sm:h-3 absolute right-2" />
+                      <Icon name="settings" className="w-3 h-3 sm:w-3.5 sm:h-3.5 inline" /> Tėveliams
+                      <Icon name="lock" className="w-2.5 h-2.5 absolute right-1.5" />
                     </button>
-                    <div className="text-blue-100 font-bold bg-blue-600/50 px-4 py-1.5 rounded-full text-sm sm:text-base tracking-widest">
+                    <div className="text-blue-100 font-bold bg-blue-600/50 px-3 py-1 rounded-full text-xs sm:text-sm tracking-widest">
                       {currentIndex + 1} / {phrases.length}
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-1.5">
                       <button 
                         onClick={speakText}
-                        className="p-2 sm:p-3 bg-blue-400 hover:bg-blue-300 rounded-full transition-colors shadow-sm"
+                        className="p-1.5 sm:p-2 bg-blue-400 hover:bg-blue-300 rounded-full transition-colors shadow-sm"
                         title="Skaityti balsu"
                       >
-                        <Icon name="volume2" className="w-5 h-5 sm:w-6 sm:h-6" />
+                        <Icon name="volume2" className="w-4 h-4 sm:w-5 sm:h-5" />
                       </button>
                       <button 
                         onClick={handleEyeClick}
-                        className="p-2 sm:p-3 bg-blue-400 hover:bg-blue-300 rounded-full transition-colors shadow-sm relative"
+                        className="p-1.5 sm:p-2 bg-blue-400 hover:bg-blue-300 rounded-full transition-colors shadow-sm relative"
                       >
-                        <Icon name={isTargetVisible ? "eyeOff" : "eye"} className="w-5 h-5 sm:w-6 sm:h-6" />
-                        {!isTargetVisible && <Icon name="lock" className="w-3 h-3 absolute bottom-0.5 right-0.5 text-blue-100" />}
+                        <Icon name={isTargetVisible ? "eyeOff" : "eye"} className="w-4 h-4 sm:w-5 sm:h-5" />
+                        {!isTargetVisible && <Icon name="lock" className="w-2.5 h-2.5 absolute bottom-0.5 right-0.5 text-blue-100" />}
                       </button>
                     </div>
                   </div>
                   
-                  <div className="text-center flex items-center justify-center pb-2 min-h-[3rem]">
+                  <div className="text-center flex items-center justify-center pb-1 min-h-[2rem] sm:min-h-[2.5rem]">
                     {isTargetVisible ? (
-                      <h2 className="text-2xl sm:text-4xl font-bold tracking-wide break-words px-2 uppercase line-clamp-2">
+                      <h2 className="text-xl sm:text-3xl font-bold tracking-wide break-words px-2 uppercase line-clamp-2">
                         {phrases[currentIndex]}
                       </h2>
                     ) : (
-                      <h2 className="text-xl sm:text-3xl font-medium text-blue-200 italic">
+                      <h2 className="text-lg sm:text-2xl font-medium text-blue-200 italic">
                         Paklausyk ir parašyk!
                       </h2>
                     )}
                   </div>
                 </div>
 
-                <div className="flex flex-col items-center justify-center p-3 sm:p-4 w-full shrink-0">
+                <div className="flex flex-col items-center justify-center p-2 sm:p-3 w-full shrink-0">
                   <div 
-                    className={`w-full max-w-xl bg-white border-4 border-dashed rounded-2xl sm:rounded-3xl p-4 sm:p-6 shadow-inner relative flex items-center justify-center min-h-[100px] sm:min-h-[120px] transition-colors
+                    className={`w-full max-w-xl bg-white border-4 border-dashed rounded-2xl p-3 sm:p-4 shadow-inner relative flex items-center justify-center min-h-[70px] sm:min-h-[90px] transition-colors
                       ${isReviewingErrors ? 'border-orange-300 bg-orange-50/50' : 'border-gray-300'}
                     `}
                     onClick={() => {
@@ -723,29 +723,29 @@
                       }
                     }}
                   >
-                    <div className="text-3xl sm:text-4xl lg:text-5xl leading-[1.6] sm:leading-[1.8] text-center w-full select-none font-mono tracking-wide flex flex-wrap justify-center items-center content-center gap-y-2">
+                    <div className="text-2xl sm:text-3xl lg:text-4xl leading-[1.4] sm:leading-[1.6] text-center w-full select-none font-mono tracking-wide flex flex-wrap justify-center items-center content-center gap-y-1">
                       {renderTextContent()}
                     </div>
                   </div>
                 </div>
                 
-                <div className="h-10 sm:h-12 w-full px-4 flex items-center justify-center shrink-0">
+                <div className="h-7 sm:h-8 w-full px-4 flex items-center justify-center shrink-0">
                   {feedbackMsg && (
-                    <div className={`px-4 py-2 rounded-xl sm:rounded-2xl font-medium text-sm sm:text-lg shadow-sm border text-center w-full max-w-xl truncate flex items-center justify-center gap-2 animate-in slide-in-from-bottom-2 ${isReviewingErrors ? 'bg-orange-100 text-orange-700 border-orange-200' : 'bg-blue-50 text-blue-700 border-blue-200'}`}>
-                      <Icon name={isReviewingErrors ? "xCircle" : "pencil"} className="w-5 h-5 inline" />
+                    <div className={`px-3 py-1 rounded-xl font-medium text-xs sm:text-sm shadow-sm border text-center w-full max-w-xl truncate flex items-center justify-center gap-1.5 animate-in slide-in-from-bottom-2 ${isReviewingErrors ? 'bg-orange-100 text-orange-700 border-orange-200' : 'bg-blue-50 text-blue-700 border-blue-200'}`}>
+                      <Icon name={isReviewingErrors ? "xCircle" : "pencil"} className="w-4 h-4 inline" />
                       {feedbackMsg}
                     </div>
                   )}
                 </div>
 
-                <div className={`w-full px-1 sm:px-4 flex flex-col gap-1.5 sm:gap-2.5 max-w-xl mx-auto mt-auto pb-2 shrink-0 transition-opacity duration-300 ${isReviewingErrors ? 'opacity-40 pointer-events-none' : 'opacity-100'}`}>
+                <div className={`w-full px-1 sm:px-3 flex flex-col gap-1 sm:gap-1.5 max-w-xl mx-auto mt-auto shrink-0 transition-opacity duration-300 ${isReviewingErrors ? 'opacity-40 pointer-events-none' : 'opacity-100'}`}>
                   {keyboardRows.map((row, rowIndex) => (
-                    <div key={rowIndex} className="flex justify-center gap-1 sm:gap-2 w-full">
+                    <div key={rowIndex} className="flex justify-center gap-1 sm:gap-1.5 w-full">
                       {row.map((key) => (
                         <button
                           key={key}
                           onClick={() => handleKeyPress(key)}
-                          className="flex-1 max-w-[45px] sm:max-w-[60px] h-12 sm:h-16 bg-white border-b-[3px] sm:border-b-4 border-gray-200 rounded-lg sm:rounded-xl text-xl sm:text-3xl font-bold text-gray-700 active:border-b-0 active:translate-y-1 active:bg-gray-100 transition-all shadow-sm flex items-center justify-center"
+                          className="flex-1 max-w-[42px] sm:max-w-[55px] h-10 sm:h-12 md:h-13 bg-white border-b-[3px] border-gray-200 rounded-lg sm:rounded-xl text-lg sm:text-2xl font-bold text-gray-700 active:border-b-0 active:translate-y-1 active:bg-gray-100 transition-all shadow-sm flex items-center justify-center"
                         >
                           {key}
                         </button>
@@ -753,38 +753,38 @@
                     </div>
                   ))}
                   
-                  <div className="flex justify-center gap-1.5 sm:gap-2 w-full mt-1 sm:mt-2">
+                  <div className="flex justify-center gap-1 sm:gap-1.5 w-full mt-0.5 sm:mt-1">
                     <button
                       onClick={() => handleKeyPress('SPACE')}
-                      className="flex-1 h-12 sm:h-16 bg-white border-b-[3px] sm:border-b-4 border-gray-200 rounded-lg sm:rounded-xl text-gray-700 active:border-b-0 active:translate-y-1 active:bg-gray-100 transition-all shadow-sm flex items-center justify-center font-bold text-lg sm:text-2xl uppercase tracking-wider"
+                      className="flex-1 h-10 sm:h-12 md:h-13 bg-white border-b-[3px] border-gray-200 rounded-lg sm:rounded-xl text-gray-700 active:border-b-0 active:translate-y-1 active:bg-gray-100 transition-all shadow-sm flex items-center justify-center font-bold text-base sm:text-xl uppercase tracking-wider"
                     >
                       Tarpas
                     </button>
                     
                     <button
                       onClick={() => handleKeyPress('BACKSPACE')}
-                      className="w-16 sm:w-24 h-12 sm:h-16 bg-red-100 border-b-[3px] sm:border-b-4 border-red-300 rounded-lg sm:rounded-xl text-red-700 active:border-b-0 active:translate-y-1 active:bg-red-200 transition-all shadow-sm flex items-center justify-center"
+                      className="w-14 sm:w-20 h-10 sm:h-12 md:h-13 bg-red-100 border-b-[3px] border-red-300 rounded-lg sm:rounded-xl text-red-700 active:border-b-0 active:translate-y-1 active:bg-red-200 transition-all shadow-sm flex items-center justify-center"
                     >
-                      <Icon name="delete" className="w-6 h-6 sm:w-8 sm:h-8" />
+                      <Icon name="delete" className="w-5 h-5 sm:w-6 sm:h-6" />
                     </button>
                   </div>
                 </div>
 
-                <div className="px-2 sm:px-4 mt-2 sm:mt-4 mb-4 sm:mb-6 max-w-xl mx-auto w-full shrink-0 pb-safe">
+                <div className="px-2 sm:px-4 mt-2 mb-3 max-w-xl mx-auto w-full shrink-0">
                   {isReviewingErrors ? (
                     <button
                       onClick={handleFixErrors}
-                      className="w-full bg-orange-500 hover:bg-orange-600 text-white text-xl sm:text-3xl font-bold py-3 sm:py-5 rounded-xl sm:rounded-2xl shadow-[0_4px_0_rgb(234,88,12)] sm:shadow-[0_6px_0_rgb(234,88,12)] active:shadow-none active:translate-y-[4px] sm:active:translate-y-[6px] transition-all flex justify-center items-center gap-2 sm:gap-3 uppercase tracking-wide animate-pulse"
+                      className="w-full bg-orange-500 hover:bg-orange-600 text-white text-lg sm:text-2xl font-bold py-2.5 sm:py-3.5 rounded-xl shadow-[0_4px_0_rgb(234,88,12)] active:shadow-none active:translate-y-[4px] transition-all flex justify-center items-center gap-2 uppercase tracking-wide animate-pulse"
                     >
-                      <Icon name="pencil" className="w-6 h-6 sm:w-8 sm:h-8 inline" />
+                      <Icon name="pencil" className="w-5 h-5 sm:w-6 sm:h-6 inline" />
                       Taisyti klaidas
                     </button>
                   ) : (
                     <button
                       onClick={checkAnswer}
-                      className="w-full bg-green-500 hover:bg-green-600 text-white text-xl sm:text-3xl font-bold py-3 sm:py-5 rounded-xl sm:rounded-2xl shadow-[0_4px_0_rgb(22,163,74)] sm:shadow-[0_6px_0_rgb(22,163,74)] active:shadow-none active:translate-y-[4px] sm:active:translate-y-[6px] transition-all flex justify-center items-center gap-2 sm:gap-3 uppercase tracking-wide"
+                      className="w-full bg-green-500 hover:bg-green-600 text-white text-lg sm:text-2xl font-bold py-2.5 sm:py-3.5 rounded-xl shadow-[0_4px_0_rgb(22,163,74)] active:shadow-none active:translate-y-[4px] transition-all flex justify-center items-center gap-2 uppercase tracking-wide"
                     >
-                      <Icon name="checkCircle2" className="w-6 h-6 sm:w-8 sm:h-8 inline" />
+                      <Icon name="checkCircle2" className="w-5 h-5 sm:w-6 sm:h-6 inline" />
                       Patikrinti
                     </button>
                   )}

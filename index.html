@@ -55,55 +55,118 @@
 <body class="min-h-screen text-slate-800 flex flex-col items-center">
 
     <!-- Menu Screen -->
-    <div id="menu" class="w-full max-w-4xl px-4 py-8 flex flex-col items-center">
+    <div id="menu" class="w-full max-w-6xl px-4 py-8 flex flex-col items-center">
         <h1 class="text-4xl md:text-5xl font-black text-center mt-4 mb-10 text-white drop-shadow-md" 
             style="text-shadow: 3px 3px 0 #22c55e, -2px -2px 0 #22c55e, 2px -2px 0 #22c55e, -2px 2px 0 #22c55e;">
             🦉 Žaidimai Vaikams 🦉
         </h1>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 w-full">
             <!-- Card 1 -->
-            <button onclick="showGame('LinksmiSkaiciai-main/index.htm')" class="card-3d bg-sky-100 hover:bg-sky-50 border-sky-400 border-2 border-b-[8px] rounded-3xl p-6 flex items-center shadow-xl transform hover:-translate-y-1 text-left w-full group">
-                <div class="text-6xl mr-4 flex-shrink-0 group-hover:scale-110 transition-transform">🔢</div>
+            <button onclick="showGame('LinksmiSkaiciai-main/index.htm')" class="card-3d bg-sky-100 hover:bg-sky-50 border-sky-400 border-2 border-b-[8px] rounded-3xl p-5 flex items-center shadow-xl transform hover:-translate-y-1 text-left w-full group">
+                <div class="text-5xl sm:text-6xl mr-4 flex-shrink-0 group-hover:scale-110 transition-transform">🔢</div>
                 <div>
-                    <h2 class="text-2xl md:text-3xl font-extrabold text-sky-800 mb-1">Linksmoji Matematika</h2>
-                    <p class="text-sky-700 font-bold text-lg md:text-xl leading-tight">Sudėk ir atimk skaičius!</p>
+                    <h2 class="text-xl sm:text-2xl font-extrabold text-sky-800 mb-1">Linksmoji Matematika</h2>
+                    <p class="text-sky-700 font-bold text-sm sm:text-base leading-tight">Sudėk ir atimk skaičius!</p>
                 </div>
             </button>
 
             <!-- Card 2 -->
-            <button onclick="showGame('MokomesRasyti-main/index.htm')" class="card-3d bg-green-100 hover:bg-green-50 border-green-500 border-2 border-b-[8px] rounded-3xl p-6 flex items-center shadow-xl transform hover:-translate-y-1 text-left w-full group">
-                <div class="text-6xl mr-4 flex-shrink-0 group-hover:scale-110 transition-transform">✍️</div>
+            <button onclick="showGame('MokomesRasyti-main/index.htm')" class="card-3d bg-green-100 hover:bg-green-50 border-green-500 border-2 border-b-[8px] rounded-3xl p-5 flex items-center shadow-xl transform hover:-translate-y-1 text-left w-full group">
+                <div class="text-5xl sm:text-6xl mr-4 flex-shrink-0 group-hover:scale-110 transition-transform">✍️</div>
                 <div>
-                    <h2 class="text-2xl md:text-3xl font-extrabold text-green-800 mb-1">Mokomės Rašyti</h2>
-                    <p class="text-green-700 font-bold text-lg md:text-xl leading-tight">Rašyk žodžius ir sakinius!</p>
+                    <h2 class="text-xl sm:text-2xl font-extrabold text-green-800 mb-1">Mokomės Rašyti</h2>
+                    <p class="text-green-700 font-bold text-sm sm:text-base leading-tight">Rašyk žodžius ir sakinius!</p>
                 </div>
             </button>
 
             <!-- Card 3 -->
-            <button onclick="showGame('RaidziuDelione-main/Index.htm')" class="card-3d bg-indigo-100 hover:bg-indigo-50 border-indigo-400 border-2 border-b-[8px] rounded-3xl p-6 flex items-center shadow-xl transform hover:-translate-y-1 text-left w-full group">
-                <div class="text-6xl mr-4 flex-shrink-0 group-hover:scale-110 transition-transform">🧩</div>
+            <button onclick="showGame('RaidziuDelione-main/Index.htm')" class="card-3d bg-indigo-100 hover:bg-indigo-50 border-indigo-400 border-2 border-b-[8px] rounded-3xl p-5 flex items-center shadow-xl transform hover:-translate-y-1 text-left w-full group">
+                <div class="text-5xl sm:text-6xl mr-4 flex-shrink-0 group-hover:scale-110 transition-transform">🧩</div>
                 <div>
-                    <h2 class="text-2xl md:text-3xl font-extrabold text-indigo-800 mb-1">Raidžių Dėlionė</h2>
-                    <p class="text-indigo-700 font-bold text-lg md:text-xl leading-tight">Sudėliok žodį iš raidžių!</p>
+                    <h2 class="text-xl sm:text-2xl font-extrabold text-indigo-800 mb-1">Raidžių Dėlionė</h2>
+                    <p class="text-indigo-700 font-bold text-sm sm:text-base leading-tight">Sudėliok žodį iš raidžių!</p>
                 </div>
             </button>
 
             <!-- Card 4 -->
-            <button onclick="showGame('SkaitymoZaidimas-main/index.htm')" class="card-3d bg-amber-100 hover:bg-amber-50 border-amber-400 border-2 border-b-[8px] rounded-3xl p-6 flex items-center shadow-xl transform hover:-translate-y-1 text-left w-full group">
-                <div class="text-6xl mr-4 flex-shrink-0 group-hover:scale-110 transition-transform">📖</div>
+            <button onclick="showGame('SkaitymoZaidimas-main/index.htm')" class="card-3d bg-amber-100 hover:bg-amber-50 border-amber-400 border-2 border-b-[8px] rounded-3xl p-5 flex items-center shadow-xl transform hover:-translate-y-1 text-left w-full group">
+                <div class="text-5xl sm:text-6xl mr-4 flex-shrink-0 group-hover:scale-110 transition-transform">📖</div>
                 <div>
-                    <h2 class="text-2xl md:text-3xl font-extrabold text-amber-800 mb-1">Skaitymo Žaidimas</h2>
-                    <p class="text-amber-700 font-bold text-lg md:text-xl leading-tight">Perskaityk ir surask paveikslėlį!</p>
+                    <h2 class="text-xl sm:text-2xl font-extrabold text-amber-800 mb-1">Skaitymo Žaidimas</h2>
+                    <p class="text-amber-700 font-bold text-sm sm:text-base leading-tight">Perskaityk ir surask paveikslėlį!</p>
                 </div>
             </button>
 
             <!-- Card 5 -->
-            <button onclick="showGame('TrukstaRaides-main/index.htm')" class="card-3d bg-rose-100 hover:bg-rose-50 border-rose-400 border-2 border-b-[8px] rounded-3xl p-6 flex items-center shadow-xl transform hover:-translate-y-1 text-left w-full group">
-                <div class="text-6xl mr-4 flex-shrink-0 group-hover:scale-110 transition-transform">🔤</div>
+            <button onclick="showGame('TrukstaRaides-main/index.htm')" class="card-3d bg-rose-100 hover:bg-rose-50 border-rose-400 border-2 border-b-[8px] rounded-3xl p-5 flex items-center shadow-xl transform hover:-translate-y-1 text-left w-full group">
+                <div class="text-5xl sm:text-6xl mr-4 flex-shrink-0 group-hover:scale-110 transition-transform">🔤</div>
                 <div>
-                    <h2 class="text-2xl md:text-3xl font-extrabold text-rose-800 mb-1">Trūksta Raidės</h2>
-                    <p class="text-rose-700 font-bold text-lg md:text-xl leading-tight">Įrašyk trūkstamą raidę į žodį!</p>
+                    <h2 class="text-xl sm:text-2xl font-extrabold text-rose-800 mb-1">Trūksta Raidės</h2>
+                    <p class="text-rose-700 font-bold text-sm sm:text-base leading-tight">Įrašyk trūkstamą raidę į žodį!</p>
+                </div>
+            </button>
+
+            <!-- Card 6 -->
+            <button onclick="showGame('LaikrodzioZaidimas-main/index.htm')" class="card-3d bg-teal-100 hover:bg-teal-50 border-teal-400 border-2 border-b-[8px] rounded-3xl p-5 flex items-center shadow-xl transform hover:-translate-y-1 text-left w-full group">
+                <div class="text-5xl sm:text-6xl mr-4 flex-shrink-0 group-hover:scale-110 transition-transform">🕐</div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-extrabold text-teal-800 mb-1">Laikrodžio Žaidimas</h2>
+                    <p class="text-teal-700 font-bold text-sm sm:text-base leading-tight">Mokykis atpažinti laiką!</p>
+                </div>
+            </button>
+
+            <!-- Card 7 -->
+            <button onclick="showGame('AtmintiesZaidimas-main/index.htm')" class="card-3d bg-violet-100 hover:bg-violet-50 border-violet-400 border-2 border-b-[8px] rounded-3xl p-5 flex items-center shadow-xl transform hover:-translate-y-1 text-left w-full group">
+                <div class="text-5xl sm:text-6xl mr-4 flex-shrink-0 group-hover:scale-110 transition-transform">🃏</div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-extrabold text-violet-800 mb-1">Atminties Žaidimas</h2>
+                    <p class="text-violet-700 font-bold text-sm sm:text-base leading-tight">Surask emoji ir žodžio poras!</p>
+                </div>
+            </button>
+
+            <!-- Card 8 -->
+            <button onclick="showGame('DidesnisMazesnis-main/index.htm')" class="card-3d bg-emerald-100 hover:bg-emerald-50 border-emerald-500 border-2 border-b-[8px] rounded-3xl p-5 flex items-center shadow-xl transform hover:-translate-y-1 text-left w-full group">
+                <div class="text-5xl sm:text-6xl mr-4 flex-shrink-0 group-hover:scale-110 transition-transform">⚖️</div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-extrabold text-emerald-800 mb-1">Didesnis ar Mažesnis</h2>
+                    <p class="text-emerald-700 font-bold text-sm sm:text-base leading-tight">Palygink skaičius: &gt;, &lt; arba =!</p>
+                </div>
+            </button>
+
+            <!-- Card 9 -->
+            <button onclick="showGame('SkaiciuEilute-main/index.htm')" class="card-3d bg-fuchsia-100 hover:bg-fuchsia-50 border-fuchsia-400 border-2 border-b-[8px] rounded-3xl p-5 flex items-center shadow-xl transform hover:-translate-y-1 text-left w-full group">
+                <div class="text-5xl sm:text-6xl mr-4 flex-shrink-0 group-hover:scale-110 transition-transform">🔢</div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-extrabold text-fuchsia-800 mb-1">Skaičių Eilutė</h2>
+                    <p class="text-fuchsia-700 font-bold text-sm sm:text-base leading-tight">Surask trūkstamą skaičių sekoje!</p>
+                </div>
+            </button>
+
+            <!-- Card 10 -->
+            <button onclick="showGame('Pinigai-main/index.htm')" class="card-3d bg-yellow-100 hover:bg-yellow-50 border-yellow-400 border-2 border-b-[8px] rounded-3xl p-5 flex items-center shadow-xl transform hover:-translate-y-1 text-left w-full group">
+                <div class="text-5xl sm:text-6xl mr-4 flex-shrink-0 group-hover:scale-110 transition-transform">💰</div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-extrabold text-yellow-800 mb-1">Pinigėliai</h2>
+                    <p class="text-yellow-700 font-bold text-sm sm:text-base leading-tight">Suskaičiuok monetas ir eurus!</p>
+                </div>
+            </button>
+
+            <!-- Card 11 -->
+            <button onclick="showGame('ZodziuTvarka-main/index.htm')" class="card-3d bg-orange-100 hover:bg-orange-50 border-orange-400 border-2 border-b-[8px] rounded-3xl p-5 flex items-center shadow-xl transform hover:-translate-y-1 text-left w-full group">
+                <div class="text-5xl sm:text-6xl mr-4 flex-shrink-0 group-hover:scale-110 transition-transform">📐</div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-extrabold text-orange-800 mb-1">Žodžių Tvarka</h2>
+                    <p class="text-orange-700 font-bold text-sm sm:text-base leading-tight">Sudėliok žodžius į teisingą sakinį!</p>
+                </div>
+            </button>
+
+            <!-- Card 12 -->
+            <button onclick="showGame('SpalvosFormos-main/index.htm')" class="card-3d bg-lime-100 hover:bg-lime-50 border-lime-400 border-2 border-b-[8px] rounded-3xl p-5 flex items-center shadow-xl transform hover:-translate-y-1 text-left w-full group">
+                <div class="text-5xl sm:text-6xl mr-4 flex-shrink-0 group-hover:scale-110 transition-transform">🟡</div>
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-extrabold text-lime-800 mb-1">Spalvos ir Formos</h2>
+                    <p class="text-lime-700 font-bold text-sm sm:text-base leading-tight">Atpažink figūras ir spalvas!</p>
                 </div>
             </button>
         </div>

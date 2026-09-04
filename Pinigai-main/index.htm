@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>💰 Pinigėliai</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #dcfce7;
+            background-image: radial-gradient(#86efac 20%, transparent 20%);
+            background-size: 20px 20px;
+            touch-action: manipulation;
+        }
+        
+        .bounce {
+            animation: bounce 0.5s;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .shake {
+            animation: shake 0.5s;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <div id="app" class="w-full max-w-2xl bg-white/95 backdrop-blur rounded-3xl shadow-xl overflow-hidden min-h-[600px] flex flex-col relative fade-in">
+        <!-- Content gets rendered here by JS -->
+    </div>
+
+    <script>
+        // Data
+        const items = {
+            coins: [
+                { value: 0.01, label: '1c', class: 'w-14 h-14 rounded-full bg-amber-600 text-amber-100 flex items-center justify-center font-bold text-xl border-2 border-amber-700 shadow-md' },
+                { value: 0.02, label: '2c', class: 'w-16 h-16 rounded-full bg-amber-600 text-amber-100 flex items-center justify-center font-bold text-2xl border-2 border-amber-700 shadow-md' },
+                { value: 0.05, label: '5c', class: 'w-18 h-18 rounded-full bg-amber-600 text-amber-100 flex items-center justify-center font-bold text-2xl border-2 border-amber-700 shadow-md shrink-0' },
+                { value: 0.10, label: '10c', class: 'w-14 h-14 rounded-full bg-yellow-500 text-yellow-900 flex items-center justify-center font-bold text-xl border-2 border-yellow-600 shadow-md' },
+                { value: 0.20, label: '20c', class: 'w-16 h-16 rounded-full bg-yellow-500 text-yellow-900 flex items-center justify-center font-bold text-2xl border-2 border-yellow-600 shadow-md' },
+                { value: 0.50, label: '50c', class: 'w-20 h-20 rounded-full bg-yellow-500 text-yellow-900 flex items-center justify-center font-bold text-3xl border-2 border-yellow-600 shadow-md shrink-0' },
+                { value: 1.00, label: '1€', class: 'w-16 h-16 rounded-full bg-gray-300 text-gray-800 flex items-center justify-center font-bold text-2xl border-[6px] border-yellow-500 shadow-md shrink-0' },
+                { value: 2.00, label: '2€', class: 'w-20 h-20 rounded-full bg-yellow-500 text-gray-900 flex items-center justify-center font-bold text-3xl border-[6px] border-gray-400 shadow-md shrink-0' }
+            ],
+            bills: [
+                { value: 5.00, label: '5€', class: 'w-20 h-12 rounded-lg bg-gray-400 text-gray-800 flex items-center justify-center font-bold text-xl border-2 border-gray-500 shadow-md shrink-0' },
+                { value: 10.00, label: '10€', class: 'w-20 h-12 rounded-lg bg-red-400 text-red-900 flex items-center justify-center font-bold text-xl border-2 border-red-500 shadow-md shrink-0' },
+                { value: 20.00, label: '20€', class: 'w-20 h-12 rounded-lg bg-blue-400 text-blue-900 flex items-center justify-center font-bold text-xl border-2 border-blue-500 shadow-md shrink-0' }
+            ]
+        };
+
+        // State
+        const state = {
+            mode: 'coins', // 'coins' or 'bills'
+            score: 0,
+            question: 1,
+            maxQuestions: 10,
+            currentTotal: 0,
+            options: [],
+            currentItems: [],
+            waiting: false
+        };
+
+        const app = document.getElementById('app');
+
+        // Audio
+        let audioCtx;
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSound(type) {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+            
+            if (type === 'correct') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(440, now);
+                osc.frequency.exponentialRampToValueAtTime(880, now + 0.1);
+                gain.gain.setValueAtTime(0, now);
+                gain.gain.linearRampToValueAtTime(0.5, now + 0.05);
+                gain.gain.linearRampToValueAtTime(0, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.exponentialRampToValueAtTime(150, now + 0.2);
+                gain.gain.setValueAtTime(0, now);
+                gain.gain.linearRampToValueAtTime(0.5, now + 0.05);
+                gain.gain.linearRampToValueAtTime(0, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'win') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(440, now);
+                osc.frequency.setValueAtTime(554.37, now + 0.1);
+                osc.frequency.setValueAtTime(659.25, now + 0.2);
+                osc.frequency.setValueAtTime(880, now + 0.3);
+                gain.gain.setValueAtTime(0, now);
+                gain.gain.linearRampToValueAtTime(0.3, now + 0.1);
+                gain.gain.linearRampToValueAtTime(0, now + 0.6);
+                osc.start(now);
+                osc.stop(now + 0.6);
+            }
+        }
+
+        // Utils
+        function formatMoney(val) {
+            return val.toFixed(2).replace('.', ',') + ' €';
+        }
+
+        function getRandomElement(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        // Screens
+        function renderStartScreen() {
+            app.innerHTML = `
+                <div class="flex-1 flex flex-col items-center justify-center p-8 text-center fade-in">
+                    <div class="text-6xl mb-4">💰</div>
+                    <h1 class="text-5xl font-black text-gray-800 mb-2 tracking-tight">Pinigėliai</h1>
+                    <p class="text-2xl text-gray-600 mb-10 font-bold">Suskaičiuok pinigus!</p>
+                    
+                    <div class="flex flex-col gap-4 w-full max-w-sm">
+                        <button onclick="startGame('coins')" class="w-full py-5 rounded-2xl bg-green-500 hover:bg-green-600 text-white font-bold text-2xl shadow-lg transition transform hover:scale-105 active:scale-95 border-b-4 border-green-700">
+                            Monetos
+                        </button>
+                        <button onclick="startGame('bills')" class="w-full py-5 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-2xl shadow-lg transition transform hover:scale-105 active:scale-95 border-b-4 border-orange-700">
+                            Su banknotais
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function startGame(mode) {
+            initAudio();
+            state.mode = mode;
+            state.score = 0;
+            state.question = 1;
+            generateQuestion();
+        }
+
+        function generateQuestion() {
+            let total = 0;
+            let currentItems = [];
+            
+            if (state.mode === 'coins') {
+                const count = Math.floor(Math.random() * 3) + 2; // 2 to 4 coins
+                for (let i = 0; i < count; i++) {
+                    const coin = getRandomElement(items.coins);
+                    currentItems.push(coin);
+                    total += coin.value;
+                }
+            } else {
+                const billCount = Math.floor(Math.random() * 2) + 1; // 1 to 2 bills
+                const coinCount = Math.floor(Math.random() * 3) + 1; // 1 to 3 coins
+                
+                for (let i = 0; i < billCount; i++) {
+                    const bill = getRandomElement(items.bills);
+                    currentItems.push(bill);
+                    total += bill.value;
+                }
+                for (let i = 0; i < coinCount; i++) {
+                    const coin = getRandomElement(items.coins);
+                    currentItems.push(coin);
+                    total += coin.value;
+                }
+            }
+            
+            // Fix floating point issues
+            total = Math.round(total * 100) / 100;
+            
+            state.currentTotal = total;
+            state.currentItems = currentItems;
+            
+            // Generate wrong options
+            const options = new Set([total]);
+            while (options.size < 4) {
+                // Add or subtract small amounts
+                const diff = (Math.floor(Math.random() * 5) + 1) * getRandomElement([0.01, 0.05, 0.10, 0.50, 1.00]);
+                const sign = Math.random() > 0.5 ? 1 : -1;
+                let wrongVal = Math.round((total + (diff * sign)) * 100) / 100;
+                
+                if (wrongVal > 0 && wrongVal !== total) {
+                    options.add(wrongVal);
+                }
+            }
+            
+            state.options = Array.from(options).sort(() => Math.random() - 0.5);
+            state.waiting = false;
+            
+            renderGameScreen();
+        }
+
+        function renderGameScreen() {
+            const itemsHtml = state.currentItems.map(item => `
+                <div class="${item.class}">
+                    ${item.label}
+                </div>
+            `).join('');
+            
+            const optionsHtml = state.options.map((opt, index) => `
+                <button id="btn-${index}" onclick="checkAnswer(${index}, ${opt})" class="py-4 bg-blue-100 hover:bg-blue-200 text-blue-900 rounded-xl font-bold text-2xl shadow-md border-b-4 border-blue-300 transition transform active:scale-95">
+                    ${formatMoney(opt)}
+                </button>
+            `).join('');
+
+            app.innerHTML = `
+                <div class="bg-blue-500 text-white px-6 py-4 flex justify-between items-center font-bold text-xl shadow-md rounded-b-xl z-10">
+                    <div>Klausimas: <span class="text-yellow-300">${state.question} / ${state.maxQuestions}</span></div>
+                    <div>Taškai: <span class="text-green-300">⭐ ${state.score}</span></div>
+                </div>
+                
+                <div class="flex-1 flex flex-col p-6 fade-in">
+                    <div id="money-container" class="flex-1 flex flex-wrap items-center justify-center gap-4 py-8 bg-white/50 rounded-2xl mb-6 shadow-inner min-h-[200px]">
+                        ${itemsHtml}
+                    </div>
+                    
+                    <div id="feedback" class="h-12 flex items-center justify-center font-black text-2xl mb-4 opacity-0 transition-opacity">
+                        Correct!
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4 mt-auto">
+                        ${optionsHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        function checkAnswer(index, value) {
+            if (state.waiting) return;
+            state.waiting = true;
+            
+            const isCorrect = Math.abs(value - state.currentTotal) < 0.001;
+            const btn = document.getElementById(`btn-${index}`);
+            const feedback = document.getElementById('feedback');
+            const container = document.getElementById('money-container');
+            
+            if (isCorrect) {
+                playSound('correct');
+                state.score++;
+                btn.className = "py-4 bg-green-500 text-white rounded-xl font-bold text-2xl shadow-md border-b-4 border-green-700 transform scale-105 bounce";
+                feedback.textContent = "Teisingai! 🎉";
+                feedback.className = "h-12 flex items-center justify-center font-black text-2xl mb-4 text-green-600 opacity-100";
+            } else {
+                playSound('wrong');
+                btn.className = "py-4 bg-red-500 text-white rounded-xl font-bold text-2xl shadow-md border-b-4 border-red-700 transform shake";
+                feedback.textContent = `Neteisingai. Turi būti: ${formatMoney(state.currentTotal)}`;
+                feedback.className = "h-12 flex items-center justify-center font-black text-2xl mb-4 text-red-600 opacity-100";
+                container.classList.add('shake');
+                
+                // Highlight correct answer
+                const correctIndex = state.options.findIndex(o => Math.abs(o - state.currentTotal) < 0.001);
+                if (correctIndex !== -1) {
+                    document.getElementById(`btn-${correctIndex}`).classList.add('bg-green-300', 'text-green-900', 'border-green-400');
+                }
+            }
+            
+            setTimeout(() => {
+                if (state.question >= state.maxQuestions) {
+                    renderEndScreen();
+                } else {
+                    state.question++;
+                    generateQuestion();
+                }
+            }, 1500);
+        }
+
+        function renderEndScreen() {
+            playSound('win');
+            
+            let stars = 1;
+            if (state.score >= 8) stars = 3;
+            else if (state.score >= 5) stars = 2;
+            
+            const starHtml = Array(3).fill(0).map((_, i) => 
+                `<span class="text-6xl ${i < stars ? 'text-yellow-400 bounce' : 'text-gray-300'} drop-shadow-md" style="animation-delay: ${i * 0.2}s">⭐</span>`
+            ).join('');
+
+            let message = "Neblogai!";
+            if (stars === 3) message = "Puikiai padirbėta! 🏆";
+            else if (stars === 2) message = "Geras rezultatas! 👍";
+
+            app.innerHTML = `
+                <div class="flex-1 flex flex-col items-center justify-center p-8 text-center fade-in">
+                    <h2 class="text-4xl font-black text-gray-800 mb-6">Žaidimas baigtas!</h2>
+                    
+                    <div class="flex justify-center gap-2 mb-6">
+                        ${starHtml}
+                    </div>
+                    
+                    <p class="text-2xl font-bold text-gray-700 mb-2">${message}</p>
+                    <p class="text-xl text-gray-600 mb-10">Surinkai: <span class="font-black text-green-600">${state.score} / ${state.maxQuestions}</span></p>
+                    
+                    <button onclick="renderStartScreen()" class="w-full max-w-xs py-5 rounded-2xl bg-blue-500 hover:bg-blue-600 text-white font-bold text-2xl shadow-lg transition transform hover:scale-105 active:scale-95 border-b-4 border-blue-700">
+                        Žaisti dar kartą 🔄
+                    </button>
+                </div>
+            `;
+        }
+
+        // Initialize
+        renderStartScreen();
+    </script>
+</body>
+</html>

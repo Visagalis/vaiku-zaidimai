@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Skaiciu Eilute</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f3e8ff;
+            background-image: radial-gradient(#d8b4fe 20%, transparent 20%);
+            background-size: 20px 20px;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        @keyframes bounce-custom {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        .animate-bounce-custom {
+            animation: bounce-custom 0.5s cubic-bezier(0.8, 0, 1, 1);
+        }
+        @keyframes pulse-custom {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: .7; transform: scale(1.05); }
+        }
+        .animate-pulse-custom {
+            animation: pulse-custom 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        .animate-shake {
+            animation: shake 0.4s ease-in-out;
+        }
+        .btn-active:active {
+            transform: scale(0.95);
+            transition: transform 0.1s;
+        }
+        .seq-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 3.5rem;
+            height: 4rem;
+            border-radius: 0.75rem;
+            background-color: #f3f4f6;
+            color: #1f2937;
+            font-size: 2rem;
+            font-weight: 800;
+            margin: 0 0.25rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        @media (min-width: 640px) {
+            .seq-box {
+                min-width: 5rem;
+                height: 5rem;
+                font-size: 2.5rem;
+                margin: 0 0.5rem;
+            }
+        }
+        .seq-box.missing {
+            background-color: #fff;
+            border: 4px dashed #a855f7;
+            color: #a855f7;
+        }
+        .seq-box.revealed {
+            background-color: #22c55e;
+            border: 4px solid #22c55e;
+            color: white;
+        }
+        .seq-box.revealed-wrong {
+            background-color: #ef4444;
+            border: 4px solid #ef4444;
+            color: white;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 overflow-hidden">
+    <div class="max-w-3xl w-full bg-white/95 backdrop-blur rounded-3xl shadow-2xl p-6 sm:p-10 border-4 border-purple-300 relative text-center">
+        
+        <!-- Start Screen -->
+        <div id="start-screen" class="block">
+            <h1 class="text-5xl sm:text-6xl font-black text-purple-600 mb-4 tracking-tight drop-shadow-md">🔢 Skaičių Eilutė</h1>
+            <p class="text-2xl sm:text-3xl text-gray-700 mb-10 font-bold">Surask trūkstamą skaičių!</p>
+            
+            <div class="flex flex-col sm:flex-row gap-6 justify-center items-center">
+                <button onclick="startGame('easy')" class="btn-active w-64 bg-green-500 hover:bg-green-600 text-white text-3xl font-bold py-6 px-8 rounded-2xl shadow-[0_8px_0_#16a34a] hover:shadow-[0_4px_0_#16a34a] hover:translate-y-1 transition-all">
+                    Lengva
+                </button>
+                <button onclick="startGame('hard')" class="btn-active w-64 bg-orange-500 hover:bg-orange-600 text-white text-3xl font-bold py-6 px-8 rounded-2xl shadow-[0_8px_0_#ea580c] hover:shadow-[0_4px_0_#ea580c] hover:translate-y-1 transition-all">
+                    Sunkiau
+                </button>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="game-screen" class="hidden">
+            <div class="flex justify-between items-center mb-8 border-b-2 border-purple-200 pb-4">
+                <div class="text-xl sm:text-2xl font-bold text-gray-600 bg-gray-100 py-2 px-4 rounded-xl">
+                    Klausimas: <span id="question-counter" class="text-purple-600">1</span> / 12
+                </div>
+                <div class="text-xl sm:text-2xl font-bold text-gray-600 bg-gray-100 py-2 px-4 rounded-xl">
+                    Taškai: <span id="score-display" class="text-green-500">0</span>
+                </div>
+            </div>
+
+            <div id="sequence-container" class="flex flex-wrap justify-center mb-10 gap-2 sm:gap-0">
+                <!-- Sequence items injected here -->
+            </div>
+
+            <div id="feedback-text" class="h-12 text-2xl sm:text-3xl font-bold mb-6 opacity-0 transition-opacity duration-300">
+                Puiku!
+            </div>
+
+            <div id="answers-container" class="grid grid-cols-2 gap-4 sm:gap-6 max-w-lg mx-auto">
+                <!-- Answer buttons injected here -->
+            </div>
+        </div>
+
+        <!-- End Screen -->
+        <div id="end-screen" class="hidden">
+            <h2 class="text-5xl font-black text-purple-600 mb-6">Žaidimas baigtas!</h2>
+            
+            <div id="stars-container" class="flex justify-center gap-4 mb-8 text-6xl sm:text-8xl">
+                <!-- Stars injected here -->
+            </div>
+
+            <p class="text-3xl text-gray-700 mb-8 font-bold">
+                Surinkai: <span id="final-score" class="text-purple-600 text-4xl">0</span> / 12
+            </p>
+            
+            <p id="end-message" class="text-2xl text-gray-600 mb-10 font-bold">
+                Šaunuolis!
+            </p>
+
+            <button onclick="showStartScreen()" class="btn-active bg-blue-500 hover:bg-blue-600 text-white text-3xl font-bold py-5 px-10 rounded-2xl shadow-[0_8px_0_#2563eb] hover:shadow-[0_4px_0_#2563eb] hover:translate-y-1 transition-all inline-block">
+                Žaisti dar kartą
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        // Audio setup
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new AudioContext();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSound(type) {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            if (type === 'correct') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+                osc.frequency.exponentialRampToValueAtTime(1046.50, audioCtx.currentTime + 0.1); // C6
+                gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.2);
+                gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.3);
+            }
+        }
+
+        // Game state
+        let mode = 'easy';
+        let currentQuestion = 0;
+        const totalQuestions = 12;
+        let score = 0;
+        let currentSequence = [];
+        let missingIndex = -1;
+        let correctAnswer = -1;
+        let isAnswering = false;
+
+        const startScreen = document.getElementById('start-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const endScreen = document.getElementById('end-screen');
+        
+        function showScreen(screenId) {
+            startScreen.classList.add('hidden');
+            gameScreen.classList.add('hidden');
+            endScreen.classList.add('hidden');
+            document.getElementById(screenId).classList.remove('hidden');
+        }
+
+        function showStartScreen() {
+            showScreen('start-screen');
+        }
+
+        function startGame(selectedMode) {
+            initAudio();
+            mode = selectedMode;
+            currentQuestion = 0;
+            score = 0;
+            isAnswering = false;
+            document.getElementById('score-display').innerText = score;
+            showScreen('game-screen');
+            nextQuestion();
+        }
+
+        function generateSequence() {
+            let step, startNum, isIncreasing = true;
+            
+            if (mode === 'easy') {
+                const steps = [1, 2, 5];
+                step = steps[Math.floor(Math.random() * steps.length)];
+                startNum = Math.floor(Math.random() * 16);
+            } else {
+                const types = ['inc3', 'inc4', 'inc10', 'dec1', 'dec2', 'dec3', 'dec5'];
+                const type = types[Math.floor(Math.random() * types.length)];
+                
+                if (type.startsWith('inc')) {
+                    step = parseInt(type.replace('inc', ''));
+                    startNum = Math.floor(Math.random() * 21);
+                } else {
+                    isIncreasing = false;
+                    step = parseInt(type.replace('dec', ''));
+                    const minStart = step * 4;
+                    startNum = minStart + Math.floor(Math.random() * 21);
+                }
+            }
+
+            const seq = [];
+            for (let i = 0; i < 5; i++) {
+                if (isIncreasing) {
+                    seq.push(startNum + (i * step));
+                } else {
+                    seq.push(startNum - (i * step));
+                }
+            }
+            return { seq, step, isIncreasing };
+        }
+
+        function nextQuestion() {
+            if (currentQuestion >= totalQuestions) {
+                endGame();
+                return;
+            }
+            
+            currentQuestion++;
+            document.getElementById('question-counter').innerText = currentQuestion;
+            isAnswering = false;
+            
+            const feedbackText = document.getElementById('feedback-text');
+            feedbackText.style.opacity = '0';
+            feedbackText.className = 'h-12 text-2xl sm:text-3xl font-bold mb-6 transition-opacity duration-300';
+            
+            const { seq, step, isIncreasing } = generateSequence();
+            currentSequence = seq;
+            
+            missingIndex = Math.floor(Math.random() * 3) + 1;
+            correctAnswer = currentSequence[missingIndex];
+            
+            renderSequence();
+            generateAnswers(correctAnswer, step, isIncreasing);
+        }
+
+        function renderSequence() {
+            const container = document.getElementById('sequence-container');
+            container.innerHTML = '';
+            container.classList.remove('animate-shake');
+            
+            currentSequence.forEach((num, index) => {
+                const box = document.createElement('div');
+                if (index === missingIndex) {
+                    box.className = 'seq-box missing animate-pulse-custom';
+                    box.innerText = '?';
+                    box.id = 'missing-box';
+                } else {
+                    box.className = 'seq-box';
+                    box.innerText = num;
+                }
+                container.appendChild(box);
+            });
+        }
+
+        function generateAnswers(correct, step, isIncreasing) {
+            const answers = new Set();
+            answers.add(correct);
+            
+            let attempts = 0;
+            while(answers.size < 4 && attempts < 50) {
+                attempts++;
+                let offset = Math.floor(Math.random() * 3) + 1;
+                if (Math.random() > 0.5) offset *= -1;
+                
+                let wrongVal = correct + (offset * step);
+                
+                if (Math.random() > 0.7) {
+                    wrongVal = correct + (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random() * 3) + 1);
+                }
+
+                if (wrongVal >= 0 && wrongVal !== correct && !currentSequence.includes(wrongVal)) {
+                    answers.add(wrongVal);
+                }
+            }
+            
+            while(answers.size < 4) {
+                let w = correct + Math.floor(Math.random() * 10) + 1;
+                if (!answers.has(w) && !currentSequence.includes(w)) answers.add(w);
+            }
+
+            const answersArray = Array.from(answers);
+            for (let i = answersArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [answersArray[i], answersArray[j]] = [answersArray[j], answersArray[i]];
+            }
+
+            const container = document.getElementById('answers-container');
+            container.innerHTML = '';
+            
+            answersArray.forEach(ans => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-active bg-blue-100 hover:bg-blue-200 text-blue-800 border-4 border-blue-300 font-bold text-4xl sm:text-5xl py-4 sm:py-6 rounded-2xl shadow-sm transition-all';
+                btn.innerText = ans;
+                btn.onclick = () => checkAnswer(ans, btn);
+                container.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selected, btnElement) {
+            if (isAnswering) return;
+            isAnswering = true;
+            
+            const missingBox = document.getElementById('missing-box');
+            missingBox.classList.remove('animate-pulse-custom');
+            
+            const feedbackText = document.getElementById('feedback-text');
+            feedbackText.style.opacity = '1';
+
+            if (selected === correctAnswer) {
+                score++;
+                document.getElementById('score-display').innerText = score;
+                playSound('correct');
+                
+                btnElement.classList.remove('bg-blue-100', 'hover:bg-blue-200', 'border-blue-300', 'text-blue-800');
+                btnElement.classList.add('bg-green-500', 'border-green-600', 'text-white', 'shadow-[0_4px_0_#16a34a]');
+                
+                missingBox.innerText = correctAnswer;
+                missingBox.classList.remove('missing');
+                missingBox.classList.add('revealed');
+                missingBox.classList.add('animate-bounce-custom');
+                
+                const praises = ['Puiku!', 'Šaunuolis!', 'Teisingai!', 'Nuostabu!', 'Taip!'];
+                feedbackText.innerText = praises[Math.floor(Math.random() * praises.length)];
+                feedbackText.classList.add('text-green-500');
+                
+            } else {
+                playSound('wrong');
+                
+                btnElement.classList.remove('bg-blue-100', 'hover:bg-blue-200', 'border-blue-300', 'text-blue-800');
+                btnElement.classList.add('bg-red-500', 'border-red-600', 'text-white', 'shadow-[0_4px_0_#dc2626]');
+                
+                missingBox.innerText = correctAnswer;
+                missingBox.classList.remove('missing');
+                missingBox.classList.add('revealed-wrong');
+                
+                const seqContainer = document.getElementById('sequence-container');
+                seqContainer.classList.add('animate-shake');
+                
+                feedbackText.innerText = 'Bandyk dar kartą kitame klausime!';
+                feedbackText.classList.add('text-red-500');
+            }
+            
+            setTimeout(() => {
+                nextQuestion();
+            }, 1500);
+        }
+
+        function endGame() {
+            showScreen('end-screen');
+            document.getElementById('final-score').innerText = score;
+            
+            const starsContainer = document.getElementById('stars-container');
+            starsContainer.innerHTML = '';
+            
+            let starsNum = 1;
+            if (score >= 10) starsNum = 3;
+            else if (score >= 7) starsNum = 2;
+            
+            for (let i = 0; i < 3; i++) {
+                const star = document.createElement('span');
+                if (i < starsNum) {
+                    star.innerText = '⭐';
+                    star.className = 'animate-bounce-custom';
+                    star.style.animationDelay = `${i * 0.2}s`;
+                } else {
+                    star.innerText = '☆';
+                    star.className = 'text-gray-300';
+                }
+                starsContainer.appendChild(star);
+            }
+            
+            const msg = document.getElementById('end-message');
+            if (starsNum === 3) {
+                msg.innerText = 'Tobula! Tu tikras skaičių meistras!';
+                playSound('correct');
+            } else if (starsNum === 2) {
+                msg.innerText = 'Labai gerai! Pasitreniruok dar truputį!';
+                playSound('correct');
+            } else {
+                msg.innerText = 'Nenusimink, bandyk dar kartą!';
+            }
+        }
+        
+    </script>
+</body>
+</html>
