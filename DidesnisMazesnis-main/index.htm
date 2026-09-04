@@ -15,7 +15,7 @@
             background-color: #e0f2fe;
             background-image: radial-gradient(#bae6fd 20%, transparent 20%);
             background-size: 40px 40px;
-            overflow: hidden;
+            overflow-y: auto;
         }
         .bounce { animation: bounce 0.5s; }
         .shake { animation: shake 0.5s; }
@@ -31,43 +31,43 @@
         .btn-hover:active { transform: scale(0.95); }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4">
+<body class="min-h-screen flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
 
     <!-- Start Screen -->
-    <div id="start-screen" class="bg-white rounded-3xl p-8 shadow-2xl text-center max-w-md w-full border-4 border-sky-300">
-        <h1 class="text-4xl md:text-5xl font-black text-sky-600 mb-2">⚖️ Didesnis ar Mažesnis</h1>
-        <p class="text-xl text-sky-500 mb-8 font-bold">Palygink skaičius!</p>
+    <div id="start-screen" class="bg-white rounded-3xl p-6 sm:p-8 shadow-2xl text-center max-w-md w-full border-4 border-sky-300">
+        <h1 class="text-3xl sm:text-5xl font-black text-sky-600 mb-2">⚖️ Didesnis ar Mažesnis</h1>
+        <p class="text-lg sm:text-xl text-sky-500 mb-6 sm:mb-8 font-bold">Palygink skaičius!</p>
         
-        <div class="space-y-4">
-            <button onclick="startGame(20)" class="w-full btn-hover bg-green-500 text-white text-2xl font-black py-4 rounded-2xl shadow-[0_6px_0_#16a34a] hover:bg-green-400 transition-colors">
+        <div class="space-y-3 sm:space-y-4">
+            <button onclick="startGame(20)" class="w-full btn-hover bg-green-500 text-white text-xl sm:text-2xl font-black py-3.5 sm:py-4 rounded-2xl shadow-[0_6px_0_#16a34a] hover:bg-green-400 transition-colors">
                 Iki 20
             </button>
-            <button onclick="startGame(100)" class="w-full btn-hover bg-orange-500 text-white text-2xl font-black py-4 rounded-2xl shadow-[0_6px_0_#ea580c] hover:bg-orange-400 transition-colors">
+            <button onclick="startGame(100)" class="w-full btn-hover bg-orange-500 text-white text-xl sm:text-2xl font-black py-3.5 sm:py-4 rounded-2xl shadow-[0_6px_0_#ea580c] hover:bg-orange-400 transition-colors">
                 Iki 100
             </button>
         </div>
     </div>
 
     <!-- Game Screen -->
-    <div id="game-screen" class="hidden bg-white rounded-3xl p-6 md:p-8 shadow-2xl text-center max-w-lg w-full border-4 border-sky-300">
-        <div class="flex justify-between items-center mb-6">
-            <div class="text-2xl font-bold text-yellow-500">⭐ <span id="score">0</span></div>
-            <div class="text-xl font-bold text-sky-500">Klausimas: <span id="question-counter">1</span> / 15</div>
-            <div class="text-xl font-bold text-red-500">🔥 <span id="streak">0</span></div>
+    <div id="game-screen" class="hidden bg-white rounded-3xl p-4 sm:p-8 shadow-2xl text-center max-w-lg w-full border-4 border-sky-300">
+        <div class="flex justify-between items-center mb-4 sm:mb-6">
+            <div class="text-xl sm:text-2xl font-bold text-yellow-500">⭐ <span id="score">0</span></div>
+            <div class="text-base sm:text-xl font-bold text-sky-500">Klausimas: <span id="question-counter">1</span> / 15</div>
+            <div class="text-base sm:text-xl font-bold text-red-500">🔥 <span id="streak">0</span></div>
         </div>
 
-        <div class="flex items-center justify-center gap-4 my-10">
-            <div id="num1" class="text-6xl md:text-8xl font-black text-sky-600 w-32 text-right">0</div>
-            <div id="operator" class="text-5xl md:text-7xl font-black text-gray-300 w-16 text-center">?</div>
-            <div id="num2" class="text-6xl md:text-8xl font-black text-sky-600 w-32 text-left">0</div>
+        <div class="flex items-center justify-center gap-2 sm:gap-4 my-4 sm:my-8">
+            <div id="num1" class="text-5xl sm:text-8xl font-black text-sky-600 w-24 sm:w-32 text-right">0</div>
+            <div id="operator" class="text-4xl sm:text-7xl font-black text-gray-300 w-12 sm:w-16 text-center">?</div>
+            <div id="num2" class="text-5xl sm:text-8xl font-black text-sky-600 w-24 sm:w-32 text-left">0</div>
         </div>
 
-        <div id="feedback" class="text-2xl font-bold h-8 mb-4 opacity-0 transition-opacity">Puiku!</div>
+        <div id="feedback" class="text-xl sm:text-2xl font-bold h-7 sm:h-8 mb-3 sm:mb-4 opacity-0 transition-opacity">Puiku!</div>
 
-        <div class="flex justify-center gap-4 mb-4">
-            <button onclick="checkAnswer('<')" class="btn-hover flex-1 bg-purple-500 text-white text-5xl md:text-6xl font-black py-6 rounded-2xl shadow-[0_8px_0_#7e22ce] active:shadow-[0_0px_0_#7e22ce] active:translate-y-[8px] transition-all">&lt;</button>
-            <button onclick="checkAnswer('=')" class="btn-hover flex-1 bg-yellow-400 text-white text-5xl md:text-6xl font-black py-6 rounded-2xl shadow-[0_8px_0_#ca8a04] active:shadow-[0_0px_0_#ca8a04] active:translate-y-[8px] transition-all">=</button>
-            <button onclick="checkAnswer('>')" class="btn-hover flex-1 bg-pink-500 text-white text-5xl md:text-6xl font-black py-6 rounded-2xl shadow-[0_8px_0_#be185d] active:shadow-[0_0px_0_#be185d] active:translate-y-[8px] transition-all">&gt;</button>
+        <div class="flex justify-center gap-3 sm:gap-4 mb-2">
+            <button id="btn-lt" onclick="checkAnswer('<', this)" class="btn-hover flex-1 bg-purple-500 text-white text-4xl sm:text-6xl font-black py-4 sm:py-6 rounded-2xl shadow-[0_6px_0_#7e22ce] active:shadow-[0_0px_0_#7e22ce] active:translate-y-[6px] transition-all">&lt;</button>
+            <button id="btn-eq" onclick="checkAnswer('=', this)" class="btn-hover flex-1 bg-yellow-400 text-white text-4xl sm:text-6xl font-black py-4 sm:py-6 rounded-2xl shadow-[0_6px_0_#ca8a04] active:shadow-[0_0px_0_#ca8a04] active:translate-y-[6px] transition-all">=</button>
+            <button id="btn-gt" onclick="checkAnswer('>', this)" class="btn-hover flex-1 bg-pink-500 text-white text-4xl sm:text-6xl font-black py-4 sm:py-6 rounded-2xl shadow-[0_8px_0_#be185d] active:shadow-[0_0px_0_#be185d] active:translate-y-[6px] transition-all">&gt;</button>
         </div>
     </div>
 
@@ -205,8 +205,20 @@
             document.getElementById('num1').classList.add('text-sky-600');
             document.getElementById('num2').classList.add('text-sky-600');
             
+            ['btn-lt', 'btn-eq', 'btn-gt'].forEach(id => {
+                const b = document.getElementById(id);
+                if (b) {
+                    b.disabled = false;
+                    b.style.opacity = '1';
+                    b.classList.remove('opacity-50', 'line-through', 'cursor-not-allowed');
+                }
+            });
+            
             isWaiting = false;
+            firstTry = true;
         }
+
+        let firstTry = true;
 
         function updateStats() {
             document.getElementById('score').textContent = score;
@@ -214,9 +226,8 @@
             document.getElementById('streak').textContent = streak;
         }
 
-        function checkAnswer(answer) {
+        function checkAnswer(answer, btn) {
             if (isWaiting) return;
-            isWaiting = true;
 
             let correct = false;
             let correctAnswer = '';
@@ -229,38 +240,47 @@
 
             const feedback = document.getElementById('feedback');
             const op = document.getElementById('operator');
-            
-            op.textContent = correct ? answer : correctAnswer;
 
             if (correct) {
-                score++;
-                streak++;
+                isWaiting = true;
+                if (firstTry) {
+                    score++;
+                    streak++;
+                }
+                op.textContent = answer;
                 playSound('correct');
-                feedback.textContent = ['Puiku!', 'Šaunuolis!', 'Teisingai!'][Math.floor(Math.random() * 3)];
-                feedback.className = 'text-2xl font-bold h-8 mb-4 text-green-500';
+                feedback.textContent = ['Puiku! 🎉', 'Šaunuolis! 🌟', 'Teisingai! 👏'][Math.floor(Math.random() * 3)];
+                feedback.className = 'text-xl sm:text-2xl font-bold h-7 sm:h-8 mb-3 sm:mb-4 text-green-500';
                 
                 document.getElementById('num1').classList.add('bounce', 'text-green-500');
                 document.getElementById('num2').classList.add('bounce', 'text-green-500');
                 document.getElementById('num1').classList.remove('text-sky-600');
                 document.getElementById('num2').classList.remove('text-sky-600');
                 op.className = 'text-5xl md:text-7xl font-black text-green-500 w-16 text-center bounce';
+                
+                feedback.style.opacity = '1';
+                updateStats();
+                setTimeout(nextQuestion, 1200);
             } else {
+                firstTry = false;
                 streak = 0;
                 playSound('wrong');
-                feedback.textContent = `${currentNum1} ${correctAnswer} ${currentNum2}`;
-                feedback.className = 'text-2xl font-bold h-8 mb-4 text-red-500';
+                if (btn) {
+                    btn.disabled = true;
+                    btn.classList.add('opacity-50', 'line-through', 'cursor-not-allowed');
+                }
+                feedback.textContent = 'Bandyk dar kartą! 🤔';
+                feedback.className = 'text-xl sm:text-2xl font-bold h-7 sm:h-8 mb-3 sm:mb-4 text-red-500';
                 
-                document.getElementById('num1').classList.add('shake', 'text-red-500');
-                document.getElementById('num2').classList.add('shake', 'text-red-500');
-                document.getElementById('num1').classList.remove('text-sky-600');
-                document.getElementById('num2').classList.remove('text-sky-600');
-                op.className = 'text-5xl md:text-7xl font-black text-red-500 w-16 text-center shake';
+                document.getElementById('num1').classList.remove('shake');
+                document.getElementById('num2').classList.remove('shake');
+                void document.getElementById('num1').offsetWidth;
+                document.getElementById('num1').classList.add('shake');
+                document.getElementById('num2').classList.add('shake');
+                
+                feedback.style.opacity = '1';
+                updateStats();
             }
-            
-            feedback.style.opacity = '1';
-            updateStats();
-
-            setTimeout(nextQuestion, 1500);
         }
 
         function endGame() {

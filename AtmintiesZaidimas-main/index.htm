@@ -16,10 +16,19 @@
             background-size: 30px 30px;
         }
 
+        :root {
+            --card-emoji-size: 2.5rem;
+            --card-word-size: 1rem;
+            --card-radius: 1rem;
+        }
+
         /* 3D Flip Card Styles */
         .card-container {
             perspective: 1000px;
+            width: 100%;
+            height: 100%;
             aspect-ratio: 1;
+            user-select: none;
         }
 
         .card-inner {
@@ -28,6 +37,7 @@
             height: 100%;
             transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
             transform-style: preserve-3d;
+            -webkit-transform-style: preserve-3d;
             cursor: pointer;
         }
 
@@ -40,18 +50,19 @@
             position: absolute;
             inset: 0;
             backface-visibility: hidden;
-            border-radius: 1rem;
+            -webkit-backface-visibility: hidden;
+            border-radius: var(--card-radius, 1rem);
             display: flex;
             align-items: center;
             justify-content: center;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            border: 4px solid white;
+            border: 3px solid white;
         }
 
         .card-back {
             background: linear-gradient(135deg, #3b82f6, #6366f1);
             color: white;
-            font-size: 3rem;
+            font-size: var(--card-emoji-size, 2.5rem);
             font-weight: 900;
         }
 
@@ -59,13 +70,34 @@
             background: #fffbeb;
             transform: rotateY(180deg);
             text-align: center;
+            display: flex;
             flex-direction: column;
-            padding: 0.5rem;
+            align-items: center;
+            justify-content: center;
+            padding: 3px;
+            overflow: hidden;
+        }
+
+        .card-emoji {
+            font-size: var(--card-emoji-size, 2.5rem);
+            line-height: 1;
+            display: block;
+        }
+
+        .card-word {
+            font-size: var(--card-word-size, 1rem);
+            font-weight: 900;
+            text-transform: uppercase;
+            line-height: 1.15;
+            color: #1e293b;
+            word-break: break-word;
+            padding: 0 2px;
         }
 
         .card-container.matched .card-front {
-            border-color: #4ade80;
-            box-shadow: 0 0 15px #4ade80;
+            border-color: #22c55e;
+            background: #f0fdf4;
+            box-shadow: 0 0 12px #22c55e;
         }
 
         @keyframes shake {
@@ -85,9 +117,9 @@
             transform: translate(-50%, -50%) scale(0);
             background: #4ade80;
             color: white;
-            padding: 1rem 2rem;
+            padding: 0.75rem 1.75rem;
             border-radius: 2rem;
-            font-size: 2rem;
+            font-size: 1.75rem;
             font-weight: 900;
             z-index: 50;
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -98,18 +130,9 @@
         .feedback-popup.show {
             transform: translate(-50%, -50%) scale(1);
         }
-        
-        .grid-3x4 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-        .grid-4x4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-        .grid-4x5 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-        
-        @media (min-width: 640px) {
-            .grid-3x4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-            .grid-4x5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
-        }
     </style>
 </head>
-<body class="min-h-screen text-slate-800 flex flex-col relative overflow-hidden">
+<body class="h-screen max-h-screen text-slate-800 flex flex-col relative overflow-hidden p-2 sm:p-3">
     
     <!-- Audio Context & Synthesis -->
     <script>
@@ -148,49 +171,48 @@
     </script>
 
     <!-- UI Containers -->
-    <div id="start-screen" class="flex flex-col items-center justify-center min-h-screen p-4 absolute inset-0 z-10 bg-white/90 backdrop-blur-sm transition-opacity duration-500">
-        <h1 class="text-4xl md:text-6xl font-black text-center text-indigo-600 mb-2 drop-shadow-sm">🃏 Atminties Žaidimas</h1>
-        <p class="text-xl md:text-2xl text-center text-slate-600 mb-8 font-bold">Surask vienodas korteles!</p>
+    <div id="start-screen" class="flex flex-col items-center justify-center h-full w-full p-4 absolute inset-0 z-10 bg-white/95 backdrop-blur-sm overflow-y-auto">
+        <h1 class="text-3xl sm:text-5xl md:text-6xl font-black text-center text-indigo-600 mb-2 drop-shadow-sm">🃏 Atminties Žaidimas</h1>
+        <p class="text-base sm:text-xl md:text-2xl text-center text-slate-600 mb-4 sm:mb-6 font-bold">Surask poras: paveikslėlį ir žodį!</p>
         
-        <div class="flex gap-4 mb-8 text-6xl animate-bounce">
+        <div class="flex gap-3 sm:gap-4 mb-4 sm:mb-6 text-4xl sm:text-6xl animate-bounce">
             🐱 🍎 🚀
         </div>
 
-        <div class="flex flex-col gap-4 w-full max-w-sm">
-            <button onclick="startGame(6)" class="py-4 px-8 bg-green-500 hover:bg-green-600 text-white rounded-2xl text-2xl font-black shadow-[0_6px_0_#166534] active:translate-y-2 active:shadow-[0_0px_0_#166534] transition-all">Lengva (3x4)</button>
-            <button onclick="startGame(8)" class="py-4 px-8 bg-orange-500 hover:bg-orange-600 text-white rounded-2xl text-2xl font-black shadow-[0_6px_0_#9a3412] active:translate-y-2 active:shadow-[0_0px_0_#9a3412] transition-all">Vidutinis (4x4)</button>
-            <button onclick="startGame(10)" class="py-4 px-8 bg-red-500 hover:bg-red-600 text-white rounded-2xl text-2xl font-black shadow-[0_6px_0_#991b1b] active:translate-y-2 active:shadow-[0_0px_0_#991b1b] transition-all">Sunku (4x5)</button>
+        <div class="flex flex-col gap-3 sm:gap-4 w-full max-w-sm">
+            <button onclick="startGame(6)" class="py-3 sm:py-4 px-6 bg-green-500 hover:bg-green-600 text-white rounded-2xl text-xl sm:text-2xl font-black shadow-[0_6px_0_#166534] active:translate-y-2 active:shadow-[0_0px_0_#166534] transition-all">Lengva (12 kortelių)</button>
+            <button onclick="startGame(8)" class="py-3 sm:py-4 px-6 bg-orange-500 hover:bg-orange-600 text-white rounded-2xl text-xl sm:text-2xl font-black shadow-[0_6px_0_#9a3412] active:translate-y-2 active:shadow-[0_0px_0_#9a3412] transition-all">Vidutinis (16 kortelių)</button>
+            <button onclick="startGame(10)" class="py-3 sm:py-4 px-6 bg-red-500 hover:bg-red-600 text-white rounded-2xl text-xl sm:text-2xl font-black shadow-[0_6px_0_#991b1b] active:translate-y-2 active:shadow-[0_0px_0_#991b1b] transition-all">Sunku (20 kortelių)</button>
         </div>
     </div>
 
-    <div id="game-screen" class="hidden flex-col min-h-screen w-full max-w-4xl mx-auto p-4 absolute inset-0">
-        <div class="flex justify-between items-center bg-white p-4 rounded-2xl shadow-md mb-4 font-bold text-lg md:text-2xl">
+    <div id="game-screen" class="hidden flex-col h-full w-full max-w-5xl mx-auto p-2 sm:p-3 absolute inset-0 overflow-hidden">
+        <div class="flex justify-between items-center bg-white px-3 py-2 sm:px-4 sm:py-2.5 rounded-2xl shadow-sm mb-2 shrink-0 font-bold text-sm sm:text-base md:text-lg border border-slate-100">
             <div id="score-pairs" class="text-indigo-600">🏆 Poros: 0/6</div>
             <div id="score-attempts" class="text-orange-500">🔄 Bandymai: 0</div>
             <div id="score-time" class="text-emerald-600">⏱ Laikas: 00:00</div>
+            <button onclick="showStartScreen()" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-600 rounded-xl text-xs sm:text-sm font-bold ml-1 transition-colors">↩ Meniu</button>
         </div>
 
-        <div class="flex-1 flex items-center justify-center">
-            <div id="grid" class="grid gap-3 w-full"></div>
+        <div id="grid-container" class="flex-1 min-h-0 w-full flex items-center justify-center overflow-hidden p-1">
+            <div id="grid"></div>
         </div>
-        
-        <button onclick="showStartScreen()" class="mt-4 p-3 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl font-bold w-full md:w-auto self-center">↩ Atgal į meniu</button>
     </div>
 
-    <div id="end-screen" class="hidden flex-col items-center justify-center min-h-screen p-4 absolute inset-0 z-20 bg-white/95 backdrop-blur-md">
-        <div class="text-8xl mb-4">🎉</div>
-        <h2 class="text-4xl md:text-5xl font-black text-center text-green-600 mb-6 drop-shadow-sm">Šaunuolis! Visos poros surastos!</h2>
+    <div id="end-screen" class="hidden flex-col items-center justify-center h-full w-full p-4 absolute inset-0 z-20 bg-white/95 backdrop-blur-md overflow-y-auto">
+        <div class="text-6xl sm:text-8xl mb-2 sm:mb-4">🎉</div>
+        <h2 class="text-3xl sm:text-4xl md:text-5xl font-black text-center text-green-600 mb-4 sm:mb-6 drop-shadow-sm">Šaunuolis! Visos poros surastos!</h2>
         
-        <div id="stars" class="text-6xl mb-6 flex gap-2"></div>
+        <div id="stars" class="text-5xl sm:text-6xl mb-4 sm:mb-6 flex gap-2"></div>
         
-        <div class="bg-indigo-50 p-6 rounded-3xl shadow-inner w-full max-w-md text-center mb-8">
-            <p class="text-2xl font-bold text-slate-700 mb-2">Bandymai: <span id="final-attempts" class="text-indigo-600">0</span></p>
-            <p class="text-2xl font-bold text-slate-700">Laikas: <span id="final-time" class="text-emerald-600">00:00</span></p>
+        <div class="bg-indigo-50 p-4 sm:p-6 rounded-3xl shadow-inner w-full max-w-md text-center mb-6 sm:mb-8">
+            <p class="text-xl sm:text-2xl font-bold text-slate-700 mb-2">Bandymai: <span id="final-attempts" class="text-indigo-600">0</span></p>
+            <p class="text-xl sm:text-2xl font-bold text-slate-700">Laikas: <span id="final-time" class="text-emerald-600">00:00</span></p>
         </div>
 
-        <div class="flex flex-col sm:flex-row gap-4 w-full max-w-md">
-            <button onclick="replayGame()" class="flex-1 py-4 px-6 bg-indigo-500 hover:bg-indigo-600 text-white rounded-2xl text-xl font-black shadow-[0_6px_0_#3730a3] active:translate-y-2 active:shadow-[0_0px_0_#3730a3] transition-all">Žaisti dar kartą</button>
-            <button onclick="showStartScreen()" class="flex-1 py-4 px-6 bg-slate-400 hover:bg-slate-500 text-white rounded-2xl text-xl font-black shadow-[0_6px_0_#334155] active:translate-y-2 active:shadow-[0_0px_0_#334155] transition-all">Iš pradžių</button>
+        <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full max-w-md">
+            <button onclick="replayGame()" class="flex-1 py-3 sm:py-4 px-6 bg-indigo-500 hover:bg-indigo-600 text-white rounded-2xl text-lg sm:text-xl font-black shadow-[0_6px_0_#3730a3] active:translate-y-2 active:shadow-[0_0px_0_#3730a3] transition-all">Žaisti dar kartą</button>
+            <button onclick="showStartScreen()" class="flex-1 py-3 sm:py-4 px-6 bg-slate-400 hover:bg-slate-500 text-white rounded-2xl text-lg sm:text-xl font-black shadow-[0_6px_0_#334155] active:translate-y-2 active:shadow-[0_0px_0_#334155] transition-all">Iš pradžių</button>
         </div>
     </div>
 
@@ -222,6 +244,63 @@
         };
         const grid = document.getElementById('grid');
         const feedback = document.getElementById('feedback');
+
+        function resizeGrid() {
+            const container = document.getElementById('grid-container');
+            if (!container || !currentPairs || screens.game.classList.contains('hidden')) return;
+            
+            const w = container.clientWidth;
+            const h = container.clientHeight;
+            if (w <= 0 || h <= 0) return;
+            
+            const isLandscape = w >= h;
+            let cols, rows;
+            if (currentPairs === 6) {
+                cols = isLandscape ? 4 : 3;
+                rows = isLandscape ? 3 : 4;
+            } else if (currentPairs === 8) {
+                cols = 4;
+                rows = 4;
+            } else { // 10 pairs = 20 cards
+                cols = isLandscape ? 5 : 4;
+                rows = isLandscape ? 4 : 5;
+            }
+            
+            const gap = Math.max(4, Math.min(10, Math.floor(Math.min(w, h) * 0.015)));
+            const availW = w - 4;
+            const availH = h - 4;
+            
+            const cardW = Math.floor((availW - (cols - 1) * gap) / cols);
+            const cardH = Math.floor((availH - (rows - 1) * gap) / rows);
+            const cardSize = Math.max(34, Math.min(cardW, cardH));
+            
+            grid.style.display = 'grid';
+            grid.style.gridTemplateColumns = `repeat(${cols}, ${cardSize}px)`;
+            grid.style.gridTemplateRows = `repeat(${rows}, ${cardSize}px)`;
+            grid.style.gap = `${gap}px`;
+            grid.style.width = 'auto';
+            grid.style.height = 'auto';
+            grid.style.margin = 'auto';
+            
+            const emojiSize = Math.max(20, Math.floor(cardSize * 0.48));
+            const wordSize = Math.max(10, Math.min(22, Math.floor(cardSize * 0.16)));
+            const radius = Math.max(6, Math.floor(cardSize * 0.12));
+            
+            document.documentElement.style.setProperty('--card-emoji-size', `${emojiSize}px`);
+            document.documentElement.style.setProperty('--card-word-size', `${wordSize}px`);
+            document.documentElement.style.setProperty('--card-radius', `${radius}px`);
+        }
+
+        window.addEventListener('resize', resizeGrid);
+        if (window.ResizeObserver) {
+            const ro = new ResizeObserver(() => {
+                if (!screens.game.classList.contains('hidden')) {
+                    resizeGrid();
+                }
+            });
+            const cont = document.getElementById('grid-container');
+            if (cont) ro.observe(cont);
+        }
 
         function shuffle(array) {
             for (let i = array.length - 1; i > 0; i--) {
@@ -283,12 +362,6 @@
             canFlip = true;
             
             updateUI();
-            
-            // Setup grid class based on pairs count
-            grid.className = 'grid gap-3 w-full h-full max-h-[80vh]';
-            if (pairsCount === 6) grid.classList.add('grid-3x4');
-            else if (pairsCount === 8) grid.classList.add('grid-4x4');
-            else if (pairsCount === 10) grid.classList.add('grid-4x5');
 
             // Generate cards
             const selectedPairs = shuffle([...ALL_PAIRS]).slice(0, pairsCount);
@@ -302,12 +375,12 @@
             deck = shuffle(deck);
             grid.innerHTML = '';
             
-            deck.forEach((card, i) => {
+            deck.forEach((card) => {
                 const el = document.createElement('div');
                 el.className = 'card-container';
                 el.dataset.id = card.id;
                 
-                const contentClass = card.type === 'emoji' ? 'text-5xl md:text-7xl' : 'text-xl md:text-2xl font-black uppercase';
+                const contentClass = card.type === 'emoji' ? 'card-emoji' : 'card-word';
                 
                 el.innerHTML = `
                     <div class="card-inner">
@@ -323,6 +396,10 @@
             });
             
             showScreen('game');
+            requestAnimationFrame(() => {
+                resizeGrid();
+                setTimeout(resizeGrid, 60);
+            });
         }
 
         function showFeedback(text) {

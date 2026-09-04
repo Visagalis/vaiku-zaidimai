@@ -41,9 +41,9 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4">
+<body class="min-h-screen flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
 
-    <div id="app" class="w-full max-w-2xl bg-white/95 backdrop-blur rounded-3xl shadow-xl overflow-hidden min-h-[600px] flex flex-col relative fade-in">
+    <div id="app" class="w-full max-w-2xl bg-white/95 backdrop-blur rounded-3xl shadow-xl flex flex-col relative fade-in border border-green-200">
         <!-- Content gets rendered here by JS -->
     </div>
 
@@ -51,19 +51,19 @@
         // Data
         const items = {
             coins: [
-                { value: 0.01, label: '1c', class: 'w-14 h-14 rounded-full bg-amber-600 text-amber-100 flex items-center justify-center font-bold text-xl border-2 border-amber-700 shadow-md' },
-                { value: 0.02, label: '2c', class: 'w-16 h-16 rounded-full bg-amber-600 text-amber-100 flex items-center justify-center font-bold text-2xl border-2 border-amber-700 shadow-md' },
-                { value: 0.05, label: '5c', class: 'w-18 h-18 rounded-full bg-amber-600 text-amber-100 flex items-center justify-center font-bold text-2xl border-2 border-amber-700 shadow-md shrink-0' },
-                { value: 0.10, label: '10c', class: 'w-14 h-14 rounded-full bg-yellow-500 text-yellow-900 flex items-center justify-center font-bold text-xl border-2 border-yellow-600 shadow-md' },
-                { value: 0.20, label: '20c', class: 'w-16 h-16 rounded-full bg-yellow-500 text-yellow-900 flex items-center justify-center font-bold text-2xl border-2 border-yellow-600 shadow-md' },
-                { value: 0.50, label: '50c', class: 'w-20 h-20 rounded-full bg-yellow-500 text-yellow-900 flex items-center justify-center font-bold text-3xl border-2 border-yellow-600 shadow-md shrink-0' },
-                { value: 1.00, label: '1€', class: 'w-16 h-16 rounded-full bg-gray-300 text-gray-800 flex items-center justify-center font-bold text-2xl border-[6px] border-yellow-500 shadow-md shrink-0' },
-                { value: 2.00, label: '2€', class: 'w-20 h-20 rounded-full bg-yellow-500 text-gray-900 flex items-center justify-center font-bold text-3xl border-[6px] border-gray-400 shadow-md shrink-0' }
+                { value: 0.01, label: '1c', class: 'w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-amber-600 text-amber-100 flex items-center justify-center font-bold text-lg sm:text-xl border-2 border-amber-700 shadow-md shrink-0' },
+                { value: 0.02, label: '2c', class: 'w-13 h-13 sm:w-15 sm:h-15 rounded-full bg-amber-600 text-amber-100 flex items-center justify-center font-bold text-xl sm:text-2xl border-2 border-amber-700 shadow-md shrink-0' },
+                { value: 0.05, label: '5c', class: 'w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-amber-600 text-amber-100 flex items-center justify-center font-bold text-xl sm:text-2xl border-2 border-amber-700 shadow-md shrink-0' },
+                { value: 0.10, label: '10c', class: 'w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-yellow-500 text-yellow-900 flex items-center justify-center font-bold text-lg sm:text-xl border-2 border-yellow-600 shadow-md shrink-0' },
+                { value: 0.20, label: '20c', class: 'w-13 h-13 sm:w-15 sm:h-15 rounded-full bg-yellow-500 text-yellow-900 flex items-center justify-center font-bold text-xl sm:text-2xl border-2 border-yellow-600 shadow-md shrink-0' },
+                { value: 0.50, label: '50c', class: 'w-15 h-15 sm:w-18 sm:h-18 rounded-full bg-yellow-500 text-yellow-900 flex items-center justify-center font-bold text-2xl sm:text-3xl border-2 border-yellow-600 shadow-md shrink-0' },
+                { value: 1.00, label: '1€', class: 'w-13 h-13 sm:w-16 sm:h-16 rounded-full bg-gray-300 text-gray-800 flex items-center justify-center font-bold text-xl sm:text-2xl border-[4px] sm:border-[6px] border-yellow-500 shadow-md shrink-0' },
+                { value: 2.00, label: '2€', class: 'w-15 h-15 sm:w-18 sm:h-18 rounded-full bg-yellow-500 text-gray-900 flex items-center justify-center font-bold text-2xl sm:text-3xl border-[4px] sm:border-[6px] border-gray-400 shadow-md shrink-0' }
             ],
             bills: [
-                { value: 5.00, label: '5€', class: 'w-20 h-12 rounded-lg bg-gray-400 text-gray-800 flex items-center justify-center font-bold text-xl border-2 border-gray-500 shadow-md shrink-0' },
-                { value: 10.00, label: '10€', class: 'w-20 h-12 rounded-lg bg-red-400 text-red-900 flex items-center justify-center font-bold text-xl border-2 border-red-500 shadow-md shrink-0' },
-                { value: 20.00, label: '20€', class: 'w-20 h-12 rounded-lg bg-blue-400 text-blue-900 flex items-center justify-center font-bold text-xl border-2 border-blue-500 shadow-md shrink-0' }
+                { value: 5.00, label: '5€', class: 'w-16 h-10 sm:w-20 sm:h-12 rounded-lg bg-gray-400 text-gray-800 flex items-center justify-center font-bold text-lg sm:text-xl border-2 border-gray-500 shadow-md shrink-0' },
+                { value: 10.00, label: '10€', class: 'w-16 h-10 sm:w-20 sm:h-12 rounded-lg bg-red-400 text-red-900 flex items-center justify-center font-bold text-lg sm:text-xl border-2 border-red-500 shadow-md shrink-0' },
+                { value: 20.00, label: '20€', class: 'w-16 h-10 sm:w-20 sm:h-12 rounded-lg bg-blue-400 text-blue-900 flex items-center justify-center font-bold text-lg sm:text-xl border-2 border-blue-500 shadow-md shrink-0' }
             ]
         };
 
@@ -218,6 +218,7 @@
             
             state.options = Array.from(options).sort(() => Math.random() - 0.5);
             state.waiting = false;
+            state.firstTry = true;
             
             renderGameScreen();
         }
@@ -230,27 +231,27 @@
             `).join('');
             
             const optionsHtml = state.options.map((opt, index) => `
-                <button id="btn-${index}" onclick="checkAnswer(${index}, ${opt})" class="py-4 bg-blue-100 hover:bg-blue-200 text-blue-900 rounded-xl font-bold text-2xl shadow-md border-b-4 border-blue-300 transition transform active:scale-95">
+                <button id="btn-${index}" onclick="checkAnswer(${index}, ${opt})" class="py-3 sm:py-4 bg-blue-100 hover:bg-blue-200 text-blue-900 rounded-xl font-bold text-xl sm:text-2xl shadow-md border-b-4 border-blue-300 transition transform active:scale-95">
                     ${formatMoney(opt)}
                 </button>
             `).join('');
 
             app.innerHTML = `
-                <div class="bg-blue-500 text-white px-6 py-4 flex justify-between items-center font-bold text-xl shadow-md rounded-b-xl z-10">
+                <div class="bg-blue-500 text-white px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center font-bold text-lg sm:text-xl shadow-md rounded-t-3xl sm:rounded-t-3xl z-10">
                     <div>Klausimas: <span class="text-yellow-300">${state.question} / ${state.maxQuestions}</span></div>
                     <div>Taškai: <span class="text-green-300">⭐ ${state.score}</span></div>
                 </div>
                 
-                <div class="flex-1 flex flex-col p-6 fade-in">
-                    <div id="money-container" class="flex-1 flex flex-wrap items-center justify-center gap-4 py-8 bg-white/50 rounded-2xl mb-6 shadow-inner min-h-[200px]">
+                <div class="flex-1 flex flex-col p-3 sm:p-5 fade-in">
+                    <div id="money-container" class="flex flex-wrap items-center justify-center gap-2.5 sm:gap-4 py-3 sm:py-5 bg-white/50 rounded-2xl mb-2 sm:mb-3 shadow-inner min-h-[90px] sm:min-h-[130px]">
                         ${itemsHtml}
                     </div>
                     
-                    <div id="feedback" class="h-12 flex items-center justify-center font-black text-2xl mb-4 opacity-0 transition-opacity">
+                    <div id="feedback" class="h-6 sm:h-8 flex items-center justify-center font-black text-lg sm:text-xl mb-1 sm:mb-2 opacity-0 transition-opacity">
                         Correct!
                     </div>
                     
-                    <div class="grid grid-cols-2 gap-4 mt-auto">
+                    <div class="grid grid-cols-2 gap-2.5 sm:gap-4 mt-auto">
                         ${optionsHtml}
                     </div>
                 </div>
@@ -259,7 +260,6 @@
 
         function checkAnswer(index, value) {
             if (state.waiting) return;
-            state.waiting = true;
             
             const isCorrect = Math.abs(value - state.currentTotal) < 0.001;
             const btn = document.getElementById(`btn-${index}`);
@@ -267,33 +267,34 @@
             const container = document.getElementById('money-container');
             
             if (isCorrect) {
+                state.waiting = true;
                 playSound('correct');
-                state.score++;
-                btn.className = "py-4 bg-green-500 text-white rounded-xl font-bold text-2xl shadow-md border-b-4 border-green-700 transform scale-105 bounce";
+                if (state.firstTry) {
+                    state.score++;
+                }
+                btn.className = "py-3 sm:py-4 bg-green-500 text-white rounded-xl font-bold text-xl sm:text-2xl shadow-md border-b-4 border-green-700 transform scale-105 bounce";
                 feedback.textContent = "Teisingai! 🎉";
-                feedback.className = "h-12 flex items-center justify-center font-black text-2xl mb-4 text-green-600 opacity-100";
-            } else {
-                playSound('wrong');
-                btn.className = "py-4 bg-red-500 text-white rounded-xl font-bold text-2xl shadow-md border-b-4 border-red-700 transform shake";
-                feedback.textContent = `Neteisingai. Turi būti: ${formatMoney(state.currentTotal)}`;
-                feedback.className = "h-12 flex items-center justify-center font-black text-2xl mb-4 text-red-600 opacity-100";
-                container.classList.add('shake');
+                feedback.className = "h-8 sm:h-10 flex items-center justify-center font-black text-xl sm:text-2xl mb-2 sm:mb-3 text-green-600 opacity-100";
                 
-                // Highlight correct answer
-                const correctIndex = state.options.findIndex(o => Math.abs(o - state.currentTotal) < 0.001);
-                if (correctIndex !== -1) {
-                    document.getElementById(`btn-${correctIndex}`).classList.add('bg-green-300', 'text-green-900', 'border-green-400');
-                }
+                setTimeout(() => {
+                    if (state.question >= state.maxQuestions) {
+                        renderEndScreen();
+                    } else {
+                        state.question++;
+                        generateQuestion();
+                    }
+                }, 1200);
+            } else {
+                state.firstTry = false;
+                playSound('wrong');
+                btn.disabled = true;
+                btn.className = "py-3 sm:py-4 bg-red-100 text-red-400 border-red-200 border-2 rounded-xl font-bold text-xl sm:text-2xl shadow-sm line-through cursor-not-allowed opacity-60 shake";
+                feedback.textContent = "Bandyk dar kartą! 🤔";
+                feedback.className = "h-8 sm:h-10 flex items-center justify-center font-black text-lg sm:text-xl mb-2 sm:mb-3 text-red-500 opacity-100 whitespace-nowrap";
+                container.classList.remove('shake');
+                void container.offsetWidth; // trigger reflow
+                container.classList.add('shake');
             }
-            
-            setTimeout(() => {
-                if (state.question >= state.maxQuestions) {
-                    renderEndScreen();
-                } else {
-                    state.question++;
-                    generateQuestion();
-                }
-            }, 1500);
         }
 
         function renderEndScreen() {

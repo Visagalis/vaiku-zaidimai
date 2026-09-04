@@ -81,8 +81,8 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4 overflow-hidden">
-    <div class="max-w-3xl w-full bg-white/95 backdrop-blur rounded-3xl shadow-2xl p-6 sm:p-10 border-4 border-purple-300 relative text-center">
+<body class="min-h-screen flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+    <div class="max-w-3xl w-full bg-white/95 backdrop-blur rounded-3xl shadow-2xl p-4 sm:p-8 border-4 border-purple-300 relative text-center">
         
         <!-- Start Screen -->
         <div id="start-screen" class="block">
@@ -101,24 +101,24 @@
 
         <!-- Game Screen -->
         <div id="game-screen" class="hidden">
-            <div class="flex justify-between items-center mb-8 border-b-2 border-purple-200 pb-4">
-                <div class="text-xl sm:text-2xl font-bold text-gray-600 bg-gray-100 py-2 px-4 rounded-xl">
+            <div class="flex justify-between items-center mb-4 sm:mb-6 border-b-2 border-purple-200 pb-3">
+                <div class="text-lg sm:text-2xl font-bold text-gray-600 bg-gray-100 py-1.5 px-3 sm:py-2 sm:px-4 rounded-xl">
                     Klausimas: <span id="question-counter" class="text-purple-600">1</span> / 12
                 </div>
-                <div class="text-xl sm:text-2xl font-bold text-gray-600 bg-gray-100 py-2 px-4 rounded-xl">
+                <div class="text-lg sm:text-2xl font-bold text-gray-600 bg-gray-100 py-1.5 px-3 sm:py-2 sm:px-4 rounded-xl">
                     Taškai: <span id="score-display" class="text-green-500">0</span>
                 </div>
             </div>
 
-            <div id="sequence-container" class="flex flex-wrap justify-center mb-10 gap-2 sm:gap-0">
+            <div id="sequence-container" class="flex flex-wrap justify-center mb-3 sm:mb-6 gap-1.5 sm:gap-0">
                 <!-- Sequence items injected here -->
             </div>
 
-            <div id="feedback-text" class="h-12 text-2xl sm:text-3xl font-bold mb-6 opacity-0 transition-opacity duration-300">
+            <div id="feedback-text" class="h-8 sm:h-10 text-xl sm:text-3xl font-bold mb-3 sm:mb-4 opacity-0 transition-opacity duration-300">
                 Puiku!
             </div>
 
-            <div id="answers-container" class="grid grid-cols-2 gap-4 sm:gap-6 max-w-lg mx-auto">
+            <div id="answers-container" class="grid grid-cols-2 gap-3 sm:gap-4 max-w-lg mx-auto">
                 <!-- Answer buttons injected here -->
             </div>
         </div>
@@ -265,6 +265,7 @@
             currentQuestion++;
             document.getElementById('question-counter').innerText = currentQuestion;
             isAnswering = false;
+            firstTry = true;
             
             const feedbackText = document.getElementById('feedback-text');
             feedbackText.style.opacity = '0';
@@ -343,53 +344,55 @@
             });
         }
 
+        let firstTry = true;
+
         function checkAnswer(selected, btnElement) {
             if (isAnswering) return;
-            isAnswering = true;
             
             const missingBox = document.getElementById('missing-box');
-            missingBox.classList.remove('animate-pulse-custom');
-            
             const feedbackText = document.getElementById('feedback-text');
             feedbackText.style.opacity = '1';
 
             if (selected === correctAnswer) {
-                score++;
-                document.getElementById('score-display').innerText = score;
+                isAnswering = true;
+                if (firstTry) {
+                    score++;
+                    document.getElementById('score-display').innerText = score;
+                }
                 playSound('correct');
                 
                 btnElement.classList.remove('bg-blue-100', 'hover:bg-blue-200', 'border-blue-300', 'text-blue-800');
                 btnElement.classList.add('bg-green-500', 'border-green-600', 'text-white', 'shadow-[0_4px_0_#16a34a]');
                 
+                missingBox.classList.remove('animate-pulse-custom');
                 missingBox.innerText = correctAnswer;
                 missingBox.classList.remove('missing');
                 missingBox.classList.add('revealed');
                 missingBox.classList.add('animate-bounce-custom');
                 
-                const praises = ['Puiku!', 'Šaunuolis!', 'Teisingai!', 'Nuostabu!', 'Taip!'];
+                const praises = ['Puiku! 🎉', 'Šaunuolis! 🌟', 'Teisingai! 👏', 'Nuostabu! 🚀', 'Taip! ✨'];
                 feedbackText.innerText = praises[Math.floor(Math.random() * praises.length)];
-                feedbackText.classList.add('text-green-500');
+                feedbackText.className = 'h-8 sm:h-10 text-xl sm:text-3xl font-bold mb-3 sm:mb-4 text-green-500';
                 
+                setTimeout(() => {
+                    nextQuestion();
+                }, 1200);
             } else {
+                firstTry = false;
                 playSound('wrong');
                 
-                btnElement.classList.remove('bg-blue-100', 'hover:bg-blue-200', 'border-blue-300', 'text-blue-800');
-                btnElement.classList.add('bg-red-500', 'border-red-600', 'text-white', 'shadow-[0_4px_0_#dc2626]');
-                
-                missingBox.innerText = correctAnswer;
-                missingBox.classList.remove('missing');
-                missingBox.classList.add('revealed-wrong');
+                btnElement.disabled = true;
+                btnElement.classList.remove('bg-blue-100', 'hover:bg-blue-200', 'border-blue-300', 'text-blue-800', 'btn-active');
+                btnElement.classList.add('bg-red-100', 'border-red-300', 'text-red-400', 'line-through', 'opacity-50', 'cursor-not-allowed');
                 
                 const seqContainer = document.getElementById('sequence-container');
+                seqContainer.classList.remove('animate-shake');
+                void seqContainer.offsetWidth;
                 seqContainer.classList.add('animate-shake');
                 
-                feedbackText.innerText = 'Bandyk dar kartą kitame klausime!';
-                feedbackText.classList.add('text-red-500');
+                feedbackText.innerText = 'Bandyk dar kartą! 🤔';
+                feedbackText.className = 'h-8 sm:h-10 text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-red-500 whitespace-nowrap';
             }
-            
-            setTimeout(() => {
-                nextQuestion();
-            }, 1500);
         }
 
         function endGame() {
