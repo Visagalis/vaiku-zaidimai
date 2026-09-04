@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Žodžių Žaidimas</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+        }
+        .animate-shake {
+            animation: shake 0.4s ease-in-out;
+        }
+        body {
+            user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+</head>
+<body class="bg-indigo-50 font-sans min-h-screen">
+
+    <!-- PRADŽIOS EKRANAS -->
+    <div id="start-screen" class="min-h-screen bg-sky-100 flex flex-col items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-3xl shadow-xl max-w-sm w-full text-center transform transition hover:scale-105">
+            <div class="text-6xl mb-6 flex justify-center gap-2">
+                🎈 🐶 🍓
+            </div>
+            <h1 class="text-3xl font-extrabold text-blue-600 mb-4">Žodžių Žaidimas</h1>
+            <p class="text-gray-600 mb-8 text-lg">Įrašyk trūkstamą raidę ir žaisk kiek tik nori!</p>
+            <button onclick="startGame()" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-6 rounded-2xl text-xl flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                Pradėti žaisti
+            </button>
+        </div>
+    </div>
+
+    <!-- ŽAIDIMO EKRANAS -->
+    <div id="game-screen" class="hidden min-h-screen flex-col items-center justify-between p-2 sm:p-4 overflow-hidden">
+        
+        <!-- Viršutinė juosta (Rezultatai) -->
+        <div class="w-full max-w-md flex justify-between items-center bg-white p-2 sm:p-4 rounded-2xl shadow-sm mb-4 sm:mb-6 mt-2">
+            
+            <!-- Taškai -->
+            <div class="flex items-center gap-1 sm:gap-1.5 bg-yellow-100 px-2 sm:px-3 py-1.5 rounded-full text-yellow-700 font-bold shadow-sm" title="Atspėti žodžiai">
+                <svg class="text-yellow-500 w-5 h-5 sm:w-6 sm:h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <span id="score-display" class="text-base sm:text-lg">0</span>
+            </div>
+
+            <!-- Iš eilės be klaidų (Streak) -->
+            <div id="streak-container" class="flex items-center gap-1 sm:gap-1.5 bg-orange-100 px-2 sm:px-3 py-1.5 rounded-full text-orange-700 font-bold shadow-sm transition-opacity duration-300 opacity-0" title="Iš eilės be klaidų">
+                <svg class="text-orange-500 animate-pulse w-5 h-5 sm:w-6 sm:h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+                <span id="streak-display" class="text-base sm:text-lg">0</span> 
+            </div>
+
+            <!-- Klaidos -->
+            <div class="flex items-center gap-1 sm:gap-1.5 bg-red-100 px-2 sm:px-3 py-1.5 rounded-full text-red-700 font-bold shadow-sm" title="Padarytos klaidos">
+                <svg class="text-red-500 w-5 h-5 sm:w-6 sm:h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                <span id="mistakes-display" class="text-base sm:text-lg">0</span>
+            </div>
+
+        </div>
+
+        <!-- Pagrindinė žaidimo lenta -->
+        <div class="flex-1 flex flex-col items-center justify-center w-full max-w-lg">
+            <!-- Emoji paveikslėlis -->
+            <div id="emoji-display" class="text-7xl sm:text-9xl mb-6 sm:mb-8 drop-shadow-xl animate-pulse" style="animation-duration: 3s;">
+                <!-- Emoji -->
+            </div>
+
+            <!-- Žodžio atvaizdavimas -->
+            <div id="word-container" class="flex w-full justify-center px-1 gap-1 sm:gap-2 mb-8 sm:mb-10">
+                <!-- Langeliai -->
+            </div>
+
+            <!-- Grįžtamojo ryšio pranešimas -->
+            <div id="feedback-message" class="h-10 mb-2 flex items-center justify-center font-bold">
+                <!-- Pranešimas -->
+            </div>
+        </div>
+
+        <!-- Klaviatūra -->
+        <div class="w-full max-w-md bg-white p-3 sm:p-4 rounded-t-3xl sm:rounded-3xl shadow-lg mt-auto pb-6 sm:pb-8">
+            <div id="keyboard-container" class="flex flex-wrap justify-center gap-1.5 sm:gap-2">
+                <!-- Mygtukai -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ŽAIDIMO LOGIKA -->
+    <script>
+        const ZODZIU_SARASAS = [
+            { word: 'KATĖ', emoji: '🐱' }, { word: 'ŠUO', emoji: '🐶' }, { word: 'ŽUVIS', emoji: '🐟' }, { word: 'KROKODILAS', emoji: '🐊' },
+            { word: 'KARVĖ', emoji: '🐄' }, { word: 'VILKAS', emoji: '🐺' }, { word: 'TIGRAS', emoji: '🐯' }, { word: 'LIŪTAS', emoji: '🦁' },
+            { word: 'PELĖDA', emoji: '🦉' }, { word: 'GYVATĖ', emoji: '🐍' }, { word: 'LOKYS', emoji: '🐻' }, { word: 'KIAULĖ', emoji: '🐷' },
+            { word: 'ARKLYS', emoji: '🐴' }, { word: 'VARLĖ', emoji: '🐸' }, { word: 'PELĖ', emoji: '🐭' }, { word: 'BITĖ', emoji: '🐝' },
+            { word: 'DRUGELIS', emoji: '🦋' }, { word: 'ZUIKIS', emoji: '🐰' }, { word: 'DRAMBLYS', emoji: '🐘' }, { word: 'BEŽDŽIONĖ', emoji: '🐒' },
+            { word: 'VĖŽLYS', emoji: '🐢' }, { word: 'PINGVINAS', emoji: '🐧' }, { word: 'VORAS', emoji: '🕷️' }, { word: 'SRAIGĖ', emoji: '🐌' },
+            { word: 'VIŠTA', emoji: '🐔' }, { word: 'ANTIS', emoji: '🦆' },
+            
+            { word: 'SAULĖ', emoji: '☀️' }, { word: 'MEDIS', emoji: '🌳' }, { word: 'GĖLĖ', emoji: '🌸' }, { word: 'MĖNULIS', emoji: '🌙' },
+            { word: 'UGNIS', emoji: '🔥' }, { word: 'SNIEGAS', emoji: '❄️' }, { word: 'LIETUS', emoji: '🌧️' }, { word: 'DEBESIS', emoji: '☁️' },
+            { word: 'ŽAIBAS', emoji: '⚡' }, { word: 'ŽVAIGŽDĖ', emoji: '⭐' }, { word: 'LAŠAS', emoji: '💧' }, { word: 'AKMUO', emoji: '🪨' },
+            { word: 'LAPAI', emoji: '🍃' }, { word: 'LAPAS', emoji: '🍁' }, { word: 'KALNAS', emoji: '⛰️' }, { word: 'ŽEMĖ', emoji: '🌍' },
+
+            { word: 'LEDAI', emoji: '🍦' }, { word: 'LEDAS', emoji: '🧊' }, { word: 'PIENAS', emoji: '🥛' }, { word: 'OBUOLYS', emoji: '🍎' },
+            { word: 'TORTAS', emoji: '🎂' }, { word: 'MORKA', emoji: '🥕' }, { word: 'DUONA', emoji: '🍞' }, { word: 'SŪRIS', emoji: '🧀' },
+            { word: 'ARBATA', emoji: '☕' }, { word: 'CITRINA', emoji: '🍋' }, { word: 'BRAŠKĖ', emoji: '🍓' }, { word: 'BANANAS', emoji: '🍌' },
+            { word: 'VYNUOGĖS', emoji: '🍇' }, { word: 'ARBŪZAS', emoji: '🍉' }, { word: 'VYŠNIA', emoji: '🍒' }, { word: 'KRIAUŠĖ', emoji: '🍐' },
+            { word: 'BULVĖ', emoji: '🥔' }, { word: 'POMIDORAS', emoji: '🍅' }, { word: 'AGURKAS', emoji: '🥒' }, { word: 'SALDAINIS', emoji: '🍬' },
+            { word: 'ŠOKOLADAS', emoji: '🍫' }, { word: 'SAUSAINIS', emoji: '🍪' }, { word: 'PICA', emoji: '🍕' }, { word: 'MĖSA', emoji: '🥩' },
+            { word: 'KIAUŠINIS', emoji: '🥚' }, { word: 'SRIUBA', emoji: '🥣' },
+
+            { word: 'NAMAS', emoji: '🏠' }, { word: 'KNYGA', emoji: '📖' }, { word: 'SUKNELĖ', emoji: '👗' }, { word: 'KĖDĖ', emoji: '🪑' },
+            { word: 'DURYS', emoji: '🚪' }, { word: 'LOVA', emoji: '🛏️' }, { word: 'LANGAS', emoji: '🪟' },
+            { word: 'LAIKRODIS', emoji: '⌚' }, { word: 'RAKTAS', emoji: '🔑' }, { word: 'KELNĖS', emoji: '👖' }, { word: 'BATAS', emoji: '👞' },
+            { word: 'KEPURĖ', emoji: '🧢' }, { word: 'PIEŠTUKAS', emoji: '✏️' }, { word: 'KUPRINĖ', emoji: '🎒' }, { word: 'KAMUOLYS', emoji: '⚽' },
+            { word: 'ŽAISLAS', emoji: '🧸' }, { word: 'TELEFONAS', emoji: '📱' }, { word: 'ŠAUKŠTAS', emoji: '🥄' },
+            { word: 'PEILIS', emoji: '🔪' }, { word: 'DOVANA', emoji: '🎁' }, { word: 'BALIONAS', emoji: '🎈' }, { word: 'VĖLIAVA', emoji: '🇱🇹' },
+
+            { word: 'MAŠINA', emoji: '🚗' }, { word: 'DVIRATIS', emoji: '🚲' }, { word: 'TRAUKINYS', emoji: '🚂' }, { word: 'LĖKTUVAS', emoji: '✈️' },
+            { word: 'LAIVAS', emoji: '🚢' }, { word: 'AUTOBUSAS', emoji: '🚌' }, { word: 'RAKETA', emoji: '🚀' }, { word: 'SRAIGTASPARNIS', emoji: '🚁' },
+
+            { word: 'MAMA', emoji: '👩' }, { word: 'TĖTIS', emoji: '👨' }, { word: 'PĖDA', emoji: '🦶' }, { word: 'AKIS', emoji: '👁️' },
+            { word: 'AUSIS', emoji: '👂' }, { word: 'NOSIS', emoji: '👃' }, { word: 'BURNA', emoji: '👄' }, { word: 'RANKA', emoji: '✋' },
+            { word: 'KOJA', emoji: '🦵' }, { word: 'VAIKAS', emoji: '🧒' }
+        ];
+
+        const LIETUVISKA_ABECELE = [
+            'A', 'Ą', 'B', 'C', 'Č', 'D', 'E', 'Ę', 'Ė', 'F',
+            'G', 'H', 'I', 'Į', 'Y', 'J', 'K', 'L', 'M', 'N',
+            'O', 'P', 'R', 'S', 'Š', 'T', 'U', 'Ų', 'Ū', 'V',
+            'Z', 'Ž'
+        ];
+
+        let currentWord = null;
+        let missingIndex = 0;
+        let score = 0;
+        let streak = 0;
+        let mistakes = 0; // Pridėtas klaidų skaitiklis
+        let isAnimating = false;
+
+        function initKeyboard() {
+            const kbContainer = document.getElementById('keyboard-container');
+            kbContainer.innerHTML = '';
+            LIETUVISKA_ABECELE.forEach(letter => {
+                const btn = document.createElement('button');
+                btn.textContent = letter;
+                btn.id = `key-${letter}`;
+                btn.className = 'w-9 h-11 sm:w-11 sm:h-14 flex items-center justify-center text-lg sm:text-2xl font-bold rounded-md sm:rounded-lg shadow-sm border-b-[3px] active:border-b-0 active:translate-y-[3px] transition-all bg-blue-100 text-blue-800 border-blue-300 hover:bg-blue-200';
+                btn.onclick = () => handleGuess(letter);
+                kbContainer.appendChild(btn);
+            });
+        }
+
+        function startGame() {
+            score = 0;
+            streak = 0;
+            mistakes = 0; // Nunuliname klaidas pradedant naują žaidimą
+            updateScoreUI();
+            
+            document.getElementById('start-screen').classList.add('hidden');
+            const gameScreen = document.getElementById('game-screen');
+            gameScreen.classList.remove('hidden');
+            gameScreen.classList.add('flex');
+            
+            initKeyboard();
+            pickNextWord();
+        }
+
+        function pickNextWord() {
+            isAnimating = false;
+            let nextWordObj;
+            
+            do {
+                const randomIndex = Math.floor(Math.random() * ZODZIU_SARASAS.length);
+                nextWordObj = ZODZIU_SARASAS[randomIndex];
+            } while (currentWord && nextWordObj.word === currentWord.word);
+
+            currentWord = nextWordObj;
+            missingIndex = Math.floor(Math.random() * currentWord.word.length);
+            
+            renderGame();
+            resetKeyboard();
+            document.getElementById('feedback-message').innerHTML = '';
+        }
+
+        function renderGame() {
+            document.getElementById('emoji-display').textContent = currentWord.emoji;
+            
+            const wordContainer = document.getElementById('word-container');
+            wordContainer.innerHTML = '';
+
+            currentWord.word.split('').forEach((letter, idx) => {
+                const isMissing = idx === missingIndex;
+                const div = document.createElement('div');
+                
+                let baseClass = 'flex-1 max-w-[60px] sm:max-w-[70px] aspect-[3/4] flex items-center justify-center font-extrabold rounded-lg sm:rounded-xl shadow-sm sm:shadow-md border-b-2 sm:border-b-4 text-2xl min-[400px]:text-3xl sm:text-5xl transition-colors ';
+                
+                if (isMissing) {
+                    div.id = 'missing-box'; 
+                    div.className = baseClass + 'bg-white text-blue-600 border-blue-200 border-2 border-dashed';
+                    div.textContent = '';
+                } else {
+                    div.className = baseClass + 'bg-white text-gray-800 border-gray-200';
+                    div.textContent = letter;
+                }
+                
+                wordContainer.appendChild(div);
+            });
+        }
+
+        function resetKeyboard() {
+            LIETUVISKA_ABECELE.forEach(letter => {
+                const btn = document.getElementById(`key-${letter}`);
+                if (btn) {
+                    btn.disabled = false;
+                    btn.className = 'w-9 h-11 sm:w-11 sm:h-14 flex items-center justify-center text-lg sm:text-2xl font-bold rounded-md sm:rounded-lg shadow-sm border-b-[3px] active:border-b-0 active:translate-y-[3px] transition-all bg-blue-100 text-blue-800 border-blue-300 hover:bg-blue-200';
+                }
+            });
+        }
+
+        function disableKeyboard() {
+            LIETUVISKA_ABECELE.forEach(letter => {
+                const btn = document.getElementById(`key-${letter}`);
+                if (btn) {
+                    btn.disabled = true;
+                    btn.classList.add('bg-gray-100', 'text-gray-400', 'border-gray-200', 'cursor-not-allowed');
+                    btn.classList.remove('bg-blue-100', 'text-blue-800', 'border-blue-300', 'hover:bg-blue-200');
+                }
+            });
+        }
+
+        function updateScoreUI() {
+            document.getElementById('score-display').textContent = score;
+            document.getElementById('mistakes-display').textContent = mistakes; // Atnaujiname klaidų tekstą
+            
+            const streakContainer = document.getElementById('streak-container');
+            const streakDisplay = document.getElementById('streak-display');
+            
+            streakDisplay.textContent = streak;
+            if (streak > 0) {
+                streakContainer.classList.remove('opacity-0');
+                streakContainer.classList.add('opacity-100');
+            } else {
+                streakContainer.classList.remove('opacity-100');
+                streakContainer.classList.add('opacity-0');
+            }
+        }
+
+        function handleGuess(letter) {
+            if (isAnimating || !currentWord) return;
+
+            const correctLetter = currentWord.word[missingIndex];
+            const missingBox = document.getElementById('missing-box');
+            const feedbackMsg = document.getElementById('feedback-message');
+            
+            missingBox.textContent = letter;
+
+            if (letter === correctLetter) {
+                isAnimating = true;
+                score++;
+                streak++;
+                updateScoreUI();
+                disableKeyboard();
+
+                missingBox.className = 'flex-1 max-w-[60px] sm:max-w-[70px] aspect-[3/4] flex items-center justify-center font-extrabold rounded-lg sm:rounded-xl shadow-sm sm:shadow-md border-b-2 sm:border-b-4 text-2xl min-[400px]:text-3xl sm:text-5xl transition-colors bg-green-400 text-white border-green-600 animate-bounce';
+                
+                feedbackMsg.innerHTML = '<div class="text-green-500 text-2xl sm:text-3xl animate-bounce flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg> Puiku! <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg></div>';
+
+                setTimeout(pickNextWord, 1500);
+            } else {
+                isAnimating = true;
+                streak = 0;
+                mistakes++; // Padidiname klaidų skaičių
+                updateScoreUI();
+
+                missingBox.className = 'flex-1 max-w-[60px] sm:max-w-[70px] aspect-[3/4] flex items-center justify-center font-extrabold rounded-lg sm:rounded-xl shadow-sm sm:shadow-md border-b-2 sm:border-b-4 text-2xl min-[400px]:text-3xl sm:text-5xl transition-colors bg-red-400 text-white border-red-600 animate-shake';
+                
+                feedbackMsg.innerHTML = '<div class="text-red-500 text-xl sm:text-2xl opacity-80">Bandyk dar kartą!</div>';
+
+                setTimeout(() => {
+                    missingBox.textContent = '';
+                    missingBox.className = 'flex-1 max-w-[60px] sm:max-w-[70px] aspect-[3/4] flex items-center justify-center font-extrabold rounded-lg sm:rounded-xl shadow-sm sm:shadow-md border-b-2 sm:border-b-4 text-2xl min-[400px]:text-3xl sm:text-5xl transition-colors bg-white text-blue-600 border-blue-200 border-2 border-dashed';
+                    feedbackMsg.innerHTML = '';
+                    isAnimating = false;
+                }, 800);
+            }
+        }
+
+        window.addEventListener('keydown', (e) => {
+            const key = e.key.toUpperCase();
+            if (LIETUVISKA_ABECELE.includes(key)) {
+                handleGuess(key);
+            }
+        });
+
+    </script>
+</body>
+</html>
