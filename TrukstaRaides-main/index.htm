@@ -96,6 +96,56 @@
 
     <!-- ŽAIDIMO LOGIKA -->
     <script>
+        // === SKIEMENŲ SPALVINIMAS ===
+        const _V = 'aeėęiįyouųūąAEĖĘIĮYOUŲŪĄ';
+        const _D = ['ai','au','ei','eu','ie','uo','ui','oi','ia','io','iu'];
+        const _L = /[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/;
+        const _O = new Set(['bl','br','dr','dv','fl','fr','gl','gr','gn','kl','kr','kn','kv','pl','pr','sk','sl','sm','sn','sp','sr','st','sv','šl','šv','šn','tr','tv','vr','žl','žv','str','skr','spr']);
+        const _SC = ['#dc2626','#2563eb','#16a34a','#ea580c','#9333ea','#db2777'];
+
+        function _syl(word) {
+            if (!word || word.length <= 1) return [word || ''];
+            const r = []; let s = '', i = 0, n = word.length;
+            while (i < n) {
+                const c = word[i];
+                if (!_L.test(c)) { s += c; i++; continue; }
+                if (!_V.includes(c)) { s += c; i++; }
+                else {
+                    s += c; i++;
+                    if (i < n && _V.includes(word[i]) && _D.includes((c + word[i]).toLowerCase())) { s += word[i]; i++; }
+                    let j = i, u = [];
+                    while (j < n && !_V.includes(word[j])) {
+                        if (!_L.test(word[j])) break;
+                        if (j+1 < n) { const p = (word[j]+word[j+1]).toLowerCase(); if (p==='ch'||p==='dz'||p==='dž') { u.push(word[j]+word[j+1]); j+=2; continue; } }
+                        u.push(word[j]); j++;
+                    }
+                    if (j >= n || (j < n && !_V.includes(word[j]) && !_L.test(word[j]))) {
+                        s += u.join(''); while (j < n && !_L.test(word[j])) { s += word[j]; j++; } i = j;
+                        if (i >= n) { r.push(s); s = ''; }
+                    } else if (u.length === 0) { r.push(s); s = ''; }
+                    else if (u.length === 1) { r.push(s); s = u[0]; i = j; }
+                    else {
+                        let sp = u.length - 1;
+                        if (u.length >= 3) { const l2 = (u[u.length-2]+u[u.length-1]).toLowerCase(); if (_O.has(l2)) sp = u.length - 2; }
+                        if (u.length >= 4) { const l3 = (u[u.length-3]+u[u.length-2]+u[u.length-1]).toLowerCase(); if (_O.has(l3)) sp = u.length - 3; }
+                        s += u.slice(0, sp).join(''); r.push(s); s = u.slice(sp).join(''); i = j;
+                    }
+                }
+            }
+            if (s) r.push(s);
+            return r.filter(x => x.length > 0);
+        }
+
+        function _col(text) {
+            if (!text) return '';
+            return text.split(/(\s+)/).map(token => {
+                if (!token.trim() || !/[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/.test(token)) return token;
+                const syls = _syl(token);
+                return syls.map((s, i) => '<span style="color:' + _SC[i % _SC.length] + '">' + s + '</span>').join('');
+            }).join('');
+        }
+        // === /SKIEMENŲ SPALVINIMAS ===
+
         const ZODZIU_SARASAS = [
             { word: 'KATĖ', emoji: '🐱' }, { word: 'ŠUO', emoji: '🐶' }, { word: 'ŽUVIS', emoji: '🐟' }, { word: 'KROKODILAS', emoji: '🐊' },
             { word: 'KARVĖ', emoji: '🐄' }, { word: 'VILKAS', emoji: '🐺' }, { word: 'TIGRAS', emoji: '🐯' }, { word: 'LIŪTAS', emoji: '🦁' },
@@ -142,6 +192,7 @@
 
         let currentWord = null;
         let missingIndex = 0;
+        let letterColors = [];
         let score = 0;
         let streak = 0;
         let mistakes = 0; // Pridėtas klaidų skaitiklis
@@ -198,6 +249,13 @@
             const wordContainer = document.getElementById('word-container');
             wordContainer.innerHTML = '';
 
+            const syls = _syl(currentWord.word);
+            letterColors = [];
+            syls.forEach((s, sIdx) => {
+                const color = _SC[sIdx % _SC.length];
+                for (let k = 0; k < s.length; k++) letterColors.push(color);
+            });
+
             currentWord.word.split('').forEach((letter, idx) => {
                 const isMissing = idx === missingIndex;
                 const div = document.createElement('div');
@@ -209,7 +267,8 @@
                     div.className = baseClass + 'bg-white text-blue-600 border-blue-200 border-2 border-dashed';
                     div.textContent = '';
                 } else {
-                    div.className = baseClass + 'bg-white text-gray-800 border-gray-200';
+                    div.className = baseClass + 'bg-white border-gray-200';
+                    div.style.color = letterColors[idx] || '#1f2937';
                     div.textContent = letter;
                 }
                 
@@ -271,7 +330,9 @@
                 updateScoreUI();
                 disableKeyboard();
 
-                missingBox.className = 'flex-1 max-w-[60px] sm:max-w-[70px] aspect-[3/4] flex items-center justify-center font-extrabold rounded-lg sm:rounded-xl shadow-sm sm:shadow-md border-b-2 sm:border-b-4 text-2xl min-[400px]:text-3xl sm:text-5xl transition-colors bg-green-400 text-white border-green-600 animate-bounce';
+                const div = missingBox;
+                div.style.color = letterColors[missingIndex] || '#2563eb';
+                div.className = 'flex-1 max-w-[60px] sm:max-w-[70px] aspect-[3/4] flex items-center justify-center font-extrabold rounded-lg sm:rounded-xl shadow-sm sm:shadow-md border-b-2 sm:border-b-4 text-2xl min-[400px]:text-3xl sm:text-5xl transition-colors bg-green-100 border-green-500 animate-bounce';
                 
                 feedbackMsg.innerHTML = '<div class="text-green-500 text-2xl sm:text-3xl animate-bounce flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg> Puiku! <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg></div>';
 
@@ -282,12 +343,14 @@
                 mistakes++; // Padidiname klaidų skaičių
                 updateScoreUI();
 
+                missingBox.style.color = '';
                 missingBox.className = 'flex-1 max-w-[60px] sm:max-w-[70px] aspect-[3/4] flex items-center justify-center font-extrabold rounded-lg sm:rounded-xl shadow-sm sm:shadow-md border-b-2 sm:border-b-4 text-2xl min-[400px]:text-3xl sm:text-5xl transition-colors bg-red-400 text-white border-red-600 animate-shake';
                 
                 feedbackMsg.innerHTML = '<div class="text-red-500 text-xl sm:text-2xl opacity-80">Bandyk dar kartą!</div>';
 
                 setTimeout(() => {
                     missingBox.textContent = '';
+                    missingBox.style.color = '';
                     missingBox.className = 'flex-1 max-w-[60px] sm:max-w-[70px] aspect-[3/4] flex items-center justify-center font-extrabold rounded-lg sm:rounded-xl shadow-sm sm:shadow-md border-b-2 sm:border-b-4 text-2xl min-[400px]:text-3xl sm:text-5xl transition-colors bg-white text-blue-600 border-blue-200 border-2 border-dashed';
                     feedbackMsg.innerHTML = '';
                     isAnimating = false;

@@ -95,6 +95,56 @@
   <script type="text/babel">
     const { useState, useEffect, useCallback, useRef, Fragment } = React;
 
+    // === SKIEMENŲ SPALVINIMAS ===
+    const _V = 'aeėęiįyouųūąAEĖĘIĮYOUŲŪĄ';
+    const _D = ['ai','au','ei','eu','ie','uo','ui','oi','ia','io','iu'];
+    const _L = /[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/;
+    const _O = new Set(['bl','br','dr','dv','fl','fr','gl','gr','gn','kl','kr','kn','kv','pl','pr','sk','sl','sm','sn','sp','sr','st','sv','šl','šv','šn','tr','tv','vr','žl','žv','str','skr','spr']);
+    const _SC = ['#dc2626','#2563eb','#16a34a','#ea580c','#9333ea','#db2777'];
+
+    function _syl(word) {
+        if (!word || word.length <= 1) return [word || ''];
+        const r = []; let s = '', i = 0, n = word.length;
+        while (i < n) {
+            const c = word[i];
+            if (!_L.test(c)) { s += c; i++; continue; }
+            if (!_V.includes(c)) { s += c; i++; }
+            else {
+                s += c; i++;
+                if (i < n && _V.includes(word[i]) && _D.includes((c + word[i]).toLowerCase())) { s += word[i]; i++; }
+                let j = i, u = [];
+                while (j < n && !_V.includes(word[j])) {
+                    if (!_L.test(word[j])) break;
+                    if (j+1 < n) { const p = (word[j]+word[j+1]).toLowerCase(); if (p==='ch'||p==='dz'||p==='dž') { u.push(word[j]+word[j+1]); j+=2; continue; } }
+                    u.push(word[j]); j++;
+                }
+                if (j >= n || (j < n && !_V.includes(word[j]) && !_L.test(word[j]))) {
+                    s += u.join(''); while (j < n && !_L.test(word[j])) { s += word[j]; j++; } i = j;
+                    if (i >= n) { r.push(s); s = ''; }
+                } else if (u.length === 0) { r.push(s); s = ''; }
+                else if (u.length === 1) { r.push(s); s = u[0]; i = j; }
+                else {
+                    let sp = u.length - 1;
+                    if (u.length >= 3) { const l2 = (u[u.length-2]+u[u.length-1]).toLowerCase(); if (_O.has(l2)) sp = u.length - 2; }
+                    if (u.length >= 4) { const l3 = (u[u.length-3]+u[u.length-2]+u[u.length-1]).toLowerCase(); if (_O.has(l3)) sp = u.length - 3; }
+                    s += u.slice(0, sp).join(''); r.push(s); s = u.slice(sp).join(''); i = j;
+                }
+            }
+        }
+        if (s) r.push(s);
+        return r.filter(x => x.length > 0);
+    }
+
+    function _col(text) {
+        if (!text) return '';
+        return text.split(/(\s+)/).map(token => {
+            if (!token.trim() || !/[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/.test(token)) return token;
+            const syls = _syl(token);
+            return syls.map((s, i) => '<span style="color:' + _SC[i % _SC.length] + '">' + s + '</span>').join('');
+        }).join('');
+    }
+    // === /SKIEMENŲ SPALVINIMAS ===
+
     const VALID_CHARS = "ĄČĘĖĮŠŲŪŽQWERTYUIOPASDFGHJKLZXCVBNM ";
 
     const Icon = ({ name, className }) => {
@@ -641,7 +691,7 @@
                       {phrases.map((phrase, idx) => (
                         <li key={idx} className="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-gray-200">
                           <span className="font-bold text-lg sm:text-xl text-gray-700 uppercase break-words pr-4">
-                            {idx + 1}. {phrase}
+                            {idx + 1}. <span dangerouslySetInnerHTML={{ __html: _col(phrase) }} />
                           </span>
                           <button
                             onClick={() => handleRemovePhrase(idx)}
@@ -704,9 +754,10 @@
                   
                   <div className="text-center flex items-center justify-center pb-1 min-h-[2rem] sm:min-h-[2.5rem]">
                     {isTargetVisible ? (
-                      <h2 className="text-xl sm:text-3xl font-bold tracking-wide break-words px-2 uppercase line-clamp-2">
-                        {phrases[currentIndex]}
-                      </h2>
+                      <h2 
+                        className="text-xl sm:text-3xl font-bold tracking-wide break-words px-4 py-0.5 rounded-xl bg-white shadow-sm uppercase line-clamp-2"
+                        dangerouslySetInnerHTML={{ __html: _col(phrases[currentIndex]) }}
+                      />
                     ) : (
                       <h2 className="text-lg sm:text-2xl font-medium text-blue-200 italic">
                         Paklausyk ir parašyk!
@@ -813,7 +864,7 @@
                   <div className="bg-white px-6 sm:px-8 py-4 sm:py-6 rounded-2xl sm:rounded-3xl shadow-lg border-2 border-green-100 max-w-full">
                     <p className="text-2xl sm:text-4xl font-bold text-green-600 break-words uppercase flex items-center justify-center gap-2 text-center">
                       <Icon name="check" className="w-8 h-8 shrink-0 inline" />
-                      <span>{currentText}</span>
+                      <span dangerouslySetInnerHTML={{ __html: _col(currentText) }} />
                     </p>
                   </div>
                 </div>
@@ -858,7 +909,7 @@
                     {stats.map((stat, idx) => (
                       <div key={idx} className="flex items-center justify-between bg-gray-50 border border-gray-200 p-4 rounded-2xl">
                         <span className="font-bold text-lg sm:text-xl text-gray-800 break-words pr-4 flex-1">
-                          {idx + 1}. {stat.phrase}
+                          {idx + 1}. <span dangerouslySetInnerHTML={{ __html: _col(stat.phrase) }} />
                         </span>
                         <div className="flex flex-col items-center justify-center shrink-0 w-24 sm:w-32 bg-white rounded-xl py-2 shadow-sm border border-gray-100">
                           <span className="text-xs sm:text-sm text-gray-400 uppercase font-bold tracking-wider">Iš karto:</span>

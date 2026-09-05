@@ -91,6 +91,56 @@
             });
         }
 
+        // === SKIEMENŲ SPALVINIMAS ===
+        const _V = 'aeėęiįyouųūąAEĖĘIĮYOUŲŪĄ';
+        const _D = ['ai','au','ei','eu','ie','uo','ui','oi','ia','io','iu'];
+        const _L = /[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/;
+        const _O = new Set(['bl','br','dr','dv','fl','fr','gl','gr','gn','kl','kr','kn','kv','pl','pr','sk','sl','sm','sn','sp','sr','st','sv','šl','šv','šn','tr','tv','vr','žl','žv','str','skr','spr']);
+        const _SC = ['#dc2626','#2563eb','#16a34a','#ea580c','#9333ea','#db2777'];
+
+        function _syl(word) {
+            if (!word || word.length <= 1) return [word || ''];
+            const r = []; let s = '', i = 0, n = word.length;
+            while (i < n) {
+                const c = word[i];
+                if (!_L.test(c)) { s += c; i++; continue; }
+                if (!_V.includes(c)) { s += c; i++; }
+                else {
+                    s += c; i++;
+                    if (i < n && _V.includes(word[i]) && _D.includes((c + word[i]).toLowerCase())) { s += word[i]; i++; }
+                    let j = i, u = [];
+                    while (j < n && !_V.includes(word[j])) {
+                        if (!_L.test(word[j])) break;
+                        if (j+1 < n) { const p = (word[j]+word[j+1]).toLowerCase(); if (p==='ch'||p==='dz'||p==='dž') { u.push(word[j]+word[j+1]); j+=2; continue; } }
+                        u.push(word[j]); j++;
+                    }
+                    if (j >= n || (j < n && !_V.includes(word[j]) && !_L.test(word[j]))) {
+                        s += u.join(''); while (j < n && !_L.test(word[j])) { s += word[j]; j++; } i = j;
+                        if (i >= n) { r.push(s); s = ''; }
+                    } else if (u.length === 0) { r.push(s); s = ''; }
+                    else if (u.length === 1) { r.push(s); s = u[0]; i = j; }
+                    else {
+                        let sp = u.length - 1;
+                        if (u.length >= 3) { const l2 = (u[u.length-2]+u[u.length-1]).toLowerCase(); if (_O.has(l2)) sp = u.length - 2; }
+                        if (u.length >= 4) { const l3 = (u[u.length-3]+u[u.length-2]+u[u.length-1]).toLowerCase(); if (_O.has(l3)) sp = u.length - 3; }
+                        s += u.slice(0, sp).join(''); r.push(s); s = u.slice(sp).join(''); i = j;
+                    }
+                }
+            }
+            if (s) r.push(s);
+            return r.filter(x => x.length > 0);
+        }
+
+        function _col(text) {
+            if (!text) return '';
+            return text.split(/(\s+)/).map(token => {
+                if (!token.trim() || !/[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/.test(token)) return token;
+                const syls = _syl(token);
+                return syls.map((s, i) => '<span style="color:' + _SC[i % _SC.length] + '">' + s + '</span>').join('');
+            }).join('');
+        }
+        // === /SKIEMENŲ SPALVINIMAS ===
+
         // Tekstinių uždavinių bazė
         const TASKS_EASY = [
             {
@@ -299,7 +349,7 @@
                 <div class="p-3 sm:p-5 flex-1 flex flex-col justify-between items-center">
                     <div class="w-full bg-rose-50/80 rounded-2xl p-3 sm:p-4 border-2 border-rose-200 shadow-sm text-center mb-1">
                         <p class="text-lg sm:text-2xl font-black text-slate-800 leading-snug">
-                            ${q.story}
+                            ${_col(q.story)}
                         </p>
                     </div>
 

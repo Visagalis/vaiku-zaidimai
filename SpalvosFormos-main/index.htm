@@ -115,6 +115,56 @@
     </div>
 
     <script>
+        // === SKIEMENŲ SPALVINIMAS ===
+        const _V = 'aeėęiįyouųūąAEĖĘIĮYOUŲŪĄ';
+        const _D = ['ai','au','ei','eu','ie','uo','ui','oi','ia','io','iu'];
+        const _L = /[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/;
+        const _O = new Set(['bl','br','dr','dv','fl','fr','gl','gr','gn','kl','kr','kn','kv','pl','pr','sk','sl','sm','sn','sp','sr','st','sv','šl','šv','šn','tr','tv','vr','žl','žv','str','skr','spr']);
+        const _SC = ['#dc2626','#2563eb','#16a34a','#ea580c','#9333ea','#db2777'];
+
+        function _syl(word) {
+            if (!word || word.length <= 1) return [word || ''];
+            const r = []; let s = '', i = 0, n = word.length;
+            while (i < n) {
+                const c = word[i];
+                if (!_L.test(c)) { s += c; i++; continue; }
+                if (!_V.includes(c)) { s += c; i++; }
+                else {
+                    s += c; i++;
+                    if (i < n && _V.includes(word[i]) && _D.includes((c + word[i]).toLowerCase())) { s += word[i]; i++; }
+                    let j = i, u = [];
+                    while (j < n && !_V.includes(word[j])) {
+                        if (!_L.test(word[j])) break;
+                        if (j+1 < n) { const p = (word[j]+word[j+1]).toLowerCase(); if (p==='ch'||p==='dz'||p==='dž') { u.push(word[j]+word[j+1]); j+=2; continue; } }
+                        u.push(word[j]); j++;
+                    }
+                    if (j >= n || (j < n && !_V.includes(word[j]) && !_L.test(word[j]))) {
+                        s += u.join(''); while (j < n && !_L.test(word[j])) { s += word[j]; j++; } i = j;
+                        if (i >= n) { r.push(s); s = ''; }
+                    } else if (u.length === 0) { r.push(s); s = ''; }
+                    else if (u.length === 1) { r.push(s); s = u[0]; i = j; }
+                    else {
+                        let sp = u.length - 1;
+                        if (u.length >= 3) { const l2 = (u[u.length-2]+u[u.length-1]).toLowerCase(); if (_O.has(l2)) sp = u.length - 2; }
+                        if (u.length >= 4) { const l3 = (u[u.length-3]+u[u.length-2]+u[u.length-1]).toLowerCase(); if (_O.has(l3)) sp = u.length - 3; }
+                        s += u.slice(0, sp).join(''); r.push(s); s = u.slice(sp).join(''); i = j;
+                    }
+                }
+            }
+            if (s) r.push(s);
+            return r.filter(x => x.length > 0);
+        }
+
+        function _col(text) {
+            if (!text) return '';
+            return text.split(/(\s+)/).map(token => {
+                if (!token.trim() || !/[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/.test(token)) return token;
+                const syls = _syl(token);
+                return syls.map((s, i) => '<span style="color:' + _SC[i % _SC.length] + '">' + s + '</span>').join('');
+            }).join('');
+        }
+        // === /SKIEMENŲ SPALVINIMAS ===
+
         // Game Data
         const SHAPES = [
             { id: 'apskritimas', name: 'Apskritimas', svg: '<circle cx="100" cy="100" r="85" />' },
@@ -232,6 +282,7 @@
             const { shape, color, options } = gameState.currentQuestion;
             
             const progress = ((gameState.questionIndex) / TOTAL_QUESTIONS) * 100;
+            const promptText = gameState.mode === 'shapes' ? 'Kokia tai forma?' : 'Kokia tai spalva ir forma?';
 
             appEl.innerHTML = `
                 <div class="glass-panel rounded-3xl p-4 sm:p-6 relative">
@@ -249,6 +300,8 @@
                         <div class="bg-blue-500 h-2.5 rounded-full transition-all duration-300" style="width: ${progress}%"></div>
                     </div>
 
+                    <h2 class="text-xl sm:text-2xl font-black text-gray-700 text-center mb-2 sm:mb-3">${_col(promptText)}</h2>
+
                     <div id="shape-container" class="shape-container flex justify-center mb-3 sm:mb-6 animate-pop-in h-32 sm:h-40 items-center">
                         <svg viewBox="0 0 200 200" width="130" height="130" class="sm:w-[160px] sm:h-[160px]" 
                              fill="${color.hex}" stroke="${color.dark}" stroke-width="8">
@@ -258,9 +311,9 @@
 
                     <div class="grid grid-cols-2 gap-2.5 sm:gap-3">
                         ${options.map((opt) => `
-                            <button onclick="handleAnswer('${opt}', this)" 
+                            <button onclick="handleAnswer('${opt.replace(/'/g, "\\'")}', this)" 
                                     class="option-btn btn-bounce bg-white hover:bg-gray-50 text-gray-800 font-bold py-3 px-2 rounded-xl text-sm sm:text-base shadow border-2 border-gray-200 transition-all flex items-center justify-center text-center leading-snug">
-                                ${opt}
+                                ${_col(opt)}
                             </button>
                         `).join('')}
                     </div>

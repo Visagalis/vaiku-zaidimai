@@ -214,6 +214,56 @@
             setTimeout(() => playTone(880, 'sine', 0.3, 0.1), 300);
         }
 
+        // === SKIEMENŲ SPALVINIMAS ===
+        const _V = 'aeėęiįyouųūąAEĖĘIĮYOUŲŪĄ';
+        const _D = ['ai','au','ei','eu','ie','uo','ui','oi','ia','io','iu'];
+        const _L = /[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/;
+        const _O = new Set(['bl','br','dr','dv','fl','fr','gl','gr','gn','kl','kr','kn','kv','pl','pr','sk','sl','sm','sn','sp','sr','st','sv','šl','šv','šn','tr','tv','vr','žl','žv','str','skr','spr']);
+        const _SC = ['#dc2626','#2563eb','#16a34a','#ea580c','#9333ea','#db2777'];
+
+        function _syl(word) {
+            if (!word || word.length <= 1) return [word || ''];
+            const r = []; let s = '', i = 0, n = word.length;
+            while (i < n) {
+                const c = word[i];
+                if (!_L.test(c)) { s += c; i++; continue; }
+                if (!_V.includes(c)) { s += c; i++; }
+                else {
+                    s += c; i++;
+                    if (i < n && _V.includes(word[i]) && _D.includes((c + word[i]).toLowerCase())) { s += word[i]; i++; }
+                    let j = i, u = [];
+                    while (j < n && !_V.includes(word[j])) {
+                        if (!_L.test(word[j])) break;
+                        if (j+1 < n) { const p = (word[j]+word[j+1]).toLowerCase(); if (p==='ch'||p==='dz'||p==='dž') { u.push(word[j]+word[j+1]); j+=2; continue; } }
+                        u.push(word[j]); j++;
+                    }
+                    if (j >= n || (j < n && !_V.includes(word[j]) && !_L.test(word[j]))) {
+                        s += u.join(''); while (j < n && !_L.test(word[j])) { s += word[j]; j++; } i = j;
+                        if (i >= n) { r.push(s); s = ''; }
+                    } else if (u.length === 0) { r.push(s); s = ''; }
+                    else if (u.length === 1) { r.push(s); s = u[0]; i = j; }
+                    else {
+                        let sp = u.length - 1;
+                        if (u.length >= 3) { const l2 = (u[u.length-2]+u[u.length-1]).toLowerCase(); if (_O.has(l2)) sp = u.length - 2; }
+                        if (u.length >= 4) { const l3 = (u[u.length-3]+u[u.length-2]+u[u.length-1]).toLowerCase(); if (_O.has(l3)) sp = u.length - 3; }
+                        s += u.slice(0, sp).join(''); r.push(s); s = u.slice(sp).join(''); i = j;
+                    }
+                }
+            }
+            if (s) r.push(s);
+            return r.filter(x => x.length > 0);
+        }
+
+        function _col(text) {
+            if (!text) return '';
+            return text.split(/(\s+)/).map(token => {
+                if (!token.trim() || !/[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/.test(token)) return token;
+                const syls = _syl(token);
+                return syls.map((s, i) => '<span style="color:' + _SC[i % _SC.length] + '">' + s + '</span>').join('');
+            }).join('');
+        }
+        // === /SKIEMENŲ SPALVINIMAS ===
+
         const sentencesData = [
             { text: "Katė geria pieną.", emoji: "🐱" },
             { text: "Šuo laksto kieme.", emoji: "🐶" },
@@ -317,7 +367,7 @@
             scrambled.forEach((obj, i) => {
                 const btn = document.createElement('div');
                 btn.className = 'word-btn';
-                btn.textContent = obj.word;
+                btn.innerHTML = _col(obj.word);
                 btn.dataset.originalIndex = obj.originalIndex;
                 btn.onclick = () => pickWord(btn, obj.word, obj.originalIndex);
                 poolContainer.appendChild(btn);
@@ -365,7 +415,7 @@
             for(let i=0; i<children.length; i++) {
                 const item = currentSlots[i];
                 if (item) {
-                    children[i].textContent = item.word;
+                    children[i].innerHTML = _col(item.word);
                     children[i].className = 'word-btn filled';
                     children[i].style.margin = "5px";
                 } else {

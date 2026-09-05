@@ -99,6 +99,56 @@
             });
         }
 
+        // === SKIEMENŲ SPALVINIMAS ===
+        const _V = 'aeėęiįyouųūąAEĖĘIĮYOUŲŪĄ';
+        const _D = ['ai','au','ei','eu','ie','uo','ui','oi','ia','io','iu'];
+        const _L = /[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/;
+        const _O = new Set(['bl','br','dr','dv','fl','fr','gl','gr','gn','kl','kr','kn','kv','pl','pr','sk','sl','sm','sn','sp','sr','st','sv','šl','šv','šn','tr','tv','vr','žl','žv','str','skr','spr']);
+        const _SC = ['#dc2626','#2563eb','#16a34a','#ea580c','#9333ea','#db2777'];
+
+        function _syl(word) {
+            if (!word || word.length <= 1) return [word || ''];
+            const r = []; let s = '', i = 0, n = word.length;
+            while (i < n) {
+                const c = word[i];
+                if (!_L.test(c)) { s += c; i++; continue; }
+                if (!_V.includes(c)) { s += c; i++; }
+                else {
+                    s += c; i++;
+                    if (i < n && _V.includes(word[i]) && _D.includes((c + word[i]).toLowerCase())) { s += word[i]; i++; }
+                    let j = i, u = [];
+                    while (j < n && !_V.includes(word[j])) {
+                        if (!_L.test(word[j])) break;
+                        if (j+1 < n) { const p = (word[j]+word[j+1]).toLowerCase(); if (p==='ch'||p==='dz'||p==='dž') { u.push(word[j]+word[j+1]); j+=2; continue; } }
+                        u.push(word[j]); j++;
+                    }
+                    if (j >= n || (j < n && !_V.includes(word[j]) && !_L.test(word[j]))) {
+                        s += u.join(''); while (j < n && !_L.test(word[j])) { s += word[j]; j++; } i = j;
+                        if (i >= n) { r.push(s); s = ''; }
+                    } else if (u.length === 0) { r.push(s); s = ''; }
+                    else if (u.length === 1) { r.push(s); s = u[0]; i = j; }
+                    else {
+                        let sp = u.length - 1;
+                        if (u.length >= 3) { const l2 = (u[u.length-2]+u[u.length-1]).toLowerCase(); if (_O.has(l2)) sp = u.length - 2; }
+                        if (u.length >= 4) { const l3 = (u[u.length-3]+u[u.length-2]+u[u.length-1]).toLowerCase(); if (_O.has(l3)) sp = u.length - 3; }
+                        s += u.slice(0, sp).join(''); r.push(s); s = u.slice(sp).join(''); i = j;
+                    }
+                }
+            }
+            if (s) r.push(s);
+            return r.filter(x => x.length > 0);
+        }
+
+        function _col(text) {
+            if (!text) return '';
+            return text.split(/(\s+)/).map(token => {
+                if (!token.trim() || !/[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/.test(token)) return token;
+                const syls = _syl(token);
+                return syls.map((s, i) => '<span style="color:' + _SC[i % _SC.length] + '">' + s + '</span>').join('');
+            }).join('');
+        }
+        // === /SKIEMENŲ SPALVINIMAS ===
+
         // Šiukšlių duomenų bazė
         const ITEMS_DATA = [
             { name: "Laikraštis", emoji: "📰", category: "paper" },
@@ -200,7 +250,7 @@
                     <button id="bin-${key}" onclick="handleChoice('${key}')" 
                         class="btn-3d flex flex-col items-center justify-between p-2.5 sm:p-3 rounded-2xl ${bin.color} ${textCls} border-2 ${bin.border} ${bin.shadow} active:shadow-[0_0px_0] transition-all h-24 sm:h-32">
                         <div class="text-3xl sm:text-4xl">${bin.icon}</div>
-                        <div class="text-xs sm:text-sm font-black text-center leading-tight mt-1">${bin.name}</div>
+                        <div class="text-xs sm:text-sm font-black text-center leading-tight mt-1">${_col(bin.name)}</div>
                     </button>
                 `;
             }).join('');
@@ -219,7 +269,7 @@
                     <!-- Daikto kortelė -->
                     <div id="item-card" class="my-auto py-3 px-8 flex flex-col items-center justify-center bg-white rounded-3xl border-3 border-emerald-200 shadow-md drop-anim min-h-[120px] sm:min-h-[140px]">
                         <div class="text-6xl sm:text-8xl mb-1">${item.emoji}</div>
-                        <div class="text-xl sm:text-2xl font-black text-emerald-950">${item.name}</div>
+                        <div class="text-xl sm:text-2xl font-black text-emerald-950">${_col(item.name)}</div>
                     </div>
 
                     <div id="feedback" class="h-6 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black my-1 opacity-0 transition-opacity">

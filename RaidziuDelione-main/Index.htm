@@ -93,11 +93,16 @@
         }
 
         .slot-locked {
-            background-color: #10b981 !important;
-            border-color: #059669 !important;
-            color: white !important;
+            background-color: #ecfdf5 !important;
+            border-color: #10b981 !important;
             transform: scale(1.05);
             pointer-events: none;
+            box-shadow: 0 3px 0 #059669;
+        }
+
+        .dark-mode .slot-locked {
+            background-color: #064e3b40 !important;
+            border-color: #10b981 !important;
             box-shadow: 0 3px 0 #047857;
         }
 
@@ -329,6 +334,72 @@
             }
         }
 
+        // === SKIEMENŲ SPALVINIMAS ===
+        const _V = 'aeėęiįyouųūąAEĖĘIĮYOUŲŪĄ';
+        const _D = ['ai','au','ei','eu','ie','uo','ui','oi','ia','io','iu'];
+        const _L = /[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/;
+        const _O = new Set(['bl','br','dr','dv','fl','fr','gl','gr','gn','kl','kr','kn','kv','pl','pr','sk','sl','sm','sn','sp','sr','st','sv','šl','šv','šn','tr','tv','vr','žl','žv','str','skr','spr']);
+        const _SC = ['#dc2626','#2563eb','#16a34a','#ea580c','#9333ea','#db2777'];
+
+        function _syl(word) {
+            if (!word || word.length <= 1) return [word || ''];
+            const r = []; let s = '', i = 0, n = word.length;
+            while (i < n) {
+                const c = word[i];
+                if (!_L.test(c)) { s += c; i++; continue; }
+                if (!_V.includes(c)) { s += c; i++; }
+                else {
+                    s += c; i++;
+                    if (i < n && _V.includes(word[i]) && _D.includes((c + word[i]).toLowerCase())) { s += word[i]; i++; }
+                    let j = i, u = [];
+                    while (j < n && !_V.includes(word[j])) {
+                        if (!_L.test(word[j])) break;
+                        if (j+1 < n) { const p = (word[j]+word[j+1]).toLowerCase(); if (p==='ch'||p==='dz'||p==='dž') { u.push(word[j]+word[j+1]); j+=2; continue; } }
+                        u.push(word[j]); j++;
+                    }
+                    if (j >= n || (j < n && !_V.includes(word[j]) && !_L.test(word[j]))) {
+                        s += u.join(''); while (j < n && !_L.test(word[j])) { s += word[j]; j++; } i = j;
+                        if (i >= n) { r.push(s); s = ''; }
+                    } else if (u.length === 0) { r.push(s); s = ''; }
+                    else if (u.length === 1) { r.push(s); s = u[0]; i = j; }
+                    else {
+                        let sp = u.length - 1;
+                        if (u.length >= 3) { const l2 = (u[u.length-2]+u[u.length-1]).toLowerCase(); if (_O.has(l2)) sp = u.length - 2; }
+                        if (u.length >= 4) { const l3 = (u[u.length-3]+u[u.length-2]+u[u.length-1]).toLowerCase(); if (_O.has(l3)) sp = u.length - 3; }
+                        s += u.slice(0, sp).join(''); r.push(s); s = u.slice(sp).join(''); i = j;
+                    }
+                }
+            }
+            if (s) r.push(s);
+            return r.filter(x => x.length > 0);
+        }
+
+        function _col(text) {
+            if (!text) return '';
+            return text.split(/(\s+)/).map(token => {
+                if (!token.trim() || !/[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/.test(token)) return token;
+                const syls = _syl(token);
+                return syls.map((s, i) => '<span style="color:' + _SC[i % _SC.length] + '">' + s + '</span>').join('');
+            }).join('');
+        }
+
+        function getWordLetterColors(word) {
+            if (!word) return [];
+            const syls = _syl(word);
+            const colors = [];
+            syls.forEach((s, i) => {
+                const c = _SC[i % _SC.length];
+                for (let k = 0; k < s.length; k++) {
+                    colors.push(c);
+                }
+            });
+            while (colors.length < word.length) {
+                colors.push(_SC[0]);
+            }
+            return colors;
+        }
+        // === /SKIEMENŲ SPALVINIMAS ===
+
         const wordsData = [
             { word: 'KATĖ', emoji: '🐱' }, 
             { word: 'ŠUO', emoji: '🐶' },
@@ -459,9 +530,11 @@
             
             currentWordStarPotential = word.length;
             
+            const letterColors = getWordLetterColors(word);
             currentPool = word.split('').map((char, index) => ({
                 char: char,
                 id: index,
+                color: letterColors[index],
                 used: false
             }));
             shuffle(currentPool);
@@ -488,9 +561,11 @@
 
         function render() {
             slotsEl.innerHTML = '';
-            const wordLen = currentWordObj.word.length;
+            const word = currentWordObj.word;
+            const wordLen = word.length;
             const baseWidth = Math.min(16, 82 / wordLen); 
             const fontSize = Math.min(3.2, 14 / wordLen);
+            const letterColors = getWordLetterColors(word);
 
             userProgress.forEach((char, i) => {
                 const slot = document.createElement('div');
@@ -503,6 +578,9 @@
                 slot.className = `border-4 rounded-xl md:rounded-[2rem] flex items-center justify-center font-black letter-tile flex-shrink-0
                                  ${lockedSlots[i] ? 'slot-locked' : char ? 'bg-sky-500 border-sky-700 text-white' : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 opacity-95 shadow-sm'}`;
                 slot.textContent = char || '';
+                if (char) {
+                    slot.style.color = letterColors[i];
+                }
                 slotsEl.appendChild(slot);
             });
 
@@ -510,8 +588,11 @@
             currentPool.forEach(item => {
                 const btn = document.createElement('button');
                 btn.className = `w-12 h-12 md:w-16 md:h-16 rounded-2xl text-2xl md:text-4xl font-black shadow-lg letter-tile
-                                 ${item.used ? 'pool-btn-disabled' : 'bg-white dark:bg-slate-700 border-b-4 md:border-b-8 border-slate-200 dark:border-slate-800 hover:bg-yellow-50 dark:hover:bg-slate-600 active:border-b-0 active:translate-y-1 text-slate-700 dark:text-slate-100'}`;
+                                 ${item.used ? 'pool-btn-disabled' : 'bg-white dark:bg-slate-700 border-b-4 md:border-b-8 border-slate-200 dark:border-slate-800 hover:bg-yellow-50 dark:hover:bg-slate-600 active:border-b-0 active:translate-y-1'}`;
                 btn.textContent = item.char;
+                if (!item.used && item.color) {
+                    btn.style.color = item.color;
+                }
                 btn.onclick = () => !item.used && placeLetter(item);
                 poolEl.appendChild(btn);
             });
@@ -524,6 +605,17 @@
                     playSound('correct');
                     userProgress[emptyIdx] = poolItem.char;
                     lockedSlots[emptyIdx] = true;
+                    if (poolItem.id !== emptyIdx) {
+                        const exactItem = currentPool.find(p => !p.used && p.id === emptyIdx && p.char === poolItem.char);
+                        if (exactItem) {
+                            const tempColor = poolItem.color;
+                            const tempId = poolItem.id;
+                            poolItem.color = exactItem.color;
+                            poolItem.id = exactItem.id;
+                            exactItem.color = tempColor;
+                            exactItem.id = tempId;
+                        }
+                    }
                     poolItem.used = true; 
                     render();
                     checkWin();
@@ -556,7 +648,7 @@
                 
                 playSound('win');
                 successEmojiLarge.textContent = currentWordObj.emoji;
-                successWordText.textContent = currentWordObj.word;
+                successWordText.innerHTML = _col(currentWordObj.word);
                 
                 const starsOverlayContainer = document.getElementById('success-stars-container');
                 starsOverlayContainer.innerHTML = '';
@@ -619,7 +711,7 @@
             stats.forEach(item => {
                 const row = document.createElement('tr');
                 row.className = "border-b border-slate-100 dark:border-slate-800";
-                row.innerHTML = `<td class="py-4 font-bold text-lg">${item.emoji} ${item.word}</td><td class="text-center font-black text-rose-500 text-lg">${item.mistakes}</td><td class="text-right text-[10px] font-bold uppercase opacity-40">${item.finished ? 'Baigta' : 'Dabar'}</td>`;
+                row.innerHTML = `<td class="py-4 font-bold text-lg">${item.emoji} ${_col(item.word)}</td><td class="text-center font-black text-rose-500 text-lg">${item.mistakes}</td><td class="text-right text-[10px] font-bold uppercase opacity-40">${item.finished ? 'Baigta' : 'Dabar'}</td>`;
                 tbody.appendChild(row);
             });
         }
