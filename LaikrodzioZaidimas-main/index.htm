@@ -2,7 +2,7 @@
 <html lang="lt">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -55,9 +55,56 @@
             text-anchor: middle;
             dominant-baseline: central;
         }
+
+        /* Tamsioji tema */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #0b1120 !important;
+                background-image: radial-gradient(#1e293b 2px, transparent 2px) !important;
+                color: #f1f5f9 !important;
+            }
+            #start-screen, #game-screen, #end-screen {
+                background-color: #0f172a !important;
+                border-color: #334155 !important;
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6) !important;
+                color: #f8fafc !important;
+            }
+            .time-btn {
+                background-color: #1e293b !important;
+                border-color: #334155 !important;
+                color: #f8fafc !important;
+            }
+            .time-btn:hover {
+                border-color: #60a5fa !important;
+            }
+            #progress {
+                color: #60a5fa !important;
+            }
+        }
     </style>
+    <!-- Apsauga nuo priartinimo gestais (pinch to zoom) -->
+    <script>
+        document.addEventListener("gesturestart", function(e) { e.preventDefault(); }, { passive: false });
+        document.addEventListener("gesturechange", function(e) { e.preventDefault(); }, { passive: false });
+        document.addEventListener("gestureend", function(e) { e.preventDefault(); }, { passive: false });
+        document.addEventListener("touchstart", function(e) {
+            if (e.touches && e.touches.length > 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+        document.addEventListener("touchmove", function(e) {
+            if (e.touches && e.touches.length > 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+        document.addEventListener("wheel", function(e) {
+            if (e.ctrlKey) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+    </script>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-4">
+<body class="min-h-screen flex flex-col items-center justify-center p-4 transition-colors duration-200">
 
     <!-- START SCREEN -->
     <div id="start-screen" class="screen active flex-col items-center justify-center w-full max-w-md bg-white p-8 rounded-3xl shadow-xl text-center border-4 border-green-400">

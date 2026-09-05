@@ -2,7 +2,7 @@
 <html lang="lt">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -20,10 +20,94 @@
             animation: shake 0.4s ease-in-out;
         }
         body {
+        touch-action: manipulation;
             user-select: none;
             -webkit-user-select: none;
         }
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #0b1120 !important;
+                color: #f8fafc;
+            }
+            #start-screen {
+                background-color: #0b1120 !important;
+            }
+            #start-screen > div {
+                background-color: #0f172a !important;
+                border: 2px solid #334155;
+                color: #f8fafc;
+            }
+            #start-screen h1 {
+                color: #60a5fa !important;
+            }
+            #start-screen p {
+                color: #94a3b8 !important;
+            }
+            #game-screen > div:first-child {
+                background-color: #0f172a !important;
+                border: 1px solid #334155;
+            }
+            #word-container > div {
+                background-color: #1e293b !important;
+                border-color: #334155 !important;
+            }
+            #word-container > #missing-box {
+                background-color: #1e293b !important;
+                border-color: #3b82f6 !important;
+                color: #60a5fa !important;
+            }
+            #game-screen > div.w-full.max-w-md.bg-white {
+                background-color: #0f172a !important;
+                border: 1px solid #334155;
+            }
+            .bg-blue-100.text-blue-800 {
+                background-color: #1e293b !important;
+                color: #93c5fd !important;
+                border-color: #334155 !important;
+            }
+            .bg-blue-100.text-blue-800:hover {
+                background-color: #334155 !important;
+            }
+            .bg-gray-100.text-gray-400 {
+                background-color: #0f172a !important;
+                color: #475569 !important;
+                border-color: #1e293b !important;
+            }
+            .bg-yellow-100 {
+                background-color: #854d0e !important;
+                color: #fef08a !important;
+            }
+            .bg-orange-100 {
+                background-color: #9a3412 !important;
+                color: #ffedd5 !important;
+            }
+            .bg-red-100 {
+                background-color: #991b1b !important;
+                color: #fee2e2 !important;
+            }
+        }
     </style>
+    <!-- Apsauga nuo priartinimo gestais (pinch to zoom) -->
+    <script>
+        document.addEventListener("gesturestart", function(e) { e.preventDefault(); }, { passive: false });
+        document.addEventListener("gesturechange", function(e) { e.preventDefault(); }, { passive: false });
+        document.addEventListener("gestureend", function(e) { e.preventDefault(); }, { passive: false });
+        document.addEventListener("touchstart", function(e) {
+            if (e.touches && e.touches.length > 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+        document.addEventListener("touchmove", function(e) {
+            if (e.touches && e.touches.length > 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+        document.addEventListener("wheel", function(e) {
+            if (e.ctrlKey) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+    </script>
 </head>
 <body class="bg-indigo-50 font-sans min-h-screen">
 

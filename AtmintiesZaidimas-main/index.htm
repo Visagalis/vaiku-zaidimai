@@ -2,7 +2,7 @@
 <html lang="lt">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -133,9 +133,64 @@
         .feedback-popup.show {
             transform: translate(-50%, -50%) scale(1);
         }
+
+        /* Tamsioji tema */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #0b1120 !important;
+                background-image: radial-gradient(#1e293b 2px, transparent 2px) !important;
+                color: #f1f5f9 !important;
+            }
+            #start-screen, #end-screen {
+                background-color: rgba(15, 23, 42, 0.96) !important;
+                color: #f8fafc !important;
+            }
+            #game-screen > div:first-child {
+                background-color: #0f172a !important;
+                border-color: #334155 !important;
+                color: #f8fafc !important;
+            }
+            .card-front {
+                background: #1e293b !important;
+                border-color: #334155 !important;
+            }
+            .card-word {
+                color: #f8fafc !important;
+            }
+            .card-back {
+                background: linear-gradient(135deg, #1d4ed8, #4338ca) !important;
+                border-color: #3b82f6 !important;
+            }
+            .card-container.matched .card-front {
+                border-color: #10b981 !important;
+                background: rgba(6, 78, 59, 0.4) !important;
+                box-shadow: 0 0 15px #10b981 !important;
+            }
+        }
     </style>
+    <!-- Apsauga nuo priartinimo gestais (pinch to zoom) -->
+    <script>
+        document.addEventListener("gesturestart", function(e) { e.preventDefault(); }, { passive: false });
+        document.addEventListener("gesturechange", function(e) { e.preventDefault(); }, { passive: false });
+        document.addEventListener("gestureend", function(e) { e.preventDefault(); }, { passive: false });
+        document.addEventListener("touchstart", function(e) {
+            if (e.touches && e.touches.length > 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+        document.addEventListener("touchmove", function(e) {
+            if (e.touches && e.touches.length > 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+        document.addEventListener("wheel", function(e) {
+            if (e.ctrlKey) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+    </script>
 </head>
-<body class="h-screen max-h-screen text-slate-800 flex flex-col relative overflow-hidden p-2 sm:p-3">
+<body class="h-screen max-h-screen text-slate-800 flex flex-col relative overflow-hidden p-2 sm:p-3 transition-colors duration-200">
     
     <!-- Audio Context & Synthesis -->
     <script>

@@ -2,7 +2,7 @@
 <html lang="lt">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -16,37 +16,199 @@
             background-image: radial-gradient(#86efac 20%, transparent 20%);
             background-size: 20px 20px;
             touch-action: manipulation;
+            color: #1e293b;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
         
-        .bounce {
-            animation: bounce 0.5s;
-        }
+        .bounce { animation: bounce 0.5s; }
         @keyframes bounce {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-20px); }
         }
 
-        .shake {
-            animation: shake 0.5s;
-        }
+        .shake { animation: shake 0.5s; }
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             25% { transform: translateX(-10px); }
             75% { transform: translateX(10px); }
         }
 
-        .fade-in {
-            animation: fadeIn 0.3s;
-        }
+        .fade-in { animation: fadeIn 0.3s; }
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
         }
+
+        /* High-Contrast Tactile Coins & Bills */
+        .coin {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            border-radius: 9999px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), inset 0 2px 3px rgba(255, 255, 255, 0.4);
+            flex-shrink: 0;
+            user-select: none;
+            position: relative;
+        }
+
+        /* 1c, 2c, 5c - Copper (Rausvas varis) */
+        .coin-copper {
+            background: radial-gradient(circle at 35% 35%, #ea580c 0%, #c2410c 55%, #7c2d12 100%);
+            color: #ffffff;
+            border: 2px solid #fdba74;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+        }
+        .coin-1c { width: 3.25rem; height: 3.25rem; font-size: 1.15rem; }
+        .coin-2c { width: 3.65rem; height: 3.65rem; font-size: 1.3rem; }
+        .coin-5c { width: 4.1rem; height: 4.1rem; font-size: 1.45rem; }
+
+        /* 10c, 20c, 50c - Nordic Gold (Auksas) */
+        .coin-gold {
+            background: radial-gradient(circle at 35% 35%, #fef08a 0%, #eab308 50%, #b45309 100%);
+            color: #3b1803;
+            border: 2px solid #fef9c3;
+            text-shadow: 0 1px 0 rgba(255,255,255,0.6);
+        }
+        .coin-10c { width: 3.35rem; height: 3.35rem; font-size: 1.2rem; }
+        .coin-20c { width: 3.85rem; height: 3.85rem; font-size: 1.35rem; }
+        .coin-50c { width: 4.4rem; height: 4.4rem; font-size: 1.55rem; }
+
+        /* 1€ - Bi-metallic (Auksinis žiedas, sidabrinis centras) */
+        .coin-1e {
+            width: 3.9rem;
+            height: 3.9rem;
+            background: radial-gradient(circle at 35% 35%, #ffffff 0%, #cbd5e1 60%, #94a3b8 100%);
+            color: #0f172a;
+            border: 5px solid #d97706;
+            font-size: 1.35rem;
+            text-shadow: 0 1px 1px rgba(255,255,255,0.8);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.35);
+        }
+
+        /* 2€ - Bi-metallic (Sidabrinis žiedas, auksinis centras) */
+        .coin-2e {
+            width: 4.4rem;
+            height: 4.4rem;
+            background: radial-gradient(circle at 35% 35%, #fef08a 0%, #eab308 60%, #b45309 100%);
+            color: #3b1803;
+            border: 5px solid #94a3b8;
+            font-size: 1.55rem;
+            text-shadow: 0 1px 1px rgba(255,255,255,0.6);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.35);
+        }
+
+        /* Banknotai */
+        .bill {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.25);
+            flex-shrink: 0;
+            user-select: none;
+            width: 4.8rem;
+            height: 2.85rem;
+            font-size: 1.25rem;
+            border: 2px solid;
+            letter-spacing: 1px;
+        }
+        .bill-5e { background: linear-gradient(135deg, #64748b, #475569); color: #f8fafc; border-color: #334155; }
+        .bill-10e { background: linear-gradient(135deg, #f43f5e, #be123c); color: #ffffff; border-color: #9f1239; }
+        .bill-20e { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: #ffffff; border-color: #1e40af; }
+
+        @media (min-width: 640px) {
+            .bill { width: 5.5rem; height: 3.25rem; font-size: 1.4rem; }
+            .coin-1c { width: 3.6rem; height: 3.6rem; font-size: 1.25rem; }
+            .coin-2c { width: 4.0rem; height: 4.0rem; font-size: 1.4rem; }
+            .coin-5c { width: 4.5rem; height: 4.5rem; font-size: 1.55rem; }
+            .coin-10c { width: 3.75rem; height: 3.75rem; font-size: 1.35rem; }
+            .coin-20c { width: 4.25rem; height: 4.25rem; font-size: 1.5rem; }
+            .coin-50c { width: 4.75rem; height: 4.75rem; font-size: 1.7rem; }
+            .coin-1e { width: 4.25rem; height: 4.25rem; font-size: 1.5rem; border-width: 6px; }
+            .coin-2e { width: 4.75rem; height: 4.75rem; font-size: 1.65rem; border-width: 6px; }
+        }
+
+        /* Default Light Tray & Card */
+        .app-card {
+            background-color: rgba(255, 255, 255, 0.96);
+            border-color: #bbf7d0;
+        }
+        .money-tray {
+            background-color: rgba(240, 253, 244, 0.9);
+            border: 2px solid #86efac;
+        }
+        .opt-btn {
+            background-color: #e0f2fe;
+            color: #0369a1;
+            border-color: #7dd3fc;
+        }
+        .opt-btn:hover {
+            background-color: #bae6fd;
+            color: #0284c7;
+        }
+
+        /* Tamsioji Tema (Dark Mode) */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #0b1120 !important;
+                background-image: radial-gradient(#1e293b 25%, transparent 25%) !important;
+                color: #f1f5f9 !important;
+            }
+            .app-card {
+                background-color: #0f172a !important;
+                border-color: #334155 !important;
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6) !important;
+            }
+            .money-tray {
+                background-color: #1e293b !important;
+                border: 2px solid #475569 !important;
+                box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.5) !important;
+            }
+            .opt-btn {
+                background-color: #1e293b !important;
+                color: #93c5fd !important;
+                border-color: #334155 !important;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3) !important;
+            }
+            .opt-btn:hover {
+                background-color: #334155 !important;
+                color: #bfdbfe !important;
+            }
+            .text-main-title {
+                color: #f8fafc !important;
+            }
+            .text-sub-title {
+                color: #94a3b8 !important;
+            }
+        }
     </style>
+    <!-- Apsauga nuo priartinimo gestais (pinch to zoom) -->
+    <script>
+        document.addEventListener("gesturestart", function(e) { e.preventDefault(); }, { passive: false });
+        document.addEventListener("gesturechange", function(e) { e.preventDefault(); }, { passive: false });
+        document.addEventListener("gestureend", function(e) { e.preventDefault(); }, { passive: false });
+        document.addEventListener("touchstart", function(e) {
+            if (e.touches && e.touches.length > 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+        document.addEventListener("touchmove", function(e) {
+            if (e.touches && e.touches.length > 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+        document.addEventListener("wheel", function(e) {
+            if (e.ctrlKey) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+    </script>
 </head>
 <body class="min-h-screen flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
 
-    <div id="app" class="w-full max-w-2xl bg-white/95 backdrop-blur rounded-3xl shadow-xl flex flex-col relative fade-in border border-green-200">
+    <div id="app" class="app-card w-full max-w-2xl rounded-3xl shadow-xl flex flex-col relative fade-in border">
         <!-- Content gets rendered here by JS -->
     </div>
 
@@ -54,19 +216,19 @@
         // Data
         const items = {
             coins: [
-                { value: 0.01, label: '1c', class: 'w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-amber-600 text-amber-100 flex items-center justify-center font-bold text-lg sm:text-xl border-2 border-amber-700 shadow-md shrink-0' },
-                { value: 0.02, label: '2c', class: 'w-13 h-13 sm:w-15 sm:h-15 rounded-full bg-amber-600 text-amber-100 flex items-center justify-center font-bold text-xl sm:text-2xl border-2 border-amber-700 shadow-md shrink-0' },
-                { value: 0.05, label: '5c', class: 'w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-amber-600 text-amber-100 flex items-center justify-center font-bold text-xl sm:text-2xl border-2 border-amber-700 shadow-md shrink-0' },
-                { value: 0.10, label: '10c', class: 'w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-yellow-500 text-yellow-900 flex items-center justify-center font-bold text-lg sm:text-xl border-2 border-yellow-600 shadow-md shrink-0' },
-                { value: 0.20, label: '20c', class: 'w-13 h-13 sm:w-15 sm:h-15 rounded-full bg-yellow-500 text-yellow-900 flex items-center justify-center font-bold text-xl sm:text-2xl border-2 border-yellow-600 shadow-md shrink-0' },
-                { value: 0.50, label: '50c', class: 'w-15 h-15 sm:w-18 sm:h-18 rounded-full bg-yellow-500 text-yellow-900 flex items-center justify-center font-bold text-2xl sm:text-3xl border-2 border-yellow-600 shadow-md shrink-0' },
-                { value: 1.00, label: '1€', class: 'w-13 h-13 sm:w-16 sm:h-16 rounded-full bg-gray-300 text-gray-800 flex items-center justify-center font-bold text-xl sm:text-2xl border-[4px] sm:border-[6px] border-yellow-500 shadow-md shrink-0' },
-                { value: 2.00, label: '2€', class: 'w-15 h-15 sm:w-18 sm:h-18 rounded-full bg-yellow-500 text-gray-900 flex items-center justify-center font-bold text-2xl sm:text-3xl border-[4px] sm:border-[6px] border-gray-400 shadow-md shrink-0' }
+                { value: 0.01, label: '1c', class: 'coin coin-copper coin-1c' },
+                { value: 0.02, label: '2c', class: 'coin coin-copper coin-2c' },
+                { value: 0.05, label: '5c', class: 'coin coin-copper coin-5c' },
+                { value: 0.10, label: '10c', class: 'coin coin-gold coin-10c' },
+                { value: 0.20, label: '20c', class: 'coin coin-gold coin-20c' },
+                { value: 0.50, label: '50c', class: 'coin coin-gold coin-50c' },
+                { value: 1.00, label: '1€', class: 'coin coin-1e' },
+                { value: 2.00, label: '2€', class: 'coin coin-2e' }
             ],
             bills: [
-                { value: 5.00, label: '5€', class: 'w-16 h-10 sm:w-20 sm:h-12 rounded-lg bg-gray-400 text-gray-800 flex items-center justify-center font-bold text-lg sm:text-xl border-2 border-gray-500 shadow-md shrink-0' },
-                { value: 10.00, label: '10€', class: 'w-16 h-10 sm:w-20 sm:h-12 rounded-lg bg-red-400 text-red-900 flex items-center justify-center font-bold text-lg sm:text-xl border-2 border-red-500 shadow-md shrink-0' },
-                { value: 20.00, label: '20€', class: 'w-16 h-10 sm:w-20 sm:h-12 rounded-lg bg-blue-400 text-blue-900 flex items-center justify-center font-bold text-lg sm:text-xl border-2 border-blue-500 shadow-md shrink-0' }
+                { value: 5.00, label: '5€', class: 'bill bill-5e' },
+                { value: 10.00, label: '10€', class: 'bill bill-10e' },
+                { value: 20.00, label: '20€', class: 'bill bill-20e' }
             ]
         };
 
@@ -150,8 +312,8 @@
             app.innerHTML = `
                 <div class="flex-1 flex flex-col items-center justify-center p-8 text-center fade-in">
                     <div class="text-6xl mb-4">💰</div>
-                    <h1 class="text-5xl font-black text-gray-800 mb-2 tracking-tight">Pinigėliai</h1>
-                    <p class="text-2xl text-gray-600 mb-10 font-bold">Suskaičiuok pinigus!</p>
+                    <h1 class="text-main-title text-5xl font-black text-gray-800 mb-2 tracking-tight">Pinigėliai</h1>
+                    <p class="text-sub-title text-2xl text-gray-600 mb-10 font-bold">Suskaičiuok pinigus!</p>
                     
                     <div class="flex flex-col gap-4 w-full max-w-sm">
                         <button onclick="startGame('coins')" class="w-full py-5 rounded-2xl bg-green-500 hover:bg-green-600 text-white font-bold text-2xl shadow-lg transition transform hover:scale-105 active:scale-95 border-b-4 border-green-700">
@@ -234,24 +396,23 @@
             `).join('');
             
             const optionsHtml = state.options.map((opt, index) => `
-                <button id="btn-${index}" onclick="checkAnswer(${index}, ${opt})" class="py-3 sm:py-4 bg-blue-100 hover:bg-blue-200 text-blue-900 rounded-xl font-bold text-xl sm:text-2xl shadow-md border-b-4 border-blue-300 transition transform active:scale-95">
+                <button id="btn-${index}" onclick="checkAnswer(${index}, ${opt})" class="opt-btn py-3 sm:py-4 rounded-xl font-black text-xl sm:text-2xl shadow-md border-b-4 transition transform active:scale-95">
                     ${formatMoney(opt)}
                 </button>
             `).join('');
 
             app.innerHTML = `
-                <div class="bg-blue-500 text-white px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center font-bold text-lg sm:text-xl shadow-md rounded-t-3xl sm:rounded-t-3xl z-10">
+                <div class="bg-blue-600 text-white px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center font-bold text-lg sm:text-xl shadow-md rounded-t-3xl sm:rounded-t-3xl z-10">
                     <div>Klausimas: <span class="text-yellow-300">${state.question} / ${state.maxQuestions}</span></div>
                     <div>Taškai: <span class="text-green-300">⭐ ${state.score}</span></div>
                 </div>
                 
                 <div class="flex-1 flex flex-col p-3 sm:p-5 fade-in">
-                    <div id="money-container" class="flex flex-wrap items-center justify-center gap-2.5 sm:gap-4 py-3 sm:py-5 bg-white/50 rounded-2xl mb-2 sm:mb-3 shadow-inner min-h-[90px] sm:min-h-[130px]">
+                    <div id="money-container" class="money-tray flex flex-wrap items-center justify-center gap-2.5 sm:gap-4 py-4 sm:py-6 rounded-2xl mb-2 sm:mb-3 min-h-[95px] sm:min-h-[140px]">
                         ${itemsHtml}
                     </div>
                     
                     <div id="feedback" class="h-6 sm:h-8 flex items-center justify-center font-black text-lg sm:text-xl mb-1 sm:mb-2 opacity-0 transition-opacity">
-                        Correct!
                     </div>
                     
                     <div class="grid grid-cols-2 gap-2.5 sm:gap-4 mt-auto">
@@ -277,7 +438,7 @@
                 }
                 btn.className = "py-3 sm:py-4 bg-green-500 text-white rounded-xl font-bold text-xl sm:text-2xl shadow-md border-b-4 border-green-700 transform scale-105 bounce";
                 feedback.textContent = "Teisingai! 🎉";
-                feedback.className = "h-8 sm:h-10 flex items-center justify-center font-black text-xl sm:text-2xl mb-2 sm:mb-3 text-green-600 opacity-100";
+                feedback.className = "h-8 sm:h-10 flex items-center justify-center font-black text-xl sm:text-2xl mb-2 sm:mb-3 text-green-500 opacity-100";
                 
                 setTimeout(() => {
                     if (state.question >= state.maxQuestions) {
@@ -308,7 +469,7 @@
             else if (state.score >= 5) stars = 2;
             
             const starHtml = Array(3).fill(0).map((_, i) => 
-                `<span class="text-6xl ${i < stars ? 'text-yellow-400 bounce' : 'text-gray-300'} drop-shadow-md" style="animation-delay: ${i * 0.2}s">⭐</span>`
+                `<span class="text-6xl ${i < stars ? 'text-yellow-400 bounce' : 'text-gray-400 opacity-40'} drop-shadow-md" style="animation-delay: ${i * 0.2}s">⭐</span>`
             ).join('');
 
             let message = "Neblogai!";
@@ -317,14 +478,14 @@
 
             app.innerHTML = `
                 <div class="flex-1 flex flex-col items-center justify-center p-8 text-center fade-in">
-                    <h2 class="text-4xl font-black text-gray-800 mb-6">Žaidimas baigtas!</h2>
+                    <h2 class="text-main-title text-4xl font-black text-gray-800 mb-6">Žaidimas baigtas!</h2>
                     
                     <div class="flex justify-center gap-2 mb-6">
                         ${starHtml}
                     </div>
                     
-                    <p class="text-2xl font-bold text-gray-700 mb-2">${message}</p>
-                    <p class="text-xl text-gray-600 mb-10">Surinkai: <span class="font-black text-green-600">${state.score} / ${state.maxQuestions}</span></p>
+                    <p class="text-sub-title text-2xl font-bold text-gray-700 mb-2">${message}</p>
+                    <p class="text-sub-title text-xl text-gray-600 mb-10">Surinkai: <span class="font-black text-green-500">${state.score} / ${state.maxQuestions}</span></p>
                     
                     <button onclick="renderStartScreen()" class="w-full max-w-xs py-5 rounded-2xl bg-blue-500 hover:bg-blue-600 text-white font-bold text-2xl shadow-lg transition transform hover:scale-105 active:scale-95 border-b-4 border-blue-700">
                         Žaisti dar kartą 🔄

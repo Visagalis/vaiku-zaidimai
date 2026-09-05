@@ -2,7 +2,7 @@
 <html lang="lt">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -43,9 +43,63 @@
         .shake-anim {
             animation: shake 0.4s ease-in-out;
         }
+
+        /* Tamsioji tema */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #0b1120 !important;
+                background-image: radial-gradient(#1e293b 20%, transparent 20%) !important;
+                color: #f1f5f9 !important;
+            }
+            #app {
+                background-color: #0f172a !important;
+                border-color: #334155 !important;
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6) !important;
+            }
+            h2, h1 {
+                color: #f8fafc !important;
+            }
+            .btn-3d {
+                background-color: #1e293b !important;
+                border-color: #334155 !important;
+                color: #f8fafc !important;
+                box-shadow: 0 5px 0 #0f172a !important;
+            }
+            .btn-3d:hover {
+                background-color: #273549 !important;
+            }
+            .bg-cyan-100\/60 {
+                background-color: rgba(30, 41, 59, 0.7) !important;
+                border-color: #334155 !important;
+            }
+            .text-cyan-900 {
+                color: #67e8f9 !important;
+            }
+        }
     </style>
+    <!-- Apsauga nuo priartinimo gestais (pinch to zoom) -->
+    <script>
+        document.addEventListener("gesturestart", function(e) { e.preventDefault(); }, { passive: false });
+        document.addEventListener("gesturechange", function(e) { e.preventDefault(); }, { passive: false });
+        document.addEventListener("gestureend", function(e) { e.preventDefault(); }, { passive: false });
+        document.addEventListener("touchstart", function(e) {
+            if (e.touches && e.touches.length > 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+        document.addEventListener("touchmove", function(e) {
+            if (e.touches && e.touches.length > 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+        document.addEventListener("wheel", function(e) {
+            if (e.ctrlKey) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+    </script>
 </head>
-<body class="h-screen max-h-screen flex items-center justify-center p-2 sm:p-4 overflow-hidden">
+<body class="h-screen max-h-screen flex items-center justify-center p-2 sm:p-4 overflow-hidden transition-colors duration-200">
 
     <div id="app" class="w-full max-w-2xl bg-white/95 backdrop-blur-md rounded-3xl shadow-xl flex flex-col relative border-4 border-cyan-300 overflow-hidden max-h-full">
         <!-- Turinis bus atvaizduotas dinamiškai per JS -->

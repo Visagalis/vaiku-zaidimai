@@ -2,7 +2,7 @@
 <html lang="lt">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -53,15 +53,40 @@
             from { opacity: 1; transform: scale(1); }
             to { opacity: 0; transform: scale(0.95); }
         }
+
+        /* Tamsioji tema (Dark mode) */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #0b1120 !important;
+                background-image: radial-gradient(#1e293b 2px, transparent 2px) !important;
+                color: #f1f5f9 !important;
+            }
+            .card-3d {
+                background-color: #1e293b !important;
+                border-color: #334155 !important;
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5) !important;
+            }
+            .card-3d:hover {
+                background-color: #273549 !important;
+            }
+            .card-3d h2 {
+                color: #f8fafc !important;
+            }
+            .card-3d p {
+                color: #94a3b8 !important;
+            }
+        }
     </style>
 </head>
-<body class="min-h-screen text-slate-800 flex flex-col items-center">
+<body class="min-h-screen text-slate-800 flex flex-col items-center transition-colors duration-200">
 
     <!-- Menu Screen -->
-    <div id="menu" class="w-full max-w-6xl px-4 py-8 flex flex-col items-center">
-        <h1 class="text-4xl md:text-5xl font-black text-center mt-4 mb-10 text-white drop-shadow-md" 
+    <div id="menu" class="w-full max-w-6xl px-3 sm:px-4 py-6 sm:py-8 flex flex-col items-center">
+        <h1 class="text-2xl min-[360px]:text-[1.7rem] min-[420px]:text-3xl sm:text-4xl md:text-5xl font-black text-center mt-2 sm:mt-4 mb-6 sm:mb-10 text-white drop-shadow-md whitespace-nowrap flex items-center justify-center gap-1.5 sm:gap-3" 
             style="text-shadow: 3px 3px 0 #22c55e, -2px -2px 0 #22c55e, 2px -2px 0 #22c55e, -2px 2px 0 #22c55e;">
-            🦉 Žaidimai Vaikams 🦉
+            <span class="text-xl min-[360px]:text-2xl sm:text-4xl select-none">🦉</span>
+            <span>Žaidimai Vaikams</span>
+            <span class="text-xl min-[360px]:text-2xl sm:text-4xl select-none">🦉</span>
         </h1>
         
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 w-full">
@@ -257,6 +282,43 @@
         const gameContainer = document.getElementById('game-container');
         const gameFrame = document.getElementById('game-frame');
         const currentGameTitle = document.getElementById('current-game-title');
+
+        // Apsauga nuo priartinimo gestais (pinch to zoom ir double tap zoom)
+        function preventZoom(doc) {
+            if (!doc) return;
+            try {
+                doc.addEventListener('gesturestart', function(e) { e.preventDefault(); }, { passive: false });
+                doc.addEventListener('gesturechange', function(e) { e.preventDefault(); }, { passive: false });
+                doc.addEventListener('gestureend', function(e) { e.preventDefault(); }, { passive: false });
+                doc.addEventListener('touchstart', function(e) {
+                    if (e.touches && e.touches.length > 1) {
+                        e.preventDefault();
+                    }
+                }, { passive: false });
+                doc.addEventListener('touchmove', function(e) {
+                    if (e.touches && e.touches.length > 1) {
+                        e.preventDefault();
+                    }
+                }, { passive: false });
+                doc.addEventListener('wheel', function(e) {
+                    if (e.ctrlKey) {
+                        e.preventDefault();
+                    }
+                }, { passive: false });
+            } catch (err) {}
+        }
+        preventZoom(document);
+
+        // Apsaugome ir įkeliamą žaidimo iframe
+        gameFrame.addEventListener('load', function() {
+            try {
+                const fDoc = gameFrame.contentDocument || (gameFrame.contentWindow && gameFrame.contentWindow.document);
+                if (fDoc) {
+                    preventZoom(fDoc);
+                }
+            } catch (err) {}
+        });
+
         function getCacheBustedUrl(url) {
             const sep = url.includes('?') ? '&' : '?';
             return `${url}${sep}_t=${Date.now()}`;

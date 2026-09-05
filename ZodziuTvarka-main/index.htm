@@ -2,7 +2,7 @@
 <html lang="lt">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
@@ -114,9 +114,65 @@
             pointer-events: none;
             transform: scale(0.5);
         }
+
+        /* Tamsioji tema */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #0b1120 !important;
+                background-image: radial-gradient(#1e293b 2px, transparent 2px) !important;
+                color: #f1f5f9 !important;
+            }
+            #start-screen, #game-screen, #end-screen {
+                background-color: #0f172a !important;
+                border-color: #334155 !important;
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6) !important;
+                color: #f8fafc !important;
+            }
+            .word-btn {
+                background-color: #1e293b !important;
+                color: #f8fafc !important;
+                box-shadow: 0 5px 0 #0f172a !important;
+                border: 1px solid #334155 !important;
+            }
+            .slot {
+                background: rgba(30, 41, 59, 0.5) !important;
+                border-color: #f59e0b !important;
+            }
+            .slot-correct {
+                border-color: #10b981 !important;
+                background: rgba(6, 78, 59, 0.4) !important;
+            }
+            #start-screen h1, #game-screen h1, #end-screen h2 {
+                color: #f8fafc !important;
+            }
+            #start-screen p, #end-screen p {
+                color: #94a3b8 !important;
+            }
+        }
     </style>
+    <!-- Apsauga nuo priartinimo gestais (pinch to zoom) -->
+    <script>
+        document.addEventListener("gesturestart", function(e) { e.preventDefault(); }, { passive: false });
+        document.addEventListener("gesturechange", function(e) { e.preventDefault(); }, { passive: false });
+        document.addEventListener("gestureend", function(e) { e.preventDefault(); }, { passive: false });
+        document.addEventListener("touchstart", function(e) {
+            if (e.touches && e.touches.length > 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+        document.addEventListener("touchmove", function(e) {
+            if (e.touches && e.touches.length > 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+        document.addEventListener("wheel", function(e) {
+            if (e.ctrlKey) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+    </script>
 </head>
-<body class="min-h-screen flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+<body class="min-h-screen flex items-center justify-center p-2 sm:p-4 overflow-y-auto transition-colors duration-200">
 
     <!-- Start Screen -->
     <div id="start-screen" class="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full text-center shadow-2xl border-4 border-yellow-400">
