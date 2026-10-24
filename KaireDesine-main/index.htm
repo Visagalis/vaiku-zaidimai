@@ -24,7 +24,7 @@
             transition: transform 0.1s ease, box-shadow 0.1s ease;
         }
         .btn-3d:active {
-            transform: translateY(4px);
+            transform: translateY(3px);
         }
 
         @keyframes bounce-scale {
@@ -41,7 +41,7 @@
             75% { transform: translateX(8px); }
         }
         .shake-anim {
-            animation: shake 0.4s ease-in-out;
+            animation: shake 0.38s ease-in-out;
         }
 
         /* Tamsioji tema */
@@ -49,32 +49,52 @@
             body {
                 background-color: #0b1120 !important;
                 background-image: radial-gradient(#1e293b 20%, transparent 20%) !important;
-                color: #f1f5f9 !important;
+                color: #f8fafc !important;
             }
             #app {
                 background-color: #0f172a !important;
                 border-color: #334155 !important;
                 box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6) !important;
+                color: #f8fafc !important;
             }
             h2, h1 {
                 color: #f8fafc !important;
+            }
+            .dark-subtext {
+                color: #cbd5e1 !important;
             }
             .btn-3d {
                 background-color: #1e293b !important;
                 border-color: #334155 !important;
                 color: #f8fafc !important;
-                box-shadow: 0 5px 0 #0f172a !important;
+                box-shadow: 0 5px 0 #090d16 !important;
             }
             .btn-3d:hover {
                 background-color: #273549 !important;
             }
+            .dark-panel {
+                background-color: #1e293b !important;
+                border-color: #334155 !important;
+            }
             .bg-fuchsia-100 {
-                background-color: rgba(30, 41, 59, 0.8) !important;
+                background-color: rgba(30, 41, 59, 0.85) !important;
                 border-color: #475569 !important;
             }
             .bg-slate-50 {
-                background-color: rgba(30, 41, 59, 0.4) !important;
+                background-color: rgba(30, 41, 59, 0.45) !important;
                 border-color: #334155 !important;
+            }
+            .grid-cell {
+                background-color: #1e293b !important;
+                border-color: #475569 !important;
+            }
+            .grid-cell-dog {
+                background-color: #312e81 !important;
+                border-color: #818cf8 !important;
+            }
+            .grid-cell-goal {
+                background-color: #14532d !important;
+                border-color: #4ade80 !important;
             }
         }
     </style>
@@ -100,14 +120,14 @@
         }, { passive: false });
     </script>
 </head>
-<body class="h-screen max-h-screen flex items-center justify-center p-2 sm:p-4 overflow-hidden transition-colors duration-200">
+<body class="h-screen max-h-screen overflow-hidden flex items-center justify-center p-2 sm:p-4 transition-colors duration-200">
 
     <div id="app" class="w-full max-w-2xl bg-white/95 backdrop-blur-md rounded-3xl shadow-xl flex flex-col relative border-4 border-fuchsia-300 overflow-hidden max-h-full">
-        <!-- Turinis bus atvaizduotas dinamiškai per JS -->
+        <!-- Turinys bus atvaizduotas dinamiškai per JS -->
     </div>
 
     <script>
-        // Web Audio API
+        // === GARSO SISTEMA (Web Audio API) ===
         let audioCtx;
         function getAudioCtx() {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -115,18 +135,27 @@
             return audioCtx;
         }
 
-        function playTone(freq, type, duration, startTime=0) {
-            const ctx = getAudioCtx();
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.type = type;
-            osc.frequency.setValueAtTime(freq, ctx.currentTime + startTime);
-            gain.gain.setValueAtTime(0.15, ctx.currentTime + startTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + startTime + duration);
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            osc.start(ctx.currentTime + startTime);
-            osc.stop(ctx.currentTime + startTime + duration);
+        function playTone(freq, type, duration, startTime = 0, vol = 0.15) {
+            try {
+                const ctx = getAudioCtx();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, ctx.currentTime + startTime);
+                gain.gain.setValueAtTime(vol, ctx.currentTime + startTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + startTime + duration);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start(ctx.currentTime + startTime);
+                osc.stop(ctx.currentTime + startTime + duration);
+            } catch (e) {
+                console.warn('Audio klaida:', e);
+            }
+        }
+
+        function playStepSound() {
+            playTone(520, 'sine', 0.09, 0, 0.14);
+            playTone(660, 'sine', 0.09, 0.05, 0.12);
         }
 
         function playCorrectSound() {
@@ -196,14 +225,14 @@
         }
         // === /SKIEMENŲ SPALVINIMAS ===
 
-        // Užduočių bazė
+        // 1 REŽIMO UŽDUOTYS: Kairė ir Dešinė
         const LEFT_RIGHT_TASKS = [
             {
                 prompt: "Kurioje pusėje yra dovanėlė? 🎁",
                 visual: `<div class="flex justify-between items-center w-full px-8 py-2">
-                    <div class="text-7xl p-3 bg-fuchsia-100 rounded-2xl border-4 border-dashed border-fuchsia-300">🎁</div>
-                    <div class="text-6xl text-slate-300 font-black">↔️</div>
-                    <div class="text-7xl p-3 bg-slate-50 rounded-2xl border-4 border-dashed border-slate-200 opacity-40">❓</div>
+                    <div class="text-6xl sm:text-7xl p-3 bg-fuchsia-100 rounded-2xl border-4 border-dashed border-fuchsia-300">🎁</div>
+                    <div class="text-5xl sm:text-6xl text-slate-300 font-black">↔️</div>
+                    <div class="text-6xl sm:text-7xl p-3 bg-slate-50 rounded-2xl border-4 border-dashed border-slate-200 opacity-40">❓</div>
                 </div>`,
                 options: ["Kairėje", "Dešinėje"],
                 correct: "Kairėje"
@@ -211,9 +240,9 @@
             {
                 prompt: "Kurioje pusėje yra obuolys? 🍏",
                 visual: `<div class="flex justify-between items-center w-full px-8 py-2">
-                    <div class="text-7xl p-3 bg-slate-50 rounded-2xl border-4 border-dashed border-slate-200 opacity-40">❓</div>
-                    <div class="text-6xl text-slate-300 font-black">↔️</div>
-                    <div class="text-7xl p-3 bg-fuchsia-100 rounded-2xl border-4 border-dashed border-fuchsia-300">🍏</div>
+                    <div class="text-6xl sm:text-7xl p-3 bg-slate-50 rounded-2xl border-4 border-dashed border-slate-200 opacity-40">❓</div>
+                    <div class="text-5xl sm:text-6xl text-slate-300 font-black">↔️</div>
+                    <div class="text-6xl sm:text-7xl p-3 bg-fuchsia-100 rounded-2xl border-4 border-dashed border-fuchsia-300">🍏</div>
                 </div>`,
                 options: ["Kairėje", "Dešinėje"],
                 correct: "Dešinėje"
@@ -221,9 +250,9 @@
             {
                 prompt: "Kurioje pusėje yra kamuolys? ⚽",
                 visual: `<div class="flex justify-between items-center w-full px-8 py-2">
-                    <div class="text-7xl p-3 bg-fuchsia-100 rounded-2xl border-4 border-dashed border-fuchsia-300">⚽</div>
-                    <div class="text-6xl text-slate-300 font-black">↔️</div>
-                    <div class="text-7xl p-3 bg-slate-50 rounded-2xl border-4 border-dashed border-slate-200 opacity-40">❓</div>
+                    <div class="text-6xl sm:text-7xl p-3 bg-fuchsia-100 rounded-2xl border-4 border-dashed border-fuchsia-300">⚽</div>
+                    <div class="text-5xl sm:text-6xl text-slate-300 font-black">↔️</div>
+                    <div class="text-6xl sm:text-7xl p-3 bg-slate-50 rounded-2xl border-4 border-dashed border-slate-200 opacity-40">❓</div>
                 </div>`,
                 options: ["Kairėje", "Dešinėje"],
                 correct: "Kairėje"
@@ -231,9 +260,9 @@
             {
                 prompt: "Kurioje pusėje yra žvaigždutė? ⭐",
                 visual: `<div class="flex justify-between items-center w-full px-8 py-2">
-                    <div class="text-7xl p-3 bg-slate-50 rounded-2xl border-4 border-dashed border-slate-200 opacity-40">❓</div>
-                    <div class="text-6xl text-slate-300 font-black">↔️</div>
-                    <div class="text-7xl p-3 bg-fuchsia-100 rounded-2xl border-4 border-dashed border-fuchsia-300">⭐</div>
+                    <div class="text-6xl sm:text-7xl p-3 bg-slate-50 rounded-2xl border-4 border-dashed border-slate-200 opacity-40">❓</div>
+                    <div class="text-5xl sm:text-6xl text-slate-300 font-black">↔️</div>
+                    <div class="text-6xl sm:text-7xl p-3 bg-fuchsia-100 rounded-2xl border-4 border-dashed border-fuchsia-300">⭐</div>
                 </div>`,
                 options: ["Kairėje", "Dešinėje"],
                 correct: "Dešinėje"
@@ -241,9 +270,9 @@
             {
                 prompt: "Kurioje pusėje yra balionas? 🎈",
                 visual: `<div class="flex justify-between items-center w-full px-8 py-2">
-                    <div class="text-7xl p-3 bg-fuchsia-100 rounded-2xl border-4 border-dashed border-fuchsia-300">🎈</div>
-                    <div class="text-6xl text-slate-300 font-black">↔️</div>
-                    <div class="text-7xl p-3 bg-slate-50 rounded-2xl border-4 border-dashed border-slate-200 opacity-40">❓</div>
+                    <div class="text-6xl sm:text-7xl p-3 bg-fuchsia-100 rounded-2xl border-4 border-dashed border-fuchsia-300">🎈</div>
+                    <div class="text-5xl sm:text-6xl text-slate-300 font-black">↔️</div>
+                    <div class="text-6xl sm:text-7xl p-3 bg-slate-50 rounded-2xl border-4 border-dashed border-slate-200 opacity-40">❓</div>
                 </div>`,
                 options: ["Kairėje", "Dešinėje"],
                 correct: "Kairėje"
@@ -251,9 +280,9 @@
             {
                 prompt: "Kurioje pusėje sėdi šuniukas? 🐶",
                 visual: `<div class="flex justify-between items-center w-full px-8 py-2">
-                    <div class="text-7xl p-3 bg-slate-50 rounded-2xl border-4 border-dashed border-slate-200 opacity-40">❓</div>
-                    <div class="text-6xl text-slate-300 font-black">↔️</div>
-                    <div class="text-7xl p-3 bg-fuchsia-100 rounded-2xl border-4 border-dashed border-fuchsia-300">🐶</div>
+                    <div class="text-6xl sm:text-7xl p-3 bg-slate-50 rounded-2xl border-4 border-dashed border-slate-200 opacity-40">❓</div>
+                    <div class="text-5xl sm:text-6xl text-slate-300 font-black">↔️</div>
+                    <div class="text-6xl sm:text-7xl p-3 bg-fuchsia-100 rounded-2xl border-4 border-dashed border-fuchsia-300">🐶</div>
                 </div>`,
                 options: ["Kairėje", "Dešinėje"],
                 correct: "Dešinėje"
@@ -261,9 +290,9 @@
             {
                 prompt: "Kurioje pusėje yra mašinėlė? 🚗",
                 visual: `<div class="flex justify-between items-center w-full px-8 py-2">
-                    <div class="text-7xl p-3 bg-fuchsia-100 rounded-2xl border-4 border-dashed border-fuchsia-300">🚗</div>
-                    <div class="text-6xl text-slate-300 font-black">↔️</div>
-                    <div class="text-7xl p-3 bg-slate-50 rounded-2xl border-4 border-dashed border-slate-200 opacity-40">❓</div>
+                    <div class="text-6xl sm:text-7xl p-3 bg-fuchsia-100 rounded-2xl border-4 border-dashed border-fuchsia-300">🚗</div>
+                    <div class="text-5xl sm:text-6xl text-slate-300 font-black">↔️</div>
+                    <div class="text-6xl sm:text-7xl p-3 bg-slate-50 rounded-2xl border-4 border-dashed border-slate-200 opacity-40">❓</div>
                 </div>`,
                 options: ["Kairėje", "Dešinėje"],
                 correct: "Kairėje"
@@ -271,63 +300,64 @@
             {
                 prompt: "Kurioje pusėje žydi gėlytė? 🌸",
                 visual: `<div class="flex justify-between items-center w-full px-8 py-2">
-                    <div class="text-7xl p-3 bg-slate-50 rounded-2xl border-4 border-dashed border-slate-200 opacity-40">❓</div>
-                    <div class="text-6xl text-slate-300 font-black">↔️</div>
-                    <div class="text-7xl p-3 bg-fuchsia-100 rounded-2xl border-4 border-dashed border-fuchsia-300">🌸</div>
+                    <div class="text-6xl sm:text-7xl p-3 bg-slate-50 rounded-2xl border-4 border-dashed border-slate-200 opacity-40">❓</div>
+                    <div class="text-5xl sm:text-6xl text-slate-300 font-black">↔️</div>
+                    <div class="text-6xl sm:text-7xl p-3 bg-fuchsia-100 rounded-2xl border-4 border-dashed border-fuchsia-300">🌸</div>
                 </div>`,
                 options: ["Kairėje", "Dešinėje"],
                 correct: "Dešinėje"
             },
             {
                 prompt: "Kur rodo rodyklė? ➡️",
-                visual: `<div class="text-8xl py-1 text-purple-600 font-black animate-pulse">➡️</div>`,
+                visual: `<div class="text-7xl sm:text-8xl py-1 text-purple-600 font-black animate-pulse">➡️</div>`,
                 options: ["Į kairę", "Į dešinę"],
                 correct: "Į dešinę"
             },
             {
                 prompt: "Kur rodo rodyklė? ⬅️",
-                visual: `<div class="text-8xl py-1 text-purple-600 font-black animate-pulse">⬅️</div>`,
+                visual: `<div class="text-7xl sm:text-8xl py-1 text-purple-600 font-black animate-pulse">⬅️</div>`,
                 options: ["Į kairę", "Į dešinę"],
                 correct: "Į kairę"
             },
             {
                 prompt: "Kur rodo pirštukas? 👉",
-                visual: `<div class="text-8xl py-1 animate-pulse">👉</div>`,
+                visual: `<div class="text-7xl sm:text-8xl py-1 animate-pulse">👉</div>`,
                 options: ["Į kairę", "Į dešinę"],
                 correct: "Į dešinę"
             },
             {
                 prompt: "Kur rodo pirštukas? 👈",
-                visual: `<div class="text-8xl py-1 animate-pulse">👈</div>`,
+                visual: `<div class="text-7xl sm:text-8xl py-1 animate-pulse">👈</div>`,
                 options: ["Į kairę", "Į dešinę"],
                 correct: "Į kairę"
             },
             {
                 prompt: "Kur skrenda raketa? 🚀",
-                visual: `<div class="text-7xl py-1 flex items-center justify-center gap-3"><span>🚀</span><span class="text-6xl text-purple-600 font-black">➡️</span></div>`,
+                visual: `<div class="text-6xl sm:text-7xl py-1 flex items-center justify-center gap-3"><span>🚀</span><span class="text-5xl sm:text-6xl text-purple-600 font-black">➡️</span></div>`,
                 options: ["Į kairę", "Į dešinę"],
                 correct: "Į dešinę"
             },
             {
                 prompt: "Kur skrenda raketa? 🚀",
-                visual: `<div class="text-7xl py-1 flex items-center justify-center gap-3"><span class="text-6xl text-purple-600 font-black">⬅️</span><span>🚀</span></div>`,
+                visual: `<div class="text-6xl sm:text-7xl py-1 flex items-center justify-center gap-3"><span class="text-5xl sm:text-6xl text-purple-600 font-black">⬅️</span><span>🚀</span></div>`,
                 options: ["Į kairę", "Į dešinę"],
                 correct: "Į kairę"
             },
             {
                 prompt: "Kur važiuoja mašinėlė? 🚗",
-                visual: `<div class="text-7xl py-1 flex items-center justify-center gap-3"><span>🚗</span><span class="text-6xl text-purple-600 font-black">➡️</span></div>`,
+                visual: `<div class="text-6xl sm:text-7xl py-1 flex items-center justify-center gap-3"><span>🚗</span><span class="text-5xl sm:text-6xl text-purple-600 font-black">➡️</span></div>`,
                 options: ["Į kairę", "Į dešinę"],
                 correct: "Į dešinę"
             },
             {
                 prompt: "Kur važiuoja mašinėlė? 🚗",
-                visual: `<div class="text-7xl py-1 flex items-center justify-center gap-3"><span class="text-6xl text-purple-600 font-black">⬅️</span><span>🚗</span></div>`,
+                visual: `<div class="text-6xl sm:text-7xl py-1 flex items-center justify-center gap-3"><span class="text-5xl sm:text-6xl text-purple-600 font-black">⬅️</span><span>🚗</span></div>`,
                 options: ["Į kairę", "Į dešinę"],
                 correct: "Į kairę"
             }
         ];
 
+        // 2 REŽIMO UŽDUOTYS: Virš, Po, Tarp, Viduje
         const SPATIAL_TASKS = [
             {
                 prompt: "Kas yra VIRŠ kėdės? 🪑",
@@ -416,6 +446,104 @@
                 </div>`,
                 options: ["Braškė", "Obuolys", "Gėlė", "Morka"],
                 correct: "Braškė"
+            },
+            {
+                prompt: "Kas yra PO stalu / kėde? 🪑",
+                visual: `<div class="flex flex-col items-center">
+                    <div class="text-5xl mb-1 opacity-50">🎈</div>
+                    <div class="text-7xl">🪑</div>
+                    <div class="text-6xl mt-1">🎁</div>
+                </div>`,
+                options: ["Dovanėlė", "Balionas", "Kėdė", "Kamuolys"],
+                correct: "Dovanėlė"
+            }
+        ];
+
+        // 3 REŽIMO UŽDUOTYS: 🐾 Nuvesk šuniuką! (3x3 tinklelis)
+        const PUPPY_LEVELS = [
+            {
+                prompt: "Nuvesk šuniuką prie kauliuko! 🐶 ➔ 🦴",
+                start: [0, 0],
+                goal: [0, 2],
+                goalEmoji: "🦴",
+                obstacles: [{ pos: [1, 1], emoji: "🌳" }, { pos: [2, 0], emoji: "🪨" }]
+            },
+            {
+                prompt: "Nuvesk šuniuką prie kauliuko! 🐶 ➔ 🦴",
+                start: [2, 2],
+                goal: [0, 2],
+                goalEmoji: "🦴",
+                obstacles: [{ pos: [1, 1], emoji: "🪨" }, { pos: [0, 0], emoji: "🌳" }]
+            },
+            {
+                prompt: "Padėk šuniukui grįžti į namelį! 🐶 ➔ 🏠",
+                start: [0, 2],
+                goal: [2, 0],
+                goalEmoji: "🏠",
+                obstacles: [{ pos: [0, 1], emoji: "🌳" }, { pos: [2, 2], emoji: "🪨" }]
+            },
+            {
+                prompt: "Nuvesk šuniuką prie kauliuko! 🐶 ➔ 🦴",
+                start: [2, 0],
+                goal: [0, 2],
+                goalEmoji: "🦴",
+                obstacles: [{ pos: [1, 0], emoji: "🪨" }, { pos: [1, 2], emoji: "🌳" }]
+            },
+            {
+                prompt: "Padėk šuniukui pasiekti kauliuką! 🐶 ➔ 🦴",
+                start: [0, 0],
+                goal: [2, 2],
+                goalEmoji: "🦴",
+                obstacles: [{ pos: [0, 1], emoji: "🌳" }, { pos: [2, 0], emoji: "🪨" }]
+            },
+            {
+                prompt: "Nuvesk šuniuką į namelį! 🐶 ➔ 🏠",
+                start: [1, 2],
+                goal: [1, 0],
+                goalEmoji: "🏠",
+                obstacles: [{ pos: [1, 1], emoji: "🌳" }]
+            },
+            {
+                prompt: "Nuvesk šuniuką prie kauliuko! 🐶 ➔ 🦴",
+                start: [0, 1],
+                goal: [2, 1],
+                goalEmoji: "🦴",
+                obstacles: [{ pos: [1, 1], emoji: "🪨" }]
+            },
+            {
+                prompt: "Padėk šuniukui grįžti į namelį! 🐶 ➔ 🏠",
+                start: [2, 1],
+                goal: [0, 0],
+                goalEmoji: "🏠",
+                obstacles: [{ pos: [2, 0], emoji: "🪨" }, { pos: [0, 2], emoji: "🌳" }]
+            },
+            {
+                prompt: "Nuvesk šuniuką prie kauliuko! 🐶 ➔ 🦴",
+                start: [1, 0],
+                goal: [1, 2],
+                goalEmoji: "🦴",
+                obstacles: [{ pos: [1, 1], emoji: "🌳" }, { pos: [2, 1], emoji: "🪨" }]
+            },
+            {
+                prompt: "Nuvesk šuniuką prie kauliuko! 🐶 ➔ 🦴",
+                start: [0, 2],
+                goal: [2, 1],
+                goalEmoji: "🦴",
+                obstacles: [{ pos: [1, 2], emoji: "🪨" }, { pos: [0, 0], emoji: "🌳" }]
+            },
+            {
+                prompt: "Padėk šuniukui pasiekti namelį! 🐶 ➔ 🏠",
+                start: [2, 2],
+                goal: [0, 0],
+                goalEmoji: "🏠",
+                obstacles: [{ pos: [1, 2], emoji: "🌳" }, { pos: [1, 0], emoji: "🪨" }]
+            },
+            {
+                prompt: "Nuvesk šuniuką prie kauliuko! 🐶 ➔ 🦴",
+                start: [0, 0],
+                goal: [2, 0],
+                goalEmoji: "🦴",
+                obstacles: [{ pos: [1, 0], emoji: "🪨" }, { pos: [1, 2], emoji: "🌳" }]
             }
         ];
 
@@ -426,7 +554,9 @@
             score: 0,
             streak: 0,
             firstTry: true,
-            waiting: false
+            waiting: false,
+            dogPos: [0, 0],
+            visited: []
         };
 
         const appEl = document.getElementById('app');
@@ -435,19 +565,35 @@
             return [...arr].sort(() => Math.random() - 0.5);
         }
 
+        function renderTopBar() {
+            return `
+                <div class="bg-fuchsia-500 text-white px-4 py-2 flex justify-between items-center font-bold text-sm sm:text-base shadow">
+                    <div>⭐ ${_col('Taškai:')} <span class="text-yellow-200">${state.score}</span></div>
+                    <div class="bg-fuchsia-600 px-3 py-0.5 rounded-xl">${_col('Klausimas:')} ${state.currentIndex + 1} / 10</div>
+                    <div>🔥 ${_col('Serija:')} <span class="text-orange-200">${state.streak}</span></div>
+                </div>
+            `;
+        }
+
         function renderStartScreen() {
             appEl.innerHTML = `
-                <div class="p-6 sm:p-8 flex flex-col items-center justify-center text-center">
-                    <div class="text-6xl sm:text-7xl mb-2 animate-bounce">🧭</div>
-                    <h1 class="text-3xl sm:text-5xl font-black text-fuchsia-700 mb-2">Kairė ar Dešinė?</h1>
-                    <p class="text-lg sm:text-xl font-bold text-slate-600 mb-6 sm:mb-8">Mokykis krypčių ir erdvinių padėčių!</p>
-                    
-                    <div class="flex flex-col gap-3.5 sm:gap-4 w-full max-w-sm">
-                        <button onclick="startGame('left-right')" class="btn-3d py-3.5 sm:py-4 px-6 bg-purple-500 hover:bg-purple-600 text-white rounded-2xl text-xl sm:text-2xl font-black shadow-[0_6px_0_#7e22ce] active:shadow-[0_0px_0_#7e22ce] transition-all">
-                            ⬅️ Kairė ar Dešinė? ➡️
+                <div class="p-5 sm:p-7 flex flex-col items-center justify-center text-center">
+                    <div class="text-5xl sm:text-6xl mb-2 animate-bounce">🧭</div>
+                    <h1 class="text-3xl sm:text-4xl font-black text-fuchsia-700 mb-1">${_col('Kairė ar Dešinė?')}</h1>
+                    <p class="text-base sm:text-lg font-bold text-slate-600 dark-subtext mb-5">${_col('Mokykis krypčių ir erdvinių padėčių!')}</p>
+
+                    <div class="flex flex-col gap-3 w-full max-w-md">
+                        <button onclick="startGame('left-right')" class="btn-3d py-3.5 px-5 bg-purple-100 hover:bg-purple-200 border-2 border-purple-400 rounded-2xl text-lg sm:text-xl font-black shadow-[0_5px_0_#a855f7] active:shadow-[0_0px_0_#a855f7] transition-all flex items-center justify-center gap-2">
+                            <span>👈</span>
+                            <span>${_col('Kairė ir Dešinė')}</span>
                         </button>
-                        <button onclick="startGame('spatial')" class="btn-3d py-3.5 sm:py-4 px-6 bg-pink-500 hover:bg-pink-600 text-white rounded-2xl text-xl sm:text-2xl font-black shadow-[0_6px_0_#be185d] active:shadow-[0_0px_0_#be185d] transition-all">
-                            📦 Erdvinės Padėtys
+                        <button onclick="startGame('spatial')" class="btn-3d py-3.5 px-5 bg-pink-100 hover:bg-pink-200 border-2 border-pink-400 rounded-2xl text-lg sm:text-xl font-black shadow-[0_5px_0_#ec4899] active:shadow-[0_0px_0_#ec4899] transition-all flex items-center justify-center gap-2">
+                            <span>📦</span>
+                            <span>${_col('Virš, Po, Tarp, Viduje')}</span>
+                        </button>
+                        <button onclick="startGame('puppy')" class="btn-3d py-3.5 px-5 bg-amber-100 hover:bg-amber-200 border-2 border-amber-400 rounded-2xl text-lg sm:text-xl font-black shadow-[0_5px_0_#f59e0b] active:shadow-[0_0px_0_#f59e0b] transition-all flex items-center justify-center gap-2">
+                            <span>🐾</span>
+                            <span>${_col('Nuvesk šuniuką! (Tinklelis)')}</span>
                         </button>
                     </div>
                 </div>
@@ -460,59 +606,71 @@
             state.score = 0;
             state.streak = 0;
             state.currentIndex = 0;
-            const pool = mode === 'left-right' ? LEFT_RIGHT_TASKS : SPATIAL_TASKS;
-            state.questions = shuffle(pool).slice(0, 10);
-            renderQuestion();
+
+            if (mode === 'left-right') {
+                state.questions = shuffle(LEFT_RIGHT_TASKS).slice(0, 10);
+            } else if (mode === 'spatial') {
+                state.questions = shuffle(SPATIAL_TASKS).slice(0, 10);
+            } else {
+                state.questions = shuffle(PUPPY_LEVELS).slice(0, 10);
+            }
+
+            loadQuestion();
         }
 
-        function renderQuestion() {
+        function loadQuestion() {
             if (state.currentIndex >= state.questions.length) {
                 renderEndScreen();
                 return;
             }
-
             state.firstTry = true;
             state.waiting = false;
+
+            if (state.mode === 'puppy') {
+                const lvl = state.questions[state.currentIndex];
+                state.dogPos = [lvl.start[0], lvl.start[1]];
+                state.visited = [`${lvl.start[0]},${lvl.start[1]}`];
+                renderPuppyQuestion();
+            } else {
+                renderQuizQuestion();
+            }
+        }
+
+        // ==========================================
+        // 1 IR 2 REŽIMAI: Viktorinos klausimai
+        // ==========================================
+        function renderQuizQuestion() {
             const q = state.questions[state.currentIndex];
             const options = state.mode === 'left-right' ? [...q.options] : shuffle([...q.options]);
 
-            const isTwoOptions = options.length === 2;
-            const gridClass = isTwoOptions ? "grid-cols-2" : "grid-cols-2";
-
             const optionsHtml = options.map((opt, idx) => `
-                <button id="btn-${idx}" onclick="handleAnswer('${opt.replace(/'/g, "\\'")}', this)" 
+                <button id="btn-${idx}" onclick="handleQuizAnswer('${opt.replace(/'/g, "\\'")}', this)"
                     class="btn-3d py-3 sm:py-4 px-4 bg-fuchsia-50 hover:bg-fuchsia-100 text-fuchsia-900 border-2 border-fuchsia-300 rounded-2xl text-lg sm:text-2xl font-black shadow-[0_5px_0_#d8b4fe] active:shadow-[0_0px_0_#d8b4fe] transition-all flex items-center justify-center text-center">
                     ${_col(opt)}
                 </button>
             `).join('');
 
             appEl.innerHTML = `
-                <!-- Top Status Bar -->
-                <div class="bg-fuchsia-500 text-white px-4 py-2 sm:py-2.5 flex justify-between items-center font-bold text-sm sm:text-base shadow">
-                    <div>⭐ Taškai: <span class="text-yellow-200">${state.score}</span></div>
-                    <div class="bg-fuchsia-600 px-3 py-1 rounded-xl">Klausimas: ${state.currentIndex + 1} / 10</div>
-                    <div>🔥 Serija: <span class="text-orange-200">${state.streak}</span></div>
-                </div>
-
+                ${renderTopBar()}
                 <div class="p-3 sm:p-5 flex-1 flex flex-col justify-between items-center">
-                    <h2 class="text-xl sm:text-2xl font-black text-slate-800 text-center mb-2 sm:mb-3">${_col(q.prompt)}</h2>
+                    <h2 class="text-xl sm:text-2xl font-black text-slate-800 text-center mb-1">${_col(q.prompt)}</h2>
 
-                    <div class="my-auto py-2 w-full flex items-center justify-center bg-white/60 rounded-2xl border-2 border-fuchsia-100 min-h-[120px] sm:min-h-[140px]">
+                    <div class="my-auto py-2 w-full flex items-center justify-center bg-white/60 dark-panel rounded-2xl border-2 border-fuchsia-100 min-h-[120px] sm:min-h-[140px]">
                         ${q.visual}
                     </div>
 
-                    <div id="feedback" class="h-6 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black my-1 opacity-0 transition-opacity">
-                        Pranešimas
+                    <div id="feedback" class="h-6 sm:h-7 flex items-center justify-center text-base sm:text-lg font-black my-1 opacity-0 transition-opacity">
+                        ${_col('Puiku!')}
                     </div>
 
-                    <div class="grid ${gridClass} gap-2.5 sm:gap-3.5 w-full mt-1">
+                    <div class="grid grid-cols-2 gap-2.5 sm:gap-3.5 w-full mt-1">
                         ${optionsHtml}
                     </div>
                 </div>
             `;
         }
 
-        function handleAnswer(selected, btn) {
+        function handleQuizAnswer(selected, btn) {
             if (state.waiting) return;
 
             const q = state.questions[state.currentIndex];
@@ -529,13 +687,13 @@
                 btn.classList.remove('bg-fuchsia-50', 'text-fuchsia-900', 'border-fuchsia-300');
                 btn.classList.add('bg-green-500', 'text-white', 'border-green-600', 'shadow-[0_5px_0_#15803d]', 'bounce-anim');
 
-                feedback.textContent = "Puiku! Teisingai! 🎉";
-                feedback.className = "h-6 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black my-1 text-green-600 opacity-100";
+                feedback.innerHTML = _col("Puiku! Teisingai! 🎉");
+                feedback.className = "h-6 sm:h-7 flex items-center justify-center text-base sm:text-lg font-black my-1 text-green-600 opacity-100";
 
                 setTimeout(() => {
                     state.currentIndex++;
-                    renderQuestion();
-                }, 1200);
+                    loadQuestion();
+                }, 1050);
             } else {
                 state.firstTry = false;
                 state.streak = 0;
@@ -545,8 +703,8 @@
                 btn.classList.add('bg-red-100', 'text-red-400', 'line-through', 'border-red-300', 'opacity-60', 'shake-anim');
                 btn.disabled = true;
 
-                feedback.textContent = "Bandyk dar kartą! 🤔";
-                feedback.className = "h-6 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black my-1 text-red-500 opacity-100";
+                feedback.innerHTML = _col("Bandyk dar kartą! 🤔");
+                feedback.className = "h-6 sm:h-7 flex items-center justify-center text-base sm:text-lg font-black my-1 text-red-500 opacity-100";
 
                 setTimeout(() => {
                     btn.classList.remove('shake-anim');
@@ -554,6 +712,150 @@
             }
         }
 
+        // ==========================================
+        // 3 REŽIMAS: 🐾 Nuvesk šuniuką! (3x3 tinklelis)
+        // ==========================================
+        function renderPuppyQuestion() {
+            const lvl = state.questions[state.currentIndex];
+            const [dr, dc] = state.dogPos;
+            const [gr, gc] = lvl.goal;
+
+            let cellsHtml = '';
+            for (let r = 0; r < 3; r++) {
+                for (let c = 0; c < 3; c++) {
+                    const isDog = r === dr && c === dc;
+                    const isGoal = r === gr && c === gc;
+                    const obs = lvl.obstacles.find(o => o.pos[0] === r && o.pos[1] === c);
+                    const wasVisited = state.visited.includes(`${r},${c}`);
+
+                    let cellClass = 'grid-cell bg-fuchsia-50/80 border-2 border-fuchsia-200';
+                    let content = '';
+
+                    if (isDog && isGoal) {
+                        cellClass = 'grid-cell-goal bg-green-200 border-4 border-green-500 bounce-anim';
+                        content = `<span class="text-3xl sm:text-4xl">🐶${lvl.goalEmoji}</span>`;
+                    } else if (isDog) {
+                        cellClass = 'grid-cell-dog bg-amber-100 border-4 border-amber-400 bounce-anim';
+                        content = `<span class="text-4xl sm:text-5xl">🐶</span>`;
+                    } else if (isGoal) {
+                        cellClass = 'grid-cell-goal bg-emerald-100 border-2 border-emerald-400';
+                        content = `<span class="text-3xl sm:text-4xl animate-pulse">${lvl.goalEmoji}</span>`;
+                    } else if (obs) {
+                        cellClass = 'grid-cell bg-slate-100 border-2 border-slate-300';
+                        content = `<span class="text-3xl sm:text-4xl">${obs.emoji}</span>`;
+                    } else if (wasVisited) {
+                        content = `<span class="text-xl sm:text-2xl opacity-45">🐾</span>`;
+                    }
+
+                    cellsHtml += `
+                        <div id="cell-${r}-${c}" class="h-16 sm:h-20 rounded-2xl ${cellClass} flex items-center justify-center shadow-sm transition-all">
+                            ${content}
+                        </div>
+                    `;
+                }
+            }
+
+            // 4 krypčių mygtukai BE rodyklių piktogramų – vaikas skaito skiemenuotus žodžius
+            const controls = [
+                { dir: 'left', label: 'Į kairę' },
+                { dir: 'up', label: 'Į viršų' },
+                { dir: 'down', label: 'Į apačią' },
+                { dir: 'right', label: 'Į dešinę' }
+            ];
+
+            const controlsHtml = controls.map(ctrl => `
+                <button onclick="movePuppy('${ctrl.dir}')"
+                    class="btn-3d py-2.5 sm:py-3.5 px-3 bg-fuchsia-50 hover:bg-fuchsia-100 border-2 border-fuchsia-300 rounded-2xl text-lg sm:text-xl font-black shadow-[0_4px_0_#d8b4fe] active:shadow-[0_0px_0_#d8b4fe] transition-all flex items-center justify-center text-center">
+                    ${_col(ctrl.label)}
+                </button>
+            `).join('');
+
+            appEl.innerHTML = `
+                ${renderTopBar()}
+                <div class="p-3 sm:p-4 flex-1 flex flex-col justify-between items-center">
+                    <h2 class="text-lg sm:text-2xl font-black text-slate-800 text-center">${_col(lvl.prompt)}</h2>
+
+                    <div id="puppy-grid" class="grid grid-cols-3 gap-2 sm:gap-2.5 w-full max-w-xs my-1.5 p-2.5 bg-white/80 dark-panel rounded-3xl border-2 border-fuchsia-200 shadow-inner">
+                        ${cellsHtml}
+                    </div>
+
+                    <div id="feedback" class="h-6 flex items-center justify-center text-sm sm:text-base font-black opacity-0 transition-opacity">
+                        ${_col('Spausk krypties mygtuką!')}
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2.5 sm:gap-3 w-full max-w-md">
+                        ${controlsHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        function movePuppy(dir) {
+            if (state.waiting) return;
+            const lvl = state.questions[state.currentIndex];
+            let [r, c] = state.dogPos;
+
+            if (dir === 'up') r -= 1;
+            else if (dir === 'down') r += 1;
+            else if (dir === 'left') c -= 1;
+            else if (dir === 'right') c += 1;
+
+            const gridEl = document.getElementById('puppy-grid');
+            const feedback = document.getElementById('feedback');
+
+            // Patikriname ribas ir kliūtis
+            const outOfBounds = r < 0 || r > 2 || c < 0 || c > 2;
+            const hitObstacle = !outOfBounds && lvl.obstacles.some(o => o.pos[0] === r && o.pos[1] === c);
+
+            if (outOfBounds || hitObstacle) {
+                state.firstTry = false;
+                state.streak = 0;
+                playWrongSound();
+                if (gridEl) {
+                    gridEl.classList.remove('shake-anim');
+                    void gridEl.offsetWidth;
+                    gridEl.classList.add('shake-anim');
+                }
+                feedback.innerHTML = _col(hitObstacle ? 'Ten kliūtis! Pasirink kitą kryptį! 🌳' : 'Ten eiti negalima! Pasirink kitą kryptį! 🚧');
+                feedback.className = 'h-6 flex items-center justify-center text-sm sm:text-base font-black text-red-500 opacity-100';
+                return;
+            }
+
+            // Žingsnis tinkamas
+            state.dogPos = [r, c];
+            const posKey = `${r},${c}`;
+            if (!state.visited.includes(posKey)) {
+                state.visited.push(posKey);
+            }
+
+            const reachedGoal = r === lvl.goal[0] && c === lvl.goal[1];
+
+            if (reachedGoal) {
+                state.waiting = true;
+                if (state.firstTry) {
+                    state.score++;
+                    state.streak++;
+                }
+                playCorrectSound();
+                renderPuppyQuestion();
+                const fb = document.getElementById('feedback');
+                fb.innerHTML = _col('Valio! Šuniukas pasiekė tikslą! 🎉');
+                fb.className = 'h-6 flex items-center justify-center text-sm sm:text-base font-black text-green-600 opacity-100';
+
+                setTimeout(() => {
+                    state.currentIndex++;
+                    loadQuestion();
+                }, 1050);
+            } else {
+                playStepSound();
+                renderPuppyQuestion();
+                const fb = document.getElementById('feedback');
+                fb.innerHTML = _col('Puiku! Eik toliau! 🐾');
+                fb.className = 'h-6 flex items-center justify-center text-sm sm:text-base font-black text-fuchsia-600 opacity-100';
+            }
+        }
+
+        // === PABAIGOS EKRANAS ===
         function renderEndScreen() {
             playWinSound();
             let stars = "⭐";
@@ -562,18 +864,18 @@
 
             appEl.innerHTML = `
                 <div class="p-6 sm:p-8 flex flex-col items-center justify-center text-center">
-                    <div class="text-7xl mb-2">🎉</div>
-                    <h2 class="text-3xl sm:text-4xl font-black text-green-600 mb-2">Šaunuolis!</h2>
+                    <div class="text-6xl sm:text-7xl mb-2">🎉</div>
+                    <h2 class="text-3xl sm:text-4xl font-black text-green-600 mb-2">${_col('Šaunuolis!')}</h2>
                     <div class="text-5xl mb-4 tracking-wider">${stars}</div>
-                    <p class="text-xl font-bold text-slate-700 mb-1">Surinkai taškų:</p>
+                    <p class="text-xl font-bold text-slate-700 dark-subtext mb-1">${_col('Surinkai taškų:')}</p>
                     <p class="text-4xl font-black text-fuchsia-600 mb-6">${state.score} / 10</p>
-                    
+
                     <div class="flex flex-col sm:flex-row gap-3 w-full max-w-sm">
-                        <button onclick="startGame(state.mode)" class="btn-3d flex-1 py-3.5 bg-fuchsia-500 hover:bg-fuchsia-600 text-white rounded-2xl text-lg font-black shadow-[0_5px_0_#a21caf] active:shadow-[0_0px_0_#a21caf] transition-all">
-                            Dar kartą
+                        <button onclick="startGame(state.mode)" class="btn-3d flex-1 py-3.5 bg-fuchsia-200 hover:bg-fuchsia-300 border-2 border-fuchsia-400 rounded-2xl text-lg font-black shadow-[0_5px_0_#a21caf] active:shadow-[0_0px_0_#a21caf] transition-all">
+                            ${_col('Dar kartą')}
                         </button>
-                        <button onclick="renderStartScreen()" class="btn-3d flex-1 py-3.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-2xl text-lg font-black shadow-[0_5px_0_#94a3b8] active:shadow-[0_0px_0_#94a3b8] transition-all">
-                            Iš pradžių
+                        <button onclick="renderStartScreen()" class="btn-3d flex-1 py-3.5 bg-slate-200 hover:bg-slate-300 border-2 border-slate-400 rounded-2xl text-lg font-black shadow-[0_5px_0_#94a3b8] active:shadow-[0_0px_0_#94a3b8] transition-all">
+                            ${_col('Iš pradžių')}
                         </button>
                     </div>
                 </div>

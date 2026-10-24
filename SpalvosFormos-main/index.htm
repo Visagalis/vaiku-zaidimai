@@ -13,47 +13,49 @@
         body {
             font-family: 'Nunito', sans-serif;
             background-color: #fef08a;
-            background-image: radial-gradient(#fbbf24 10%, transparent 10%);
+            background-image: radial-gradient(#fbbf24 12%, transparent 12%);
             background-size: 20px 20px;
             touch-action: manipulation;
             user-select: none;
             -webkit-user-select: none;
         }
-        
-        .shape-container svg {
-            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
-            transition: transform 0.3s ease;
+
+        .shape-svg {
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.14));
+            transition: transform 0.25s ease;
         }
 
+        .btn-bounce {
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+        }
         .btn-bounce:active {
             transform: scale(0.95);
         }
 
-        /* Animations */
         @keyframes bounce-sm {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px) scale(1.05); }
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-10px) scale(1.06); }
         }
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-10px); }
-            40%, 80% { transform: translateX(10px); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
         }
         @keyframes pop-in {
-            0% { transform: scale(0.5); opacity: 0; }
-            70% { transform: scale(1.1); }
+            0% { transform: scale(0.7); opacity: 0; }
+            70% { transform: scale(1.05); }
             100% { transform: scale(1); opacity: 1; }
         }
-        
-        .animate-bounce-sm { animation: bounce-sm 0.5s ease-in-out; }
-        .animate-shake { animation: shake 0.5s ease-in-out; }
-        .animate-pop-in { animation: pop-in 0.4s ease-out forwards; }
-        
+
+        .animate-bounce-sm { animation: bounce-sm 0.45s ease-in-out; }
+        .animate-shake { animation: shake 0.4s ease-in-out; }
+        .animate-pop-in { animation: pop-in 0.35s ease-out forwards; }
+
         .glass-panel {
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
-            border: 4px solid white;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border: 4px solid #fde047;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
         }
 
         /* Tamsioji tema */
@@ -61,27 +63,32 @@
             body {
                 background-color: #0b1120 !important;
                 background-image: radial-gradient(#1e293b 20%, transparent 20%) !important;
-                color: #f1f5f9 !important;
+                color: #f8fafc !important;
             }
             .glass-panel {
-                background: rgba(15, 23, 42, 0.95) !important;
+                background: #0f172a !important;
                 border-color: #334155 !important;
                 box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6) !important;
                 color: #f8fafc !important;
             }
-            .glass-panel h1, .glass-panel h2 {
-                color: #f8fafc !important;
-            }
-            .glass-panel p {
-                color: #94a3b8 !important;
-            }
-            .btn-bounce.bg-white {
+            .dark-panel {
                 background-color: #1e293b !important;
                 border-color: #334155 !important;
                 color: #f8fafc !important;
             }
-            .btn-bounce.bg-white:hover {
-                background-color: #334155 !important;
+            .dark-btn {
+                background-color: #1e293b !important;
+                border-color: #334155 !important;
+                color: #f8fafc !important;
+            }
+            .dark-btn:hover {
+                background-color: #273549 !important;
+            }
+            .dark-text {
+                color: #f8fafc !important;
+            }
+            .dark-subtext {
+                color: #cbd5e1 !important;
             }
         }
     </style>
@@ -107,10 +114,14 @@
         }, { passive: false });
     </script>
 </head>
-<body class="min-h-screen flex items-center justify-center p-2 sm:p-4 overflow-y-auto transition-colors duration-200">
+<body class="h-screen max-h-screen overflow-hidden flex items-center justify-center p-2 sm:p-4 transition-colors duration-200">
 
-    <!-- AUDIO SYSTEM -->
+    <div id="app" class="w-full max-w-xl glass-panel rounded-3xl flex flex-col relative overflow-hidden max-h-full">
+        <!-- EKRANAI GENERUOJAMI ČIA -->
+    </div>
+
     <script>
+        // === GARSO SISTEMA (Web Audio API) ===
         let audioCtx = null;
         function getAudioCtx() {
             if (!audioCtx) {
@@ -119,52 +130,47 @@
             if (audioCtx.state === 'suspended') audioCtx.resume();
             return audioCtx;
         }
-        
-        function playTone(freq, type, duration, vol=0.1) {
+
+        function playTone(freq, type, duration, vol = 0.15, delay = 0) {
             try {
                 const ctx = getAudioCtx();
                 const osc = ctx.createOscillator();
                 const gain = ctx.createGain();
                 osc.type = type;
-                osc.frequency.setValueAtTime(freq, ctx.currentTime);
-                
-                gain.gain.setValueAtTime(vol, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
-                
+                osc.frequency.setValueAtTime(freq, ctx.currentTime + delay);
+                gain.gain.setValueAtTime(vol, ctx.currentTime + delay);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + duration);
                 osc.connect(gain);
                 gain.connect(ctx.destination);
-                
-                osc.start();
-                osc.stop(ctx.currentTime + duration);
+                osc.start(ctx.currentTime + delay);
+                osc.stop(ctx.currentTime + delay + duration);
             } catch (e) {
-                console.warn('Audio playback error:', e);
+                console.warn('Audio klaida:', e);
             }
         }
-        
+
+        function playPopSound() {
+            playTone(587.33, 'sine', 0.12, 0.18, 0);
+            playTone(880, 'sine', 0.12, 0.15, 0.06);
+        }
+
         function playCorrectSound() {
-            playTone(523.25, 'sine', 0.1, 0.2); // C5
-            setTimeout(() => playTone(659.25, 'sine', 0.1, 0.2), 100); // E5
-            setTimeout(() => playTone(783.99, 'sine', 0.2, 0.2), 200); // G5
+            playTone(523.25, 'sine', 0.12, 0.18, 0);
+            playTone(659.25, 'sine', 0.12, 0.18, 0.09);
+            playTone(783.99, 'sine', 0.22, 0.2, 0.18);
         }
-        
+
         function playWrongSound() {
-            playTone(300, 'sawtooth', 0.2, 0.1);
-            setTimeout(() => playTone(250, 'sawtooth', 0.3, 0.1), 150);
+            playTone(290, 'sawtooth', 0.18, 0.12, 0);
+            playTone(230, 'sawtooth', 0.24, 0.12, 0.12);
         }
-        
+
         function playWinSound() {
-            const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
-            notes.forEach((freq, i) => {
-                setTimeout(() => playTone(freq, 'sine', 0.2, 0.2), i * 150);
+            [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+                playTone(freq, 'sine', 0.22, 0.2, i * 0.13);
             });
         }
-    </script>
 
-    <div id="app" class="w-full max-w-lg mx-auto">
-        <!-- SCREENS WILL BE INJECTED HERE -->
-    </div>
-
-    <script>
         // === SKIEMENŲ SPALVINIMAS ===
         const _V = 'aeėęiįyouųūąAEĖĘIĮYOUŲŪĄ';
         const _D = ['ai','au','ei','eu','ie','uo','ui','oi','ia','io','iu'];
@@ -215,94 +221,92 @@
         }
         // === /SKIEMENŲ SPALVINIMAS ===
 
-        // Game Data
+        // === ŽAIDIMO DUOMENYS (visos figūros vyriškosios giminės) ===
         const SHAPES = [
-            { id: 'apskritimas', name: 'Apskritimas', svg: '<circle cx="100" cy="100" r="85" />' },
-            { id: 'kvadratas', name: 'Kvadratas', svg: '<rect x="15" y="15" width="170" height="170" rx="10" />' },
-            { id: 'trikampis', name: 'Trikampis', svg: '<polygon points="100,15 15,180 185,180" stroke-linejoin="round" />' },
-            { id: 'staciakampis', name: 'Stačiakampis', svg: '<rect x="10" y="40" width="180" height="120" rx="10" />' },
-            { id: 'rombas', name: 'Rombas', svg: '<polygon points="100,10 190,100 100,190 10,100" stroke-linejoin="round" />' },
-            { id: 'ovalas', name: 'Ovalas', svg: '<ellipse cx="100" cy="100" rx="95" ry="60" />' },
-            { id: 'penkiakampis', name: 'Penkiakampis', svg: '<polygon points="100,10 190,75 155,185 45,185 10,75" stroke-linejoin="round" />' },
-            { id: 'sesiakampis', name: 'Šešiakampis', svg: '<polygon points="50,15 150,15 195,100 150,185 50,185 5,100" stroke-linejoin="round" />' }
+            { id: 'apskritimas', name: 'Apskritimas', accPlural: 'APSKRITIMUS', svg: '<circle cx="100" cy="100" r="82" />' },
+            { id: 'kvadratas', name: 'Kvadratas', accPlural: 'KVADRATUS', svg: '<rect x="18" y="18" width="164" height="164" rx="12" />' },
+            { id: 'trikampis', name: 'Trikampis', accPlural: 'TRIKAMPIUS', svg: '<polygon points="100,16 16,182 184,182" stroke-linejoin="round" />' },
+            { id: 'staciakampis', name: 'Stačiakampis', accPlural: 'STAČIAKAMPIUS', svg: '<rect x="12" y="42" width="176" height="116" rx="12" />' },
+            { id: 'rombas', name: 'Rombas', accPlural: 'ROMBUS', svg: '<polygon points="100,12 188,100 100,188 12,100" stroke-linejoin="round" />' },
+            { id: 'ovalas', name: 'Ovalas', accPlural: 'OVALUS', svg: '<ellipse cx="100" cy="100" rx="90" ry="58" />' },
+            { id: 'penkiakampis', name: 'Penkiakampis', accPlural: 'PENKIAKAMPIUS', svg: '<polygon points="100,12 188,76 154,184 46,184 12,76" stroke-linejoin="round" />' },
+            { id: 'sesiakampis', name: 'Šešiakampis', accPlural: 'ŠEŠIAKAMPIUS', svg: '<polygon points="52,16 148,16 192,100 148,184 52,184 8,100" stroke-linejoin="round" />' }
         ];
 
         const COLORS = [
-            { id: 'raudonas', name: 'Raudonas', hex: '#ef4444', dark: '#b91c1c' },
-            { id: 'melynas', name: 'Mėlynas', hex: '#3b82f6', dark: '#1d4ed8' },
-            { id: 'zalias', name: 'Žalias', hex: '#22c55e', dark: '#15803d' },
-            { id: 'geltonas', name: 'Geltonas', hex: '#eab308', dark: '#a16207' },
-            { id: 'oranzinis', name: 'Oranžinis', hex: '#f97316', dark: '#c2410c' },
-            { id: 'violetinis', name: 'Violetinis', hex: '#8b5cf6', dark: '#6d28d9' },
-            { id: 'rozinis', name: 'Rožinis', hex: '#ec4899', dark: '#be185d' }
+            { id: 'raudonas', name: 'Raudonas', fem: 'Raudona', accFemPlural: 'RAUDONAS', hex: '#ef4444', dark: '#b91c1c' },
+            { id: 'melynas', name: 'Mėlynas', fem: 'Mėlyna', accFemPlural: 'MĖLYNAS', hex: '#3b82f6', dark: '#1d4ed8' },
+            { id: 'zalias', name: 'Žalias', fem: 'Žalia', accFemPlural: 'ŽALIAS', hex: '#22c55e', dark: '#15803d' },
+            { id: 'geltonas', name: 'Geltonas', fem: 'Geltona', accFemPlural: 'GELTONAS', hex: '#eab308', dark: '#a16207' },
+            { id: 'oranzinis', name: 'Oranžinis', fem: 'Oranžinė', accFemPlural: 'ORANŽINES', hex: '#f97316', dark: '#c2410c' },
+            { id: 'violetinis', name: 'Violetinis', fem: 'Violetinė', accFemPlural: 'VIOLETINES', hex: '#8b5cf6', dark: '#6d28d9' },
+            { id: 'rozinis', name: 'Rožinis', fem: 'Rožinė', accFemPlural: 'ROŽINES', hex: '#ec4899', dark: '#be185d' }
         ];
 
-        const TOTAL_QUESTIONS = 12;
+        const TOTAL_QUESTIONS = 10;
 
         let gameState = {
-            mode: null, 
+            mode: 'recognize',
             questionIndex: 0,
             score: 0,
-            currentQuestion: null,
-            isAnswering: false
+            streak: 0,
+            firstTry: true,
+            isAnswering: false,
+            currentQuestion: null
         };
 
         const appEl = document.getElementById('app');
 
-        const shuffle = (array) => [...array].sort(() => Math.random() - 0.5);
-        const pickRandom = (array) => array[Math.floor(Math.random() * array.length)];
+        function shuffle(arr) {
+            return [...arr].sort(() => Math.random() - 0.5);
+        }
 
-        function renderStartScreen() {
-            appEl.innerHTML = `
-                <div class="glass-panel rounded-3xl p-8 text-center animate-pop-in">
-                    <div class="flex justify-center space-x-2 mb-4">
-                        <svg class="w-12 h-12 text-red-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm0-2a6 6 0 100-12 6 6 0 000 12z" clip-rule="evenodd" /></svg>
-                        <svg class="w-12 h-12 text-blue-500" viewBox="0 0 20 20" fill="currentColor"><path d="M4 4h12v12H4z" /></svg>
-                        <svg class="w-12 h-12 text-green-500" viewBox="0 0 20 20" fill="currentColor"><path d="M10 3L3 15h14L10 3z" /></svg>
-                    </div>
-                    <h1 class="text-4xl font-black text-gray-800 mb-2 leading-tight">🟡 Spalvos<br>ir Formos</h1>
-                    <p class="text-xl text-gray-600 mb-8 font-semibold">Atpažink figūras ir spalvas!</p>
-                    
-                    <div class="space-y-4">
-                        <button onclick="startGame('shapes')" class="btn-bounce w-full block bg-green-500 hover:bg-green-600 text-white font-bold py-5 px-6 rounded-2xl text-2xl shadow-lg border-b-4 border-green-700 transition-colors">
-                            Formos
-                        </button>
-                        <button onclick="startGame('mixed')" class="btn-bounce w-full block bg-orange-500 hover:bg-orange-600 text-white font-bold py-5 px-6 rounded-2xl text-2xl shadow-lg border-b-4 border-orange-700 transition-colors">
-                            Spalvos ir Formos
-                        </button>
-                    </div>
+        function pickRandom(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function renderShapeSvg(shape, color, sizeClass = 'w-28 h-28 sm:w-36 sm:h-36') {
+            return `<svg viewBox="0 0 200 200" class="shape-svg ${sizeClass}" fill="${color.hex}" stroke="${color.dark}" stroke-width="10">${shape.svg}</svg>`;
+        }
+
+        function renderTopBar() {
+            return `
+                <div class="bg-amber-500 text-white px-4 py-2 flex justify-between items-center font-extrabold text-sm sm:text-base shadow">
+                    <div>⭐ ${_col('Taškai:')} <span class="text-yellow-100">${gameState.score}</span></div>
+                    <div class="bg-amber-600 px-3 py-0.5 rounded-xl">${_col('Klausimas:')} ${gameState.questionIndex + 1} / ${TOTAL_QUESTIONS}</div>
+                    <div>🔥 ${_col('Serija:')} <span class="text-orange-100">${gameState.streak}</span></div>
                 </div>
             `;
         }
 
-        function generateQuestion() {
-            const shape = pickRandom(SHAPES);
-            const color = pickRandom(COLORS);
-            
-            let correctAnswerStr = gameState.mode === 'shapes' ? shape.name : `${color.name} ${shape.name.toLowerCase()}`;
-            
-            let wrongAnswers = [];
-            if (gameState.mode === 'shapes') {
-                let otherShapes = SHAPES.filter(s => s.id !== shape.id);
-                wrongAnswers = shuffle(otherShapes).slice(0, 3).map(s => s.name);
-            } else {
-                let others = [];
-                let wrongShape = pickRandom(SHAPES.filter(s => s.id !== shape.id));
-                others.push(`${color.name} ${wrongShape.name.toLowerCase()}`);
-                
-                let wrongColor = pickRandom(COLORS.filter(c => c.id !== color.id));
-                others.push(`${wrongColor.name} ${shape.name.toLowerCase()}`);
-                
-                let wrongS2 = pickRandom(SHAPES.filter(s => s.id !== shape.id && s.id !== wrongShape.id));
-                let wrongC2 = pickRandom(COLORS.filter(c => c.id !== color.id && c.id !== wrongColor.id));
-                others.push(`${wrongC2.name} ${wrongS2.name.toLowerCase()}`);
-                
-                wrongAnswers = others;
-            }
+        // === PRADŽIOS EKRANAS ===
+        function renderStartScreen() {
+            appEl.innerHTML = `
+                <div class="p-5 sm:p-7 flex flex-col items-center justify-center text-center animate-pop-in">
+                    <div class="flex justify-center items-center gap-3 mb-2">
+                        ${renderShapeSvg(SHAPES[0], COLORS[0], 'w-12 h-12 sm:w-14 sm:h-14')}
+                        ${renderShapeSvg(SHAPES[1], COLORS[1], 'w-12 h-12 sm:w-14 sm:h-14')}
+                        ${renderShapeSvg(SHAPES[2], COLORS[2], 'w-12 h-12 sm:w-14 sm:h-14')}
+                    </div>
+                    <h1 class="text-3xl sm:text-4xl font-black text-slate-800 dark-text mb-1 leading-tight">🟡 ${_col('Spalvos ir Formos')}</h1>
+                    <p class="text-base sm:text-lg text-slate-600 dark-subtext mb-5 font-bold">${_col('Pasirink žaidimo užduotį!')}</p>
 
-            const options = shuffle([correctAnswerStr, ...wrongAnswers]);
-
-            return { shape, color, correctAnswerStr, options };
+                    <div class="flex flex-col gap-3 w-full max-w-md">
+                        <button onclick="startGame('recognize')" class="btn-bounce w-full bg-amber-100 hover:bg-amber-200 dark-btn border-2 border-amber-400 py-3.5 px-4 rounded-2xl text-lg sm:text-xl font-black shadow-md flex items-center justify-center gap-2">
+                            <span>🔺</span>
+                            <span>${_col('Atpažink figūrą ir spalvą')}</span>
+                        </button>
+                        <button onclick="startGame('necklace')" class="btn-bounce w-full bg-sky-100 hover:bg-sky-200 dark-btn border-2 border-sky-400 py-3.5 px-4 rounded-2xl text-lg sm:text-xl font-black shadow-md flex items-center justify-center gap-2">
+                            <span>📿</span>
+                            <span>${_col('Karoliukų vėrinys (Pratęsk seką!)')}</span>
+                        </button>
+                        <button onclick="startGame('hunt')" class="btn-bounce w-full bg-emerald-100 hover:bg-emerald-200 dark-btn border-2 border-emerald-400 py-3.5 px-4 rounded-2xl text-lg sm:text-xl font-black shadow-md flex items-center justify-center gap-2">
+                            <span>🔍</span>
+                            <span>${_col('Figūrų medžioklė (Surask visas!)')}</span>
+                        </button>
+                    </div>
+                </div>
+            `;
         }
 
         function startGame(mode) {
@@ -311,8 +315,10 @@
                 mode,
                 questionIndex: 0,
                 score: 0,
-                currentQuestion: null,
-                isAnswering: false
+                streak: 0,
+                firstTry: true,
+                isAnswering: false,
+                currentQuestion: null
             };
             nextQuestion();
         }
@@ -324,45 +330,83 @@
             }
             gameState.isAnswering = false;
             gameState.firstTry = true;
-            gameState.currentQuestion = generateQuestion();
-            renderGameScreen();
+
+            if (gameState.mode === 'recognize') {
+                gameState.currentQuestion = generateRecognizeQuestion();
+                renderRecognizeScreen();
+            } else if (gameState.mode === 'necklace') {
+                gameState.currentQuestion = generateNecklaceQuestion();
+                renderNecklaceScreen();
+            } else if (gameState.mode === 'hunt') {
+                gameState.currentQuestion = generateHuntQuestion();
+                renderHuntScreen();
+            }
         }
 
-        function renderGameScreen() {
-            const { shape, color, options } = gameState.currentQuestion;
-            
-            const progress = ((gameState.questionIndex) / TOTAL_QUESTIONS) * 100;
-            const promptText = gameState.mode === 'shapes' ? 'Kokia tai forma?' : 'Kokia tai spalva ir forma?';
+        // ==========================================
+        // 1 REŽIMAS: 🔺 Atpažink figūrą ir spalvą
+        // ==========================================
+        function generateRecognizeQuestion() {
+            const shape = pickRandom(SHAPES);
+            const color = pickRandom(COLORS);
+            const subTypes = ['both', 'shape', 'color', 'both'];
+            const subType = subTypes[gameState.questionIndex % subTypes.length];
+
+            let promptText = '';
+            let correctAnswerStr = '';
+            let wrongAnswers = [];
+
+            if (subType === 'shape') {
+                promptText = 'Kokia čia figūra?';
+                correctAnswerStr = shape.name;
+                wrongAnswers = shuffle(SHAPES.filter(s => s.id !== shape.id)).slice(0, 3).map(s => s.name);
+            } else if (subType === 'color') {
+                promptText = 'Kokia čia spalva?';
+                correctAnswerStr = color.fem;
+                wrongAnswers = shuffle(COLORS.filter(c => c.id !== color.id)).slice(0, 3).map(c => c.fem);
+            } else {
+                promptText = 'Kokia čia spalva ir figūra?';
+                correctAnswerStr = `${color.name} ${shape.name.toLowerCase()}`;
+                const wrongShape = pickRandom(SHAPES.filter(s => s.id !== shape.id));
+                const wrongColor = pickRandom(COLORS.filter(c => c.id !== color.id));
+                const wrongS2 = pickRandom(SHAPES.filter(s => s.id !== shape.id && s.id !== wrongShape.id));
+                const wrongC2 = pickRandom(COLORS.filter(c => c.id !== color.id && c.id !== wrongColor.id));
+                wrongAnswers = [
+                    `${color.name} ${wrongShape.name.toLowerCase()}`,
+                    `${wrongColor.name} ${shape.name.toLowerCase()}`,
+                    `${wrongC2.name} ${wrongS2.name.toLowerCase()}`
+                ];
+            }
+
+            return {
+                shape,
+                color,
+                promptText,
+                correctAnswerStr,
+                options: shuffle([correctAnswerStr, ...wrongAnswers])
+            };
+        }
+
+        function renderRecognizeScreen() {
+            const { shape, color, promptText, options } = gameState.currentQuestion;
 
             appEl.innerHTML = `
-                <div class="glass-panel rounded-3xl p-4 sm:p-6 relative">
-                    <div class="flex justify-between items-center mb-3 sm:mb-4">
-                        <div class="flex items-center space-x-1 text-yellow-500">
-                            <svg class="w-7 h-7 sm:w-8 sm:h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
-                            <span class="text-xl sm:text-2xl font-bold">${gameState.score}</span>
-                        </div>
-                        <div class="text-gray-500 font-bold text-lg sm:text-xl">
-                            ${gameState.questionIndex + 1} / ${TOTAL_QUESTIONS}
-                        </div>
-                    </div>
-                    
-                    <div class="w-full bg-gray-200 rounded-full h-2.5 mb-3 sm:mb-6">
-                        <div class="bg-blue-500 h-2.5 rounded-full transition-all duration-300" style="width: ${progress}%"></div>
+                ${renderTopBar()}
+                <div class="p-3 sm:p-5 flex-1 flex flex-col justify-between items-center">
+                    <h2 class="text-xl sm:text-2xl font-black text-slate-800 dark-text text-center">${_col(promptText)}</h2>
+
+                    <div id="shape-display" class="my-2 p-4 bg-amber-50/70 dark-panel rounded-2xl border-2 border-amber-200 w-full flex justify-center items-center h-36 sm:h-44 animate-pop-in">
+                        ${renderShapeSvg(shape, color, 'w-28 h-28 sm:w-36 sm:h-36')}
                     </div>
 
-                    <h2 class="text-xl sm:text-2xl font-black text-gray-700 text-center mb-2 sm:mb-3">${_col(promptText)}</h2>
-
-                    <div id="shape-container" class="shape-container flex justify-center mb-3 sm:mb-6 animate-pop-in h-32 sm:h-40 items-center">
-                        <svg viewBox="0 0 200 200" width="130" height="130" class="sm:w-[160px] sm:h-[160px]" 
-                             fill="${color.hex}" stroke="${color.dark}" stroke-width="8">
-                            ${shape.svg}
-                        </svg>
+                    <div id="feedback-msg" class="h-6 text-base sm:text-lg font-black text-center opacity-0 transition-opacity">
+                        ${_col('Puiku!')}
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2.5 sm:gap-3">
-                        ${options.map((opt) => `
-                            <button onclick="handleAnswer('${opt.replace(/'/g, "\\'")}', this)" 
-                                    class="option-btn btn-bounce bg-white hover:bg-gray-50 text-gray-800 font-bold py-3 px-2 rounded-xl text-sm sm:text-base shadow border-2 border-gray-200 transition-all flex items-center justify-center text-center leading-snug">
+                    <div class="grid grid-cols-2 gap-2.5 sm:gap-3 w-full">
+                        ${options.map(opt => `
+                            <button onclick="handleRecognizeAnswer('${opt.replace(/'/g, "\\'")}', this)"
+                                class="btn-bounce bg-white hover:bg-amber-50 dark-btn text-slate-800 font-black py-3 px-2 rounded-2xl text-base sm:text-lg shadow border-2 border-amber-300 transition-all flex items-center justify-center text-center leading-snug">
                                 ${_col(opt)}
                             </button>
                         `).join('')}
@@ -371,68 +415,352 @@
             `;
         }
 
-        function handleAnswer(selectedOption, btnElement) {
+        function handleRecognizeAnswer(selectedOption, btnEl) {
             if (gameState.isAnswering) return;
+            const q = gameState.currentQuestion;
+            const shapeDisplay = document.getElementById('shape-display');
+            const feedbackEl = document.getElementById('feedback-msg');
 
-            const isCorrect = selectedOption === gameState.currentQuestion.correctAnswerStr;
-            const shapeContainer = document.getElementById('shape-container');
-
-            if (isCorrect) {
+            if (selectedOption === q.correctAnswerStr) {
                 gameState.isAnswering = true;
                 if (gameState.firstTry) {
                     gameState.score++;
+                    gameState.streak++;
                 }
                 playCorrectSound();
-                btnElement.classList.remove('bg-white', 'hover:bg-gray-50', 'text-gray-800', 'border-gray-200');
-                btnElement.classList.add('bg-green-500', 'text-white', 'border-green-600', 'scale-105');
-                shapeContainer.classList.remove('animate-bounce-sm');
-                void shapeContainer.offsetWidth;
-                shapeContainer.classList.add('animate-bounce-sm');
-                
+                btnEl.classList.remove('bg-white', 'dark-btn', 'border-amber-300');
+                btnEl.classList.add('bg-green-500', 'text-white', 'border-green-600');
+                shapeDisplay.classList.remove('animate-bounce-sm');
+                void shapeDisplay.offsetWidth;
+                shapeDisplay.classList.add('animate-bounce-sm');
+
+                feedbackEl.innerHTML = _col('Puiku! Teisingai! 🎉');
+                feedbackEl.className = 'h-6 text-base sm:text-lg font-black text-center text-green-600 opacity-100';
+
                 gameState.questionIndex++;
-                setTimeout(() => {
-                    nextQuestion();
-                }, 1200);
+                setTimeout(nextQuestion, 1000);
             } else {
                 gameState.firstTry = false;
+                gameState.streak = 0;
                 playWrongSound();
-                btnElement.disabled = true;
-                btnElement.classList.remove('bg-white', 'hover:bg-gray-50', 'text-gray-800', 'border-gray-200');
-                btnElement.classList.add('bg-red-100', 'text-red-400', 'border-red-300', 'line-through', 'opacity-60', 'cursor-not-allowed');
-                shapeContainer.classList.remove('animate-shake');
-                void shapeContainer.offsetWidth;
-                shapeContainer.classList.add('animate-shake');
+                btnEl.disabled = true;
+                btnEl.classList.add('opacity-50', 'line-through', 'border-red-400');
+                shapeDisplay.classList.remove('animate-shake');
+                void shapeDisplay.offsetWidth;
+                shapeDisplay.classList.add('animate-shake');
+
+                feedbackEl.innerHTML = _col('Bandyk dar kartą! 🤔');
+                feedbackEl.className = 'h-6 text-base sm:text-lg font-black text-center text-red-500 opacity-100';
             }
         }
 
-        function renderEndScreen() {
-            playWinSound();
-            
-            let stars = 1;
-            if (gameState.score >= 10) stars = 3;
-            else if (gameState.score >= 7) stars = 2;
+        // ==========================================
+        // 2 REŽIMAS: 📿 Karoliukų vėrinys (Pratęsk seką!)
+        // ==========================================
+        function makeBead(shape, color) {
+            return {
+                key: `${color.id}_${shape.id}`,
+                shape,
+                color,
+                label: `${color.name} ${shape.name.toLowerCase()}`
+            };
+        }
 
-            const starHtml = Array(3).fill(0).map((_, i) => `
-                <svg class="w-16 h-16 ${i < stars ? 'text-yellow-400 animate-bounce-sm' : 'text-gray-300'} drop-shadow-md" fill="currentColor" viewBox="0 0 20 20" style="animation-delay: ${i*0.2}s">
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
+        function generateNecklaceQuestion() {
+            const pickedShapes = shuffle(SHAPES).slice(0, 4);
+            const pickedColors = shuffle(COLORS).slice(0, 4);
+
+            const beadA = makeBead(pickedShapes[0], pickedColors[0]);
+            const beadB = makeBead(pickedShapes[1], pickedColors[1]);
+            const beadC = makeBead(pickedShapes[2], pickedColors[2]);
+            const beadD = makeBead(pickedShapes[3], pickedColors[3]);
+
+            const patternTypes = ['ABABAB', 'AABAAB', 'ABCABC'];
+            const pType = patternTypes[gameState.questionIndex % patternTypes.length];
+
+            let sequence = [];
+            if (pType === 'ABABAB') {
+                sequence = [beadA, beadB, beadA, beadB, beadA, beadB];
+            } else if (pType === 'AABAAB') {
+                sequence = [beadA, beadA, beadB, beadA, beadA, beadB];
+            } else {
+                sequence = [beadA, beadB, beadC, beadA, beadB, beadC];
+            }
+
+            // 4 rodomi karoliukai + 2 tuščios vietos
+            const choices = shuffle([beadA, beadB, beadC, beadD]);
+
+            return {
+                sequence,
+                revealedCount: 4,
+                filledCount: 4,
+                choices
+            };
+        }
+
+        function renderNecklaceScreen() {
+            const q = gameState.currentQuestion;
+
+            const slotsHtml = q.sequence.map((bead, idx) => {
+                if (idx < q.filledCount) {
+                    return `
+                        <div class="w-11 h-11 sm:w-14 sm:h-14 rounded-2xl bg-white dark-panel border-2 border-amber-300 shadow flex items-center justify-center z-10 animate-pop-in">
+                            ${renderShapeSvg(bead.shape, bead.color, 'w-8 h-8 sm:w-11 sm:h-11')}
+                        </div>
+                    `;
+                }
+                const isCurrent = idx === q.filledCount;
+                return `
+                    <div id="slot-${idx}" class="w-11 h-11 sm:w-14 sm:h-14 rounded-2xl ${isCurrent ? 'bg-yellow-100 border-amber-500 scale-105' : 'bg-slate-100 border-slate-300 opacity-75'} dark-panel border-2 border-dashed flex items-center justify-center z-10 font-black text-lg sm:text-xl text-amber-600 transition-all">
+                        ?
+                    </div>
+                `;
+            }).join('');
+
+            const choicesHtml = q.choices.map((bead, idx) => `
+                <button onclick="handleBeadTap(${idx})"
+                    class="btn-bounce bg-white hover:bg-sky-50 dark-btn border-2 border-sky-300 rounded-2xl p-2 sm:p-2.5 shadow flex items-center gap-2 text-left">
+                    <div class="shrink-0">${renderShapeSvg(bead.shape, bead.color, 'w-9 h-9 sm:w-11 sm:h-11')}</div>
+                    <div class="text-xs sm:text-sm font-black leading-tight">${_col(bead.label)}</div>
+                </button>
             `).join('');
 
             appEl.innerHTML = `
-                <div class="glass-panel rounded-3xl p-8 text-center animate-pop-in">
-                    <h2 class="text-4xl font-black text-gray-800 mb-6">Žaidimas baigtas!</h2>
-                    
-                    <div class="flex justify-center space-x-2 mb-6">
-                        ${starHtml}
-                    </div>
-                    
-                    <div class="text-2xl text-gray-600 font-bold mb-8">
-                        Surinkai: <span class="text-blue-600 text-4xl">${gameState.score}</span> / ${TOTAL_QUESTIONS}
+                ${renderTopBar()}
+                <div class="p-3 sm:p-5 flex-1 flex flex-col justify-between items-center">
+                    <div class="text-center">
+                        <h2 class="text-lg sm:text-2xl font-black text-slate-800 dark-text">${_col('Pratęsk karoliukų vėrinį! 📿')}</h2>
+                        <p class="text-xs sm:text-sm font-bold text-slate-500 dark-subtext">${_col('Paspausk tinkamą karoliuką ir užpildyk vėrinį')}</p>
                     </div>
 
-                    <button onclick="renderStartScreen()" class="btn-bounce w-full block bg-blue-500 hover:bg-blue-600 text-white font-bold py-5 px-6 rounded-2xl text-2xl shadow-lg border-b-4 border-blue-700 transition-colors">
-                        Žaisti dar kartą!
-                    </button>
+                    <!-- Vėrinio juosta -->
+                    <div id="necklace-bar" class="relative w-full py-5 px-2 bg-amber-50/80 dark-panel rounded-2xl border-2 border-amber-200 flex items-center justify-around my-2">
+                        <div class="absolute left-3 right-3 h-1.5 bg-amber-400 rounded-full z-0"></div>
+                        ${slotsHtml}
+                    </div>
+
+                    <div id="feedback-msg" class="h-6 text-base sm:text-lg font-black text-center opacity-0 transition-opacity">
+                        ${_col('Puiku!')}
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2.5 sm:gap-3 w-full">
+                        ${choicesHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        function handleBeadTap(choiceIdx) {
+            if (gameState.isAnswering) return;
+            const q = gameState.currentQuestion;
+            const chosenBead = q.choices[choiceIdx];
+            const expectedBead = q.sequence[q.filledCount];
+            const feedbackEl = document.getElementById('feedback-msg');
+
+            if (chosenBead.key === expectedBead.key) {
+                q.filledCount++;
+                if (q.filledCount >= q.sequence.length) {
+                    gameState.isAnswering = true;
+                    if (gameState.firstTry) {
+                        gameState.score++;
+                        gameState.streak++;
+                    }
+                    playCorrectSound();
+                    renderNecklaceScreen();
+                    const fb = document.getElementById('feedback-msg');
+                    fb.innerHTML = _col('Vėrinys suvertas! Šaunu! 🎉');
+                    fb.className = 'h-6 text-base sm:text-lg font-black text-center text-green-600 opacity-100';
+                    gameState.questionIndex++;
+                    setTimeout(nextQuestion, 1000);
+                } else {
+                    playPopSound();
+                    renderNecklaceScreen();
+                    const fb = document.getElementById('feedback-msg');
+                    fb.innerHTML = _col('Puiku! Dabar parink paskutinį karoliuką! ✨');
+                    fb.className = 'h-6 text-base sm:text-lg font-black text-center text-sky-600 opacity-100';
+                }
+            } else {
+                gameState.firstTry = false;
+                gameState.streak = 0;
+                playWrongSound();
+                const slotEl = document.getElementById(`slot-${q.filledCount}`);
+                if (slotEl) {
+                    slotEl.classList.remove('animate-shake');
+                    void slotEl.offsetWidth;
+                    slotEl.classList.add('animate-shake');
+                }
+                feedbackEl.innerHTML = _col('Pažiūrėk į seką ir bandyk dar kartą! 🤔');
+                feedbackEl.className = 'h-6 text-base sm:text-lg font-black text-center text-red-500 opacity-100';
+            }
+        }
+
+        // ==========================================
+        // 3 REŽIMAS: 🔍 Figūrų medžioklė (Surask visas!)
+        // ==========================================
+        function generateHuntQuestion() {
+            const huntByShape = gameState.questionIndex % 2 === 0;
+            const targetShape = pickRandom(SHAPES);
+            const targetColor = pickRandom(COLORS);
+
+            let promptText = '';
+            let cells = [];
+
+            if (huntByShape) {
+                promptText = `Paspausk visus ${targetShape.accPlural}!`;
+                // 3 tikslinės figūros
+                for (let i = 0; i < 3; i++) {
+                    cells.push({
+                        shape: targetShape,
+                        color: pickRandom(COLORS),
+                        isTarget: true,
+                        found: false
+                    });
+                }
+                // 6 kitos figūros
+                const otherShapes = SHAPES.filter(s => s.id !== targetShape.id);
+                for (let i = 0; i < 6; i++) {
+                    cells.push({
+                        shape: pickRandom(otherShapes),
+                        color: pickRandom(COLORS),
+                        isTarget: false,
+                        found: false
+                    });
+                }
+            } else {
+                promptText = `Paspausk visas ${targetColor.accFemPlural} figūras!`;
+                // 3 tikslinės spalvos figūros
+                for (let i = 0; i < 3; i++) {
+                    cells.push({
+                        shape: pickRandom(SHAPES),
+                        color: targetColor,
+                        isTarget: true,
+                        found: false
+                    });
+                }
+                // 6 kitų spalvų figūros
+                const otherColors = COLORS.filter(c => c.id !== targetColor.id);
+                for (let i = 0; i < 6; i++) {
+                    cells.push({
+                        shape: pickRandom(SHAPES),
+                        color: pickRandom(otherColors),
+                        isTarget: false,
+                        found: false
+                    });
+                }
+            }
+
+            return {
+                promptText,
+                cells: shuffle(cells),
+                foundCount: 0,
+                targetTotal: 3
+            };
+        }
+
+        function renderHuntScreen() {
+            const q = gameState.currentQuestion;
+
+            const gridHtml = q.cells.map((cell, idx) => `
+                <button id="hunt-cell-${idx}" onclick="handleHuntTap(${idx})"
+                    class="btn-bounce relative h-20 sm:h-24 rounded-2xl border-2 ${cell.found ? 'bg-green-100 border-green-500 scale-95' : 'bg-white hover:bg-amber-50 border-amber-200'} dark-btn shadow flex items-center justify-center transition-all">
+                    ${renderShapeSvg(cell.shape, cell.color, 'w-14 h-14 sm:w-16 sm:h-16')}
+                    ${cell.found ? '<span class="absolute top-1 right-1 text-base sm:text-lg">✅</span>' : ''}
+                </button>
+            `).join('');
+
+            appEl.innerHTML = `
+                ${renderTopBar()}
+                <div class="p-3 sm:p-5 flex-1 flex flex-col justify-between items-center">
+                    <div class="text-center">
+                        <h2 class="text-lg sm:text-2xl font-black text-slate-800 dark-text">${_col(q.promptText)}</h2>
+                        <div class="inline-block mt-1 px-3 py-0.5 rounded-full bg-emerald-100 dark-panel border border-emerald-300 text-xs sm:text-sm font-black">
+                            ${_col('Surasta:')} ${q.foundCount} / ${q.targetTotal}
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2.5 sm:gap-3 w-full max-w-sm my-2">
+                        ${gridHtml}
+                    </div>
+
+                    <div id="feedback-msg" class="h-6 text-base sm:text-lg font-black text-center opacity-0 transition-opacity">
+                        ${_col('Puiku!')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function handleHuntTap(idx) {
+            if (gameState.isAnswering) return;
+            const q = gameState.currentQuestion;
+            const cell = q.cells[idx];
+            if (cell.found) return;
+
+            const cellBtn = document.getElementById(`hunt-cell-${idx}`);
+            const feedbackEl = document.getElementById('feedback-msg');
+
+            if (cell.isTarget) {
+                cell.found = true;
+                q.foundCount++;
+
+                if (q.foundCount >= q.targetTotal) {
+                    gameState.isAnswering = true;
+                    if (gameState.firstTry) {
+                        gameState.score++;
+                        gameState.streak++;
+                    }
+                    playCorrectSound();
+                    renderHuntScreen();
+                    const fb = document.getElementById('feedback-msg');
+                    fb.innerHTML = _col('Visos figūros surastos! Šaunuolis! 🎉');
+                    fb.className = 'h-6 text-base sm:text-lg font-black text-center text-green-600 opacity-100';
+                    gameState.questionIndex++;
+                    setTimeout(nextQuestion, 1000);
+                } else {
+                    playPopSound();
+                    renderHuntScreen();
+                    const fb = document.getElementById('feedback-msg');
+                    fb.innerHTML = _col('Teisingai! Ieškok toliau! 🔍');
+                    fb.className = 'h-6 text-base sm:text-lg font-black text-center text-emerald-600 opacity-100';
+                }
+            } else {
+                gameState.firstTry = false;
+                gameState.streak = 0;
+                playWrongSound();
+                if (cellBtn) {
+                    cellBtn.classList.remove('animate-shake');
+                    void cellBtn.offsetWidth;
+                    cellBtn.classList.add('animate-shake');
+                }
+                feedbackEl.innerHTML = _col('Ši figūra netinka! Bandyk dar kartą! 🤔');
+                feedbackEl.className = 'h-6 text-base sm:text-lg font-black text-center text-red-500 opacity-100';
+            }
+        }
+
+        // === PABAIGOS EKRANAS ===
+        function renderEndScreen() {
+            playWinSound();
+            let stars = '⭐';
+            if (gameState.score >= 9) stars = '⭐⭐⭐';
+            else if (gameState.score >= 6) stars = '⭐⭐';
+
+            appEl.innerHTML = `
+                <div class="p-6 sm:p-8 flex flex-col items-center justify-center text-center animate-pop-in">
+                    <div class="text-6xl sm:text-7xl mb-2">🏆</div>
+                    <h2 class="text-3xl sm:text-4xl font-black text-slate-800 dark-text mb-2">${_col('Žaidimas baigtas!')}</h2>
+                    <div class="text-5xl mb-4 tracking-widest">${stars}</div>
+
+                    <div class="text-xl sm:text-2xl text-slate-700 dark-subtext font-extrabold mb-6">
+                        ${_col('Surinkai taškų:')} <span class="text-amber-600 text-3xl sm:text-4xl font-black">${gameState.score}</span> / ${TOTAL_QUESTIONS}
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-3 w-full max-w-sm">
+                        <button onclick="startGame(gameState.mode)" class="btn-bounce flex-1 py-3.5 px-5 bg-amber-400 hover:bg-amber-500 text-slate-900 rounded-2xl text-lg sm:text-xl font-black shadow-md border-b-4 border-amber-600">
+                            ${_col('Žaisti dar kartą')}
+                        </button>
+                        <button onclick="renderStartScreen()" class="btn-bounce flex-1 py-3.5 px-5 bg-slate-200 hover:bg-slate-300 dark-btn text-slate-800 rounded-2xl text-lg sm:text-xl font-black shadow-md border-b-4 border-slate-400">
+                            ${_col('Į pradžią')}
+                        </button>
+                    </div>
                 </div>
             `;
         }

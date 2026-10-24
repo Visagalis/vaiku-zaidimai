@@ -6,79 +6,144 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Laikrodžio Žaidimas</title>
+    <title>🕐 Laikrodžio Žaidimas</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Nunito', sans-serif;
+            background-color: #f0fdf4;
+            background-image: radial-gradient(#86efac 20%, transparent 20%);
+            background-size: 24px 24px;
             touch-action: manipulation;
             user-select: none;
             -webkit-user-select: none;
-            background-color: #f0fdf4;
-            background-image: radial-gradient(#86efac 2px, transparent 2px);
-            background-size: 30px 30px;
-            overflow-y: auto;
+            color: #1e293b;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        .screen {
-            display: none;
-        }
-        .screen.active {
-            display: flex;
-        }
-
-        /* Animations */
+        .bounce { animation: bounce 0.45s; }
         @keyframes bounce {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-        .animate-bounce-click {
-            animation: bounce 0.3s ease-in-out;
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
 
+        .shake { animation: shake 0.4s; }
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
-            20% { transform: translateX(-10px); }
-            40% { transform: translateX(10px); }
-            60% { transform: translateX(-10px); }
-            80% { transform: translateX(10px); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
         }
-        .animate-shake {
-            animation: shake 0.4s ease-in-out;
+
+        .fade-in { animation: fadeIn 0.25s ease-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.97); }
+            to { opacity: 1; transform: scale(1); }
         }
-        
+
+        .app-card {
+            background-color: rgba(255, 255, 255, 0.96);
+            border-color: #86efac;
+        }
+
+        .panel-box {
+            background-color: #f8fafc;
+            border: 2px solid #cbd5e1;
+        }
+
+        .opt-btn {
+            background-color: #e0f2fe;
+            color: #0369a1;
+            border-color: #7dd3fc;
+        }
+        .opt-btn:hover {
+            background-color: #bae6fd;
+        }
+
+        .ctrl-btn {
+            background-color: #f1f5f9;
+            color: #1e293b;
+            border-color: #cbd5e1;
+        }
+        .ctrl-btn:active {
+            transform: scale(0.94);
+        }
+
         .clock-number {
-            font-size: 24px;
-            font-weight: 800;
+            font-size: 22px;
+            font-weight: 900;
             fill: #1e293b;
             text-anchor: middle;
             dominant-baseline: central;
+            pointer-events: none;
         }
 
-        /* Tamsioji tema */
+        .clock-num-hit {
+            fill: transparent;
+            cursor: pointer;
+            transition: fill 0.15s ease;
+        }
+        .clock-num-hit:hover {
+            fill: rgba(59, 130, 246, 0.15);
+        }
+        .clock-num-hit:active {
+            fill: rgba(59, 130, 246, 0.3);
+        }
+
+        #hour-hand, #minute-hand {
+            transition: transform 0.25s cubic-bezier(0.34, 1.4, 0.64, 1);
+            transform-origin: 150px 150px;
+        }
+
+        /* Tamsioji Tema (Dark Mode) */
         @media (prefers-color-scheme: dark) {
             body {
                 background-color: #0b1120 !important;
-                background-image: radial-gradient(#1e293b 2px, transparent 2px) !important;
-                color: #f1f5f9 !important;
+                background-image: radial-gradient(#1e293b 25%, transparent 25%) !important;
+                color: #f8fafc !important;
             }
-            #start-screen, #game-screen, #end-screen {
+            .app-card {
                 background-color: #0f172a !important;
                 border-color: #334155 !important;
                 box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6) !important;
                 color: #f8fafc !important;
             }
-            .time-btn {
+            .panel-box {
                 background-color: #1e293b !important;
                 border-color: #334155 !important;
                 color: #f8fafc !important;
             }
-            .time-btn:hover {
-                border-color: #60a5fa !important;
+            .opt-btn {
+                background-color: #1e293b !important;
+                color: #f8fafc !important;
+                border-color: #334155 !important;
             }
-            #progress {
-                color: #60a5fa !important;
+            .opt-btn:hover {
+                background-color: #334155 !important;
+            }
+            .ctrl-btn {
+                background-color: #1e293b !important;
+                color: #f8fafc !important;
+                border-color: #475569 !important;
+            }
+            .text-main-title {
+                color: #f8fafc !important;
+            }
+            .text-sub-title {
+                color: #cbd5e1 !important;
+            }
+            #clock-face-circle {
+                fill: #1e293b !important;
+                stroke: #64748b !important;
+            }
+            .clock-number {
+                fill: #f8fafc !important;
+            }
+            #hour-hand {
+                stroke: #f8fafc !important;
+            }
+            #minute-hand {
+                stroke: #60a5fa !important;
             }
         }
     </style>
@@ -104,349 +169,595 @@
         }, { passive: false });
     </script>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-4 transition-colors duration-200">
+<body class="h-screen max-h-screen overflow-hidden flex items-center justify-center p-2 sm:p-4">
 
-    <!-- START SCREEN -->
-    <div id="start-screen" class="screen active flex-col items-center justify-center w-full max-w-md bg-white p-8 rounded-3xl shadow-xl text-center border-4 border-green-400">
-        <h1 class="text-4xl font-black text-green-600 mb-2">🕐 Laikrodžio Žaidimas</h1>
-        <p class="text-xl text-gray-600 mb-8 font-bold">Mokykis atpažinti laiką!</p>
-        
-        <div class="flex flex-col gap-4 w-full">
-            <button onclick="startGame('hours')" class="w-full py-4 bg-green-500 hover:bg-green-600 text-white rounded-2xl text-2xl font-bold shadow-[0_6px_0_#16a34a] active:shadow-[0_0px_0_#16a34a] active:translate-y-[6px] transition-all">
-                Valandos
-            </button>
-            <button onclick="startGame('half-hours')" class="w-full py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-2xl text-2xl font-bold shadow-[0_6px_0_#ea580c] active:shadow-[0_0px_0_#ea580c] active:translate-y-[6px] transition-all">
-                Pusvalandžiai
-            </button>
-            <button onclick="startGame('minutes')" class="w-full py-4 bg-red-500 hover:bg-red-600 text-white rounded-2xl text-2xl font-bold shadow-[0_6px_0_#dc2626] active:shadow-[0_0px_0_#dc2626] active:translate-y-[6px] transition-all">
-                Minutės
-            </button>
-        </div>
-    </div>
-
-    <!-- GAME SCREEN -->
-    <div id="game-screen" class="screen flex-col items-center w-full max-w-lg bg-white p-4 sm:p-6 rounded-3xl shadow-xl border-4 border-blue-400 my-auto">
-        <!-- Top Bar -->
-        <div class="flex justify-between w-full mb-3 sm:mb-6 px-1 sm:px-2 text-lg sm:text-xl font-bold text-gray-700">
-            <div class="flex items-center gap-1.5 sm:gap-2">⭐ <span id="score">0</span></div>
-            <div class="flex items-center gap-1.5 sm:gap-2 text-blue-600" id="progress">1 / 10</div>
-            <div class="flex items-center gap-1.5 sm:gap-2">🔥 <span id="streak">0</span></div>
-        </div>
-        
-        <div id="feedback-msg" class="h-6 sm:h-8 text-xl sm:text-2xl font-black text-center mb-2 sm:mb-4"></div>
-
-        <!-- Clock SVG Container -->
-        <div class="w-[200px] h-[200px] xs:w-[240px] xs:h-[240px] sm:w-[280px] sm:h-[280px] mb-4 sm:mb-6 relative">
-            <svg id="clock-svg" viewBox="0 0 300 300" class="w-full h-full drop-shadow-md">
-                <circle cx="150" cy="150" r="145" fill="#f8fafc" stroke="#334155" stroke-width="10"/>
-                <!-- Ticks and Numbers will be generated by JS -->
-                <g id="clock-marks"></g>
-                <g id="clock-numbers"></g>
-                
-                <!-- Hands -->
-                <line id="hour-hand" x1="150" y1="150" x2="150" y2="70" stroke="#1e293b" stroke-width="10" stroke-linecap="round" transform-origin="150 150"/>
-                <line id="minute-hand" x1="150" y1="150" x2="150" y2="40" stroke="#2563eb" stroke-width="6" stroke-linecap="round" transform-origin="150 150"/>
-                
-                <!-- Center point -->
-                <circle cx="150" cy="150" r="8" fill="#ef4444"/>
-            </svg>
-        </div>
-
-        <!-- Answers -->
-        <div class="grid grid-cols-2 gap-2.5 sm:gap-4 w-full" id="answers-container">
-            <!-- Buttons injected by JS -->
-        </div>
-    </div>
-
-    <!-- END SCREEN -->
-    <div id="end-screen" class="screen flex-col items-center justify-center w-full max-w-md bg-white p-8 rounded-3xl shadow-xl text-center border-4 border-yellow-400">
-        <h2 class="text-4xl font-black text-yellow-500 mb-4" id="end-title">Žaidimas Baigtas!</h2>
-        <div class="text-6xl mb-4" id="end-emoji">🏆</div>
-        <p class="text-2xl font-bold text-gray-700 mb-2">Tavo rezultatas:</p>
-        <p class="text-5xl font-black text-blue-600 mb-8"><span id="final-score">0</span> / 10</p>
-        <button onclick="showStartScreen()" class="w-full py-4 bg-blue-500 hover:bg-blue-600 text-white rounded-2xl text-2xl font-bold shadow-[0_6px_0_#2563eb] active:shadow-[0_0px_0_#2563eb] active:translate-y-[6px] transition-all">
-            Žaisti dar kartą
-        </button>
+    <div id="app" class="app-card w-full max-w-2xl rounded-3xl shadow-xl flex flex-col relative fade-in border-4 overflow-hidden max-h-full">
+        <!-- Content rendered by JS -->
     </div>
 
     <script>
-        // Game State
-        let difficulty = 'hours';
-        let currentQuestion = 0;
-        let score = 0;
-        let streak = 0;
-        let totalQuestions = 10;
-        let correctAnswer = "";
-        let isAnswering = false;
-        let firstTry = true;
+        // === SKIEMENŲ SPALVINIMAS ===
+        const _V = 'aeėęiįyouųūąAEĖĘIĮYOUŲŪĄ';
+        const _D = ['ai','au','ei','eu','ie','uo','ui','oi','ia','io','iu'];
+        const _L = /[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/;
+        const _O = new Set(['bl','br','dr','dv','fl','fr','gl','gr','gn','kl','kr','kn','kv','pl','pr','sk','sl','sm','sn','sp','sr','st','sv','šl','šv','šn','tr','tv','vr','žl','žv','str','skr','spr']);
+        const _SC = ['#dc2626','#2563eb','#16a34a','#ea580c','#9333ea','#db2777'];
 
-        // Audio Context Setup
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        
-        function playTone(freq, type, duration, startTime=0) {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
+        function _syl(word) {
+            if (!word || word.length <= 1) return [word || ''];
+            const r = []; let s = '', i = 0, n = word.length;
+            while (i < n) {
+                const c = word[i];
+                if (!_L.test(c)) { s += c; i++; continue; }
+                if (!_V.includes(c)) { s += c; i++; }
+                else {
+                    if (i + 1 < n && _D.includes(word.slice(i, i + 2).toLowerCase())) { s += word.slice(i, i + 2); i += 2; }
+                    else { s += c; i++; }
+                    let j = i;
+                    while (j < n && _L.test(word[j]) && !_V.includes(word[j])) j++;
+                    let cl = word.slice(i, j);
+                    if (j >= n || !_L.test(word[j])) { s += cl; i = j; while (i < n && !_L.test(word[i])) { s += word[i]; i++; } r.push(s); s = ''; }
+                    else if (cl.length === 0) { r.push(s); s = ''; }
+                    else if (cl.length === 1) { r.push(s); s = cl; i = j; }
+                    else {
+                        let u = [];
+                        for (let k = 0; k < cl.length;) {
+                            const p = cl.slice(k, k + 2).toLowerCase();
+                            if (p === 'dz' || p === 'dž' || p === 'ch') { u.push(cl.slice(k, k + 2)); k += 2; }
+                            else { u.push(cl[k]); k++; }
+                        }
+                        let sp = u.length - 1;
+                        if (u.length >= 2) {
+                            const l2 = (u[u.length - 2] + u[u.length - 1]).toLowerCase();
+                            const l3 = u.length >= 3 ? (u[u.length - 3] + l2).toLowerCase() : '';
+                            if (l3 && _O.has(l3)) sp = u.length - 3;
+                            else if (_O.has(l2)) sp = u.length - 2;
+                        }
+                        s += u.slice(0, sp).join(''); r.push(s); s = u.slice(sp).join(''); i = j;
+                    }
+                }
+            }
+            if (s) r.push(s);
+            return r.filter(x => x.length > 0);
+        }
+
+        function _col(text) {
+            if (!text) return '';
+            return text.split(/(\s+)/).map(token => {
+                if (!token.trim() || !/[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/.test(token)) return token;
+                const syls = _syl(token);
+                return syls.map((s, i) => '<span style="color:' + _SC[i % _SC.length] + '">' + s + '</span>').join('');
+            }).join('');
+        }
+        // === /SKIEMENŲ SPALVINIMAS ===
+
+        const DAILY_ROUTINES = [
+            { icon: '🌅', title: 'Keliamės į mokyklą', h: 7, m: 0, display: '07:00' },
+            { icon: '🪥', title: 'Valomės dantukus ir pusryčiaujame', h: 7, m: 30, display: '07:30' },
+            { icon: '🎒', title: 'Pamokų pradžia', h: 8, m: 0, display: '08:00' },
+            { icon: '🍎', title: 'Priešpiečių pertrauka', h: 10, m: 0, display: '10:00' },
+            { icon: '🍲', title: 'Pietų metas', h: 12, m: 0, display: '12:00' },
+            { icon: '🎨', title: 'Dailės ir darbelių pamoka', h: 13, m: 0, display: '13:00' },
+            { icon: '⚽', title: 'Būrelis po pamokų', h: 15, m: 0, display: '15:00' },
+            { icon: '📚', title: 'Ruošiame namų darbus', h: 16, m: 30, display: '16:30' },
+            { icon: '🍝', title: 'Vakarienė su šeima', h: 18, m: 0, display: '18:00' },
+            { icon: '📖', title: 'Skaitome pasaką prieš miegą', h: 20, m: 30, display: '20:30' },
+            { icon: '🌙', title: 'Einame miegoti', h: 21, m: 0, display: '21:00' }
+        ];
+
+        const state = {
+            mode: 'hours', // 'hours' | 'minutes' | 'interactive' | 'routine'
+            score: 0,
+            streak: 0,
+            question: 1,
+            maxQuestions: 10,
+            targetH: 3,
+            targetM: 0,
+            targetStr: '03:00',
+            userH: 12,
+            userM: 0,
+            activeHand: 'hour', // 'hour' | 'minute'
+            routineItem: null,
+            routineSubMode: 'match', // 'match' | 'set'
+            options: [],
+            waiting: false,
+            firstTry: true
+        };
+
+        const app = document.getElementById('app');
+
+        // Web Audio API
+        let audioCtx;
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSound(type) {
+            initAudio();
+            if (!audioCtx) return;
             const osc = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-            
-            osc.type = type;
-            osc.frequency.setValueAtTime(freq, audioCtx.currentTime + startTime);
-            
-            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime + startTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + startTime + duration);
-            
-            osc.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            
-            osc.start(audioCtx.currentTime + startTime);
-            osc.stop(audioCtx.currentTime + startTime + duration);
-        }
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
 
-        function playCorrectSound() {
-            playTone(440, 'sine', 0.2, 0);   // A4
-            playTone(554.37, 'sine', 0.2, 0.1); // C#5
-            playTone(659.25, 'sine', 0.3, 0.2); // E5
-        }
-
-        function playWrongSound() {
-            playTone(300, 'sawtooth', 0.3, 0);
-            playTone(250, 'sawtooth', 0.4, 0.2);
-        }
-
-        function playWinSound() {
-            playTone(523.25, 'square', 0.2, 0); // C5
-            playTone(659.25, 'square', 0.2, 0.2); // E5
-            playTone(783.99, 'square', 0.2, 0.4); // G5
-            playTone(1046.50, 'square', 0.5, 0.6); // C6
-        }
-
-        // Init SVG Clock Face
-        function initClockFace() {
-            const marksGrp = document.getElementById('clock-marks');
-            const numsGrp = document.getElementById('clock-numbers');
-            marksGrp.innerHTML = '';
-            numsGrp.innerHTML = '';
-            
-            const cx = 150, cy = 150;
-            
-            // Draw ticks
-            for (let i = 0; i < 60; i++) {
-                const angle = (i * 6) * Math.PI / 180;
-                const isHour = i % 5 === 0;
-                const r1 = 140;
-                const r2 = isHour ? 125 : 133;
-                
-                const x1 = cx + r1 * Math.sin(angle);
-                const y1 = cy - r1 * Math.cos(angle);
-                const x2 = cx + r2 * Math.sin(angle);
-                const y2 = cy - r2 * Math.cos(angle);
-                
-                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                line.setAttribute('x1', x1);
-                line.setAttribute('y1', y1);
-                line.setAttribute('x2', x2);
-                line.setAttribute('y2', y2);
-                line.setAttribute('stroke', '#64748b');
-                line.setAttribute('stroke-width', isHour ? '4' : '2');
-                marksGrp.appendChild(line);
+            if (type === 'tick') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(750, now);
+                osc.frequency.exponentialRampToValueAtTime(1100, now + 0.05);
+                gain.gain.setValueAtTime(0.18, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.06);
+                osc.start(now);
+                osc.stop(now + 0.06);
+            } else if (type === 'correct') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(440, now);
+                osc.frequency.exponentialRampToValueAtTime(880, now + 0.18);
+                gain.gain.setValueAtTime(0.28, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.32);
+                osc.start(now);
+                osc.stop(now + 0.32);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.exponentialRampToValueAtTime(150, now + 0.22);
+                gain.gain.setValueAtTime(0.28, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'win') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(440, now);
+                osc.frequency.setValueAtTime(554.37, now + 0.1);
+                osc.frequency.setValueAtTime(659.25, now + 0.2);
+                osc.frequency.setValueAtTime(880, now + 0.3);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.6);
+                osc.start(now);
+                osc.stop(now + 0.6);
             }
-            
-            // Draw numbers 1-12
-            for (let i = 1; i <= 12; i++) {
-                const angle = (i * 30) * Math.PI / 180;
-                const r = 105;
-                const x = cx + r * Math.sin(angle);
-                const y = cy - r * Math.cos(angle);
-                
-                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                text.setAttribute('x', x);
-                text.setAttribute('y', y + 2); // slight adjustment for visual center
-                text.setAttribute('class', 'clock-number');
-                text.textContent = i;
-                numsGrp.appendChild(text);
-            }
-        }
-
-        function setClockHands(hours, minutes) {
-            const hourDeg = (hours % 12) * 30 + minutes * 0.5;
-            const minDeg = minutes * 6;
-            
-            const hourHand = document.getElementById('hour-hand');
-            const minHand = document.getElementById('minute-hand');
-            
-            hourHand.style.transform = `rotate(${hourDeg}deg)`;
-            minHand.style.transform = `rotate(${minDeg}deg)`;
-        }
-
-        // Screens
-        function showScreen(id) {
-            document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-        }
-
-        function showStartScreen() {
-            showScreen('start-screen');
-        }
-
-        function startGame(level) {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            difficulty = level;
-            score = 0;
-            streak = 0;
-            currentQuestion = 0;
-            updateTopBar();
-            initClockFace();
-            showScreen('game-screen');
-            nextQuestion();
-        }
-
-        function updateTopBar() {
-            document.getElementById('score').textContent = score;
-            document.getElementById('streak').textContent = streak;
-            document.getElementById('progress').textContent = `${currentQuestion} / ${totalQuestions}`;
         }
 
         function padZero(num) {
             return num < 10 ? '0' + num : num.toString();
         }
 
-        function generateTime() {
-            let h = Math.floor(Math.random() * 12) + 1;
-            let m = 0;
-            
-            if (difficulty === 'half-hours') {
-                m = Math.random() > 0.5 ? 30 : 0;
-            } else if (difficulty === 'minutes') {
-                m = Math.floor(Math.random() * 12) * 5; // 0, 5, 10 ... 55
-            }
-            
-            return { h, m, str: `${h}:${padZero(m)}` };
+        function formatTime(h, m) {
+            return `${padZero(h)}:${padZero(m)}`;
         }
 
-        function generateWrongOptions(correctTime) {
-            let options = new Set();
-            options.add(correctTime.str);
-            
-            while (options.size < 4) {
-                let tempTime;
-                
-                if (difficulty === 'hours') {
-                    let h = Math.floor(Math.random() * 12) + 1;
-                    tempTime = `${h}:00`;
-                } else if (difficulty === 'half-hours') {
-                    let h = Math.floor(Math.random() * 12) + 1;
-                    let m = Math.random() > 0.5 ? 30 : 0;
-                    tempTime = `${h}:${padZero(m)}`;
-                } else {
-                    let h = Math.floor(Math.random() * 12) + 1;
-                    let m = Math.floor(Math.random() * 12) * 5;
-                    tempTime = `${h}:${padZero(m)}`;
+        function renderTopBar() {
+            return `
+                <div class="bg-emerald-600 text-white px-3 sm:px-5 py-2 sm:py-2.5 flex justify-between items-center font-bold text-sm sm:text-lg shadow-md shrink-0">
+                    <div class="flex items-center gap-2">
+                        <button onclick="renderStartScreen()" class="bg-emerald-700 hover:bg-emerald-800 px-2 py-0.5 rounded-lg text-sm sm:text-base transition active:scale-95" title="Pradžia">🏠</button>
+                        <span>⭐ ${_col('Taškai:')} <span class="text-yellow-300 font-black">${state.score}</span></span>
+                    </div>
+                    <div class="bg-emerald-700 px-2.5 py-0.5 rounded-xl">${_col('Klausimas:')} <span class="text-yellow-300">${state.question} / ${state.maxQuestions}</span></div>
+                    <div>🔥 ${_col('Serija:')} <span class="text-orange-300 font-black">${state.streak}</span></div>
+                </div>
+            `;
+        }
+
+        function renderStartScreen() {
+            app.innerHTML = `
+                <div class="flex-1 flex flex-col items-center justify-center p-4 sm:p-7 text-center fade-in">
+                    <div class="text-5xl sm:text-6xl mb-1.5 bounce">🕐</div>
+                    <h1 class="text-main-title text-2xl sm:text-4xl font-black text-gray-800 mb-1 tracking-tight">${_col('Laikrodžio Žaidimas')}</h1>
+                    <p class="text-sub-title text-sm sm:text-lg text-gray-600 mb-4 sm:mb-6 font-bold">${_col('Mokykis pažinti ir nustatyti laiką!')}</p>
+                    
+                    <div class="flex flex-col gap-2.5 sm:gap-3 w-full max-w-md">
+                        <button onclick="startGame('hours')" class="w-full py-3 sm:py-3.5 px-4 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-base sm:text-xl shadow-lg transition transform active:scale-95 border-b-4 border-emerald-700">
+                            🟢 ${_col('Pilnos valandos (Atpažink laiką)')}
+                        </button>
+                        <button onclick="startGame('minutes')" class="w-full py-3 sm:py-3.5 px-4 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-black text-base sm:text-xl shadow-lg transition transform active:scale-95 border-b-4 border-amber-700">
+                            🟡 ${_col('Pusvalandžiai ir minutės')}
+                        </button>
+                        <button onclick="startGame('interactive')" class="w-full py-3 sm:py-3.5 px-4 rounded-2xl bg-indigo-500 hover:bg-indigo-600 text-white font-black text-base sm:text-xl shadow-lg transition transform active:scale-95 border-b-4 border-indigo-700">
+                            🖐️ ${_col('Nustatyk laikrodį pats!')}
+                        </button>
+                        <button onclick="startGame('routine')" class="w-full py-3 sm:py-3.5 px-4 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white font-black text-base sm:text-xl shadow-lg transition transform active:scale-95 border-b-4 border-rose-700">
+                            🌞 ${_col('Dienotvarkė (Kada tai vyksta?)')}
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function startGame(mode) {
+            initAudio();
+            state.mode = mode;
+            state.score = 0;
+            state.streak = 0;
+            state.question = 1;
+            generateQuestion();
+        }
+
+        function buildClockSvgHTML(interactive) {
+            const cx = 150, cy = 150;
+            let ticksHtml = '';
+            for (let i = 0; i < 60; i++) {
+                const angle = (i * 6) * Math.PI / 180;
+                const isHour = i % 5 === 0;
+                const r1 = 138;
+                const r2 = isHour ? 124 : 132;
+                const x1 = (cx + r1 * Math.sin(angle)).toFixed(2);
+                const y1 = (cy - r1 * Math.cos(angle)).toFixed(2);
+                const x2 = (cx + r2 * Math.sin(angle)).toFixed(2);
+                const y2 = (cy - r2 * Math.cos(angle)).toFixed(2);
+                ticksHtml += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#64748b" stroke-width="${isHour ? '4' : '2'}" stroke-linecap="round"/>`;
+            }
+
+            let numbersHtml = '';
+            for (let i = 1; i <= 12; i++) {
+                const angle = (i * 30) * Math.PI / 180;
+                const r = 102;
+                const x = (cx + r * Math.sin(angle)).toFixed(2);
+                const y = (cy - r * Math.cos(angle)).toFixed(2);
+                if (interactive) {
+                    numbersHtml += `<circle cx="${x}" cy="${y}" r="22" class="clock-num-hit" onclick="onClockNumberClick(${i})"/>`;
                 }
-                
-                options.add(tempTime);
+                numbersHtml += `<text x="${x}" y="${parseFloat(y) + 1}" class="clock-number">${i}</text>`;
             }
-            
-            return Array.from(options).sort(() => Math.random() - 0.5);
+
+            return `
+                <svg id="clock-svg" viewBox="0 0 300 300" class="w-full h-full drop-shadow-md">
+                    <circle id="clock-face-circle" cx="150" cy="150" r="144" fill="#ffffff" stroke="#334155" stroke-width="8"/>
+                    <g id="clock-marks">${ticksHtml}</g>
+                    <g id="clock-numbers">${numbersHtml}</g>
+                    <!-- Hour Hand -->
+                    <line id="hour-hand" x1="150" y1="150" x2="150" y2="74" stroke="#1e293b" stroke-width="10" stroke-linecap="round"/>
+                    <!-- Minute Hand -->
+                    <line id="minute-hand" x1="150" y1="150" x2="150" y2="42" stroke="#2563eb" stroke-width="6" stroke-linecap="round"/>
+                    <!-- Center Pin -->
+                    <circle cx="150" cy="150" r="9" fill="#ef4444" stroke="#ffffff" stroke-width="2"/>
+                </svg>
+            `;
         }
 
-        function nextQuestion() {
-            if (currentQuestion >= totalQuestions) {
-                endGame();
+        function updateClockHands(hours, minutes) {
+            const hourHand = document.getElementById('hour-hand');
+            const minHand = document.getElementById('minute-hand');
+            if (!hourHand || !minHand) return;
+            const hourDeg = (hours % 12) * 30 + minutes * 0.5;
+            const minDeg = minutes * 6;
+            hourHand.style.transform = `rotate(${hourDeg}deg)`;
+            minHand.style.transform = `rotate(${minDeg}deg)`;
+        }
+
+        function generateQuestion() {
+            state.waiting = false;
+            state.firstTry = true;
+
+            if (state.mode === 'routine') {
+                const item = DAILY_ROUTINES[(state.question - 1 + Math.floor(Math.random() * 3)) % DAILY_ROUTINES.length];
+                state.routineItem = item;
+                state.targetH = item.h;
+                state.targetM = item.m;
+                state.targetStr = item.display;
+                state.routineSubMode = (state.question % 2 === 0) ? 'set' : 'match';
+
+                if (state.routineSubMode === 'set') {
+                    state.userH = 12;
+                    state.userM = 0;
+                    state.activeHand = 'hour';
+                    renderInteractiveScreen(true);
+                } else {
+                    const opts = new Set([item.display]);
+                    while (opts.size < 4) {
+                        const other = DAILY_ROUTINES[Math.floor(Math.random() * DAILY_ROUTINES.length)];
+                        opts.add(other.display);
+                    }
+                    state.options = Array.from(opts).sort(() => Math.random() - 0.5);
+                    renderMatchScreen(true);
+                }
                 return;
             }
-            
-            currentQuestion++;
-            firstTry = true;
-            isAnswering = false;
-            updateTopBar();
-            
-            const msgEl = document.getElementById('feedback-msg');
-            msgEl.textContent = "Kiek valandų?";
-            msgEl.className = "h-8 text-2xl font-black text-center mb-4 text-gray-700";
 
-            let time = generateTime();
-            correctAnswer = time.str;
-            setClockHands(time.h, time.m);
-            
-            let answers = generateWrongOptions(time);
-            
-            const container = document.getElementById('answers-container');
-            container.innerHTML = '';
-            
-            answers.forEach(ans => {
-                const btn = document.createElement('button');
-                btn.className = "time-btn py-4 bg-white border-4 border-slate-200 hover:border-blue-400 rounded-2xl text-3xl font-black text-slate-700 shadow-md transition-all active:scale-95";
-                btn.textContent = ans;
-                btn.onclick = () => handleAnswer(ans, btn);
-                container.appendChild(btn);
-            });
-        }
+            let h = Math.floor(Math.random() * 12) + 1;
+            let m = 0;
 
-        function handleAnswer(ans, btn) {
-            if (isAnswering) return;
-            
-            if (ans === correctAnswer) {
-                isAnswering = true;
-                if (firstTry) {
-                    score++;
-                    streak++;
+            if (state.mode === 'hours') {
+                m = 0;
+            } else if (state.mode === 'minutes') {
+                const minsPool = [0, 15, 30, 45, 5, 10, 20, 25, 35, 40, 50, 55];
+                m = minsPool[Math.floor(Math.random() * (state.question <= 5 ? 4 : minsPool.length))];
+            } else if (state.mode === 'interactive') {
+                const interactiveMins = [0, 0, 30, 15, 45, 5, 10, 20, 25, 35, 40, 50, 55];
+                m = interactiveMins[Math.floor(Math.random() * (state.question <= 4 ? 3 : interactiveMins.length))];
+            }
+
+            state.targetH = h;
+            state.targetM = m;
+            state.targetStr = formatTime(h, m);
+
+            if (state.mode === 'interactive') {
+                state.userH = (h % 12) + 1;
+                state.userM = 0;
+                state.activeHand = 'hour';
+                renderInteractiveScreen(false);
+            } else {
+                const opts = new Set([state.targetStr]);
+                while (opts.size < 4) {
+                    const rh = Math.floor(Math.random() * 12) + 1;
+                    let rm = 0;
+                    if (state.mode === 'minutes') {
+                        const mp = [0, 15, 30, 45, 5, 10, 20, 25, 35, 40, 50, 55];
+                        rm = mp[Math.floor(Math.random() * mp.length)];
+                    }
+                    opts.add(formatTime(rh, rm));
                 }
-                updateTopBar();
-                playCorrectSound();
-                
-                btn.classList.remove('border-slate-200', 'hover:border-blue-400');
-                btn.classList.add('bg-green-500', 'text-white', 'border-green-600', 'animate-bounce-click');
-                
-                const msgEl = document.getElementById('feedback-msg');
-                const msgs = ["Puiku!", "Šaunuolis!", "Teisingai!", "Nuostabu!"];
-                msgEl.textContent = msgs[Math.floor(Math.random() * msgs.length)];
-                msgEl.className = "h-8 text-2xl font-black text-center mb-4 text-green-500";
-                
-                setTimeout(() => {
-                    nextQuestion();
-                }, 1500);
+                state.options = Array.from(opts).sort(() => Math.random() - 0.5);
+                renderMatchScreen(false);
+            }
+        }
+
+        function renderMatchScreen(isRoutine) {
+            const routineBanner = isRoutine && state.routineItem ? `
+                <div class="panel-box px-3 py-1.5 sm:py-2 rounded-2xl mb-1 text-center shadow-sm">
+                    <div class="text-base sm:text-xl font-black text-main-title">${state.routineItem.icon} ${_col(state.routineItem.title)}</div>
+                    <div class="text-xs sm:text-sm font-bold text-sub-title">${_col('Kokį laiką rodo laikrodis?')}</div>
+                </div>
+            ` : `
+                <h2 class="text-center text-lg sm:text-2xl font-black text-slate-700 text-main-title">
+                    ${_col('Kiek valandų rodo laikrodis?')}
+                </h2>
+            `;
+
+            const optionsHtml = state.options.map((opt, idx) => `
+                <button id="btn-${idx}" onclick="checkMatchAnswer(${idx}, '${opt}')" class="opt-btn py-2.5 sm:py-3.5 rounded-2xl font-black text-xl sm:text-3xl shadow-md border-b-4 transition transform active:scale-95">
+                    ${opt}
+                </button>
+            `).join('');
+
+            app.innerHTML = `
+                ${renderTopBar()}
+                <div class="flex-1 flex flex-col items-center justify-between p-2.5 sm:p-5 fade-in overflow-hidden">
+                    ${routineBanner}
+
+                    <div id="clock-wrap" class="w-[170px] h-[170px] sm:w-[225px] sm:h-[225px] my-1 shrink-0">
+                        ${buildClockSvgHTML(false)}
+                    </div>
+
+                    <div id="feedback" class="h-6 sm:h-7 flex items-center justify-center font-black text-base sm:text-xl opacity-0 transition-opacity"></div>
+
+                    <div class="grid grid-cols-2 gap-2.5 sm:gap-3.5 w-full">
+                        ${optionsHtml}
+                    </div>
+                </div>
+            `;
+            updateClockHands(state.targetH, state.targetM);
+        }
+
+        function renderInteractiveScreen(isRoutine) {
+            const headerHtml = isRoutine && state.routineItem ? `
+                <div class="panel-box px-3 py-1.5 rounded-2xl text-center w-full shadow-sm">
+                    <div class="text-sm sm:text-lg font-black text-main-title">${state.routineItem.icon} ${_col(state.routineItem.title)} – <span class="text-indigo-600 dark:text-indigo-400 font-black">${state.targetStr}</span></div>
+                    <div class="text-xs sm:text-sm font-bold text-sub-title">${_col('Nustatyk šį laiką laikrodyje!')}</div>
+                </div>
+            ` : `
+                <div class="text-center">
+                    <p class="text-xs sm:text-sm font-bold text-sub-title">${_col('Spausk skaičius ant ciferblato arba mygtukus:')}</p>
+                    <div class="inline-block mt-0.5 px-4 py-1 rounded-2xl bg-amber-100 border-2 border-amber-400 text-amber-900 font-black text-lg sm:text-2xl shadow-sm">
+                        🎯 ${_col('Nustatyk laikrodį:')} ${state.targetStr}
+                    </div>
+                </div>
+            `;
+
+            app.innerHTML = `
+                ${renderTopBar()}
+                <div class="flex-1 flex flex-col items-center justify-between p-2 sm:p-4 fade-in overflow-hidden">
+                    ${headerHtml}
+
+                    <div class="flex items-center gap-2 my-0.5">
+                        <button id="toggle-hour-btn" onclick="setActiveHand('hour')" class="px-2.5 py-1 rounded-xl text-xs sm:text-sm font-black border-2 transition ${state.activeHand === 'hour' ? 'bg-slate-800 text-white border-slate-900' : 'ctrl-btn'}">
+                            🕐 ${_col('Valandos')}
+                        </button>
+                        <button id="toggle-min-btn" onclick="setActiveHand('minute')" class="px-2.5 py-1 rounded-xl text-xs sm:text-sm font-black border-2 transition ${state.activeHand === 'minute' ? 'bg-blue-600 text-white border-blue-800' : 'ctrl-btn'}">
+                            ⏱️ ${_col('Minutės')}
+                        </button>
+                        <span id="user-time-badge" class="px-2.5 py-1 rounded-xl bg-emerald-100 text-emerald-900 font-black text-xs sm:text-sm border border-emerald-300">
+                            ${formatTime(state.userH, state.userM)}
+                        </span>
+                    </div>
+
+                    <div id="clock-wrap" class="w-[155px] h-[155px] sm:w-[200px] sm:h-[200px] shrink-0">
+                        ${buildClockSvgHTML(true)}
+                    </div>
+
+                    <div id="feedback" class="h-5 sm:h-6 flex items-center justify-center font-black text-xs sm:text-base opacity-0 transition-opacity"></div>
+
+                    <!-- Tactile adjustment buttons -->
+                    <div class="grid grid-cols-4 gap-1.5 sm:gap-2.5 w-full">
+                        <button onclick="adjustTime(-1, 0)" class="ctrl-btn py-2 sm:py-2.5 rounded-xl font-black text-xs sm:text-base border-b-4 shadow-sm">
+                            🕐 -1 ${_col('val.')}
+                        </button>
+                        <button onclick="adjustTime(1, 0)" class="ctrl-btn py-2 sm:py-2.5 rounded-xl font-black text-xs sm:text-base border-b-4 shadow-sm">
+                            🕐 +1 ${_col('val.')}
+                        </button>
+                        <button onclick="adjustTime(0, 5)" class="ctrl-btn py-2 sm:py-2.5 rounded-xl font-black text-xs sm:text-base border-b-4 shadow-sm">
+                            ⏱️ +5 ${_col('min.')}
+                        </button>
+                        <button onclick="adjustTime(0, 15)" class="ctrl-btn py-2 sm:py-2.5 rounded-xl font-black text-xs sm:text-base border-b-4 shadow-sm">
+                            ⏱️ +15 ${_col('min.')}
+                        </button>
+                    </div>
+
+                    <button onclick="checkInteractiveAnswer()" class="w-full py-2.5 sm:py-3 rounded-2xl bg-green-500 hover:bg-green-600 text-white font-black text-base sm:text-xl shadow-md border-b-4 border-green-700 transition transform active:scale-95">
+                        ${_col('Patikrinti!')} ✅
+                    </button>
+                </div>
+            `;
+            updateClockHands(state.userH, state.userM);
+        }
+
+        function setActiveHand(hand) {
+            if (state.waiting) return;
+            state.activeHand = hand;
+            playSound('tick');
+            const hBtn = document.getElementById('toggle-hour-btn');
+            const mBtn = document.getElementById('toggle-min-btn');
+            if (hBtn && mBtn) {
+                hBtn.className = `px-2.5 py-1 rounded-xl text-xs sm:text-sm font-black border-2 transition ${hand === 'hour' ? 'bg-slate-800 text-white border-slate-900' : 'ctrl-btn'}`;
+                mBtn.className = `px-2.5 py-1 rounded-xl text-xs sm:text-sm font-black border-2 transition ${hand === 'minute' ? 'bg-blue-600 text-white border-blue-800' : 'ctrl-btn'}`;
+            }
+        }
+
+        function onClockNumberClick(num) {
+            if (state.waiting) return;
+            playSound('tick');
+            if (state.activeHand === 'hour') {
+                state.userH = num;
             } else {
-                firstTry = false;
-                streak = 0;
-                updateTopBar();
-                playWrongSound();
-                
-                btn.classList.remove('border-slate-200', 'hover:border-blue-400');
-                btn.classList.add('bg-red-100', 'border-red-300', 'text-red-400', 'opacity-50', 'animate-shake');
+                state.userM = (num % 12) * 5;
+            }
+            refreshInteractiveClock();
+        }
+
+        function adjustTime(deltaH, deltaM) {
+            if (state.waiting) return;
+            playSound('tick');
+            if (deltaH !== 0) {
+                state.userH = ((state.userH - 1 + deltaH + 12) % 12) + 1;
+            }
+            if (deltaM !== 0) {
+                let totalMins = state.userM + deltaM;
+                if (totalMins >= 60) {
+                    state.userH = (state.userH % 12) + 1;
+                }
+                state.userM = (totalMins + 60) % 60;
+            }
+            refreshInteractiveClock();
+        }
+
+        function refreshInteractiveClock() {
+            updateClockHands(state.userH, state.userM);
+            const badge = document.getElementById('user-time-badge');
+            if (badge) {
+                badge.textContent = formatTime(state.userH, state.userM);
+            }
+        }
+
+        function checkInteractiveAnswer() {
+            if (state.waiting) return;
+            const isHourMatch = (state.userH % 12) === (state.targetH % 12);
+            const isMinMatch = state.userM === state.targetM;
+            const feedback = document.getElementById('feedback');
+            const clockWrap = document.getElementById('clock-wrap');
+
+            if (isHourMatch && isMinMatch) {
+                state.waiting = true;
+                playSound('correct');
+                if (state.firstTry) {
+                    state.score++;
+                    state.streak++;
+                }
+                feedback.innerHTML = `${_col('Puiku! Laikrodis nustatytas tiksliai!')} 🎉`;
+                feedback.className = "h-5 sm:h-6 flex items-center justify-center font-black text-sm sm:text-lg text-green-500 opacity-100";
+                clockWrap.classList.add('bounce');
+
+                setTimeout(() => {
+                    if (state.question >= state.maxQuestions) {
+                        renderEndScreen();
+                    } else {
+                        state.question++;
+                        generateQuestion();
+                    }
+                }, 1150);
+            } else {
+                state.firstTry = false;
+                state.streak = 0;
+                playSound('wrong');
+                let hint = 'Patikrink valandų ir minučių rodykles!';
+                if (!isHourMatch && isMinMatch) hint = 'Minutės teisingos, bet patikrink valandų rodyklę!';
+                else if (isHourMatch && !isMinMatch) hint = 'Valandos teisingos, bet patikrink minučių rodyklę!';
+                feedback.innerHTML = `${_col(hint)} 🤔`;
+                feedback.className = "h-5 sm:h-6 flex items-center justify-center font-black text-xs sm:text-sm text-red-500 opacity-100";
+                clockWrap.classList.remove('shake');
+                void clockWrap.offsetWidth;
+                clockWrap.classList.add('shake');
+            }
+        }
+
+        function checkMatchAnswer(index, selectedStr) {
+            if (state.waiting) return;
+            const btn = document.getElementById(`btn-${index}`);
+            const feedback = document.getElementById('feedback');
+            const clockWrap = document.getElementById('clock-wrap');
+
+            if (selectedStr === state.targetStr) {
+                state.waiting = true;
+                playSound('correct');
+                if (state.firstTry) {
+                    state.score++;
+                    state.streak++;
+                }
+                btn.className = "py-2.5 sm:py-3.5 bg-green-500 text-white rounded-2xl font-black text-xl sm:text-3xl shadow-md border-b-4 border-green-700 transform scale-105 bounce";
+                feedback.innerHTML = `${_col('Teisingai! Šaunuolis!')} 🎉`;
+                feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-base sm:text-xl text-green-500 opacity-100";
+
+                setTimeout(() => {
+                    if (state.question >= state.maxQuestions) {
+                        renderEndScreen();
+                    } else {
+                        state.question++;
+                        generateQuestion();
+                    }
+                }, 1100);
+            } else {
+                state.firstTry = false;
+                state.streak = 0;
+                playSound('wrong');
                 btn.disabled = true;
-                
-                const msgEl = document.getElementById('feedback-msg');
-                msgEl.textContent = "Bandyk dar kartą!";
-                msgEl.className = "h-8 text-2xl font-black text-center mb-4 text-red-500";
-                
-                setTimeout(() => {
-                    btn.classList.remove('animate-shake');
-                }, 400);
+                btn.className = "py-2.5 sm:py-3.5 bg-red-100 text-red-400 border-red-200 border-2 rounded-2xl font-bold text-xl sm:text-3xl shadow-sm line-through cursor-not-allowed opacity-60 shake";
+                feedback.innerHTML = `${_col('Bandyk dar kartą!')} 🤔`;
+                feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-base sm:text-xl text-red-500 opacity-100";
+                clockWrap.classList.remove('shake');
+                void clockWrap.offsetWidth;
+                clockWrap.classList.add('shake');
             }
         }
 
-        function endGame() {
-            showScreen('end-screen');
-            document.getElementById('final-score').textContent = score;
-            
-            const emojiEl = document.getElementById('end-emoji');
-            const titleEl = document.getElementById('end-title');
-            
-            if (score >= 8) {
-                emojiEl.textContent = "🏆";
-                titleEl.textContent = "Šaunuolis!";
-                playWinSound();
-            } else if (score >= 5) {
-                emojiEl.textContent = "🌟";
-                titleEl.textContent = "Neblogai!";
-                playCorrectSound();
-            } else {
-                emojiEl.textContent = "👍";
-                titleEl.textContent = "Bandyk dar!";
-            }
+        function renderEndScreen() {
+            playSound('win');
+
+            let stars = 1;
+            if (state.score >= 8) stars = 3;
+            else if (state.score >= 5) stars = 2;
+
+            const starHtml = Array(3).fill(0).map((_, i) =>
+                `<span class="text-5xl sm:text-6xl ${i < stars ? 'text-yellow-400 bounce' : 'text-gray-400 opacity-40'} drop-shadow-md" style="animation-delay: ${i * 0.2}s">⭐</span>`
+            ).join('');
+
+            let message = "Neblogai! Pasitreniruok dar!";
+            if (stars === 3) message = "Puikiai! Tu tikras laiko meistras!";
+            else if (stars === 2) message = "Geras rezultatas!";
+
+            app.innerHTML = `
+                <div class="flex-1 flex flex-col items-center justify-center p-6 sm:p-8 text-center fade-in">
+                    <h2 class="text-main-title text-3xl sm:text-4xl font-black text-gray-800 mb-4">${_col('Žaidimas baigtas!')}</h2>
+                    
+                    <div class="flex justify-center gap-2 mb-4">
+                        ${starHtml}
+                    </div>
+                    
+                    <p class="text-sub-title text-xl sm:text-2xl font-bold text-gray-700 mb-2">${_col(message)} 🏆</p>
+                    <p class="text-sub-title text-lg sm:text-xl text-gray-600 mb-8">${_col('Surinkai:')} <span class="font-black text-green-500">${state.score} / ${state.maxQuestions}</span></p>
+                    
+                    <button onclick="renderStartScreen()" class="w-full max-w-xs py-4 rounded-2xl bg-blue-500 hover:bg-blue-600 text-white font-black text-xl sm:text-2xl shadow-lg transition transform active:scale-95 border-b-4 border-blue-700">
+                        ${_col('Žaisti dar kartą')} 🔄
+                    </button>
+                </div>
+            `;
         }
 
-        // Init clock face immediately so it doesn't wait
-        initClockFace();
+        // Initialize
+        renderStartScreen();
     </script>
 </body>
 </html>

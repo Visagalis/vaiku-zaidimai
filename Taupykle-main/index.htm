@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>🐷 Taupyklė ir Piniginės</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #fdf2f8;
+            background-image: radial-gradient(#f9a8d4 20%, transparent 20%);
+            background-size: 20px 20px;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+            color: #1e293b;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .bounce { animation: bounce 0.45s; }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+
+        .shake { animation: shake 0.4s; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        .fade-in { animation: fadeIn 0.25s ease-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.97); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .pop-in { animation: popIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.5); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* High-Contrast Tactile Coins & Bills */
+        .coin {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            border-radius: 9999px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), inset 0 2px 3px rgba(255, 255, 255, 0.4);
+            flex-shrink: 0;
+            user-select: none;
+            position: relative;
+            transition: transform 0.12s ease;
+        }
+        button.coin:active, button.bill:active {
+            transform: scale(0.9);
+        }
+
+        .coin-copper {
+            background: radial-gradient(circle at 35% 35%, #ea580c 0%, #c2410c 55%, #7c2d12 100%);
+            color: #ffffff;
+            border: 2px solid #fdba74;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+        }
+        .coin-1c { width: 2.65rem; height: 2.65rem; font-size: 0.95rem; }
+        .coin-2c { width: 2.9rem; height: 2.9rem; font-size: 1.05rem; }
+        .coin-5c { width: 3.2rem; height: 3.2rem; font-size: 1.15rem; }
+
+        .coin-gold {
+            background: radial-gradient(circle at 35% 35%, #fef08a 0%, #eab308 50%, #b45309 100%);
+            color: #3b1803;
+            border: 2px solid #fef9c3;
+            text-shadow: 0 1px 0 rgba(255,255,255,0.6);
+        }
+        .coin-10c { width: 2.8rem; height: 2.8rem; font-size: 1.0rem; }
+        .coin-20c { width: 3.1rem; height: 3.1rem; font-size: 1.1rem; }
+        .coin-50c { width: 3.45rem; height: 3.45rem; font-size: 1.2rem; }
+
+        .coin-1e {
+            width: 3.25rem;
+            height: 3.25rem;
+            background: radial-gradient(circle at 35% 35%, #ffffff 0%, #cbd5e1 60%, #94a3b8 100%);
+            color: #0f172a;
+            border: 4px solid #d97706;
+            font-size: 1.1rem;
+            text-shadow: 0 1px 1px rgba(255,255,255,0.8);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.35);
+        }
+
+        .coin-2e {
+            width: 3.55rem;
+            height: 3.55rem;
+            background: radial-gradient(circle at 35% 35%, #fef08a 0%, #eab308 60%, #b45309 100%);
+            color: #3b1803;
+            border: 4px solid #94a3b8;
+            font-size: 1.2rem;
+            text-shadow: 0 1px 1px rgba(255,255,255,0.6);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.35);
+        }
+
+        .bill {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.25);
+            flex-shrink: 0;
+            user-select: none;
+            width: 3.9rem;
+            height: 2.3rem;
+            font-size: 1.05rem;
+            border: 2px solid;
+            letter-spacing: 0.5px;
+            transition: transform 0.12s ease;
+        }
+        .bill-5e { background: linear-gradient(135deg, #64748b, #475569); color: #f8fafc; border-color: #334155; }
+        .bill-10e { background: linear-gradient(135deg, #f43f5e, #be123c); color: #ffffff; border-color: #9f1239; }
+        .bill-20e { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: #ffffff; border-color: #1e40af; }
+
+        @media (min-width: 640px) {
+            .bill { width: 4.7rem; height: 2.8rem; font-size: 1.25rem; }
+            .coin-1c { width: 3.0rem; height: 3.0rem; font-size: 1.05rem; }
+            .coin-2c { width: 3.3rem; height: 3.3rem; font-size: 1.15rem; }
+            .coin-5c { width: 3.65rem; height: 3.65rem; font-size: 1.25rem; }
+            .coin-10c { width: 3.2rem; height: 3.2rem; font-size: 1.15rem; }
+            .coin-20c { width: 3.55rem; height: 3.55rem; font-size: 1.25rem; }
+            .coin-50c { width: 3.95rem; height: 3.95rem; font-size: 1.35rem; }
+            .coin-1e { width: 3.7rem; height: 3.7rem; font-size: 1.3rem; border-width: 5px; }
+            .coin-2e { width: 4.05rem; height: 4.05rem; font-size: 1.4rem; border-width: 5px; }
+        }
+
+        .app-card {
+            background-color: rgba(255, 255, 255, 0.97);
+            border-color: #f472b6;
+        }
+        .piggy-box {
+            background-color: #fdf2f8;
+            border: 2px dashed #f472b6;
+        }
+        .wallet-panel {
+            background-color: #f8fafc;
+            border: 2px solid #cbd5e1;
+        }
+        .choice-btn {
+            background-color: #fce7f3;
+            color: #9d174d;
+            border-color: #f9a8d4;
+        }
+        .choice-btn:hover {
+            background-color: #fbcfe8;
+        }
+
+        /* Tamsioji Tema (Dark Mode) */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #0b1120 !important;
+                background-image: radial-gradient(#1e293b 25%, transparent 25%) !important;
+                color: #f1f5f9 !important;
+            }
+            .app-card {
+                background-color: #0f172a !important;
+                border-color: #334155 !important;
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6) !important;
+            }
+            .piggy-box {
+                background-color: #1e293b !important;
+                border-color: #475569 !important;
+                box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.5) !important;
+            }
+            .wallet-panel {
+                background-color: #1e293b !important;
+                border-color: #334155 !important;
+            }
+            .choice-btn {
+                background-color: #1e293b !important;
+                color: #f9a8d4 !important;
+                border-color: #334155 !important;
+            }
+            .choice-btn:hover {
+                background-color: #334155 !important;
+            }
+            .text-main-title {
+                color: #f8fafc !important;
+            }
+            .text-sub-title {
+                color: #94a3b8 !important;
+            }
+        }
+    </style>
+    <!-- Apsauga nuo priartinimo gestais (pinch to zoom) -->
+    <script>
+        document.addEventListener("gesturestart", function(e) { e.preventDefault(); }, { passive: false });
+        document.addEventListener("gesturechange", function(e) { e.preventDefault(); }, { passive: false });
+        document.addEventListener("gestureend", function(e) { e.preventDefault(); }, { passive: false });
+        document.addEventListener("touchstart", function(e) {
+            if (e.touches && e.touches.length > 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+        document.addEventListener("touchmove", function(e) {
+            if (e.touches && e.touches.length > 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+        document.addEventListener("wheel", function(e) {
+            if (e.ctrlKey) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+    </script>
+</head>
+<body class="h-screen max-h-screen flex items-center justify-center p-2 sm:p-4 overflow-hidden">
+
+    <div id="app" class="app-card w-full max-w-2xl rounded-3xl shadow-xl flex flex-col relative fade-in border-4 overflow-hidden max-h-full">
+    </div>
+
+    <script>
+        // === SKIEMENŲ SPALVINIMAS ===
+        const _V = 'aeėęiįyouųūąAEĖĘIĮYOUŲŪĄ';
+        const _D = ['ai','au','ei','eu','ie','uo','ui','oi','ia','io','iu'];
+        const _L = /[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/;
+        const _O = new Set(['bl','br','dr','dv','fl','fr','gl','gr','gn','kl','kr','kn','kv','pl','pr','sk','sl','sm','sn','sp','sr','st','sv','šl','šv','šn','tr','tv','vr','žl','žv','str','skr','spr']);
+        const _SC = ['#dc2626','#2563eb','#16a34a','#ea580c','#9333ea','#db2777'];
+
+        function _syl(word) {
+            if (!word || word.length <= 1) return [word || ''];
+            const r = []; let s = '', i = 0, n = word.length;
+            while (i < n) {
+                const c = word[i];
+                if (!_L.test(c)) { s += c; i++; continue; }
+                if (!_V.includes(c)) { s += c; i++; }
+                else {
+                    if (i + 1 < n && _D.includes(word.slice(i, i + 2).toLowerCase())) { s += word.slice(i, i + 2); i += 2; }
+                    else { s += c; i++; }
+                    let j = i;
+                    while (j < n && _L.test(word[j]) && !_V.includes(word[j])) j++;
+                    let cl = word.slice(i, j);
+                    if (j >= n || !_L.test(word[j])) { s += cl; i = j; while (i < n && !_L.test(word[i])) { s += word[i]; i++; } r.push(s); s = ''; }
+                    else if (cl.length === 0) { r.push(s); s = ''; }
+                    else if (cl.length === 1) { r.push(s); s = cl; i = j; }
+                    else {
+                        let u = [];
+                        for (let k = 0; k < cl.length;) {
+                            const p = cl.slice(k, k + 2).toLowerCase();
+                            if (p === 'dz' || p === 'dž' || p === 'ch') { u.push(cl.slice(k, k + 2)); k += 2; }
+                            else { u.push(cl[k]); k++; }
+                        }
+                        let sp = u.length - 1;
+                        if (u.length >= 2) {
+                            const l2 = (u[u.length - 2] + u[u.length - 1]).toLowerCase();
+                            const l3 = u.length >= 3 ? (u[u.length - 3] + l2).toLowerCase() : '';
+                            if (l3 && _O.has(l3)) sp = u.length - 3;
+                            else if (_O.has(l2)) sp = u.length - 2;
+                        }
+                        s += u.slice(0, sp).join(''); r.push(s); s = u.slice(sp).join(''); i = j;
+                    }
+                }
+            }
+            if (s) r.push(s);
+            return r.filter(x => x.length > 0);
+        }
+
+        function _col(text) {
+            if (!text) return '';
+            return text.split(/(\s+)/).map(token => {
+                if (!token.trim() || !/[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/.test(token)) return token;
+                const syls = _syl(token);
+                return syls.map((s, i) => '<span style="color:' + _SC[i % _SC.length] + '">' + s + '</span>').join('');
+            }).join('');
+        }
+        // === /SKIEMENŲ SPALVINIMAS ===
+
+        const MONEY = {
+            c1:  { cents: 1, label: '1c', class: 'coin coin-copper coin-1c' },
+            c2:  { cents: 2, label: '2c', class: 'coin coin-copper coin-2c' },
+            c5:  { cents: 5, label: '5c', class: 'coin coin-copper coin-5c' },
+            c10: { cents: 10, label: '10c', class: 'coin coin-gold coin-10c' },
+            c20: { cents: 20, label: '20c', class: 'coin coin-gold coin-20c' },
+            c50: { cents: 50, label: '50c', class: 'coin coin-gold coin-50c' },
+            e1:  { cents: 100, label: '1€', class: 'coin coin-1e' },
+            e2:  { cents: 200, label: '2€', class: 'coin coin-2e' },
+            e5:  { cents: 500, label: '5€', class: 'bill bill-5e' },
+            e10: { cents: 1000, label: '10€', class: 'bill bill-10e' },
+            e20: { cents: 2000, label: '20€', class: 'bill bill-20e' }
+        };
+
+        // 1. Palyginimo užduotys (Kairė vs Dešinė piniginė)
+        const COMPARE_TASKS = [
+            { left: [MONEY.c10, MONEY.c10, MONEY.c10], right: [MONEY.c50] }, // 30c < 50c
+            { left: [MONEY.c50, MONEY.c50], right: [MONEY.e1] }, // 100c = 100c
+            { left: [MONEY.c20, MONEY.c20, MONEY.c20], right: [MONEY.c50] }, // 60c > 50c
+            { left: [MONEY.c5, MONEY.c5], right: [MONEY.c10] }, // 10c = 10c
+            { left: [MONEY.e1, MONEY.e1, MONEY.e1], right: [MONEY.e2] }, // 3€ > 2€
+            { left: [MONEY.e2, MONEY.e2], right: [MONEY.e5] }, // 4€ < 5€
+            { left: [MONEY.e5, MONEY.e5], right: [MONEY.e10] }, // 10€ = 10€
+            { left: [MONEY.c20, MONEY.c10, MONEY.c5], right: [MONEY.c50] }, // 35c < 50c
+            { left: [MONEY.e2, MONEY.e2, MONEY.e1], right: [MONEY.e5] }, // 5€ = 5€
+            { left: [MONEY.e5, MONEY.e2, MONEY.e2], right: [MONEY.e10] }, // 9€ < 10€
+            { left: [MONEY.c50, MONEY.c20, MONEY.c20], right: [MONEY.e1] }, // 90c < 1€
+            { left: [MONEY.e10, MONEY.e5], right: [MONEY.e20] }, // 15€ < 20€
+            { left: [MONEY.c50, MONEY.c20, MONEY.c10], right: [MONEY.c50, MONEY.c20] } // 80c > 70c
+        ];
+
+        // 2. Pinigų keityklos užduotys (Iškeisk stambų pinigą į smulkesnius)
+        const EXCHANGE_TASKS = [
+            { target: MONEY.c5,  pool: [MONEY.c1, MONEY.c2] },
+            { target: MONEY.c10, pool: [MONEY.c1, MONEY.c2, MONEY.c5] },
+            { target: MONEY.c20, pool: [MONEY.c2, MONEY.c5, MONEY.c10] },
+            { target: MONEY.c50, pool: [MONEY.c5, MONEY.c10, MONEY.c20] },
+            { target: MONEY.e1,  pool: [MONEY.c10, MONEY.c20, MONEY.c50] },
+            { target: MONEY.e2,  pool: [MONEY.c50, MONEY.e1] },
+            { target: MONEY.e5,  pool: [MONEY.e1, MONEY.e2] },
+            { target: MONEY.e10, pool: [MONEY.e1, MONEY.e2, MONEY.e5] },
+            { target: MONEY.e20, pool: [MONEY.e2, MONEY.e5, MONEY.e10] }
+        ];
+
+        // 3. Taupyklės užduotys (Ar užteks pinigų?)
+        const PIGGY_TASKS = [
+            { item: 'Ledai', emoji: '🍦', price: 50, piggy: [MONEY.c20, MONEY.c20, MONEY.c10] }, // 50c >= 50c -> Taip
+            { item: 'Spurga', emoji: '🍩', price: 60, piggy: [MONEY.c20, MONEY.c20, MONEY.c5] }, // 45c < 60c -> Ne
+            { item: 'Šokoladas', emoji: '🍫', price: 80, piggy: [MONEY.c50, MONEY.c20, MONEY.c20] }, // 90c >= 80c -> Taip
+            { item: 'Sąsiuvinis', emoji: '📓', price: 100, piggy: [MONEY.c50, MONEY.c20, MONEY.c10] }, // 80c < 1€ -> Ne
+            { item: 'Dažai', emoji: '🎨', price: 300, piggy: [MONEY.e2, MONEY.e1] }, // 3€ >= 3€ -> Taip
+            { item: 'Knygelė', emoji: '📖', price: 500, piggy: [MONEY.e2, MONEY.e2] }, // 4€ < 5€ -> Ne
+            { item: 'Meškiukas', emoji: '🧸', price: 700, piggy: [MONEY.e5, MONEY.e2, MONEY.e1] }, // 8€ >= 7€ -> Taip
+            { item: 'Kamuolys', emoji: '⚽', price: 1000, piggy: [MONEY.e5, MONEY.e2, MONEY.e2] }, // 9€ < 10€ -> Ne
+            { item: 'Mašinėlė', emoji: '🚗', price: 1200, piggy: [MONEY.e10, MONEY.e2] }, // 12€ >= 12€ -> Taip
+            { item: 'Kuprinė', emoji: '🎒', price: 1500, piggy: [MONEY.e10, MONEY.e2, MONEY.e1] }, // 13€ < 15€ -> Ne
+            { item: 'Bandelė', emoji: '🥐', price: 40, piggy: [MONEY.c20, MONEY.c10, MONEY.c10] }, // 40c >= 40c -> Taip
+            { item: 'Lėktuvėlis', emoji: '✈️', price: 1400, piggy: [MONEY.e10, MONEY.e5] } // 15€ >= 14€ -> Taip
+        ];
+
+        const state = {
+            mode: 'compare', // 'compare' | 'exchange' | 'piggy'
+            score: 0,
+            streak: 0,
+            question: 1,
+            maxQuestions: 10,
+            currentTask: null,
+            collectedItems: [],
+            waiting: false,
+            firstTry: true
+        };
+
+        const app = document.getElementById('app');
+
+        let audioCtx;
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        function playSound(type) {
+            initAudio();
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
+
+            if (type === 'coin') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(950, now);
+                osc.frequency.exponentialRampToValueAtTime(1400, now + 0.08);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+                osc.start(now);
+                osc.stop(now + 0.12);
+            } else if (type === 'remove') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, now);
+                osc.frequency.exponentialRampToValueAtTime(380, now + 0.08);
+                gain.gain.setValueAtTime(0.18, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                osc.start(now);
+                osc.stop(now + 0.1);
+            } else if (type === 'correct') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, now);
+                osc.frequency.exponentialRampToValueAtTime(1046.5, now + 0.18);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.32);
+                osc.start(now);
+                osc.stop(now + 0.32);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.exponentialRampToValueAtTime(150, now + 0.22);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'win') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(440, now);
+                osc.frequency.setValueAtTime(554.37, now + 0.1);
+                osc.frequency.setValueAtTime(659.25, now + 0.2);
+                osc.frequency.setValueAtTime(880, now + 0.3);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.6);
+                osc.start(now);
+                osc.stop(now + 0.6);
+            }
+        }
+
+        function formatMoneyCents(cents) {
+            if (cents < 100) return cents + ' c';
+            if (cents % 100 === 0) return (cents / 100) + ' €';
+            return (cents / 100).toFixed(2).replace('.', ',') + ' €';
+        }
+
+        function sumCoins(arr) {
+            return arr.reduce((acc, c) => acc + c.cents, 0);
+        }
+
+        function getRandomElement(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function renderStartScreen() {
+            app.innerHTML = `
+                <div class="flex-1 flex flex-col items-center justify-center p-5 sm:p-8 text-center fade-in">
+                    <div class="text-5xl sm:text-6xl mb-2 bounce">🐷</div>
+                    <h1 class="text-main-title text-3xl sm:text-5xl font-black text-pink-600 mb-1 tracking-tight">${_col('Taupyklė ir Piniginės')}</h1>
+                    <p class="text-sub-title text-base sm:text-xl text-slate-600 mb-5 sm:mb-7 font-bold">${_col('Palygink pinigines, iškeisk monetas ir taupyk!')}</p>
+                    
+                    <div class="flex flex-col gap-3 w-full max-w-sm">
+                        <button onclick="startGame('compare')" class="w-full py-3.5 sm:py-4 px-4 rounded-2xl bg-pink-500 hover:bg-pink-600 text-white font-black text-lg sm:text-2xl shadow-lg transition transform active:scale-95 border-b-4 border-pink-700">
+                            ⚖️ ${_col('Kurioje piniginėje daugiau?')}
+                        </button>
+                        <button onclick="startGame('exchange')" class="w-full py-3.5 sm:py-4 px-4 rounded-2xl bg-purple-500 hover:bg-purple-600 text-white font-black text-lg sm:text-2xl shadow-lg transition transform active:scale-95 border-b-4 border-purple-700">
+                            🔄 ${_col('Pinigų keitykla')}
+                        </button>
+                        <button onclick="startGame('piggy')" class="w-full py-3.5 sm:py-4 px-4 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-lg sm:text-2xl shadow-lg transition transform active:scale-95 border-b-4 border-emerald-700">
+                            🐷 ${_col('Ar užteks taupyklėje?')}
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function startGame(mode) {
+            initAudio();
+            state.mode = mode;
+            state.score = 0;
+            state.streak = 0;
+            state.question = 1;
+            generateQuestion();
+        }
+
+        function renderTopBar() {
+            return `
+                <div class="bg-pink-500 text-white px-4 py-2 sm:py-2.5 flex justify-between items-center font-bold text-sm sm:text-base shadow-md shrink-0">
+                    <div>⭐ ${_col('Taškai:')} <span class="text-yellow-200 font-black">${state.score}</span></div>
+                    <div class="bg-pink-600 px-2.5 py-0.5 rounded-xl">${_col('Užduotis:')} <span class="text-yellow-200">${state.question} / ${state.maxQuestions}</span></div>
+                    <div>🔥 ${_col('Serija:')} <span class="text-amber-200 font-black">${state.streak}</span></div>
+                </div>
+            `;
+        }
+
+        function generateQuestion() {
+            state.waiting = false;
+            state.firstTry = true;
+            state.collectedItems = [];
+
+            if (state.mode === 'compare') {
+                let nextTask;
+                do {
+                    nextTask = getRandomElement(COMPARE_TASKS);
+                } while (state.currentTask === nextTask);
+                state.currentTask = nextTask;
+                renderCompareScreen();
+            } else if (state.mode === 'exchange') {
+                let nextEx;
+                do {
+                    nextEx = getRandomElement(EXCHANGE_TASKS);
+                } while (state.currentTask && nextEx.target.cents === state.currentTask.target?.cents);
+                state.currentTask = nextEx;
+                renderExchangeScreen();
+            } else {
+                let nextPiggy;
+                do {
+                    nextPiggy = getRandomElement(PIGGY_TASKS);
+                } while (state.currentTask && nextPiggy.item === state.currentTask.item);
+                state.currentTask = nextPiggy;
+                renderPiggyScreen();
+            }
+        }
+
+        // --- MODE 1: COMPARE ---
+        function renderCompareScreen() {
+            const { left, right } = state.currentTask;
+            const leftHtml = left.map(c => `<div class="${c.class} pop-in">${c.label}</div>`).join('');
+            const rightHtml = right.map(c => `<div class="${c.class} pop-in">${c.label}</div>`).join('');
+
+            app.innerHTML = `
+                ${renderTopBar()}
+                <div class="flex-1 flex flex-col p-3 sm:p-5 fade-in justify-between overflow-hidden">
+                    <h2 class="text-center text-base sm:text-2xl font-black text-slate-700 text-main-title">
+                        ${_col('Kurioje piniginėje yra daugiau pinigų?')}
+                    </h2>
+
+                    <div id="compare-area" class="grid grid-cols-2 gap-2.5 sm:gap-4 my-1">
+                        <div onclick="checkCompare('left', document.getElementById('btn-left'))" class="piggy-box p-2.5 sm:p-4 rounded-2xl flex flex-col items-center justify-between min-h-[135px] sm:min-h-[175px] cursor-pointer hover:scale-[1.01] transition">
+                            <span class="text-xs sm:text-sm font-black uppercase tracking-wider text-pink-600">👛 ${_col('Kairė')}</span>
+                            <div class="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 my-auto py-1">
+                                ${leftHtml}
+                            </div>
+                        </div>
+
+                        <div onclick="checkCompare('right', document.getElementById('btn-right'))" class="piggy-box p-2.5 sm:p-4 rounded-2xl flex flex-col items-center justify-between min-h-[135px] sm:min-h-[175px] cursor-pointer hover:scale-[1.01] transition">
+                            <span class="text-xs sm:text-sm font-black uppercase tracking-wider text-indigo-600">👛 ${_col('Dešinė')}</span>
+                            <div class="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 my-auto py-1">
+                                ${rightHtml}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="feedback" class="h-7 flex items-center justify-center font-black text-sm sm:text-lg opacity-0 transition-opacity"></div>
+
+                    <div class="grid grid-cols-3 gap-2 sm:gap-3">
+                        <button id="btn-left" onclick="checkCompare('left', this)" class="choice-btn py-3 sm:py-4 px-2 rounded-2xl font-black text-sm sm:text-lg shadow-md border-b-4 transition transform active:scale-95">
+                            👈 ${_col('Kairėje')}
+                        </button>
+                        <button id="btn-eq" onclick="checkCompare('equal', this)" class="choice-btn py-3 sm:py-4 px-2 rounded-2xl font-black text-sm sm:text-lg shadow-md border-b-4 transition transform active:scale-95">
+                            🟰 ${_col('Po lygiai')}
+                        </button>
+                        <button id="btn-right" onclick="checkCompare('right', this)" class="choice-btn py-3 sm:py-4 px-2 rounded-2xl font-black text-sm sm:text-lg shadow-md border-b-4 transition transform active:scale-95">
+                            👉 ${_col('Dešinėje')}
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function checkCompare(choice, btn) {
+            if (state.waiting) return;
+            const leftSum = sumCoins(state.currentTask.left);
+            const rightSum = sumCoins(state.currentTask.right);
+            let correctChoice = 'equal';
+            if (leftSum > rightSum) correctChoice = 'left';
+            else if (rightSum > leftSum) correctChoice = 'right';
+
+            const feedback = document.getElementById('feedback');
+            const area = document.getElementById('compare-area');
+
+            if (choice === correctChoice) {
+                state.waiting = true;
+                playSound('correct');
+                if (state.firstTry) {
+                    state.score++;
+                    state.streak++;
+                }
+                if (btn) btn.className = "py-3 sm:py-4 px-2 bg-green-500 text-white rounded-2xl font-black text-sm sm:text-lg shadow-md border-b-4 border-green-700 bounce";
+                feedback.innerHTML = `${_col('Teisingai!')} (${formatMoneyCents(leftSum)} ir ${formatMoneyCents(rightSum)}) 🎉`;
+                feedback.className = "h-7 flex items-center justify-center font-black text-sm sm:text-lg text-green-500 opacity-100";
+
+                setTimeout(() => {
+                    if (state.question >= state.maxQuestions) renderEndScreen();
+                    else { state.question++; generateQuestion(); }
+                }, 1300);
+            } else {
+                state.firstTry = false;
+                state.streak = 0;
+                playSound('wrong');
+                if (btn) {
+                    btn.disabled = true;
+                    btn.classList.add('opacity-40', 'line-through');
+                }
+                feedback.innerHTML = `${_col('Suskaičiuok abi pinigines dar kartą!')} 🤔`;
+                feedback.className = "h-7 flex items-center justify-center font-black text-sm sm:text-lg text-red-500 opacity-100";
+                area.classList.remove('shake');
+                void area.offsetWidth;
+                area.classList.add('shake');
+            }
+        }
+
+        // --- MODE 2: EXCHANGE ---
+        function addExCoin(idx) {
+            if (state.waiting) return;
+            if (state.collectedItems.length >= 10) return;
+            state.collectedItems.push(state.currentTask.pool[idx]);
+            playSound('coin');
+            updateExchangeUI();
+        }
+
+        function removeExCoin(idx) {
+            if (state.waiting) return;
+            state.collectedItems.splice(idx, 1);
+            playSound('remove');
+            updateExchangeUI();
+        }
+
+        function clearExchange() {
+            if (state.waiting) return;
+            state.collectedItems = [];
+            playSound('remove');
+            updateExchangeUI();
+        }
+
+        function renderExchangeScreen() {
+            const { target, pool } = state.currentTask;
+            const poolHtml = pool.map((c, idx) => `
+                <button onclick="addExCoin(${idx})" class="${c.class} cursor-pointer hover:scale-105">
+                    ${c.label}
+                </button>
+            `).join('');
+
+            app.innerHTML = `
+                ${renderTopBar()}
+                <div class="flex-1 flex flex-col p-2.5 sm:p-4 fade-in justify-between overflow-hidden">
+                    <div class="wallet-panel p-2 sm:p-3 rounded-2xl flex items-center justify-center gap-3 sm:gap-4">
+                        <div class="text-left">
+                            <div class="text-xs sm:text-sm font-bold text-slate-500 text-sub-title">${_col('Iškeisk šį pinigą į smulkesnius:')}</div>
+                            <div class="text-base sm:text-xl font-black text-slate-800 text-main-title">${_col('Vertė:')} ${formatMoneyCents(target.cents)}</div>
+                        </div>
+                        <div class="${target.class} bounce">${target.label}</div>
+                    </div>
+
+                    <div class="flex flex-col">
+                        <div class="flex justify-between items-center px-1 mb-1 text-xs sm:text-sm font-extrabold">
+                            <span class="text-sub-title">${_col('Surinkta smulkiais:')} <strong id="ex-sum" class="text-pink-600 text-sm sm:text-base">0 c</strong></span>
+                            <button onclick="clearExchange()" class="text-rose-500 hover:underline font-bold text-xs sm:text-sm">🗑️ ${_col('Išvalyti')}</button>
+                        </div>
+                        <div id="ex-tray" class="piggy-box flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5 p-2 sm:p-3 rounded-2xl min-h-[76px] sm:min-h-[96px]">
+                        </div>
+                    </div>
+
+                    <div id="feedback" class="h-6 flex items-center justify-center font-black text-xs sm:text-base opacity-0 transition-opacity"></div>
+
+                    <div class="wallet-panel p-2 sm:p-3 rounded-2xl flex flex-col items-center gap-1">
+                        <span class="text-[11px] sm:text-xs font-bold text-slate-400">${_col('Smulkūs pinigėliai (spausk ant jų):')}</span>
+                        <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+                            ${poolHtml}
+                        </div>
+                    </div>
+
+                    <button onclick="checkExchangeAnswer()" class="w-full py-2.5 sm:py-3.5 rounded-2xl bg-purple-500 hover:bg-purple-600 text-white font-black text-lg sm:text-2xl shadow-md border-b-4 border-purple-700 transition transform active:scale-95">
+                        🔄 ${_col('Iškeisti!')}
+                    </button>
+                </div>
+            `;
+            updateExchangeUI();
+        }
+
+        function updateExchangeUI() {
+            const tray = document.getElementById('ex-tray');
+            const sumEl = document.getElementById('ex-sum');
+            if (!tray || !sumEl) return;
+
+            sumEl.textContent = formatMoneyCents(sumCoins(state.collectedItems));
+            if (state.collectedItems.length === 0) {
+                tray.innerHTML = `<span class="text-slate-400 font-bold text-xs sm:text-sm text-center">${_col('Spausk smulkesnes monetas apačioje')}</span>`;
+            } else {
+                tray.innerHTML = state.collectedItems.map((item, idx) => `
+                    <button onclick="removeExCoin(${idx})" class="${item.class} pop-in cursor-pointer hover:opacity-80" title="Nuimti">
+                        ${item.label}
+                    </button>
+                `).join('');
+            }
+        }
+
+        function checkExchangeAnswer() {
+            if (state.waiting) return;
+            const currentSum = sumCoins(state.collectedItems);
+            const targetSum = state.currentTask.target.cents;
+            const feedback = document.getElementById('feedback');
+            const tray = document.getElementById('ex-tray');
+
+            if (currentSum === targetSum) {
+                state.waiting = true;
+                playSound('correct');
+                if (state.firstTry) {
+                    state.score++;
+                    state.streak++;
+                }
+                feedback.innerHTML = `${_col('Puikiai iškeitei pinigą!')} 🎉`;
+                feedback.className = "h-6 flex items-center justify-center font-black text-sm sm:text-lg text-green-500 opacity-100";
+                tray.classList.add('bounce');
+
+                setTimeout(() => {
+                    if (state.question >= state.maxQuestions) renderEndScreen();
+                    else { state.question++; generateQuestion(); }
+                }, 1200);
+            } else {
+                state.firstTry = false;
+                state.streak = 0;
+                playSound('wrong');
+                const msg = currentSum < targetSum ? 'Dar trūksta smulkių pinigėlių!' : 'Per daug! Paspausk ant monetos, kad nuimtum.';
+                feedback.innerHTML = `${_col(msg)} 🤔`;
+                feedback.className = "h-6 flex items-center justify-center font-black text-xs sm:text-base text-red-500 opacity-100";
+                tray.classList.remove('shake');
+                void tray.offsetWidth;
+                tray.classList.add('shake');
+            }
+        }
+
+        // --- MODE 3: PIGGY BANK ---
+        function renderPiggyScreen() {
+            const task = state.currentTask;
+            const piggyCoinsHtml = task.piggy.map(c => `<div class="${c.class} pop-in">${c.label}</div>`).join('');
+
+            app.innerHTML = `
+                ${renderTopBar()}
+                <div class="flex-1 flex flex-col p-3 sm:p-5 fade-in justify-between overflow-hidden">
+                    <div class="wallet-panel p-2.5 sm:p-3.5 rounded-2xl flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-2.5 sm:gap-3">
+                            <span class="text-4xl sm:text-5xl">${task.emoji}</span>
+                            <div class="text-left">
+                                <div class="text-xs sm:text-sm font-bold text-slate-500 text-sub-title">${_col('Svajonių pirkinys:')}</div>
+                                <div class="text-lg sm:text-2xl font-black text-slate-800 text-main-title">${_col(task.item)}</div>
+                            </div>
+                        </div>
+                        <div class="bg-amber-300 border-2 border-amber-500 text-amber-950 font-black text-lg sm:text-2xl px-3 sm:px-4 py-1 rounded-2xl">
+                            🏷️ ${formatMoneyCents(task.price)}
+                        </div>
+                    </div>
+
+                    <div id="piggy-container" class="piggy-box p-3 sm:p-4 rounded-2xl flex flex-col items-center justify-center gap-2 min-h-[115px] sm:min-h-[145px]">
+                        <div class="text-xs sm:text-sm font-black text-pink-600">🐷 ${_col('Tavo taupyklėje yra:')}</div>
+                        <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+                            ${piggyCoinsHtml}
+                        </div>
+                    </div>
+
+                    <div class="text-center font-black text-base sm:text-xl text-slate-700 text-main-title">
+                        ${_col('Ar užteks pinigų taupyklėje šiam pirkiniui?')}
+                    </div>
+
+                    <div id="feedback" class="h-6 flex items-center justify-center font-black text-sm sm:text-lg opacity-0 transition-opacity"></div>
+
+                    <div class="grid grid-cols-2 gap-3 sm:gap-4">
+                        <button id="btn-yes" onclick="checkPiggyAnswer(true, this)" class="py-3.5 sm:py-4 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-base sm:text-xl shadow-md border-b-4 border-emerald-700 transition transform active:scale-95">
+                            ✅ ${_col('Taip, užteks!')}
+                        </button>
+                        <button id="btn-no" onclick="checkPiggyAnswer(false, this)" class="py-3.5 sm:py-4 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white font-black text-base sm:text-xl shadow-md border-b-4 border-rose-700 transition transform active:scale-95">
+                            ❌ ${_col('Ne, trūksta!')}
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function checkPiggyAnswer(ans, btn) {
+            if (state.waiting) return;
+            const piggySum = sumCoins(state.currentTask.piggy);
+            const enough = piggySum >= state.currentTask.price;
+            const feedback = document.getElementById('feedback');
+            const box = document.getElementById('piggy-container');
+
+            if (ans === enough) {
+                state.waiting = true;
+                playSound('correct');
+                if (state.firstTry) {
+                    state.score++;
+                    state.streak++;
+                }
+                btn.classList.add('bounce');
+                feedback.innerHTML = `${_col('Teisingai! Taupyklėje yra')} ${formatMoneyCents(piggySum)}! 🎉`;
+                feedback.className = "h-6 flex items-center justify-center font-black text-sm sm:text-lg text-green-500 opacity-100";
+
+                setTimeout(() => {
+                    if (state.question >= state.maxQuestions) renderEndScreen();
+                    else { state.question++; generateQuestion(); }
+                }, 1300);
+            } else {
+                state.firstTry = false;
+                state.streak = 0;
+                playSound('wrong');
+                btn.disabled = true;
+                btn.classList.add('opacity-40');
+                feedback.innerHTML = `${_col('Suskaičiuok dar kartą: taupyklėje yra')} ${formatMoneyCents(piggySum)}! 🤔`;
+                feedback.className = "h-6 flex items-center justify-center font-black text-xs sm:text-base text-red-500 opacity-100";
+                box.classList.remove('shake');
+                void box.offsetWidth;
+                box.classList.add('shake');
+            }
+        }
+
+        function renderEndScreen() {
+            playSound('win');
+            let stars = 1;
+            if (state.score >= 8) stars = 3;
+            else if (state.score >= 5) stars = 2;
+
+            const starHtml = Array(3).fill(0).map((_, i) => 
+                `<span class="text-5xl sm:text-6xl ${i < stars ? 'text-yellow-400 bounce' : 'text-gray-400 opacity-40'} drop-shadow-md" style="animation-delay: ${i * 0.2}s">⭐</span>`
+            ).join('');
+
+            let message = "Šaunuolis!";
+            if (stars === 3) message = "Puiku! Tikras taupymo meistras!";
+            else if (stars === 2) message = "Labai geras rezultatas!";
+
+            app.innerHTML = `
+                <div class="flex-1 flex flex-col items-center justify-center p-6 sm:p-8 text-center fade-in">
+                    <h2 class="text-main-title text-3xl sm:text-4xl font-black text-gray-800 mb-4">${_col('Žaidimas baigtas!')}</h2>
+                    <div class="flex justify-center gap-2 mb-4">${starHtml}</div>
+                    <p class="text-sub-title text-xl sm:text-2xl font-bold text-gray-700 mb-2">${_col(message)} 🐷</p>
+                    <p class="text-sub-title text-lg sm:text-xl text-gray-600 mb-8">${_col('Taškai:')} <span class="font-black text-green-500">${state.score} / ${state.maxQuestions}</span></p>
+                    <button onclick="renderStartScreen()" class="w-full max-w-xs py-4 rounded-2xl bg-pink-500 hover:bg-pink-600 text-white font-black text-xl sm:text-2xl shadow-lg transition transform active:scale-95 border-b-4 border-pink-700">
+                        ${_col('Žaisti dar kartą')} 🔄
+                    </button>
+                </div>
+            `;
+        }
+
+        renderStartScreen();
+    </script>
+</body>
+</html>

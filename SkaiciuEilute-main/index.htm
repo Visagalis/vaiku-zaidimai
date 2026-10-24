@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Skaiciu Eilute</title>
+    <title>🔢 Skaičių Eilutė</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
     <style>
@@ -14,105 +14,208 @@
             font-family: 'Nunito', sans-serif;
             background-color: #f3e8ff;
             background-image: radial-gradient(#d8b4fe 20%, transparent 20%);
-            background-size: 20px 20px;
+            background-size: 22px 22px;
             touch-action: manipulation;
             user-select: none;
             -webkit-user-select: none;
+            color: #1e293b;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
-        @keyframes bounce-custom {
+
+        .bounce { animation: bounce 0.45s; }
+        @keyframes bounce {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
+            50% { transform: translateY(-12px); }
         }
-        .animate-bounce-custom {
-            animation: bounce-custom 0.5s cubic-bezier(0.8, 0, 1, 1);
-        }
-        @keyframes pulse-custom {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: .7; transform: scale(1.05); }
-        }
-        .animate-pulse-custom {
-            animation: pulse-custom 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
+
+        .shake { animation: shake 0.4s; }
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
         }
-        .animate-shake {
-            animation: shake 0.4s ease-in-out;
+
+        .fade-in { animation: fadeIn 0.25s ease-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.97); }
+            to { opacity: 1; transform: scale(1); }
         }
-        .btn-active:active {
-            transform: scale(0.95);
-            transition: transform 0.1s;
+
+        .frog-hop {
+            animation: frogHop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
-        .seq-box {
+        @keyframes frogHop {
+            0% { transform: translateY(0) scale(1); }
+            45% { transform: translateY(-28px) scale(1.25); }
+            100% { transform: translateY(0) scale(1); }
+        }
+
+        .app-card {
+            background-color: rgba(255, 255, 255, 0.96);
+            border-color: #d8b4fe;
+        }
+
+        .panel-box {
+            background-color: #f8fafc;
+            border: 2px solid #e2e8f0;
+        }
+
+        .opt-btn {
+            background-color: #ede9fe;
+            color: #5b21b6;
+            border-color: #c4b5fd;
+        }
+        .opt-btn:hover {
+            background-color: #ddd6fe;
+        }
+
+        /* Train carriage styling */
+        .carriage {
+            position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
-            min-width: 3.5rem;
-            height: 4rem;
-            border-radius: 0.75rem;
-            background-color: #f3f4f6;
-            color: #1f2937;
-            font-size: 2rem;
-            font-weight: 800;
-            margin: 0 0.25rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            min-width: 3.1rem;
+            height: 3.5rem;
+            border-radius: 0.85rem;
+            font-weight: 900;
+            font-size: 1.45rem;
+            border: 3px solid;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.15);
+            margin-bottom: 0.5rem;
         }
+        .carriage::before, .carriage::after {
+            content: '';
+            position: absolute;
+            bottom: -9px;
+            width: 12px;
+            height: 12px;
+            background-color: #334155;
+            border: 2px solid #94a3b8;
+            border-radius: 9999px;
+        }
+        .carriage::before { left: 6px; }
+        .carriage::after { right: 6px; }
+
         @media (min-width: 640px) {
-            .seq-box {
-                min-width: 5rem;
-                height: 5rem;
-                font-size: 2.5rem;
-                margin: 0 0.5rem;
+            .carriage {
+                min-width: 4.4rem;
+                height: 4.5rem;
+                font-size: 2rem;
+            }
+            .carriage::before, .carriage::after {
+                width: 15px;
+                height: 15px;
+                bottom: -11px;
             }
         }
-        .seq-box.missing {
-            background-color: #fff;
-            border: 4px dashed #a855f7;
-            color: #a855f7;
+
+        /* Lily pad styling */
+        .lily-pad {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 2.35rem;
+            height: 2.35rem;
+            border-radius: 9999px;
+            background: radial-gradient(circle at 35% 35%, #4ade80, #16a34a);
+            border: 3px solid #15803d;
+            color: #052e16;
+            font-weight: 900;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            transition: transform 0.15s ease, background 0.2s ease;
+            cursor: pointer;
         }
-        .seq-box.revealed {
-            background-color: #22c55e;
-            border: 4px solid #22c55e;
-            color: white;
+        .lily-pad:active {
+            transform: scale(0.9);
         }
-        .seq-box.revealed-wrong {
-            background-color: #ef4444;
-            border: 4px solid #ef4444;
-            color: white;
+        @media (min-width: 640px) {
+            .lily-pad {
+                width: 3.1rem;
+                height: 3.1rem;
+                font-size: 1.25rem;
+            }
         }
 
-        /* Tamsioji tema */
+        /* Neighbor houses */
+        .house-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 5.5rem;
+        }
+        .house-roof {
+            width: 0;
+            height: 0;
+            border-left: 3.1rem solid transparent;
+            border-right: 3.1rem solid transparent;
+            border-bottom: 2.1rem solid #ef4444;
+        }
+        .house-body {
+            width: 5.2rem;
+            height: 4.5rem;
+            border-radius: 0 0 0.85rem 0.85rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 1.75rem;
+            border: 3px solid;
+            box-shadow: 0 6px 10px -2px rgba(0,0,0,0.15);
+        }
+        @media (min-width: 640px) {
+            .house-card { width: 7.2rem; }
+            .house-roof {
+                border-left: 4rem solid transparent;
+                border-right: 4rem solid transparent;
+                border-bottom: 2.7rem solid #ef4444;
+            }
+            .house-body {
+                width: 6.8rem;
+                height: 5.6rem;
+                font-size: 2.35rem;
+            }
+        }
+
+        /* Tamsioji Tema (Dark Mode) */
         @media (prefers-color-scheme: dark) {
             body {
                 background-color: #0b1120 !important;
-                background-image: radial-gradient(#1e293b 20%, transparent 20%) !important;
-                color: #f1f5f9 !important;
+                background-image: radial-gradient(#1e293b 25%, transparent 25%) !important;
+                color: #f8fafc !important;
             }
-            .game-panel {
+            .app-card {
                 background-color: #0f172a !important;
                 border-color: #334155 !important;
                 box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6) !important;
                 color: #f8fafc !important;
             }
-            .seq-box {
+            .panel-box {
+                background-color: #1e293b !important;
+                border-color: #334155 !important;
+                color: #f8fafc !important;
+            }
+            .opt-btn {
                 background-color: #1e293b !important;
                 color: #f8fafc !important;
-                border: 1px solid #334155 !important;
-            }
-            .seq-box.missing {
-                background-color: #312e81 !important;
-                border-color: #c084fc !important;
-                color: #c084fc !important;
-            }
-            .ans-btn {
-                background-color: #1e293b !important;
-                color: #c084fc !important;
                 border-color: #334155 !important;
             }
-            .ans-btn:hover {
+            .opt-btn:hover {
                 background-color: #334155 !important;
+            }
+            .text-main-title {
+                color: #f8fafc !important;
+            }
+            .text-sub-title {
+                color: #cbd5e1 !important;
+            }
+            .pond-box {
+                background-color: #0c4a6e !important;
+                border-color: #0369a1 !important;
             }
         }
     </style>
@@ -138,79 +241,102 @@
         }, { passive: false });
     </script>
 </head>
-<body class="min-h-screen flex items-center justify-center p-2 sm:p-4 overflow-y-auto transition-colors duration-200">
-    <div class="game-panel max-w-3xl w-full bg-white/95 backdrop-blur rounded-3xl shadow-2xl p-4 sm:p-8 border-4 border-purple-300 relative text-center">
-        
-        <!-- Start Screen -->
-        <div id="start-screen" class="block">
-            <h1 class="text-5xl sm:text-6xl font-black text-purple-600 mb-4 tracking-tight drop-shadow-md">🔢 Skaičių Eilutė</h1>
-            <p class="text-2xl sm:text-3xl text-gray-700 mb-10 font-bold">Surask trūkstamą skaičių!</p>
-            
-            <div class="flex flex-col sm:flex-row gap-6 justify-center items-center">
-                <button onclick="startGame('easy')" class="btn-active w-64 bg-green-500 hover:bg-green-600 text-white text-3xl font-bold py-6 px-8 rounded-2xl shadow-[0_8px_0_#16a34a] hover:shadow-[0_4px_0_#16a34a] hover:translate-y-1 transition-all">
-                    Lengva
-                </button>
-                <button onclick="startGame('hard')" class="btn-active w-64 bg-orange-500 hover:bg-orange-600 text-white text-3xl font-bold py-6 px-8 rounded-2xl shadow-[0_8px_0_#ea580c] hover:shadow-[0_4px_0_#ea580c] hover:translate-y-1 transition-all">
-                    Sunkiau
-                </button>
-            </div>
-        </div>
+<body class="h-screen max-h-screen overflow-hidden flex items-center justify-center p-2 sm:p-4">
 
-        <!-- Game Screen -->
-        <div id="game-screen" class="hidden">
-            <div class="flex justify-between items-center mb-4 sm:mb-6 border-b-2 border-purple-200 pb-3">
-                <div class="text-lg sm:text-2xl font-bold text-gray-600 bg-gray-100 py-1.5 px-3 sm:py-2 sm:px-4 rounded-xl">
-                    Klausimas: <span id="question-counter" class="text-purple-600">1</span> / 12
-                </div>
-                <div class="text-lg sm:text-2xl font-bold text-gray-600 bg-gray-100 py-1.5 px-3 sm:py-2 sm:px-4 rounded-xl">
-                    Taškai: <span id="score-display" class="text-green-500">0</span>
-                </div>
-            </div>
-
-            <div id="sequence-container" class="flex flex-wrap justify-center mb-3 sm:mb-6 gap-1.5 sm:gap-0">
-                <!-- Sequence items injected here -->
-            </div>
-
-            <div id="feedback-text" class="h-8 sm:h-10 text-xl sm:text-3xl font-bold mb-3 sm:mb-4 opacity-0 transition-opacity duration-300">
-                Puiku!
-            </div>
-
-            <div id="answers-container" class="grid grid-cols-2 gap-3 sm:gap-4 max-w-lg mx-auto">
-                <!-- Answer buttons injected here -->
-            </div>
-        </div>
-
-        <!-- End Screen -->
-        <div id="end-screen" class="hidden">
-            <h2 class="text-5xl font-black text-purple-600 mb-6">Žaidimas baigtas!</h2>
-            
-            <div id="stars-container" class="flex justify-center gap-4 mb-8 text-6xl sm:text-8xl">
-                <!-- Stars injected here -->
-            </div>
-
-            <p class="text-3xl text-gray-700 mb-8 font-bold">
-                Surinkai: <span id="final-score" class="text-purple-600 text-4xl">0</span> / 12
-            </p>
-            
-            <p id="end-message" class="text-2xl text-gray-600 mb-10 font-bold">
-                Šaunuolis!
-            </p>
-
-            <button onclick="showStartScreen()" class="btn-active bg-blue-500 hover:bg-blue-600 text-white text-3xl font-bold py-5 px-10 rounded-2xl shadow-[0_8px_0_#2563eb] hover:shadow-[0_4px_0_#2563eb] hover:translate-y-1 transition-all inline-block">
-                Žaisti dar kartą
-            </button>
-        </div>
-
+    <div id="app" class="app-card w-full max-w-2xl rounded-3xl shadow-xl flex flex-col relative fade-in border-4 overflow-hidden max-h-full">
+        <!-- Content rendered by JS -->
     </div>
 
     <script>
-        // Audio setup
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        let audioCtx;
+        // === SKIEMENŲ SPALVINIMAS ===
+        const _V = 'aeėęiįyouųūąAEĖĘIĮYOUŲŪĄ';
+        const _D = ['ai','au','ei','eu','ie','uo','ui','oi','ia','io','iu'];
+        const _L = /[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/;
+        const _O = new Set(['bl','br','dr','dv','fl','fr','gl','gr','gn','kl','kr','kn','kv','pl','pr','sk','sl','sm','sn','sp','sr','st','sv','šl','šv','šn','tr','tv','vr','žl','žv','str','skr','spr']);
+        const _SC = ['#dc2626','#2563eb','#16a34a','#ea580c','#9333ea','#db2777'];
 
+        function _syl(word) {
+            if (!word || word.length <= 1) return [word || ''];
+            const r = []; let s = '', i = 0, n = word.length;
+            while (i < n) {
+                const c = word[i];
+                if (!_L.test(c)) { s += c; i++; continue; }
+                if (!_V.includes(c)) { s += c; i++; }
+                else {
+                    if (i + 1 < n && _D.includes(word.slice(i, i + 2).toLowerCase())) { s += word.slice(i, i + 2); i += 2; }
+                    else { s += c; i++; }
+                    let j = i;
+                    while (j < n && _L.test(word[j]) && !_V.includes(word[j])) j++;
+                    let cl = word.slice(i, j);
+                    if (j >= n || !_L.test(word[j])) { s += cl; i = j; while (i < n && !_L.test(word[i])) { s += word[i]; i++; } r.push(s); s = ''; }
+                    else if (cl.length === 0) { r.push(s); s = ''; }
+                    else if (cl.length === 1) { r.push(s); s = cl; i = j; }
+                    else {
+                        let u = [];
+                        for (let k = 0; k < cl.length;) {
+                            const p = cl.slice(k, k + 2).toLowerCase();
+                            if (p === 'dz' || p === 'dž' || p === 'ch') { u.push(cl.slice(k, k + 2)); k += 2; }
+                            else { u.push(cl[k]); k++; }
+                        }
+                        let sp = u.length - 1;
+                        if (u.length >= 2) {
+                            const l2 = (u[u.length - 2] + u[u.length - 1]).toLowerCase();
+                            const l3 = u.length >= 3 ? (u[u.length - 3] + l2).toLowerCase() : '';
+                            if (l3 && _O.has(l3)) sp = u.length - 3;
+                            else if (_O.has(l2)) sp = u.length - 2;
+                        }
+                        s += u.slice(0, sp).join(''); r.push(s); s = u.slice(sp).join(''); i = j;
+                    }
+                }
+            }
+            if (s) r.push(s);
+            return r.filter(x => x.length > 0);
+        }
+
+        function _col(text) {
+            if (!text) return '';
+            return text.split(/(\s+)/).map(token => {
+                if (!token.trim() || !/[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/.test(token)) return token;
+                const syls = _syl(token);
+                return syls.map((s, i) => '<span style="color:' + _SC[i % _SC.length] + '">' + s + '</span>').join('');
+            }).join('');
+        }
+        // === /SKIEMENŲ SPALVINIMAS ===
+
+        const state = {
+            mode: 'train', // 'train' | 'frog' | 'neighbors'
+            score: 0,
+            streak: 0,
+            question: 1,
+            maxQuestions: 10,
+            // Mode 1: Train
+            sequence: [],
+            missingIdx: 2,
+            correctVal: 0,
+            step: 1,
+            isIncreasing: true,
+            options: [],
+            // Mode 2: Frog
+            frogStart: 3,
+            frogDelta: 4,
+            frogTarget: 7,
+            frogPos: 3,
+            // Mode 3: Neighbors
+            centerNum: 15,
+            leftVal: null,
+            rightVal: null,
+            activeSide: 'left', // 'left' | 'right'
+            waiting: false,
+            firstTry: true
+        };
+
+        const app = document.getElementById('app');
+
+        // Web Audio API
+        let audioCtx;
         function initAudio() {
             if (!audioCtx) {
-                audioCtx = new AudioContext();
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             }
             if (audioCtx.state === 'suspended') {
                 audioCtx.resume();
@@ -218,276 +344,590 @@
         }
 
         function playSound(type) {
+            initAudio();
             if (!audioCtx) return;
             const osc = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-            
-            osc.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            
-            if (type === 'correct') {
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
+
+            if (type === 'hop') {
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
-                osc.frequency.exponentialRampToValueAtTime(1046.50, audioCtx.currentTime + 0.1); // C6
-                gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.3);
+                osc.frequency.setValueAtTime(320, now);
+                osc.frequency.exponentialRampToValueAtTime(780, now + 0.14);
+                gain.gain.setValueAtTime(0.22, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.16);
+                osc.start(now);
+                osc.stop(now + 0.16);
+            } else if (type === 'correct') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(440, now);
+                osc.frequency.exponentialRampToValueAtTime(880, now + 0.18);
+                gain.gain.setValueAtTime(0.28, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.32);
+                osc.start(now);
+                osc.stop(now + 0.32);
             } else if (type === 'wrong') {
                 osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(300, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.2);
-                gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.3);
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.exponentialRampToValueAtTime(150, now + 0.22);
+                gain.gain.setValueAtTime(0.28, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'win') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(440, now);
+                osc.frequency.setValueAtTime(554.37, now + 0.1);
+                osc.frequency.setValueAtTime(659.25, now + 0.2);
+                osc.frequency.setValueAtTime(880, now + 0.3);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.6);
+                osc.start(now);
+                osc.stop(now + 0.6);
             }
         }
 
-        // Game state
-        let mode = 'easy';
-        let currentQuestion = 0;
-        const totalQuestions = 12;
-        let score = 0;
-        let currentSequence = [];
-        let missingIndex = -1;
-        let correctAnswer = -1;
-        let isAnswering = false;
-
-        const startScreen = document.getElementById('start-screen');
-        const gameScreen = document.getElementById('game-screen');
-        const endScreen = document.getElementById('end-screen');
-        
-        function showScreen(screenId) {
-            startScreen.classList.add('hidden');
-            gameScreen.classList.add('hidden');
-            endScreen.classList.add('hidden');
-            document.getElementById(screenId).classList.remove('hidden');
+        function renderTopBar() {
+            return `
+                <div class="bg-purple-600 text-white px-3 sm:px-5 py-2 sm:py-2.5 flex justify-between items-center font-bold text-sm sm:text-lg shadow-md shrink-0">
+                    <div class="flex items-center gap-2">
+                        <button onclick="renderStartScreen()" class="bg-purple-700 hover:bg-purple-800 px-2 py-0.5 rounded-lg text-sm sm:text-base transition active:scale-95" title="Pradžia">🏠</button>
+                        <span>⭐ ${_col('Taškai:')} <span class="text-yellow-300 font-black">${state.score}</span></span>
+                    </div>
+                    <div class="bg-purple-700 px-2.5 py-0.5 rounded-xl">${_col('Klausimas:')} <span class="text-yellow-300">${state.question} / ${state.maxQuestions}</span></div>
+                    <div>🔥 ${_col('Serija:')} <span class="text-orange-300 font-black">${state.streak}</span></div>
+                </div>
+            `;
         }
 
-        function showStartScreen() {
-            showScreen('start-screen');
+        function renderStartScreen() {
+            app.innerHTML = `
+                <div class="flex-1 flex flex-col items-center justify-center p-5 sm:p-8 text-center fade-in">
+                    <div class="text-5xl sm:text-6xl mb-2 bounce">🔢</div>
+                    <h1 class="text-main-title text-3xl sm:text-5xl font-black text-gray-800 mb-1 tracking-tight">${_col('Skaičių Eilutė')}</h1>
+                    <p class="text-sub-title text-base sm:text-xl text-gray-600 mb-5 sm:mb-7 font-bold">${_col('Atrask sekas, šuolius ir skaičių kaimynus!')}</p>
+                    
+                    <div class="flex flex-col gap-3 w-full max-w-md">
+                        <button onclick="startGame('train')" class="w-full py-3.5 sm:py-4 px-4 rounded-2xl bg-purple-500 hover:bg-purple-600 text-white font-black text-lg sm:text-2xl shadow-lg transition transform active:scale-95 border-b-4 border-purple-700">
+                            🚂 ${_col('Skaičių traukinukas (Sekos)')}
+                        </button>
+                        <button onclick="startGame('frog')" class="w-full py-3.5 sm:py-4 px-4 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-lg sm:text-2xl shadow-lg transition transform active:scale-95 border-b-4 border-emerald-700">
+                            🐸 ${_col('Varlytės šuoliai (Skaičių tiesė)')}
+                        </button>
+                        <button onclick="startGame('neighbors')" class="w-full py-3.5 sm:py-4 px-4 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-black text-lg sm:text-2xl shadow-lg transition transform active:scale-95 border-b-4 border-amber-700">
+                            🏠 ${_col('Skaičiaus kaimynai (Prieš ir Po)')}
+                        </button>
+                    </div>
+                </div>
+            `;
         }
 
-        function startGame(selectedMode) {
+        function startGame(mode) {
             initAudio();
-            mode = selectedMode;
-            currentQuestion = 0;
-            score = 0;
-            isAnswering = false;
-            document.getElementById('score-display').innerText = score;
-            showScreen('game-screen');
-            nextQuestion();
+            state.mode = mode;
+            state.score = 0;
+            state.streak = 0;
+            state.question = 1;
+            generateQuestion();
         }
 
-        function generateSequence() {
-            let step, startNum, isIncreasing = true;
-            
-            if (mode === 'easy') {
-                const steps = [1, 2, 5];
-                step = steps[Math.floor(Math.random() * steps.length)];
-                startNum = Math.floor(Math.random() * 16);
+        function generateQuestion() {
+            state.waiting = false;
+            state.firstTry = true;
+
+            if (state.mode === 'train') {
+                generateTrainQuestion();
+            } else if (state.mode === 'frog') {
+                generateFrogQuestion();
             } else {
-                const types = ['inc3', 'inc4', 'inc10', 'dec1', 'dec2', 'dec3', 'dec5'];
-                const type = types[Math.floor(Math.random() * types.length)];
-                
-                if (type.startsWith('inc')) {
-                    step = parseInt(type.replace('inc', ''));
-                    startNum = Math.floor(Math.random() * 21);
-                } else {
-                    isIncreasing = false;
-                    step = parseInt(type.replace('dec', ''));
-                    const minStart = step * 4;
-                    startNum = minStart + Math.floor(Math.random() * 21);
-                }
+                generateNeighborsQuestion();
+            }
+        }
+
+        // === MODE 1: SKAIČIŲ TRAUKINUKAS ===
+        function generateTrainQuestion() {
+            const configs = [
+                { step: 1, inc: true, maxStart: 15 },
+                { step: 2, inc: true, maxStart: 12 },
+                { step: 5, inc: true, maxStart: 25 },
+                { step: 10, inc: true, maxStart: 50 },
+                { step: 1, inc: false, minStart: 6, maxStart: 20 },
+                { step: 2, inc: false, minStart: 10, maxStart: 20 }
+            ];
+            const cfg = configs[Math.floor(Math.random() * configs.length)];
+            state.step = cfg.step;
+            state.isIncreasing = cfg.inc;
+
+            let startNum;
+            if (cfg.step === 10) {
+                startNum = (Math.floor(Math.random() * 5) + 1) * 10;
+            } else if (cfg.step === 5) {
+                startNum = (Math.floor(Math.random() * 6)) * 5;
+            } else if (cfg.step === 2) {
+                startNum = cfg.inc ? (Math.floor(Math.random() * 7) * 2) : (10 + Math.floor(Math.random() * 6) * 2);
+            } else {
+                startNum = cfg.inc ? Math.floor(Math.random() * 15) + 1 : Math.floor(Math.random() * 14) + 6;
             }
 
             const seq = [];
             for (let i = 0; i < 5; i++) {
-                if (isIncreasing) {
-                    seq.push(startNum + (i * step));
-                } else {
-                    seq.push(startNum - (i * step));
+                seq.push(cfg.inc ? startNum + i * cfg.step : startNum - i * cfg.step);
+            }
+            state.sequence = seq;
+            state.missingIdx = Math.floor(Math.random() * 4) + 1; // index 1..4
+            state.correctVal = seq[state.missingIdx];
+
+            const opts = new Set([state.correctVal]);
+            while (opts.size < 4) {
+                const diff = (Math.floor(Math.random() * 3) + 1) * (Math.random() > 0.4 ? cfg.step : 1);
+                const sign = Math.random() > 0.5 ? 1 : -1;
+                const cand = state.correctVal + diff * sign;
+                if (cand >= 0 && cand !== state.correctVal) {
+                    opts.add(cand);
                 }
             }
-            return { seq, step, isIncreasing };
+            state.options = Array.from(opts).sort(() => Math.random() - 0.5);
+            renderTrainScreen();
         }
 
-        function nextQuestion() {
-            if (currentQuestion >= totalQuestions) {
-                endGame();
-                return;
-            }
-            
-            currentQuestion++;
-            document.getElementById('question-counter').innerText = currentQuestion;
-            isAnswering = false;
-            firstTry = true;
-            
-            const feedbackText = document.getElementById('feedback-text');
-            feedbackText.style.opacity = '0';
-            feedbackText.className = 'h-12 text-2xl sm:text-3xl font-bold mb-6 transition-opacity duration-300';
-            
-            const { seq, step, isIncreasing } = generateSequence();
-            currentSequence = seq;
-            
-            missingIndex = Math.floor(Math.random() * 3) + 1;
-            correctAnswer = currentSequence[missingIndex];
-            
-            renderSequence();
-            generateAnswers(correctAnswer, step, isIncreasing);
+        function renderTrainScreen() {
+            const carriageColors = [
+                'bg-rose-100 border-rose-400 text-rose-900',
+                'bg-amber-100 border-amber-400 text-amber-900',
+                'bg-emerald-100 border-emerald-400 text-emerald-900',
+                'bg-sky-100 border-sky-400 text-sky-900',
+                'bg-purple-100 border-purple-400 text-purple-900'
+            ];
+
+            const trainHtml = state.sequence.map((num, idx) => {
+                if (idx === state.missingIdx) {
+                    return `
+                        <div class="flex items-center">
+                            <span class="text-slate-400 font-black text-xs sm:text-base mx-0.5">═</span>
+                            <div id="missing-carriage" class="carriage bg-yellow-100 border-dashed border-amber-500 text-amber-600 animate-pulse">
+                                ?
+                            </div>
+                        </div>
+                    `;
+                }
+                return `
+                    <div class="flex items-center">
+                        <span class="text-slate-400 font-black text-xs sm:text-base mx-0.5">═</span>
+                        <div class="carriage ${carriageColors[idx % carriageColors.length]}">
+                            ${num}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            const ruleHint = state.isIncreasing
+                ? `📈 ${_col('Skaičiuojame po')} +${state.step} ${_col('į priekį')}`
+                : `📉 ${_col('Skaičiuojame po')} -${state.step} ${_col('atgal')}`;
+
+            const optionsHtml = state.options.map((opt, idx) => `
+                <button id="btn-${idx}" onclick="checkTrainAnswer(${idx}, ${opt})" class="opt-btn py-3 sm:py-4 rounded-2xl font-black text-2xl sm:text-4xl shadow-md border-b-4 transition transform active:scale-95">
+                    ${opt}
+                </button>
+            `).join('');
+
+            app.innerHTML = `
+                ${renderTopBar()}
+                <div class="flex-1 flex flex-col justify-between p-3 sm:p-5 fade-in overflow-hidden">
+                    <div class="text-center">
+                        <h2 class="text-lg sm:text-2xl font-black text-main-title mb-1">
+                            ${_col('Koks skaičius pasislėpė traukinuke?')}
+                        </h2>
+                        <span class="inline-block px-3 py-0.5 rounded-full bg-purple-100 text-purple-900 font-extrabold text-xs sm:text-sm border border-purple-300">
+                            ${ruleHint}
+                        </span>
+                    </div>
+
+                    <div id="train-container" class="panel-box p-3 sm:p-5 rounded-2xl flex items-center justify-center overflow-x-auto">
+                        <div class="text-3xl sm:text-5xl mr-0.5 mb-2 shrink-0">🚂</div>
+                        ${trainHtml}
+                    </div>
+
+                    <div id="feedback" class="h-6 sm:h-8 flex items-center justify-center font-black text-base sm:text-xl opacity-0 transition-opacity"></div>
+
+                    <div class="grid grid-cols-2 gap-2.5 sm:gap-3.5">
+                        ${optionsHtml}
+                    </div>
+                </div>
+            `;
         }
 
-        function renderSequence() {
-            const container = document.getElementById('sequence-container');
-            container.innerHTML = '';
-            container.classList.remove('animate-shake');
-            
-            currentSequence.forEach((num, index) => {
-                const box = document.createElement('div');
-                if (index === missingIndex) {
-                    box.className = 'seq-box missing animate-pulse-custom';
-                    box.innerText = '?';
-                    box.id = 'missing-box';
-                } else {
-                    box.className = 'seq-box';
-                    box.innerText = num;
-                }
-                container.appendChild(box);
-            });
-        }
+        function checkTrainAnswer(idx, val) {
+            if (state.waiting) return;
+            const btn = document.getElementById(`btn-${idx}`);
+            const feedback = document.getElementById('feedback');
+            const missingCarriage = document.getElementById('missing-carriage');
+            const trainContainer = document.getElementById('train-container');
 
-        function generateAnswers(correct, step, isIncreasing) {
-            const answers = new Set();
-            answers.add(correct);
-            
-            let attempts = 0;
-            while(answers.size < 4 && attempts < 50) {
-                attempts++;
-                let offset = Math.floor(Math.random() * 3) + 1;
-                if (Math.random() > 0.5) offset *= -1;
-                
-                let wrongVal = correct + (offset * step);
-                
-                if (Math.random() > 0.7) {
-                    wrongVal = correct + (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random() * 3) + 1);
-                }
-
-                if (wrongVal >= 0 && wrongVal !== correct && !currentSequence.includes(wrongVal)) {
-                    answers.add(wrongVal);
-                }
-            }
-            
-            while(answers.size < 4) {
-                let w = correct + Math.floor(Math.random() * 10) + 1;
-                if (!answers.has(w) && !currentSequence.includes(w)) answers.add(w);
-            }
-
-            const answersArray = Array.from(answers);
-            for (let i = answersArray.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [answersArray[i], answersArray[j]] = [answersArray[j], answersArray[i]];
-            }
-
-            const container = document.getElementById('answers-container');
-            container.innerHTML = '';
-            
-            answersArray.forEach(ans => {
-                const btn = document.createElement('button');
-                btn.className = 'btn-active ans-btn bg-blue-100 hover:bg-blue-200 text-blue-800 border-4 border-blue-300 font-bold text-4xl sm:text-5xl py-4 sm:py-6 rounded-2xl shadow-sm transition-all';
-                btn.innerText = ans;
-                btn.onclick = () => checkAnswer(ans, btn);
-                container.appendChild(btn);
-            });
-        }
-
-        let firstTry = true;
-
-        function checkAnswer(selected, btnElement) {
-            if (isAnswering) return;
-            
-            const missingBox = document.getElementById('missing-box');
-            const feedbackText = document.getElementById('feedback-text');
-            feedbackText.style.opacity = '1';
-
-            if (selected === correctAnswer) {
-                isAnswering = true;
-                if (firstTry) {
-                    score++;
-                    document.getElementById('score-display').innerText = score;
-                }
+            if (val === state.correctVal) {
+                state.waiting = true;
                 playSound('correct');
-                
-                btnElement.classList.remove('bg-blue-100', 'hover:bg-blue-200', 'border-blue-300', 'text-blue-800');
-                btnElement.classList.add('bg-green-500', 'border-green-600', 'text-white', 'shadow-[0_4px_0_#16a34a]');
-                
-                missingBox.classList.remove('animate-pulse-custom');
-                missingBox.innerText = correctAnswer;
-                missingBox.classList.remove('missing');
-                missingBox.classList.add('revealed');
-                missingBox.classList.add('animate-bounce-custom');
-                
-                const praises = ['Puiku! 🎉', 'Šaunuolis! 🌟', 'Teisingai! 👏', 'Nuostabu! 🚀', 'Taip! ✨'];
-                feedbackText.innerText = praises[Math.floor(Math.random() * praises.length)];
-                feedbackText.className = 'h-8 sm:h-10 text-xl sm:text-3xl font-bold mb-3 sm:mb-4 text-green-500';
-                
+                if (state.firstTry) {
+                    state.score++;
+                    state.streak++;
+                }
+                btn.className = "py-3 sm:py-4 bg-green-500 text-white rounded-2xl font-black text-2xl sm:text-4xl shadow-md border-b-4 border-green-700 bounce";
+                if (missingCarriage) {
+                    missingCarriage.textContent = val;
+                    missingCarriage.className = "carriage bg-green-500 border-green-700 text-white bounce";
+                }
+                feedback.innerHTML = `${_col('Teisingai! Traukinukas važiuoja toliau!')} 🚂🎉`;
+                feedback.className = "h-6 sm:h-8 flex items-center justify-center font-black text-base sm:text-xl text-green-500 opacity-100";
+
                 setTimeout(() => {
-                    nextQuestion();
+                    if (state.question >= state.maxQuestions) {
+                        renderEndScreen();
+                    } else {
+                        state.question++;
+                        generateQuestion();
+                    }
+                }, 1150);
+            } else {
+                state.firstTry = false;
+                state.streak = 0;
+                playSound('wrong');
+                btn.disabled = true;
+                btn.className = "py-3 sm:py-4 bg-red-100 text-red-400 border-red-200 border-2 rounded-2xl font-bold text-2xl sm:text-4xl line-through opacity-60 cursor-not-allowed shake";
+                feedback.innerHTML = `${_col('Bandyk dar kartą!')} 🤔`;
+                feedback.className = "h-6 sm:h-8 flex items-center justify-center font-black text-base sm:text-xl text-red-500 opacity-100";
+                trainContainer.classList.remove('shake');
+                void trainContainer.offsetWidth;
+                trainContainer.classList.add('shake');
+            }
+        }
+
+        // === MODE 2: VARLYTĖS ŠUOLIAI ===
+        function generateFrogQuestion() {
+            const goForward = Math.random() > 0.4;
+            if (goForward) {
+                state.frogStart = Math.floor(Math.random() * 7); // 0..6
+                const maxJump = Math.min(5, 10 - state.frogStart);
+                state.frogDelta = Math.floor(Math.random() * maxJump) + 1;
+                state.frogTarget = state.frogStart + state.frogDelta;
+            } else {
+                state.frogStart = Math.floor(Math.random() * 7) + 4; // 4..10
+                const maxBack = Math.min(5, state.frogStart);
+                state.frogDelta = -(Math.floor(Math.random() * maxBack) + 1);
+                state.frogTarget = state.frogStart + state.frogDelta;
+            }
+            state.frogPos = state.frogStart;
+            renderFrogScreen();
+        }
+
+        function renderFrogScreen() {
+            const dirText = state.frogDelta > 0
+                ? `+${state.frogDelta} ${_col('į priekį')} ➡️`
+                : `${state.frogDelta} ${_col('atgal')} ⬅️`;
+
+            let lilyPadsHtml = '';
+            for (let i = 0; i <= 10; i++) {
+                const isFrogHere = (i === state.frogPos);
+                const isStart = (i === state.frogStart);
+                lilyPadsHtml += `
+                    <button id="lily-${i}" onclick="onLilyPadClick(${i})" class="lily-pad ${isStart ? 'ring-4 ring-yellow-400' : ''}">
+                        <span id="frog-icon-${i}" class="text-lg sm:text-2xl leading-none ${isFrogHere ? 'block frog-hop' : 'hidden'}">🐸</span>
+                        <span class="${isFrogHere ? 'text-xs sm:text-sm' : ''}">${i}</span>
+                    </button>
+                `;
+            }
+
+            app.innerHTML = `
+                ${renderTopBar()}
+                <div class="flex-1 flex flex-col justify-between p-3 sm:p-5 fade-in overflow-hidden">
+                    <div class="panel-box p-3 sm:p-4 rounded-2xl text-center shadow-sm">
+                        <p class="text-sm sm:text-lg font-extrabold text-main-title leading-snug">
+                            🐸 ${_col('Varlytė tupi ant')} <span class="px-2 py-0.5 rounded-lg bg-emerald-100 text-emerald-900 font-black">${state.frogStart}</span>
+                            ${_col('ir pašoka')} <span class="px-2 py-0.5 rounded-lg bg-amber-100 text-amber-900 font-black">${dirText}</span>
+                        </p>
+                        <p class="text-xs sm:text-base font-bold text-sub-title mt-1">
+                            ${_col('Ant kurio lapelio ji nutūps? Paspausk tą lapelį!')}
+                        </p>
+                    </div>
+
+                    <!-- Pond with Number Line of Lily Pads -->
+                    <div id="pond-container" class="pond-box bg-sky-100 border-4 border-sky-300 rounded-3xl p-3 sm:p-5 flex flex-col items-center justify-center shadow-inner">
+                        <div class="flex flex-wrap sm:flex-nowrap items-center justify-center gap-1 sm:gap-1.5 w-full">
+                            ${lilyPadsHtml}
+                        </div>
+                    </div>
+
+                    <div id="feedback" class="h-7 sm:h-8 flex items-center justify-center font-black text-base sm:text-xl opacity-0 transition-opacity"></div>
+                </div>
+            `;
+        }
+
+        function onLilyPadClick(padNum) {
+            if (state.waiting) return;
+            const feedback = document.getElementById('feedback');
+            const pond = document.getElementById('pond-container');
+            const clickedPad = document.getElementById(`lily-${padNum}`);
+
+            if (padNum === state.frogTarget) {
+                state.waiting = true;
+                state.frogPos = padNum;
+                playSound('hop');
+                setTimeout(() => playSound('correct'), 160);
+
+                if (state.firstTry) {
+                    state.score++;
+                    state.streak++;
+                }
+
+                // Move frog to target pad with hop animation
+                for (let i = 0; i <= 10; i++) {
+                    const icon = document.getElementById(`frog-icon-${i}`);
+                    if (icon) {
+                        if (i === padNum) {
+                            icon.className = "text-lg sm:text-2xl leading-none block frog-hop";
+                        } else {
+                            icon.className = "hidden";
+                        }
+                    }
+                }
+                if (clickedPad) {
+                    clickedPad.classList.add('ring-4', 'ring-green-400', 'bounce');
+                }
+
+                feedback.innerHTML = `${_col('Kva kva! Puikus šuolis ant')} ${padNum}! 🐸🎉`;
+                feedback.className = "h-7 sm:h-8 flex items-center justify-center font-black text-base sm:text-xl text-green-500 opacity-100";
+
+                setTimeout(() => {
+                    if (state.question >= state.maxQuestions) {
+                        renderEndScreen();
+                    } else {
+                        state.question++;
+                        generateQuestion();
+                    }
                 }, 1200);
             } else {
-                firstTry = false;
+                state.firstTry = false;
+                state.streak = 0;
                 playSound('wrong');
-                
-                btnElement.disabled = true;
-                btnElement.classList.remove('bg-blue-100', 'hover:bg-blue-200', 'border-blue-300', 'text-blue-800', 'btn-active');
-                btnElement.classList.add('bg-red-100', 'border-red-300', 'text-red-400', 'line-through', 'opacity-50', 'cursor-not-allowed');
-                
-                const seqContainer = document.getElementById('sequence-container');
-                seqContainer.classList.remove('animate-shake');
-                void seqContainer.offsetWidth;
-                seqContainer.classList.add('animate-shake');
-                
-                feedbackText.innerText = 'Bandyk dar kartą! 🤔';
-                feedbackText.className = 'h-8 sm:h-10 text-xl sm:text-2xl font-bold mb-3 sm:mb-4 text-red-500 whitespace-nowrap';
+                if (clickedPad) {
+                    clickedPad.classList.add('opacity-50', 'shake');
+                }
+                const hint = state.frogDelta > 0
+                    ? `Skaičiuok nuo ${state.frogStart} į dešinę po vieną lapelį!`
+                    : `Skaičiuok nuo ${state.frogStart} į kairę atgal!`;
+                feedback.innerHTML = `${_col(hint)} 🤔`;
+                feedback.className = "h-7 sm:h-8 flex items-center justify-center font-black text-xs sm:text-base text-red-500 opacity-100";
+                pond.classList.remove('shake');
+                void pond.offsetWidth;
+                pond.classList.add('shake');
             }
         }
 
-        function endGame() {
-            showScreen('end-screen');
-            document.getElementById('final-score').innerText = score;
-            
-            const starsContainer = document.getElementById('stars-container');
-            starsContainer.innerHTML = '';
-            
-            let starsNum = 1;
-            if (score >= 10) starsNum = 3;
-            else if (score >= 7) starsNum = 2;
-            
-            for (let i = 0; i < 3; i++) {
-                const star = document.createElement('span');
-                if (i < starsNum) {
-                    star.innerText = '⭐';
-                    star.className = 'animate-bounce-custom';
-                    star.style.animationDelay = `${i * 0.2}s`;
-                } else {
-                    star.innerText = '☆';
-                    star.className = 'text-gray-300';
+        // === MODE 3: SKAIČIAUS KAIMYNAI (PRIEŠ IR PO) ===
+        function generateNeighborsQuestion() {
+            state.centerNum = Math.floor(Math.random() * 19) + 1; // 1..19 so neighbors are 0..20
+            state.leftVal = null;
+            state.rightVal = null;
+            state.activeSide = 'left';
+
+            const leftAns = state.centerNum - 1;
+            const rightAns = state.centerNum + 1;
+            const opts = new Set([leftAns, rightAns]);
+            while (opts.size < 6) {
+                const cand = Math.max(0, state.centerNum + Math.floor(Math.random() * 9) - 4);
+                if (cand !== state.centerNum) {
+                    opts.add(cand);
                 }
-                starsContainer.appendChild(star);
             }
-            
-            const msg = document.getElementById('end-message');
-            if (starsNum === 3) {
-                msg.innerText = 'Tobula! Tu tikras skaičių meistras!';
-                playSound('correct');
-            } else if (starsNum === 2) {
-                msg.innerText = 'Labai gerai! Pasitreniruok dar truputį!';
-                playSound('correct');
+            state.options = Array.from(opts).sort(() => Math.random() - 0.5);
+            renderNeighborsScreen();
+        }
+
+        function selectNeighborHouse(side) {
+            if (state.waiting) return;
+            state.activeSide = side;
+            playSound('hop');
+            updateNeighborsUI();
+        }
+
+        function renderNeighborsScreen() {
+            const tilesHtml = state.options.map((num, idx) => `
+                <button id="tile-${idx}" onclick="onNeighborTileClick(${num}, ${idx})" class="opt-btn py-3 sm:py-3.5 rounded-2xl font-black text-2xl sm:text-3xl shadow-md border-b-4 transition transform active:scale-95">
+                    ${num}
+                </button>
+            `).join('');
+
+            app.innerHTML = `
+                ${renderTopBar()}
+                <div class="flex-1 flex flex-col justify-between p-3 sm:p-5 fade-in overflow-hidden">
+                    <div class="text-center">
+                        <h2 class="text-base sm:text-2xl font-black text-main-title">
+                            ${_col('Surask skaičiaus kaimynus! (Prieš ir Po)')}
+                        </h2>
+                        <p class="text-xs sm:text-sm font-bold text-sub-title">
+                            ${_col('Paspausk abu kaimyninius skaičius apačioje:')}
+                        </p>
+                    </div>
+
+                    <!-- 3 Little Houses -->
+                    <div id="houses-container" class="flex items-end justify-center gap-3 sm:gap-6 my-1">
+                        <!-- Left Neighbor House -->
+                        <div onclick="selectNeighborHouse('left')" class="house-card cursor-pointer">
+                            <span class="text-xs sm:text-sm font-extrabold text-sub-title mb-0.5">⬅️ ${_col('Prieš')}</span>
+                            <div class="house-roof"></div>
+                            <div id="house-left" class="house-body">?</div>
+                        </div>
+
+                        <!-- Center Number House -->
+                        <div class="house-card">
+                            <span class="text-xs sm:text-sm font-extrabold text-purple-600 dark:text-purple-400 mb-0.5">🏡 ${_col('Skaičius')}</span>
+                            <div class="house-roof" style="border-bottom-color: #7c3aed;"></div>
+                            <div class="house-body bg-purple-600 border-purple-800 text-white">
+                                ${state.centerNum}
+                            </div>
+                        </div>
+
+                        <!-- Right Neighbor House -->
+                        <div onclick="selectNeighborHouse('right')" class="house-card cursor-pointer">
+                            <span class="text-xs sm:text-sm font-extrabold text-sub-title mb-0.5">${_col('Po')} ➡️</span>
+                            <div class="house-roof"></div>
+                            <div id="house-right" class="house-body">?</div>
+                        </div>
+                    </div>
+
+                    <div id="feedback" class="h-6 sm:h-7 flex items-center justify-center font-black text-sm sm:text-lg opacity-0 transition-opacity"></div>
+
+                    <!-- 6 Number Tiles -->
+                    <div class="grid grid-cols-3 gap-2 sm:gap-3">
+                        ${tilesHtml}
+                    </div>
+                </div>
+            `;
+            updateNeighborsUI();
+        }
+
+        function updateNeighborsUI() {
+            const leftEl = document.getElementById('house-left');
+            const rightEl = document.getElementById('house-right');
+            if (!leftEl || !rightEl) return;
+
+            if (state.leftVal !== null) {
+                leftEl.textContent = state.leftVal;
+                leftEl.className = "house-body bg-green-500 border-green-700 text-white bounce";
             } else {
-                msg.innerText = 'Nenusimink, bandyk dar kartą!';
+                leftEl.textContent = '?';
+                leftEl.className = `house-body ${state.activeSide === 'left' ? 'bg-amber-100 border-amber-500 text-amber-800 ring-4 ring-amber-300' : 'bg-slate-100 border-slate-300 text-slate-500'}`;
+            }
+
+            if (state.rightVal !== null) {
+                rightEl.textContent = state.rightVal;
+                rightEl.className = "house-body bg-green-500 border-green-700 text-white bounce";
+            } else {
+                rightEl.textContent = '?';
+                rightEl.className = `house-body ${state.activeSide === 'right' ? 'bg-amber-100 border-amber-500 text-amber-800 ring-4 ring-amber-300' : 'bg-slate-100 border-slate-300 text-slate-500'}`;
             }
         }
-        
+
+        function onNeighborTileClick(num, idx) {
+            if (state.waiting) return;
+            const leftTarget = state.centerNum - 1;
+            const rightTarget = state.centerNum + 1;
+            const tileBtn = document.getElementById(`tile-${idx}`);
+            const feedback = document.getElementById('feedback');
+            const housesContainer = document.getElementById('houses-container');
+
+            // Allow smart placement into matching neighbor house if empty
+            if (num === leftTarget && state.leftVal === null) {
+                state.leftVal = num;
+                if (state.rightVal === null) state.activeSide = 'right';
+                if (tileBtn) {
+                    tileBtn.disabled = true;
+                    tileBtn.className = "py-3 sm:py-3.5 bg-green-500 text-white rounded-2xl font-black text-2xl sm:text-3xl shadow-md border-b-4 border-green-700 opacity-80";
+                }
+                playSound('hop');
+                updateNeighborsUI();
+            } else if (num === rightTarget && state.rightVal === null) {
+                state.rightVal = num;
+                if (state.leftVal === null) state.activeSide = 'left';
+                if (tileBtn) {
+                    tileBtn.disabled = true;
+                    tileBtn.className = "py-3 sm:py-3.5 bg-green-500 text-white rounded-2xl font-black text-2xl sm:text-3xl shadow-md border-b-4 border-green-700 opacity-80";
+                }
+                playSound('hop');
+                updateNeighborsUI();
+            } else {
+                state.firstTry = false;
+                state.streak = 0;
+                playSound('wrong');
+                if (tileBtn) {
+                    tileBtn.disabled = true;
+                    tileBtn.className = "py-3 sm:py-3.5 bg-red-100 text-red-400 border-red-200 border-2 rounded-2xl font-bold text-2xl sm:text-3xl line-through opacity-50 cursor-not-allowed shake";
+                }
+                feedback.innerHTML = `${_col('Pagalvok: kas eina prieš ir po')} ${state.centerNum}? 🤔`;
+                feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-xs sm:text-base text-red-500 opacity-100";
+                housesContainer.classList.remove('shake');
+                void housesContainer.offsetWidth;
+                housesContainer.classList.add('shake');
+                return;
+            }
+
+            // Check if both neighbors are now filled
+            if (state.leftVal === leftTarget && state.rightVal === rightTarget) {
+                state.waiting = true;
+                playSound('correct');
+                if (state.firstTry) {
+                    state.score++;
+                    state.streak++;
+                }
+                feedback.innerHTML = `${_col('Puiku! Abu kaimynai surasti!')} 🏠🎉`;
+                feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-base sm:text-xl text-green-500 opacity-100";
+
+                setTimeout(() => {
+                    if (state.question >= state.maxQuestions) {
+                        renderEndScreen();
+                    } else {
+                        state.question++;
+                        generateQuestion();
+                    }
+                }, 1150);
+            }
+        }
+
+        function renderEndScreen() {
+            playSound('win');
+
+            let stars = 1;
+            if (state.score >= 8) stars = 3;
+            else if (state.score >= 5) stars = 2;
+
+            const starHtml = Array(3).fill(0).map((_, i) =>
+                `<span class="text-5xl sm:text-6xl ${i < stars ? 'text-yellow-400 bounce' : 'text-gray-400 opacity-40'} drop-shadow-md" style="animation-delay: ${i * 0.2}s">⭐</span>`
+            ).join('');
+
+            let message = "Neblogai! Pasitreniruok dar!";
+            if (stars === 3) message = "Tobula! Tu tikras skaičių meistras!";
+            else if (stars === 2) message = "Labai geras rezultatas!";
+
+            app.innerHTML = `
+                <div class="flex-1 flex flex-col items-center justify-center p-6 sm:p-8 text-center fade-in">
+                    <h2 class="text-main-title text-3xl sm:text-4xl font-black text-gray-800 mb-4">${_col('Žaidimas baigtas!')}</h2>
+                    
+                    <div class="flex justify-center gap-2 mb-4">
+                        ${starHtml}
+                    </div>
+                    
+                    <p class="text-sub-title text-xl sm:text-2xl font-bold text-gray-700 mb-2">${_col(message)} 🏆</p>
+                    <p class="text-sub-title text-lg sm:text-xl text-gray-600 mb-8">${_col('Surinkai:')} <span class="font-black text-green-500">${state.score} / ${state.maxQuestions}</span></p>
+                    
+                    <button onclick="renderStartScreen()" class="w-full max-w-xs py-4 rounded-2xl bg-blue-500 hover:bg-blue-600 text-white font-black text-xl sm:text-2xl shadow-lg transition transform active:scale-95 border-b-4 border-blue-700">
+                        ${_col('Žaisti dar kartą')} 🔄
+                    </button>
+                </div>
+            `;
+        }
+
+        // Initialize
+        renderStartScreen();
     </script>
 </body>
 </html>

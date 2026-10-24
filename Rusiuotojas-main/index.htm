@@ -37,7 +37,7 @@
 
         @keyframes bounce-scale {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+            50% { transform: scale(1.12); }
         }
         .bounce-anim {
             animation: bounce-scale 0.4s ease-in-out;
@@ -70,9 +70,16 @@
             .text-slate-600 {
                 color: #94a3b8 !important;
             }
-            .bg-emerald-100\/60 {
-                background-color: rgba(30, 41, 59, 0.7) !important;
+            .meadow-scene {
+                background: linear-gradient(to bottom, #0f172a, #064e3b, #14532d) !important;
+                border-color: #047857 !important;
+            }
+            .item-card-box, .picked-banner {
+                background-color: #1e293b !important;
                 border-color: #334155 !important;
+            }
+            .bin-label-pill {
+                background-color: rgba(15, 23, 42, 0.92) !important;
             }
         }
     </style>
@@ -125,6 +132,10 @@
             gain.connect(ctx.destination);
             osc.start(ctx.currentTime + startTime);
             osc.stop(ctx.currentTime + startTime + duration);
+        }
+
+        function playPickSound() {
+            playTone(520, 'sine', 0.08, 0);
         }
 
         function playCorrectSound() {
@@ -212,45 +223,63 @@
             { name: "Stiklinė taurė", emoji: "🍷", category: "glass" },
             // Bio items
             { name: "Obuolio graužtukas", emoji: "🍏", category: "bio" },
-            { name: "Banano žievė", emoji: "🍌", category: "bio" }
+            { name: "Banano žievė", emoji: "🍌", category: "bio" },
+            { name: "Kiaušinio lukštas", emoji: "🥚", category: "bio" },
+            { name: "Arbūzo žievė", emoji: "🍉", category: "bio" },
+            { name: "Kriaušės graužtukas", emoji: "🍐", category: "bio" }
         ];
 
+        const NATURE_REWARDS = ["🌸", "🐰", "🦋", "🐿️", "🌻", "🦔", "🌷", "🐞", "🐦"];
+
         const BINS = {
-            paper: { name: "Popierius", color: "bg-blue-500", border: "border-blue-600", shadow: "shadow-[0_6px_0_#1d4ed8]", icon: "🔵" },
-            plastic: { name: "Plastikas ir Metalas", color: "bg-yellow-400", border: "border-yellow-500", shadow: "shadow-[0_6px_0_#ca8a04]", icon: "🟡", textColor: "text-yellow-950" },
-            glass: { name: "Stiklas", color: "bg-green-600", border: "border-green-700", shadow: "shadow-[0_6px_0_#15803d]", icon: "🟢" },
-            bio: { name: "Biologinės atliekos", color: "bg-amber-700", border: "border-amber-800", shadow: "shadow-[0_6px_0_#78350f]", icon: "🟤" }
+            paper: { name: "Popierius", color: "bg-blue-500", border: "border-blue-600", shadow: "shadow-[0_5px_0_#1d4ed8]", icon: "🔵" },
+            plastic: { name: "Plastikas ir Metalas", color: "bg-yellow-400", border: "border-yellow-500", shadow: "shadow-[0_5px_0_#ca8a04]", icon: "🟡" },
+            glass: { name: "Stiklas", color: "bg-green-600", border: "border-green-700", shadow: "shadow-[0_5px_0_#15803d]", icon: "🟢" },
+            bio: { name: "Biologinės atliekos", color: "bg-amber-700", border: "border-amber-800", shadow: "shadow-[0_5px_0_#78350f]", icon: "🟤" }
         };
 
         let state = {
             mode: '3bins',
             questions: [],
             currentIndex: 0,
+            totalPossible: 10,
             score: 0,
             streak: 0,
             firstTry: true,
-            waiting: false
+            waiting: false,
+            // Mode 'meadow' state
+            meadowRounds: 3,
+            meadowSpots: [],
+            selectedSpotIdx: 0
         };
 
         const appEl = document.getElementById('app');
 
         function shuffle(arr) {
-            return [...arr].sort(() => Math.random() - 0.5);
+            const copy = [...arr];
+            for (let i = copy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [copy[i], copy[j]] = [copy[j], copy[i]];
+            }
+            return copy;
         }
 
         function renderStartScreen() {
             appEl.innerHTML = `
-                <div class="p-6 sm:p-8 flex flex-col items-center justify-center text-center">
-                    <div class="text-6xl sm:text-7xl mb-2 animate-bounce">♻️</div>
-                    <h1 class="text-3xl sm:text-5xl font-black text-emerald-800 mb-2">Šiukšlių Rūšiuotojas</h1>
-                    <p class="text-lg sm:text-xl font-bold text-slate-600 mb-6 sm:mb-8">Mokykis saugoti gamtą ir rūšiuoti atliekas!</p>
+                <div class="p-5 sm:p-8 flex flex-col items-center justify-center text-center">
+                    <div class="text-5xl sm:text-7xl mb-2 animate-bounce">♻️</div>
+                    <h1 class="text-2xl sm:text-4xl font-black text-emerald-800 mb-1 sm:mb-2">${_col('Šiukšlių Rūšiuotojas')}</h1>
+                    <p class="text-base sm:text-lg font-bold text-slate-600 mb-5 sm:mb-6">${_col('Mokykis saugoti gamtą ir rūšiuoti atliekas!')}</p>
                     
-                    <div class="flex flex-col gap-3.5 sm:gap-4 w-full max-w-sm">
-                        <button onclick="startGame('3bins')" class="btn-3d py-3.5 sm:py-4 px-6 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl text-xl sm:text-2xl font-black shadow-[0_6px_0_#059669] active:shadow-[0_0px_0_#059669] transition-all">
-                            🟡 Popierius, Plastikas, Stiklas 🟢
+                    <div class="flex flex-col gap-3 w-full max-w-md">
+                        <button onclick="startGame('3bins')" class="btn-3d py-3 sm:py-3.5 px-5 bg-emerald-100 hover:bg-emerald-200 border-2 border-emerald-400 rounded-2xl text-lg sm:text-xl font-black shadow-[0_5px_0_#059669] active:shadow-[0_0px_0_#059669] transition-all">
+                            ♻️ ${_col('Greitas rūšiavimas (3 konteineriai)')}
                         </button>
-                        <button onclick="startGame('4bins')" class="btn-3d py-3.5 sm:py-4 px-6 bg-teal-600 hover:bg-teal-700 text-white rounded-2xl text-xl sm:text-2xl font-black shadow-[0_6px_0_#0f766e] active:shadow-[0_0px_0_#0f766e] transition-all">
-                            🍎 Su Maisto / Bio atliekomis
+                        <button onclick="startGame('4bins')" class="btn-3d py-3 sm:py-3.5 px-5 bg-teal-100 hover:bg-teal-200 border-2 border-teal-400 rounded-2xl text-lg sm:text-xl font-black shadow-[0_5px_0_#0f766e] active:shadow-[0_0px_0_#0f766e] transition-all">
+                            🍎 ${_col('Su Biologinėmis atliekomis (4 konteineriai)')}
+                        </button>
+                        <button onclick="startGame('meadow')" class="btn-3d py-3 sm:py-3.5 px-5 bg-lime-100 hover:bg-lime-200 border-2 border-lime-500 rounded-2xl text-lg sm:text-xl font-black shadow-[0_5px_0_#65a30d] active:shadow-[0_0px_0_#65a30d] transition-all">
+                            🌳 ${_col('Išvalyk miško pievelę!')} 🐰
                         </button>
                     </div>
                 </div>
@@ -263,13 +292,196 @@
             state.score = 0;
             state.streak = 0;
             state.currentIndex = 0;
-            
-            const pool = mode === '3bins' 
-                ? ITEMS_DATA.filter(it => it.category !== 'bio')
-                : ITEMS_DATA;
 
-            state.questions = shuffle(pool).slice(0, 10);
-            renderQuestion();
+            if (mode === 'meadow') {
+                const shuffledItems = shuffle(ITEMS_DATA);
+                state.questions = [
+                    shuffledItems.slice(0, 5),
+                    shuffledItems.slice(5, 10),
+                    shuffledItems.slice(10, 15)
+                ];
+                state.totalPossible = 15;
+                prepareMeadowRound();
+            } else {
+                const pool = mode === '3bins' 
+                    ? ITEMS_DATA.filter(it => it.category !== 'bio')
+                    : ITEMS_DATA;
+
+                state.questions = shuffle(pool).slice(0, 10);
+                state.totalPossible = 10;
+                renderQuestion();
+            }
+        }
+
+        function prepareMeadowRound() {
+            if (state.currentIndex >= state.questions.length) {
+                renderEndScreen();
+                return;
+            }
+            const roundItems = state.questions[state.currentIndex];
+            const rewards = shuffle(NATURE_REWARDS);
+            state.meadowSpots = roundItems.map((item, idx) => ({
+                item,
+                sorted: false,
+                firstTry: true,
+                reward: rewards[idx % rewards.length]
+            }));
+            state.selectedSpotIdx = 0;
+            state.waiting = false;
+            renderMeadow();
+        }
+
+        function renderMeadow() {
+            const activeSpot = state.meadowSpots[state.selectedSpotIdx];
+            const allSorted = state.meadowSpots.every(s => s.sorted);
+
+            const spotsHtml = state.meadowSpots.map((spot, idx) => {
+                if (spot.sorted) {
+                    return `
+                        <div class="flex flex-col items-center justify-center p-2 rounded-2xl bg-white/60 border-2 border-green-300 shadow-sm bounce-anim min-h-[70px] sm:min-h-[82px]">
+                            <div class="text-3xl sm:text-5xl">${spot.reward}</div>
+                            <span class="text-[10px] sm:text-xs font-extrabold text-green-800">${_col('Švaru!')}</span>
+                        </div>
+                    `;
+                }
+                const isSelected = idx === state.selectedSpotIdx;
+                const selClass = isSelected
+                    ? "bg-amber-50 border-amber-500 ring-4 ring-amber-400 scale-105 shadow-md"
+                    : "bg-white/90 hover:bg-white border-emerald-300 opacity-90";
+                return `
+                    <button onclick="selectMeadowSpot(${idx})"
+                        class="btn-3d flex flex-col items-center justify-center p-1.5 sm:p-2 rounded-2xl border-2 transition-all min-h-[70px] sm:min-h-[82px] ${selClass}">
+                        <div class="text-3xl sm:text-4xl">${spot.item.emoji}</div>
+                        <span class="text-[10px] sm:text-xs font-black text-center leading-tight line-clamp-1 mt-0.5">${_col(spot.item.name)}</span>
+                    </button>
+                `;
+            }).join('');
+
+            const activeBinKeys = ['paper', 'plastic', 'glass', 'bio'];
+            const binsHtml = activeBinKeys.map(key => {
+                const bin = BINS[key];
+                return `
+                    <button id="bin-${key}" onclick="handleMeadowBin('${key}')" 
+                        class="btn-3d flex flex-col items-center justify-between p-2 sm:p-2.5 rounded-2xl ${bin.color} border-2 ${bin.border} ${bin.shadow} active:shadow-[0_0px_0] transition-all h-20 sm:h-28">
+                        <div class="text-2xl sm:text-3xl">${bin.icon}</div>
+                        <div class="bin-label-pill bg-white/95 px-1.5 py-0.5 rounded-lg text-[11px] sm:text-xs font-black text-center leading-tight shadow-sm w-full">${_col(bin.name)}</div>
+                    </button>
+                `;
+            }).join('');
+
+            const pickedInfoHtml = (!allSorted && activeSpot && !activeSpot.sorted)
+                ? `<div class="picked-banner w-full py-1.5 px-3 bg-amber-50 border-2 border-amber-300 rounded-2xl flex items-center justify-center gap-2 shadow-sm">
+                       <span class="text-2xl sm:text-3xl">${activeSpot.item.emoji}</span>
+                       <span class="text-sm sm:text-lg font-black">${_col(activeSpot.item.name)}</span>
+                   </div>`
+                : `<div class="picked-banner w-full py-1.5 px-3 bg-green-100 border-2 border-green-400 rounded-2xl flex items-center justify-center gap-2 shadow-sm">
+                       <span class="text-sm sm:text-lg font-black">${_col('Pievelė švari! Gyvūnėliai džiaugiasi!')} 🐰🦋🐿️</span>
+                   </div>`;
+
+            appEl.innerHTML = `
+                <!-- Top Status Bar -->
+                <div class="bg-emerald-600 text-white px-3 sm:px-4 py-2 sm:py-2.5 flex justify-between items-center font-bold text-xs sm:text-base shadow">
+                    <div class="flex items-center gap-2">
+                        <button onclick="renderStartScreen()" class="bg-emerald-700 hover:bg-emerald-800 px-2.5 py-1 rounded-xl text-sm" title="Į pradžią">🏠</button>
+                        <span>⭐ Taškai: <span class="text-yellow-200">${state.score}</span></span>
+                    </div>
+                    <div class="bg-emerald-700 px-2.5 py-1 rounded-xl">Pievelė: ${state.currentIndex + 1} / ${state.questions.length}</div>
+                    <div>🔥 Serija: <span class="text-orange-200">${state.streak}</span></div>
+                </div>
+
+                <div class="p-2.5 sm:p-4 flex-1 flex flex-col justify-between items-center gap-1.5">
+                    <h2 class="text-base sm:text-xl font-black text-slate-800 text-center">${_col('Paspausk šiukšlę pievelėje ir įmesk į tinkamą konteinerį!')}</h2>
+
+                    <!-- Miško pievelė -->
+                    <div class="meadow-scene w-full rounded-3xl border-3 border-emerald-300 bg-gradient-to-b from-sky-100 via-emerald-100 to-green-200 p-2.5 sm:p-3.5 shadow-inner flex flex-col gap-2">
+                        <div class="flex justify-between items-center text-xl sm:text-2xl px-2 opacity-90">
+                            <span>🌲🌳🌿</span>
+                            <span>☀️☁️</span>
+                            <span>🌿🌳🌲</span>
+                        </div>
+                        <div class="grid grid-cols-5 gap-1.5 sm:gap-2.5">
+                            ${spotsHtml}
+                        </div>
+                    </div>
+
+                    <!-- Pasirinktos šiukšlės juosta -->
+                    ${pickedInfoHtml}
+
+                    <div id="feedback" class="h-5 sm:h-7 flex items-center justify-center text-sm sm:text-base font-black opacity-0 transition-opacity">
+                        Pranešimas
+                    </div>
+
+                    <!-- Konteineriai -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5 w-full">
+                        ${binsHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        function selectMeadowSpot(idx) {
+            if (state.waiting) return;
+            const spot = state.meadowSpots[idx];
+            if (!spot || spot.sorted) return;
+            playPickSound();
+            state.selectedSpotIdx = idx;
+            renderMeadow();
+        }
+
+        function handleMeadowBin(chosenKey) {
+            if (state.waiting) return;
+            const spot = state.meadowSpots[state.selectedSpotIdx];
+            if (!spot || spot.sorted) return;
+
+            const feedback = document.getElementById('feedback');
+            const binBtn = document.getElementById(`bin-${chosenKey}`);
+
+            if (chosenKey === spot.item.category) {
+                playCorrectSound();
+                spot.sorted = true;
+                if (spot.firstTry) {
+                    state.score++;
+                    state.streak++;
+                }
+
+                // Auto-select next unsorted trash item if any remain
+                const nextIdx = state.meadowSpots.findIndex(s => !s.sorted);
+                if (nextIdx !== -1) {
+                    state.selectedSpotIdx = nextIdx;
+                    renderMeadow();
+                    const fb = document.getElementById('feedback');
+                    if (fb) {
+                        fb.innerHTML = _col("Puiku! Dar viena vieta išvalyta!") + " 🌸";
+                        fb.className = "h-5 sm:h-7 flex items-center justify-center text-sm sm:text-base font-black text-green-600 opacity-100";
+                    }
+                } else {
+                    state.waiting = true;
+                    renderMeadow();
+                    const fb = document.getElementById('feedback');
+                    if (fb) {
+                        fb.innerHTML = _col("Valio! Visa miško pievelė švari!") + " 🎉🌳";
+                        fb.className = "h-5 sm:h-7 flex items-center justify-center text-sm sm:text-base font-black text-green-600 opacity-100";
+                    }
+                    setTimeout(() => {
+                        state.currentIndex++;
+                        prepareMeadowRound();
+                    }, 1250);
+                }
+            } else {
+                spot.firstTry = false;
+                state.streak = 0;
+                playWrongSound();
+                if (binBtn) {
+                    binBtn.classList.add('shake-anim', 'opacity-50');
+                    setTimeout(() => {
+                        binBtn.classList.remove('shake-anim', 'opacity-50');
+                    }, 400);
+                }
+                if (feedback) {
+                    feedback.innerHTML = _col("Bandyk kitą konteinerį!") + " 🤔";
+                    feedback.className = "h-5 sm:h-7 flex items-center justify-center text-sm sm:text-base font-black text-red-500 opacity-100";
+                }
+            }
         }
 
         function renderQuestion() {
@@ -290,29 +502,31 @@
 
             const binsHtml = activeBinKeys.map(key => {
                 const bin = BINS[key];
-                const textCls = bin.textColor || 'text-white';
                 return `
                     <button id="bin-${key}" onclick="handleChoice('${key}')" 
-                        class="btn-3d flex flex-col items-center justify-between p-2.5 sm:p-3 rounded-2xl ${bin.color} ${textCls} border-2 ${bin.border} ${bin.shadow} active:shadow-[0_0px_0] transition-all h-24 sm:h-32">
+                        class="btn-3d flex flex-col items-center justify-between p-2.5 sm:p-3 rounded-2xl ${bin.color} border-2 ${bin.border} ${bin.shadow} active:shadow-[0_0px_0] transition-all h-24 sm:h-32">
                         <div class="text-3xl sm:text-4xl">${bin.icon}</div>
-                        <div class="text-xs sm:text-sm font-black text-center leading-tight mt-1">${_col(bin.name)}</div>
+                        <div class="bin-label-pill bg-white/95 px-2 py-0.5 rounded-lg text-xs sm:text-sm font-black text-center leading-tight mt-1 shadow-sm w-full">${_col(bin.name)}</div>
                     </button>
                 `;
             }).join('');
 
             appEl.innerHTML = `
                 <!-- Top Status Bar -->
-                <div class="bg-emerald-600 text-white px-4 py-2 sm:py-2.5 flex justify-between items-center font-bold text-sm sm:text-base shadow">
-                    <div>⭐ Taškai: <span class="text-yellow-200">${state.score}</span></div>
+                <div class="bg-emerald-600 text-white px-3 sm:px-4 py-2 sm:py-2.5 flex justify-between items-center font-bold text-xs sm:text-base shadow">
+                    <div class="flex items-center gap-2">
+                        <button onclick="renderStartScreen()" class="bg-emerald-700 hover:bg-emerald-800 px-2.5 py-1 rounded-xl text-sm" title="Į pradžią">🏠</button>
+                        <span>⭐ Taškai: <span class="text-yellow-200">${state.score}</span></span>
+                    </div>
                     <div class="bg-emerald-700 px-3 py-1 rounded-xl">Atlieka: ${state.currentIndex + 1} / 10</div>
                     <div>🔥 Serija: <span class="text-orange-200">${state.streak}</span></div>
                 </div>
 
                 <div class="p-3 sm:p-5 flex-1 flex flex-col justify-between items-center">
-                    <h2 class="text-lg sm:text-2xl font-black text-slate-800 text-center mb-1">Į kurį konteinerį mesti šią atlieką?</h2>
+                    <h2 class="text-lg sm:text-2xl font-black text-slate-800 text-center mb-1">${_col('Į kurį konteinerį mesti šią atlieką?')}</h2>
 
                     <!-- Daikto kortelė -->
-                    <div id="item-card" class="my-auto py-3 px-8 flex flex-col items-center justify-center bg-white rounded-3xl border-3 border-emerald-200 shadow-md drop-anim min-h-[120px] sm:min-h-[140px]">
+                    <div id="item-card" class="item-card-box my-auto py-3 px-8 flex flex-col items-center justify-center bg-white rounded-3xl border-3 border-emerald-200 shadow-md drop-anim min-h-[120px] sm:min-h-[140px]">
                         <div class="text-6xl sm:text-8xl mb-1">${item.emoji}</div>
                         <div class="text-xl sm:text-2xl font-black text-emerald-950">${_col(item.name)}</div>
                     </div>
@@ -348,7 +562,7 @@
                 binBtn.classList.add('bounce-anim');
                 itemCard.classList.add('scale-75', 'opacity-0', 'transition-all', 'duration-300');
 
-                feedback.textContent = `Puiku! Švaru ir teisinga! 🌍`;
+                feedback.innerHTML = _col("Puiku! Švaru ir teisinga!") + " 🌍";
                 feedback.className = "h-6 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black my-1 text-green-600 opacity-100";
 
                 setTimeout(() => {
@@ -363,7 +577,7 @@
                 binBtn.classList.add('shake-anim', 'opacity-40');
                 binBtn.disabled = true;
 
-                feedback.textContent = "Bandyk kitą konteinerį! 🤔";
+                feedback.innerHTML = _col("Bandyk kitą konteinerį!") + " 🤔";
                 feedback.className = "h-6 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black my-1 text-red-500 opacity-100";
 
                 setTimeout(() => {
@@ -374,24 +588,25 @@
 
         function renderEndScreen() {
             playWinSound();
+            const ratio = state.score / state.totalPossible;
             let stars = "⭐";
-            if (state.score >= 8) stars = "⭐⭐⭐";
-            else if (state.score >= 5) stars = "⭐⭐";
+            if (ratio >= 0.8) stars = "⭐⭐⭐";
+            else if (ratio >= 0.5) stars = "⭐⭐";
 
             appEl.innerHTML = `
                 <div class="p-6 sm:p-8 flex flex-col items-center justify-center text-center">
                     <div class="text-7xl mb-2">🎉</div>
-                    <h2 class="text-3xl sm:text-4xl font-black text-green-600 mb-2">Šaunuolis!</h2>
+                    <h2 class="text-3xl sm:text-4xl font-black text-green-600 mb-2">${_col('Šaunuolis!')}</h2>
                     <div class="text-5xl mb-4 tracking-wider">${stars}</div>
-                    <p class="text-xl font-bold text-slate-700 mb-1">Surinkai taškų:</p>
-                    <p class="text-4xl font-black text-emerald-600 mb-6">${state.score} / 10</p>
+                    <p class="text-xl font-bold text-slate-700 mb-1">${_col('Surinkai taškų:')}</p>
+                    <p class="text-4xl font-black text-emerald-600 mb-6">${state.score} / ${state.totalPossible}</p>
                     
                     <div class="flex flex-col sm:flex-row gap-3 w-full max-w-sm">
-                        <button onclick="startGame(state.mode)" class="btn-3d flex-1 py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl text-lg font-black shadow-[0_5px_0_#059669] active:shadow-[0_0px_0_#059669] transition-all">
-                            Dar kartą
+                        <button onclick="startGame(state.mode)" class="btn-3d flex-1 py-3.5 bg-emerald-100 hover:bg-emerald-200 border-2 border-emerald-400 rounded-2xl text-lg font-black shadow-[0_5px_0_#059669] active:shadow-[0_0px_0_#059669] transition-all">
+                            🔄 ${_col('Dar kartą')}
                         </button>
-                        <button onclick="renderStartScreen()" class="btn-3d flex-1 py-3.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-2xl text-lg font-black shadow-[0_5px_0_#94a3b8] active:shadow-[0_0px_0_#94a3b8] transition-all">
-                            Iš pradžių
+                        <button onclick="renderStartScreen()" class="btn-3d flex-1 py-3.5 bg-slate-100 hover:bg-slate-200 border-2 border-slate-300 rounded-2xl text-lg font-black shadow-[0_5px_0_#94a3b8] active:shadow-[0_0px_0_#94a3b8] transition-all">
+                            🏠 ${_col('Iš pradžių')}
                         </button>
                     </div>
                 </div>

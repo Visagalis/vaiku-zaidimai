@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>🛒 Mažoji Parduotuvė</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #fff7ed;
+            background-image: radial-gradient(#fdba74 20%, transparent 20%);
+            background-size: 20px 20px;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+            color: #1e293b;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .bounce { animation: bounce 0.45s; }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+
+        .shake { animation: shake 0.4s; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        .fade-in { animation: fadeIn 0.25s ease-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.97); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .pop-in { animation: popIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.5); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* High-Contrast Tactile Coins & Bills */
+        .coin {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            border-radius: 9999px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), inset 0 2px 3px rgba(255, 255, 255, 0.4);
+            flex-shrink: 0;
+            user-select: none;
+            position: relative;
+            transition: transform 0.12s ease;
+        }
+        button.coin:active, button.bill:active {
+            transform: scale(0.9);
+        }
+
+        .coin-copper {
+            background: radial-gradient(circle at 35% 35%, #ea580c 0%, #c2410c 55%, #7c2d12 100%);
+            color: #ffffff;
+            border: 2px solid #fdba74;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+        }
+        .coin-1c { width: 2.75rem; height: 2.75rem; font-size: 1rem; }
+        .coin-2c { width: 3.0rem; height: 3.0rem; font-size: 1.05rem; }
+        .coin-5c { width: 3.3rem; height: 3.3rem; font-size: 1.15rem; }
+
+        .coin-gold {
+            background: radial-gradient(circle at 35% 35%, #fef08a 0%, #eab308 50%, #b45309 100%);
+            color: #3b1803;
+            border: 2px solid #fef9c3;
+            text-shadow: 0 1px 0 rgba(255,255,255,0.6);
+        }
+        .coin-10c { width: 2.9rem; height: 2.9rem; font-size: 1.05rem; }
+        .coin-20c { width: 3.2rem; height: 3.2rem; font-size: 1.15rem; }
+        .coin-50c { width: 3.55rem; height: 3.55rem; font-size: 1.25rem; }
+
+        .coin-1e {
+            width: 3.35rem;
+            height: 3.35rem;
+            background: radial-gradient(circle at 35% 35%, #ffffff 0%, #cbd5e1 60%, #94a3b8 100%);
+            color: #0f172a;
+            border: 4px solid #d97706;
+            font-size: 1.15rem;
+            text-shadow: 0 1px 1px rgba(255,255,255,0.8);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.35);
+        }
+
+        .coin-2e {
+            width: 3.65rem;
+            height: 3.65rem;
+            background: radial-gradient(circle at 35% 35%, #fef08a 0%, #eab308 60%, #b45309 100%);
+            color: #3b1803;
+            border: 4px solid #94a3b8;
+            font-size: 1.25rem;
+            text-shadow: 0 1px 1px rgba(255,255,255,0.6);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.35);
+        }
+
+        .bill {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.25);
+            flex-shrink: 0;
+            user-select: none;
+            width: 4.1rem;
+            height: 2.4rem;
+            font-size: 1.1rem;
+            border: 2px solid;
+            letter-spacing: 0.5px;
+            transition: transform 0.12s ease;
+        }
+        .bill-5e { background: linear-gradient(135deg, #64748b, #475569); color: #f8fafc; border-color: #334155; }
+        .bill-10e { background: linear-gradient(135deg, #f43f5e, #be123c); color: #ffffff; border-color: #9f1239; }
+        .bill-20e { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: #ffffff; border-color: #1e40af; }
+
+        @media (min-width: 640px) {
+            .bill { width: 4.9rem; height: 2.9rem; font-size: 1.3rem; }
+            .coin-1c { width: 3.1rem; height: 3.1rem; font-size: 1.1rem; }
+            .coin-2c { width: 3.4rem; height: 3.4rem; font-size: 1.2rem; }
+            .coin-5c { width: 3.8rem; height: 3.8rem; font-size: 1.3rem; }
+            .coin-10c { width: 3.3rem; height: 3.3rem; font-size: 1.2rem; }
+            .coin-20c { width: 3.65rem; height: 3.65rem; font-size: 1.3rem; }
+            .coin-50c { width: 4.05rem; height: 4.05rem; font-size: 1.4rem; }
+            .coin-1e { width: 3.8rem; height: 3.8rem; font-size: 1.35rem; border-width: 5px; }
+            .coin-2e { width: 4.15rem; height: 4.15rem; font-size: 1.45rem; border-width: 5px; }
+        }
+
+        .app-card {
+            background-color: rgba(255, 255, 255, 0.97);
+            border-color: #fb923c;
+        }
+        .shop-shelf {
+            background-color: #fffbeb;
+            border: 2px solid #fde68a;
+        }
+        .counter-tray {
+            background-color: #f0fdf4;
+            border: 2px dashed #4ade80;
+        }
+        .wallet-box {
+            background-color: #f8fafc;
+            border: 2px solid #cbd5e1;
+        }
+        .item-card {
+            background-color: #ffffff;
+            border: 2px solid #fed7aa;
+        }
+        .item-card:hover {
+            background-color: #ffedd5;
+        }
+
+        /* Tamsioji Tema (Dark Mode) */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #0b1120 !important;
+                background-image: radial-gradient(#1e293b 25%, transparent 25%) !important;
+                color: #f1f5f9 !important;
+            }
+            .app-card {
+                background-color: #0f172a !important;
+                border-color: #334155 !important;
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6) !important;
+            }
+            .shop-shelf {
+                background-color: #1e293b !important;
+                border-color: #475569 !important;
+            }
+            .counter-tray {
+                background-color: #1e293b !important;
+                border-color: #475569 !important;
+                box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.5) !important;
+            }
+            .wallet-box {
+                background-color: #0f172a !important;
+                border-color: #334155 !important;
+            }
+            .item-card {
+                background-color: #1e293b !important;
+                border-color: #334155 !important;
+                color: #f8fafc !important;
+            }
+            .item-card:hover {
+                background-color: #334155 !important;
+            }
+            .price-tag {
+                background-color: #0f172a !important;
+                color: #fde047 !important;
+                border-color: #eab308 !important;
+            }
+            .text-main-title {
+                color: #f8fafc !important;
+            }
+            .text-sub-title {
+                color: #94a3b8 !important;
+            }
+        }
+    </style>
+    <!-- Apsauga nuo priartinimo gestais (pinch to zoom) -->
+    <script>
+        document.addEventListener("gesturestart", function(e) { e.preventDefault(); }, { passive: false });
+        document.addEventListener("gesturechange", function(e) { e.preventDefault(); }, { passive: false });
+        document.addEventListener("gestureend", function(e) { e.preventDefault(); }, { passive: false });
+        document.addEventListener("touchstart", function(e) {
+            if (e.touches && e.touches.length > 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+        document.addEventListener("touchmove", function(e) {
+            if (e.touches && e.touches.length > 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+        document.addEventListener("wheel", function(e) {
+            if (e.ctrlKey) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+    </script>
+</head>
+<body class="h-screen max-h-screen flex items-center justify-center p-2 sm:p-4 overflow-hidden">
+
+    <div id="app" class="app-card w-full max-w-2xl rounded-3xl shadow-xl flex flex-col relative fade-in border-4 overflow-hidden max-h-full">
+    </div>
+
+    <script>
+        // === SKIEMENŲ SPALVINIMAS ===
+        const _V = 'aeėęiįyouųūąAEĖĘIĮYOUŲŪĄ';
+        const _D = ['ai','au','ei','eu','ie','uo','ui','oi','ia','io','iu'];
+        const _L = /[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/;
+        const _O = new Set(['bl','br','dr','dv','fl','fr','gl','gr','gn','kl','kr','kn','kv','pl','pr','sk','sl','sm','sn','sp','sr','st','sv','šl','šv','šn','tr','tv','vr','žl','žv','str','skr','spr']);
+        const _SC = ['#dc2626','#2563eb','#16a34a','#ea580c','#9333ea','#db2777'];
+
+        function _syl(word) {
+            if (!word || word.length <= 1) return [word || ''];
+            const r = []; let s = '', i = 0, n = word.length;
+            while (i < n) {
+                const c = word[i];
+                if (!_L.test(c)) { s += c; i++; continue; }
+                if (!_V.includes(c)) { s += c; i++; }
+                else {
+                    if (i + 1 < n && _D.includes(word.slice(i, i + 2).toLowerCase())) { s += word.slice(i, i + 2); i += 2; }
+                    else { s += c; i++; }
+                    let j = i;
+                    while (j < n && _L.test(word[j]) && !_V.includes(word[j])) j++;
+                    let cl = word.slice(i, j);
+                    if (j >= n || !_L.test(word[j])) { s += cl; i = j; while (i < n && !_L.test(word[i])) { s += word[i]; i++; } r.push(s); s = ''; }
+                    else if (cl.length === 0) { r.push(s); s = ''; }
+                    else if (cl.length === 1) { r.push(s); s = cl; i = j; }
+                    else {
+                        let u = [];
+                        for (let k = 0; k < cl.length;) {
+                            const p = cl.slice(k, k + 2).toLowerCase();
+                            if (p === 'dz' || p === 'dž' || p === 'ch') { u.push(cl.slice(k, k + 2)); k += 2; }
+                            else { u.push(cl[k]); k++; }
+                        }
+                        let sp = u.length - 1;
+                        if (u.length >= 2) {
+                            const l2 = (u[u.length - 2] + u[u.length - 1]).toLowerCase();
+                            const l3 = u.length >= 3 ? (u[u.length - 3] + l2).toLowerCase() : '';
+                            if (l3 && _O.has(l3)) sp = u.length - 3;
+                            else if (_O.has(l2)) sp = u.length - 2;
+                        }
+                        s += u.slice(0, sp).join(''); r.push(s); s = u.slice(sp).join(''); i = j;
+                    }
+                }
+            }
+            if (s) r.push(s);
+            return r.filter(x => x.length > 0);
+        }
+
+        function _col(text) {
+            if (!text) return '';
+            return text.split(/(\s+)/).map(token => {
+                if (!token.trim() || !/[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/.test(token)) return token;
+                const syls = _syl(token);
+                return syls.map((s, i) => '<span style="color:' + _SC[i % _SC.length] + '">' + s + '</span>').join('');
+            }).join('');
+        }
+        // === /SKIEMENŲ SPALVINIMAS ===
+
+        const MONEY = {
+            centCoins: [
+                { cents: 1, label: '1c', class: 'coin coin-copper coin-1c' },
+                { cents: 2, label: '2c', class: 'coin coin-copper coin-2c' },
+                { cents: 5, label: '5c', class: 'coin coin-copper coin-5c' },
+                { cents: 10, label: '10c', class: 'coin coin-gold coin-10c' },
+                { cents: 20, label: '20c', class: 'coin coin-gold coin-20c' },
+                { cents: 50, label: '50c', class: 'coin coin-gold coin-50c' }
+            ],
+            euroCoins: [
+                { cents: 100, label: '1€', class: 'coin coin-1e' },
+                { cents: 200, label: '2€', class: 'coin coin-2e' }
+            ],
+            bills: [
+                { cents: 500, label: '5€', class: 'bill bill-5e' },
+                { cents: 1000, label: '10€', class: 'bill bill-10e' },
+                { cents: 2000, label: '20€', class: 'bill bill-20e' }
+            ]
+        };
+
+        const ALL_COINS = [...MONEY.centCoins, ...MONEY.euroCoins];
+        const EURO_POOL = [...MONEY.euroCoins, ...MONEY.bills];
+
+        // Parduotuvės prekės (centais ir eurais)
+        const SHOP_ITEMS = [
+            { name: 'Saldainis', emoji: '🍬', cents: 15, pool: MONEY.centCoins },
+            { name: 'Obuolys', emoji: '🍎', cents: 25, pool: MONEY.centCoins },
+            { name: 'Bananas', emoji: '🍌', cents: 30, pool: MONEY.centCoins },
+            { name: 'Bandelė', emoji: '🥐', cents: 40, pool: MONEY.centCoins },
+            { name: 'Spurga', emoji: '🍩', cents: 55, pool: MONEY.centCoins },
+            { name: 'Ledai', emoji: '🍦', cents: 70, pool: MONEY.centCoins },
+            { name: 'Sultys', emoji: '🧃', cents: 80, pool: MONEY.centCoins },
+            { name: 'Šokoladas', emoji: '🍫', cents: 90, pool: MONEY.centCoins },
+            { name: 'Pieštukas', emoji: '✏️', cents: 100, pool: ALL_COINS },
+            { name: 'Sąsiuvinis', emoji: '📓', cents: 150, pool: ALL_COINS },
+            { name: 'Pienas', emoji: '🥛', cents: 200, pool: ALL_COINS },
+            { name: 'Dažai', emoji: '🎨', cents: 300, pool: EURO_POOL },
+            { name: 'Knygelė', emoji: '📖', cents: 600, pool: EURO_POOL },
+            { name: 'Meškiukas', emoji: '🧸', cents: 800, pool: EURO_POOL },
+            { name: 'Kamuolys', emoji: '⚽', cents: 900, pool: EURO_POOL },
+            { name: 'Mašinėlė', emoji: '🚗', cents: 1200, pool: EURO_POOL },
+            { name: 'Lėktuvėlis', emoji: '✈️', cents: 1500, pool: EURO_POOL },
+            { name: 'Kuprinė', emoji: '🎒', cents: 1700, pool: EURO_POOL }
+        ];
+
+        const BASKET_PAIRS = [
+            { item1: { name: 'Saldainis', emoji: '🍬', cents: 10 }, item2: { name: 'Obuolys', emoji: '🍎', cents: 20 }, pool: MONEY.centCoins },
+            { item1: { name: 'Bananas', emoji: '🍌', cents: 30 }, item2: { name: 'Bandelė', emoji: '🥐', cents: 20 }, pool: MONEY.centCoins },
+            { item1: { name: 'Spurga', emoji: '🍩', cents: 50 }, item2: { name: 'Saldainis', emoji: '🍬', cents: 15 }, pool: MONEY.centCoins },
+            { item1: { name: 'Ledai', emoji: '🍦', cents: 60 }, item2: { name: 'Obuolys', emoji: '🍎', cents: 20 }, pool: MONEY.centCoins },
+            { item1: { name: 'Sausainis', emoji: '🍪', cents: 25 }, item2: { name: 'Sultys', emoji: '🧃', cents: 50 }, pool: MONEY.centCoins },
+            { item1: { name: 'Pieštukas', emoji: '✏️', cents: 100 }, item2: { name: 'Trintukas', emoji: '🧽', cents: 50 }, pool: ALL_COINS },
+            { item1: { name: 'Duona', emoji: '🍞', cents: 200 }, item2: { name: 'Pienas', emoji: '🥛', cents: 100 }, pool: EURO_POOL },
+            { item1: { name: 'Dažai', emoji: '🎨', cents: 300 }, item2: { name: 'Sąsiuvinis', emoji: '📓', cents: 200 }, pool: EURO_POOL },
+            { item1: { name: 'Knygelė', emoji: '📖', cents: 500 }, item2: { name: 'Pieštukas', emoji: '✏️', cents: 200 }, pool: EURO_POOL },
+            { item1: { name: 'Meškiukas', emoji: '🧸', cents: 600 }, item2: { name: 'Balionas', emoji: '🎈', cents: 200 }, pool: EURO_POOL },
+            { item1: { name: 'Kamuolys', emoji: '⚽', cents: 1000 }, item2: { name: 'Švilpukas', emoji: '🪈', cents: 200 }, pool: EURO_POOL },
+            { item1: { name: 'Mašinėlė', emoji: '🚗', cents: 1000 }, item2: { name: 'Knygelė', emoji: '📖', cents: 500 }, pool: EURO_POOL }
+        ];
+
+        const AFFORD_TASKS = [
+            {
+                wallet: [MONEY.centCoins[5], MONEY.centCoins[3]], // 50c + 10c = 60c
+                correct: { name: 'Ledai', emoji: '🍦', cents: 60 },
+                wrong: [
+                    { name: 'Spurga', emoji: '🍩', cents: 40 },
+                    { name: 'Šokoladas', emoji: '🍫', cents: 80 },
+                    { name: 'Pieštukas', emoji: '✏️', cents: 100 }
+                ]
+            },
+            {
+                wallet: [MONEY.centCoins[4], MONEY.centCoins[4], MONEY.centCoins[2]], // 20c + 20c + 5c = 45c
+                correct: { name: 'Bandelė', emoji: '🥐', cents: 45 },
+                wrong: [
+                    { name: 'Saldainis', emoji: '🍬', cents: 25 },
+                    { name: 'Ledai', emoji: '🍦', cents: 65 },
+                    { name: 'Sultys', emoji: '🧃', cents: 75 }
+                ]
+            },
+            {
+                wallet: [MONEY.centCoins[5], MONEY.centCoins[4], MONEY.centCoins[3]], // 50c + 20c + 10c = 80c
+                correct: { name: 'Sultys', emoji: '🧃', cents: 80 },
+                wrong: [
+                    { name: 'Obuolys', emoji: '🍎', cents: 30 },
+                    { name: 'Bananas', emoji: '🍌', cents: 50 },
+                    { name: 'Sūris', emoji: '🧀', cents: 90 }
+                ]
+            },
+            {
+                wallet: [MONEY.euroCoins[1], MONEY.euroCoins[0]], // 2€ + 1€ = 3€
+                correct: { name: 'Dažai', emoji: '🎨', cents: 300 },
+                wrong: [
+                    { name: 'Pieštukas', emoji: '✏️', cents: 100 },
+                    { name: 'Sąsiuvinis', emoji: '📓', cents: 200 },
+                    { name: 'Knygelė', emoji: '📖', cents: 500 }
+                ]
+            },
+            {
+                wallet: [MONEY.bills[0], MONEY.euroCoins[1]], // 5€ + 2€ = 7€
+                correct: { name: 'Meškiukas', emoji: '🧸', cents: 700 },
+                wrong: [
+                    { name: 'Balionas', emoji: '🎈', cents: 400 },
+                    { name: 'Kamuolys', emoji: '⚽', cents: 900 },
+                    { name: 'Mašinėlė', emoji: '🚗', cents: 1200 }
+                ]
+            },
+            {
+                wallet: [MONEY.bills[0], MONEY.euroCoins[1], MONEY.euroCoins[1]], // 5€ + 2€ + 2€ = 9€
+                correct: { name: 'Kamuolys', emoji: '⚽', cents: 900 },
+                wrong: [
+                    { name: 'Dažai', emoji: '🎨', cents: 500 },
+                    { name: 'Knygelė', emoji: '📖', cents: 700 },
+                    { name: 'Lėktuvėlis', emoji: '✈️', cents: 1100 }
+                ]
+            },
+            {
+                wallet: [MONEY.bills[1], MONEY.euroCoins[1]], // 10€ + 2€ = 12€
+                correct: { name: 'Mašinėlė', emoji: '🚗', cents: 1200 },
+                wrong: [
+                    { name: 'Meškiukas', emoji: '🧸', cents: 800 },
+                    { name: 'Kamuolys', emoji: '⚽', cents: 1000 },
+                    { name: 'Kuprinė', emoji: '🎒', cents: 1500 }
+                ]
+            },
+            {
+                wallet: [MONEY.bills[1], MONEY.bills[0]], // 10€ + 5€ = 15€
+                correct: { name: 'Kuprinė', emoji: '🎒', cents: 1500 },
+                wrong: [
+                    { name: 'Knygelė', emoji: '📖', cents: 600 },
+                    { name: 'Kamuolys', emoji: '⚽', cents: 1000 },
+                    { name: 'Dviratis', emoji: '🚲', cents: 2000 }
+                ]
+            },
+            {
+                wallet: [MONEY.euroCoins[0], MONEY.centCoins[5]], // 1€ + 50c = 1,50€
+                correct: { name: 'Sąsiuvinis', emoji: '📓', cents: 150 },
+                wrong: [
+                    { name: 'Ledai', emoji: '🍦', cents: 80 },
+                    { name: 'Pieštukas', emoji: '✏️', cents: 100 },
+                    { name: 'Dažai', emoji: '🎨', cents: 250 }
+                ]
+            },
+            {
+                wallet: [MONEY.centCoins[4], MONEY.centCoins[3], MONEY.centCoins[2]], // 20c + 10c + 5c = 35c
+                correct: { name: 'Obuolys', emoji: '🍎', cents: 35 },
+                wrong: [
+                    { name: 'Saldainis', emoji: '🍬', cents: 15 },
+                    { name: 'Bandelė', emoji: '🥐', cents: 50 },
+                    { name: 'Spurga', emoji: '🍩', cents: 65 }
+                ]
+            }
+        ];
+
+        const state = {
+            mode: 'single', // 'single' | 'basket' | 'afford'
+            score: 0,
+            streak: 0,
+            question: 1,
+            maxQuestions: 10,
+            targetCents: 0,
+            currentTask: null,
+            collectedItems: [],
+            walletPool: [],
+            waiting: false,
+            firstTry: true
+        };
+
+        const app = document.getElementById('app');
+
+        let audioCtx;
+        function initAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        function playSound(type) {
+            initAudio();
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
+
+            if (type === 'coin') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(950, now);
+                osc.frequency.exponentialRampToValueAtTime(1400, now + 0.08);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+                osc.start(now);
+                osc.stop(now + 0.12);
+            } else if (type === 'remove') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, now);
+                osc.frequency.exponentialRampToValueAtTime(380, now + 0.08);
+                gain.gain.setValueAtTime(0.18, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                osc.start(now);
+                osc.stop(now + 0.1);
+            } else if (type === 'correct') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, now);
+                osc.frequency.exponentialRampToValueAtTime(1046.5, now + 0.18);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.32);
+                osc.start(now);
+                osc.stop(now + 0.32);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.exponentialRampToValueAtTime(150, now + 0.22);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'win') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(440, now);
+                osc.frequency.setValueAtTime(554.37, now + 0.1);
+                osc.frequency.setValueAtTime(659.25, now + 0.2);
+                osc.frequency.setValueAtTime(880, now + 0.3);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.6);
+                osc.start(now);
+                osc.stop(now + 0.6);
+            }
+        }
+
+        function formatMoneyCents(cents) {
+            if (cents < 100) return cents + ' c';
+            if (cents % 100 === 0) return (cents / 100) + ' €';
+            return (cents / 100).toFixed(2).replace('.', ',') + ' €';
+        }
+
+        function getRandomElement(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function shuffle(arr) {
+            return [...arr].sort(() => Math.random() - 0.5);
+        }
+
+        function renderStartScreen() {
+            app.innerHTML = `
+                <div class="flex-1 flex flex-col items-center justify-center p-5 sm:p-8 text-center fade-in">
+                    <div class="text-5xl sm:text-6xl mb-2 bounce">🛒</div>
+                    <h1 class="text-main-title text-3xl sm:text-5xl font-black text-orange-700 mb-1 tracking-tight">${_col('Mažoji Parduotuvė')}</h1>
+                    <p class="text-sub-title text-base sm:text-xl text-slate-600 mb-5 sm:mb-7 font-bold">${_col('Išsirink prekes ir sumokėk pinigėliais!')}</p>
+                    
+                    <div class="flex flex-col gap-3 w-full max-w-sm">
+                        <button onclick="startGame('single')" class="w-full py-3.5 sm:py-4 px-4 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white font-black text-lg sm:text-2xl shadow-lg transition transform active:scale-95 border-b-4 border-orange-700">
+                            🍭 ${_col('Perku vieną prekę')}
+                        </button>
+                        <button onclick="startGame('basket')" class="w-full py-3.5 sm:py-4 px-4 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-lg sm:text-2xl shadow-lg transition transform active:scale-95 border-b-4 border-emerald-700">
+                            🧺 ${_col('Pirkinių krepšelis')}
+                        </button>
+                        <button onclick="startGame('afford')" class="w-full py-3.5 sm:py-4 px-4 rounded-2xl bg-sky-500 hover:bg-sky-600 text-white font-black text-lg sm:text-2xl shadow-lg transition transform active:scale-95 border-b-4 border-sky-700">
+                            🛍️ ${_col('Ką galiu nupirkti?')}
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function startGame(mode) {
+            initAudio();
+            state.mode = mode;
+            state.score = 0;
+            state.streak = 0;
+            state.question = 1;
+            generateQuestion();
+        }
+
+        function renderTopBar() {
+            return `
+                <div class="bg-orange-500 text-white px-4 py-2 sm:py-2.5 flex justify-between items-center font-bold text-sm sm:text-base shadow-md shrink-0">
+                    <div>⭐ ${_col('Taškai:')} <span class="text-yellow-200 font-black">${state.score}</span></div>
+                    <div class="bg-orange-600 px-2.5 py-0.5 rounded-xl">${_col('Pirkimas:')} <span class="text-yellow-200">${state.question} / ${state.maxQuestions}</span></div>
+                    <div>🔥 ${_col('Serija:')} <span class="text-amber-200 font-black">${state.streak}</span></div>
+                </div>
+            `;
+        }
+
+        function generateQuestion() {
+            state.waiting = false;
+            state.firstTry = true;
+            state.collectedItems = [];
+
+            if (state.mode === 'single') {
+                let nextItem;
+                do {
+                    nextItem = getRandomElement(SHOP_ITEMS);
+                } while (state.currentTask && nextItem.name === state.currentTask.name);
+                state.currentTask = nextItem;
+                state.targetCents = nextItem.cents;
+                state.walletPool = nextItem.pool;
+                renderPayScreen();
+            } else if (state.mode === 'basket') {
+                let nextPair;
+                do {
+                    nextPair = getRandomElement(BASKET_PAIRS);
+                } while (state.currentTask && nextPair.item1.name === state.currentTask.item1?.name && nextPair.item2.name === state.currentTask.item2?.name);
+                state.currentTask = nextPair;
+                state.targetCents = nextPair.item1.cents + nextPair.item2.cents;
+                state.walletPool = nextPair.pool;
+                renderPayScreen();
+            } else {
+                let nextAfford;
+                do {
+                    nextAfford = getRandomElement(AFFORD_TASKS);
+                } while (state.currentTask && nextAfford.correct.name === state.currentTask.correct?.name);
+                state.currentTask = nextAfford;
+                state.targetCents = nextAfford.correct.cents;
+                renderAffordScreen();
+            }
+        }
+
+        function getCollectedSum() {
+            return state.collectedItems.reduce((acc, item) => acc + item.cents, 0);
+        }
+
+        function addCoin(idx) {
+            if (state.waiting) return;
+            if (state.collectedItems.length >= 10) return;
+            state.collectedItems.push(state.walletPool[idx]);
+            playSound('coin');
+            updateCounterUI();
+        }
+
+        function removeCoin(idx) {
+            if (state.waiting) return;
+            state.collectedItems.splice(idx, 1);
+            playSound('remove');
+            updateCounterUI();
+        }
+
+        function clearCounter() {
+            if (state.waiting) return;
+            state.collectedItems = [];
+            playSound('remove');
+            updateCounterUI();
+        }
+
+        function renderPayScreen() {
+            let shelfHtml = '';
+            if (state.mode === 'single') {
+                const it = state.currentTask;
+                shelfHtml = `
+                    <div class="shop-shelf p-2 sm:p-3 rounded-2xl flex items-center justify-center gap-3 sm:gap-5 shadow-sm">
+                        <div class="text-4xl sm:text-6xl drop-shadow">${it.emoji}</div>
+                        <div class="text-left">
+                            <div class="text-xs sm:text-sm font-bold text-slate-500 text-sub-title">${_col('Prekė parduotuvėje:')}</div>
+                            <div class="text-xl sm:text-2xl font-black text-slate-800 text-main-title">${_col(it.name)}</div>
+                        </div>
+                        <div class="price-tag bg-amber-300 border-2 border-amber-500 text-amber-950 font-black text-xl sm:text-3xl px-3 sm:px-4 py-1 sm:py-1.5 rounded-2xl shadow-sm">
+                            🏷️ ${formatMoneyCents(it.cents)}
+                        </div>
+                    </div>
+                `;
+            } else {
+                const { item1, item2 } = state.currentTask;
+                shelfHtml = `
+                    <div class="shop-shelf p-2 sm:p-3 rounded-2xl flex flex-col items-center justify-center gap-1 shadow-sm">
+                        <div class="text-xs sm:text-sm font-bold text-slate-500 text-sub-title">${_col('Suskaičiuok krepšelio kainą ir sumokėk:')}</div>
+                        <div class="flex items-center justify-center gap-2 sm:gap-4 flex-wrap">
+                            <div class="flex items-center gap-1.5 bg-white/80 dark:bg-slate-800 px-2.5 py-1 rounded-xl border border-amber-300">
+                                <span class="text-2xl sm:text-3xl">${item1.emoji}</span>
+                                <span class="font-extrabold text-sm sm:text-base">${_col(item1.name)}</span>
+                                <span class="price-tag bg-amber-200 text-amber-900 font-black px-2 py-0.5 rounded-lg text-sm sm:text-base">${formatMoneyCents(item1.cents)}</span>
+                            </div>
+                            <span class="font-black text-xl text-orange-500">+</span>
+                            <div class="flex items-center gap-1.5 bg-white/80 dark:bg-slate-800 px-2.5 py-1 rounded-xl border border-amber-300">
+                                <span class="text-2xl sm:text-3xl">${item2.emoji}</span>
+                                <span class="font-extrabold text-sm sm:text-base">${_col(item2.name)}</span>
+                                <span class="price-tag bg-amber-200 text-amber-900 font-black px-2 py-0.5 rounded-lg text-sm sm:text-base">${formatMoneyCents(item2.cents)}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            const walletHtml = state.walletPool.map((item, idx) => `
+                <button onclick="addCoin(${idx})" class="${item.class} cursor-pointer hover:scale-105">
+                    ${item.label}
+                </button>
+            `).join('');
+
+            app.innerHTML = `
+                ${renderTopBar()}
+                <div class="flex-1 flex flex-col p-2.5 sm:p-4 fade-in justify-between overflow-hidden">
+                    ${shelfHtml}
+
+                    <!-- Prekystalis -->
+                    <div class="flex flex-col">
+                        <div class="flex justify-between items-center px-1 mb-1 text-xs sm:text-sm font-extrabold">
+                            <span class="text-sub-title">${_col('Ant prekystalio padėta:')} <strong id="counter-sum" class="text-emerald-600 text-sm sm:text-base">0 c</strong></span>
+                            <button onclick="clearCounter()" class="text-rose-500 hover:underline font-bold text-xs sm:text-sm">🗑️ ${_col('Išvalyti')}</button>
+                        </div>
+                        <div id="counter-tray" class="counter-tray flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5 p-2 sm:p-3 rounded-2xl min-h-[76px] sm:min-h-[96px]">
+                        </div>
+                    </div>
+
+                    <div id="feedback" class="h-6 flex items-center justify-center font-black text-xs sm:text-base opacity-0 transition-opacity"></div>
+
+                    <!-- Piniginė -->
+                    <div class="wallet-box p-2 sm:p-3 rounded-2xl flex flex-col items-center gap-1">
+                        <span class="text-[11px] sm:text-xs font-bold text-slate-400">${_col('Tavo piniginė (spausk ant pinigų):')}</span>
+                        <div class="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5">
+                            ${walletHtml}
+                        </div>
+                    </div>
+
+                    <button onclick="checkPayAnswer()" class="w-full py-2.5 sm:py-3.5 rounded-2xl bg-green-500 hover:bg-green-600 text-white font-black text-lg sm:text-2xl shadow-md border-b-4 border-green-700 transition transform active:scale-95">
+                        🛒 ${_col('Pirkti!')}
+                    </button>
+                </div>
+            `;
+            updateCounterUI();
+        }
+
+        function updateCounterUI() {
+            const tray = document.getElementById('counter-tray');
+            const sumEl = document.getElementById('counter-sum');
+            if (!tray || !sumEl) return;
+
+            sumEl.textContent = formatMoneyCents(getCollectedSum());
+
+            if (state.collectedItems.length === 0) {
+                tray.innerHTML = `<span class="text-slate-400 font-bold text-xs sm:text-sm text-center">${_col('Spausk ant pinigų apačioje, kad padėtum ant prekystalio')}</span>`;
+            } else {
+                tray.innerHTML = state.collectedItems.map((item, idx) => `
+                    <button onclick="removeCoin(${idx})" class="${item.class} pop-in cursor-pointer hover:opacity-80" title="Nuimti">
+                        ${item.label}
+                    </button>
+                `).join('');
+            }
+        }
+
+        function checkPayAnswer() {
+            if (state.waiting) return;
+            const currentSum = getCollectedSum();
+            const feedback = document.getElementById('feedback');
+            const tray = document.getElementById('counter-tray');
+
+            if (currentSum === state.targetCents) {
+                state.waiting = true;
+                playSound('correct');
+                if (state.firstTry) {
+                    state.score++;
+                    state.streak++;
+                }
+                feedback.innerHTML = `${_col('Puikus pirkinys! Sumokėjai tiksliai!')} 🎉`;
+                feedback.className = "h-6 flex items-center justify-center font-black text-sm sm:text-lg text-green-500 opacity-100";
+                tray.classList.add('bounce');
+
+                setTimeout(() => {
+                    if (state.question >= state.maxQuestions) {
+                        renderEndScreen();
+                    } else {
+                        state.question++;
+                        generateQuestion();
+                    }
+                }, 1200);
+            } else {
+                state.firstTry = false;
+                state.streak = 0;
+                playSound('wrong');
+                let msg = currentSum < state.targetCents
+                    ? 'Dar trūksta pinigėlių!'
+                    : 'Padėjai per daug! Paspausk ant monetos, kad nuimtum.';
+                feedback.innerHTML = `${_col(msg)} 🤔`;
+                feedback.className = "h-6 flex items-center justify-center font-black text-xs sm:text-base text-red-500 opacity-100";
+                tray.classList.remove('shake');
+                void tray.offsetWidth;
+                tray.classList.add('shake');
+            }
+        }
+
+        function renderAffordScreen() {
+            const task = state.currentTask;
+            const walletCoinsHtml = task.wallet.map(item => `
+                <div class="${item.class} pop-in">${item.label}</div>
+            `).join('');
+
+            const allOptions = shuffle([task.correct, ...task.wrong]);
+            const optionsHtml = allOptions.map((opt, idx) => `
+                <button id="afford-btn-${idx}" onclick="checkAffordAnswer(${idx}, ${opt.cents})" class="item-card p-2.5 sm:p-3.5 rounded-2xl shadow-sm border-b-4 transition transform active:scale-95 flex flex-col items-center justify-center gap-1">
+                    <span class="text-3xl sm:text-4xl">${opt.emoji}</span>
+                    <span class="font-extrabold text-sm sm:text-base">${_col(opt.name)}</span>
+                    <span class="price-tag bg-amber-100 border border-amber-400 text-amber-900 font-black text-sm sm:text-lg px-2.5 py-0.5 rounded-xl">${formatMoneyCents(opt.cents)}</span>
+                </button>
+            `).join('');
+
+            app.innerHTML = `
+                ${renderTopBar()}
+                <div class="flex-1 flex flex-col p-3 sm:p-5 fade-in justify-between overflow-hidden">
+                    <div class="text-center">
+                        <h2 class="text-base sm:text-xl font-black text-slate-700 text-main-title mb-1">
+                            ${_col('Kurią prekę gali nupirkti lygiai už šiuos pinigus?')}
+                        </h2>
+                        <div id="afford-wallet" class="counter-tray flex flex-wrap items-center justify-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-2xl min-h-[85px] sm:min-h-[110px]">
+                            ${walletCoinsHtml}
+                        </div>
+                    </div>
+
+                    <div id="feedback" class="h-6 sm:h-7 flex items-center justify-center font-black text-sm sm:text-lg opacity-0 transition-opacity"></div>
+
+                    <div class="grid grid-cols-2 gap-2.5 sm:gap-3.5">
+                        ${optionsHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        function checkAffordAnswer(idx, cents) {
+            if (state.waiting) return;
+            const btn = document.getElementById(`afford-btn-${idx}`);
+            const feedback = document.getElementById('feedback');
+            const walletEl = document.getElementById('afford-wallet');
+
+            if (cents === state.targetCents) {
+                state.waiting = true;
+                playSound('correct');
+                if (state.firstTry) {
+                    state.score++;
+                    state.streak++;
+                }
+                btn.className = "p-2.5 sm:p-3.5 rounded-2xl bg-green-500 text-white border-b-4 border-green-700 flex flex-col items-center justify-center gap-1 bounce";
+                feedback.innerHTML = `${_col('Teisingai! Pinigų užtenka lygiai šiai prekei!')} 🎉`;
+                feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-sm sm:text-lg text-green-500 opacity-100";
+
+                setTimeout(() => {
+                    if (state.question >= state.maxQuestions) {
+                        renderEndScreen();
+                    } else {
+                        state.question++;
+                        generateQuestion();
+                    }
+                }, 1200);
+            } else {
+                state.firstTry = false;
+                state.streak = 0;
+                playSound('wrong');
+                btn.disabled = true;
+                btn.classList.add('opacity-40', 'cursor-not-allowed', 'shake');
+                feedback.innerHTML = `${_col('Suskaičiuok pinigus dar kartą!')} 🤔`;
+                feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-sm sm:text-lg text-red-500 opacity-100";
+                walletEl.classList.remove('shake');
+                void walletEl.offsetWidth;
+                walletEl.classList.add('shake');
+            }
+        }
+
+        function renderEndScreen() {
+            playSound('win');
+            let stars = 1;
+            if (state.score >= 8) stars = 3;
+            else if (state.score >= 5) stars = 2;
+
+            const starHtml = Array(3).fill(0).map((_, i) => 
+                `<span class="text-5xl sm:text-6xl ${i < stars ? 'text-yellow-400 bounce' : 'text-gray-400 opacity-40'} drop-shadow-md" style="animation-delay: ${i * 0.2}s">⭐</span>`
+            ).join('');
+
+            let message = "Šaunus pirkėjas!";
+            if (stars === 3) message = "Nuostabu! Tikras parduotuvės ekspertas!";
+            else if (stars === 2) message = "Puikiai apsipirkai!";
+
+            app.innerHTML = `
+                <div class="flex-1 flex flex-col items-center justify-center p-6 sm:p-8 text-center fade-in">
+                    <h2 class="text-main-title text-3xl sm:text-4xl font-black text-gray-800 mb-4">${_col('Apsipirkimas baigtas!')}</h2>
+                    <div class="flex justify-center gap-2 mb-4">${starHtml}</div>
+                    <p class="text-sub-title text-xl sm:text-2xl font-bold text-gray-700 mb-2">${_col(message)} 🛍️</p>
+                    <p class="text-sub-title text-lg sm:text-xl text-gray-600 mb-8">${_col('Taškai:')} <span class="font-black text-green-500">${state.score} / ${state.maxQuestions}</span></p>
+                    <button onclick="renderStartScreen()" class="w-full max-w-xs py-4 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white font-black text-xl sm:text-2xl shadow-lg transition transform active:scale-95 border-b-4 border-orange-700">
+                        ${_col('Žaisti dar kartą')} 🔄
+                    </button>
+                </div>
+            `;
+        }
+
+        renderStartScreen();
+    </script>
+</body>
+</html>

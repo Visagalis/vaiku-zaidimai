@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Didesnis ar Mažesnis</title>
+    <title>⚖️ Didesnis ar Mažesnis</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
     <style>
@@ -16,43 +16,124 @@
             user-select: none;
             -webkit-user-select: none;
             background-color: #e0f2fe;
-            background-image: radial-gradient(#bae6fd 20%, transparent 20%);
-            background-size: 40px 40px;
-            overflow-y: auto;
+            background-image: radial-gradient(#7dd3fc 20%, transparent 20%);
+            background-size: 24px 24px;
+            color: #1e293b;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
-        .bounce { animation: bounce 0.5s; }
-        .shake { animation: shake 0.5s; }
+
+        .bounce { animation: bounce 0.48s cubic-bezier(0.28, 0.84, 0.42, 1); }
         @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
+            0%, 100% { transform: translateY(0) scale(1); }
+            45% { transform: translateY(-14px) scale(1.08); }
         }
+
+        .shake { animation: shake 0.42s cubic-bezier(.36,.07,.19,.97) both; }
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
         }
-        .btn-hover:active { transform: scale(0.95); }
 
-        /* Tamsioji tema */
+        .fade-in { animation: fadeIn 0.25s ease-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.97); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .pop-in { animation: popIn 0.22s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.5); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Šviesios temos kortelės ir panelės */
+        .app-card {
+            background-color: rgba(255, 255, 255, 0.97);
+            border-color: #7dd3fc;
+        }
+        .panel-box {
+            background-color: #f0f9ff;
+            border: 2px dashed #38bdf8;
+        }
+        .num-card {
+            background-color: #ffffff;
+            border: 3px solid #bae6fd;
+            transition: transform 0.25s ease, border-color 0.25s ease;
+        }
+        .basket-card {
+            background-color: #fffbeb;
+            border: 3px solid #fcd34d;
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.25s ease;
+        }
+        .stair-slot {
+            background-color: #f8fafc;
+            border: 3px dashed #94a3b8;
+            transition: all 0.2s ease;
+        }
+        .stair-slot.filled {
+            background-color: #dcfce7;
+            border: 3px solid #22c55e;
+            color: #15803d;
+        }
+        .bubble-btn {
+            background-color: #e0f2fe;
+            color: #0369a1;
+            border-color: #38bdf8;
+        }
+        .bubble-btn:hover {
+            background-color: #bae6fd;
+        }
+
+        /* Automatinė tamsioji tema (Dark Mode) */
         @media (prefers-color-scheme: dark) {
             body {
                 background-color: #0b1120 !important;
-                background-image: radial-gradient(#1e293b 20%, transparent 20%) !important;
-                color: #f1f5f9 !important;
+                background-image: radial-gradient(#1e293b 25%, transparent 25%) !important;
+                color: #f8fafc !important;
             }
-            #start-screen, #game-screen, #end-screen {
+            .app-card {
                 background-color: #0f172a !important;
                 border-color: #334155 !important;
-                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6) !important;
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.7) !important;
             }
-            #num1, #num2 {
-                color: #38bdf8 !important;
+            .panel-box {
+                background-color: #1e293b !important;
+                border: 2px dashed #475569 !important;
             }
-            #operator {
-                color: #64748b !important;
+            .num-card {
+                background-color: #1e293b !important;
+                border-color: #334155 !important;
+                color: #f8fafc !important;
             }
-            #end-screen p {
-                color: #94a3b8 !important;
+            .basket-card {
+                background-color: #1e293b !important;
+                border-color: #475569 !important;
+                color: #f8fafc !important;
+            }
+            .stair-slot {
+                background-color: #1e293b !important;
+                border-color: #475569 !important;
+                color: #f8fafc !important;
+            }
+            .stair-slot.filled {
+                background-color: #064e3b !important;
+                border-color: #10b981 !important;
+                color: #ecfdf5 !important;
+            }
+            .bubble-btn {
+                background-color: #1e293b !important;
+                color: #f8fafc !important;
+                border-color: #475569 !important;
+            }
+            .bubble-btn:hover {
+                background-color: #334155 !important;
+            }
+            .text-main-title {
+                color: #f8fafc !important;
+            }
+            .text-sub-title {
+                color: #cbd5e1 !important;
             }
         }
     </style>
@@ -78,270 +159,835 @@
         }, { passive: false });
     </script>
 </head>
-<body class="min-h-screen flex items-center justify-center p-2 sm:p-4 overflow-y-auto transition-colors duration-200">
+<body class="h-screen max-h-screen overflow-hidden flex items-center justify-center p-2 sm:p-4">
 
-    <!-- Start Screen -->
-    <div id="start-screen" class="bg-white rounded-3xl p-6 sm:p-8 shadow-2xl text-center max-w-md w-full border-4 border-sky-300">
-        <h1 class="text-3xl sm:text-5xl font-black text-sky-600 mb-2">⚖️ Didesnis ar Mažesnis</h1>
-        <p class="text-lg sm:text-xl text-sky-500 mb-6 sm:mb-8 font-bold">Palygink skaičius!</p>
-        
-        <div class="space-y-3 sm:space-y-4">
-            <button onclick="startGame(20)" class="w-full btn-hover bg-green-500 text-white text-xl sm:text-2xl font-black py-3.5 sm:py-4 rounded-2xl shadow-[0_6px_0_#16a34a] hover:bg-green-400 transition-colors">
-                Iki 20
-            </button>
-            <button onclick="startGame(100)" class="w-full btn-hover bg-orange-500 text-white text-xl sm:text-2xl font-black py-3.5 sm:py-4 rounded-2xl shadow-[0_6px_0_#ea580c] hover:bg-orange-400 transition-colors">
-                Iki 100
-            </button>
-        </div>
-    </div>
-
-    <!-- Game Screen -->
-    <div id="game-screen" class="hidden bg-white rounded-3xl p-4 sm:p-8 shadow-2xl text-center max-w-lg w-full border-4 border-sky-300">
-        <div class="flex justify-between items-center mb-4 sm:mb-6">
-            <div class="text-xl sm:text-2xl font-bold text-yellow-500">⭐ <span id="score">0</span></div>
-            <div class="text-base sm:text-xl font-bold text-sky-500">Klausimas: <span id="question-counter">1</span> / 15</div>
-            <div class="text-base sm:text-xl font-bold text-red-500">🔥 <span id="streak">0</span></div>
-        </div>
-
-        <div class="flex items-center justify-center gap-2 sm:gap-4 my-4 sm:my-8">
-            <div id="num1" class="text-5xl sm:text-8xl font-black text-sky-600 w-24 sm:w-32 text-right">0</div>
-            <div id="operator" class="text-4xl sm:text-7xl font-black text-gray-300 w-12 sm:w-16 text-center">?</div>
-            <div id="num2" class="text-5xl sm:text-8xl font-black text-sky-600 w-24 sm:w-32 text-left">0</div>
-        </div>
-
-        <div id="feedback" class="text-xl sm:text-2xl font-bold h-7 sm:h-8 mb-3 sm:mb-4 opacity-0 transition-opacity">Puiku!</div>
-
-        <div class="flex justify-center gap-3 sm:gap-4 mb-2">
-            <button id="btn-lt" onclick="checkAnswer('<', this)" class="btn-hover flex-1 bg-purple-500 text-white text-4xl sm:text-6xl font-black py-4 sm:py-6 rounded-2xl shadow-[0_6px_0_#7e22ce] active:shadow-[0_0px_0_#7e22ce] active:translate-y-[6px] transition-all">&lt;</button>
-            <button id="btn-eq" onclick="checkAnswer('=', this)" class="btn-hover flex-1 bg-yellow-400 text-white text-4xl sm:text-6xl font-black py-4 sm:py-6 rounded-2xl shadow-[0_6px_0_#ca8a04] active:shadow-[0_0px_0_#ca8a04] active:translate-y-[6px] transition-all">=</button>
-            <button id="btn-gt" onclick="checkAnswer('>', this)" class="btn-hover flex-1 bg-pink-500 text-white text-4xl sm:text-6xl font-black py-4 sm:py-6 rounded-2xl shadow-[0_8px_0_#be185d] active:shadow-[0_0px_0_#be185d] active:translate-y-[6px] transition-all">&gt;</button>
-        </div>
-    </div>
-
-    <!-- End Screen -->
-    <div id="end-screen" class="hidden bg-white rounded-3xl p-8 shadow-2xl text-center max-w-md w-full border-4 border-sky-300">
-        <h2 class="text-4xl font-black text-sky-600 mb-4">Žaidimas baigtas!</h2>
-        <div id="stars" class="text-6xl mb-6 tracking-widest text-yellow-400">⭐⭐⭐</div>
-        <p class="text-2xl font-bold text-gray-700 mb-8">Teisingai: <span id="final-score" class="text-sky-500">15</span> / 15</p>
-        
-        <div class="space-y-4">
-            <button onclick="restartGame()" class="w-full btn-hover bg-sky-500 text-white text-2xl font-black py-4 rounded-2xl shadow-[0_6px_0_#0284c7] hover:bg-sky-400 transition-colors">
-                Dar kartą
-            </button>
-            <button onclick="goToMenu()" class="w-full btn-hover bg-gray-300 text-gray-700 text-2xl font-black py-4 rounded-2xl shadow-[0_6px_0_#9ca3af] hover:bg-gray-200 transition-colors">
-                Iš pradžių
-            </button>
-        </div>
+    <div id="app" class="app-card w-full max-w-2xl rounded-3xl shadow-2xl flex flex-col relative fade-in border-4 overflow-hidden max-h-full">
+        <!-- Turinys generuojamas per JS -->
     </div>
 
     <script>
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        
+        // === SKIEMENŲ SPALVINIMAS ===
+        const _V = 'aeėęiįyouųūąAEĖĘIĮYOUŲŪĄ';
+        const _D = ['ai','au','ei','eu','ie','uo','ui','oi','ia','io','iu'];
+        const _L = /[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/;
+        const _O = new Set(['bl','br','dr','dv','fl','fr','gl','gr','gn','kl','kr','kn','kv','pl','pr','sk','sl','sm','sn','sp','sr','st','sv','šl','šv','šn','tr','tv','vr','žl','žv','str','skr','spr']);
+        const _SC = ['#dc2626','#2563eb','#16a34a','#ea580c','#9333ea','#db2777'];
+
+        function _syl(word) {
+            if (!word || word.length <= 1) return [word || ''];
+            const r = []; let s = '', i = 0, n = word.length;
+            while (i < n) {
+                const c = word[i];
+                if (!_L.test(c)) { s += c; i++; continue; }
+                if (!_V.includes(c)) { s += c; i++; }
+                else {
+                    if (i + 1 < n && _D.includes(word.slice(i, i + 2).toLowerCase())) { s += word.slice(i, i + 2); i += 2; }
+                    else { s += c; i++; }
+                    let j = i;
+                    while (j < n && _L.test(word[j]) && !_V.includes(word[j])) j++;
+                    let cl = word.slice(i, j);
+                    if (j >= n || !_L.test(word[j])) { s += cl; i = j; while (i < n && !_L.test(word[i])) { s += word[i]; i++; } r.push(s); s = ''; }
+                    else if (cl.length === 0) { r.push(s); s = ''; }
+                    else if (cl.length === 1) { r.push(s); s = cl; i = j; }
+                    else {
+                        let u = [];
+                        for (let k = 0; k < cl.length;) {
+                            const p = cl.slice(k, k + 2).toLowerCase();
+                            if (p === 'dz' || p === 'dž' || p === 'ch') { u.push(cl.slice(k, k + 2)); k += 2; }
+                            else { u.push(cl[k]); k++; }
+                        }
+                        let sp = u.length - 1;
+                        if (u.length >= 2) {
+                            const l2 = (u[u.length - 2] + u[u.length - 1]).toLowerCase();
+                            const l3 = u.length >= 3 ? (u[u.length - 3] + l2).toLowerCase() : '';
+                            if (l3 && _O.has(l3)) sp = u.length - 3;
+                            else if (_O.has(l2)) sp = u.length - 2;
+                        }
+                        s += u.slice(0, sp).join(''); r.push(s); s = u.slice(sp).join(''); i = j;
+                    }
+                }
+            }
+            if (s) r.push(s);
+            return r.filter(x => x.length > 0);
+        }
+
+        function _col(text) {
+            if (!text) return '';
+            return text.split(/(\s+)/).map(token => {
+                if (!token.trim() || !/[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/.test(token)) return token;
+                const syls = _syl(token);
+                return syls.map((s, i) => '<span style="color:' + _SC[i % _SC.length] + '">' + s + '</span>').join('');
+            }).join('');
+        }
+        // === /SKIEMENŲ SPALVINIMAS ===
+
+        const app = document.getElementById('app');
+
+        const PRAISE_WORDS = ['Puiku!', 'Šaunuolis!', 'Teisingai!', 'Nuostabu!'];
+        const BASKET_ITEMS = ['🍓', '🍏', '🍊', '🍐', '🥕', '🍪', '🧁'];
+
+        const state = {
+            mode: 'croc', // 'croc' | 'baskets' | 'stairs'
+            maxNum: 20,   // 20 arba 100
+            score: 0,
+            streak: 0,
+            question: 1,
+            maxQuestions: 10,
+            waiting: false,
+            firstTry: true,
+
+            // Mode 1: Alkanas Krokodilas
+            num1: 0,
+            num2: 0,
+            crocState: '?', // '?' | '<' | '=' | '>'
+
+            // Mode 2: Daiktų svarstyklės
+            leftBasket: { a: 0, b: 0, total: 0, emoji: '🍓', label: '' },
+            rightBasket: { a: 0, b: 0, total: 0, emoji: '🍏', label: '' },
+            basketResult: '?',
+
+            // Mode 3: Skaičių laipteliai
+            poolNumbers: [], // [{ id, val, placed }]
+            stairs: [null, null, null, null], // saugo id
+            frogAtFlag: false
+        };
+
+        // Web Audio API
+        let audioCtx;
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
         function playSound(type) {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
+            initAudio();
+            if (!audioCtx) return;
+            const now = audioCtx.currentTime;
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain);
             gain.connect(audioCtx.destination);
-            
-            if (type === 'correct') {
+
+            if (type === 'click') {
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(400, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.1);
-                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.3);
+                osc.frequency.setValueAtTime(650, now);
+                osc.frequency.exponentialRampToValueAtTime(1050, now + 0.07);
+                gain.gain.setValueAtTime(0.18, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.09);
+                osc.start(now);
+                osc.stop(now + 0.09);
+            } else if (type === 'hop') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(380, now);
+                osc.frequency.exponentialRampToValueAtTime(760, now + 0.11);
+                gain.gain.setValueAtTime(0.22, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+                osc.start(now);
+                osc.stop(now + 0.12);
+            } else if (type === 'correct') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(440, now);
+                osc.frequency.setValueAtTime(554.37, now + 0.09);
+                osc.frequency.setValueAtTime(659.25, now + 0.18);
+                gain.gain.setValueAtTime(0.25, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                osc.start(now);
+                osc.stop(now + 0.35);
             } else if (type === 'wrong') {
                 osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(300, audioCtx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.2);
-                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.3);
+                osc.frequency.setValueAtTime(280, now);
+                osc.frequency.exponentialRampToValueAtTime(150, now + 0.22);
+                gain.gain.setValueAtTime(0.25, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                osc.start(now);
+                osc.stop(now + 0.25);
             } else if (type === 'win') {
                 osc.type = 'square';
-                osc.frequency.setValueAtTime(440, audioCtx.currentTime);
-                osc.frequency.setValueAtTime(554, audioCtx.currentTime + 0.1);
-                osc.frequency.setValueAtTime(659, audioCtx.currentTime + 0.2);
-                osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.3);
-                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.6);
+                osc.frequency.setValueAtTime(440, now);
+                osc.frequency.setValueAtTime(554.37, now + 0.1);
+                osc.frequency.setValueAtTime(659.25, now + 0.2);
+                osc.frequency.setValueAtTime(880, now + 0.3);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+                osc.start(now);
+                osc.stop(now + 0.6);
             }
         }
 
-        let maxNum = 20;
-        let score = 0;
-        let currentQuestion = 0;
-        const totalQuestions = 15;
-        let currentNum1 = 0;
-        let currentNum2 = 0;
-        let streak = 0;
-        let isWaiting = false;
-
-        const screens = {
-            start: document.getElementById('start-screen'),
-            game: document.getElementById('game-screen'),
-            end: document.getElementById('end-screen')
-        };
-
-        function showScreen(name) {
-            Object.values(screens).forEach(s => s.classList.add('hidden'));
-            screens[name].classList.remove('hidden');
+        function randomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
-        function startGame(max) {
-            maxNum = max;
-            score = 0;
-            currentQuestion = 0;
-            streak = 0;
-            updateStats();
-            showScreen('game');
-            nextQuestion();
+        function getRandomElement(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
         }
 
-        function restartGame() {
-            startGame(maxNum);
+        function setDifficulty(maxVal) {
+            initAudio();
+            playSound('click');
+            state.maxNum = maxVal;
+            renderStartScreen();
         }
 
-        function goToMenu() {
-            showScreen('start');
+        function renderTopBar() {
+            return `
+                <div class="bg-sky-500 text-white px-3 sm:px-4 py-2 sm:py-2.5 flex justify-between items-center font-bold text-xs sm:text-base shadow-md shrink-0">
+                    <div class="flex items-center gap-1.5">
+                        <button onclick="renderStartScreen()" class="bg-sky-700 hover:bg-sky-800 px-2 py-1 rounded-lg text-xs sm:text-sm transition active:scale-95" title="Meniu">🏠 ${_col('Meniu')}</button>
+                        <span>⭐ ${_col('Taškai:')} <span class="text-yellow-300 font-black">${state.score}</span></span>
+                    </div>
+                    <div class="bg-sky-700 px-2.5 py-0.5 rounded-xl">${_col('Klausimas:')} <span class="text-yellow-300 font-black">${state.question} / ${state.maxQuestions}</span></div>
+                    <div>🔥 ${_col('Serija:')} <span class="text-orange-200 font-black">${state.streak}</span></div>
+                </div>
+            `;
         }
 
-        function generateNumbers() {
-            if (Math.random() < 0.2) {
-                const n = Math.floor(Math.random() * (maxNum + 1));
-                return [n, n];
-            }
-            
-            let n1 = Math.floor(Math.random() * (maxNum + 1));
-            let n2 = Math.floor(Math.random() * (maxNum + 1));
-            
-            if (maxNum === 100 && Math.random() < 0.3) {
-                n2 = n1 + Math.floor(Math.random() * 11) - 5;
-                if (n2 < 0) n2 = 0;
-                if (n2 > 100) n2 = 100;
-            }
-            
-            while (n1 === n2) {
-                n2 = Math.floor(Math.random() * (maxNum + 1));
-            }
-            return [n1, n2];
+        function renderStartScreen() {
+            const btn20Class = state.maxNum === 20
+                ? 'bg-sky-500 text-white border-sky-700 shadow-md scale-105'
+                : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-400';
+            const btn100Class = state.maxNum === 100
+                ? 'bg-sky-500 text-white border-sky-700 shadow-md scale-105'
+                : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-400';
+
+            app.innerHTML = `
+                <div class="flex-1 flex flex-col items-center justify-center p-5 sm:p-8 text-center fade-in">
+                    <div class="text-5xl sm:text-6xl mb-1.5 bounce">⚖️</div>
+                    <h1 class="text-main-title text-3xl sm:text-5xl font-black text-slate-800 mb-1 tracking-tight">${_col('Didesnis ar Mažesnis')}</h1>
+                    <p class="text-sub-title text-sm sm:text-lg text-slate-600 mb-3 sm:mb-4 font-bold">${_col('Palygink ir surikiuok skaičius!')}</p>
+                    
+                    <!-- Sudėtingumo pasirinkimas -->
+                    <div class="flex items-center justify-center gap-2 mb-4 sm:mb-5">
+                        <span class="text-xs sm:text-sm font-extrabold text-sub-title">${_col('Skaičiai:')}</span>
+                        <button onclick="setDifficulty(20)" class="px-3.5 py-1.5 rounded-xl font-black text-xs sm:text-sm border-b-4 transition ${btn20Class}">
+                            🟢 ${_col('Iki 20')}
+                        </button>
+                        <button onclick="setDifficulty(100)" class="px-3.5 py-1.5 rounded-xl font-black text-xs sm:text-sm border-b-4 transition ${btn100Class}">
+                            🟠 ${_col('Iki 100')}
+                        </button>
+                    </div>
+
+                    <div class="flex flex-col gap-3 w-full max-w-md">
+                        <button onclick="startGame('croc')" class="w-full py-3 sm:py-4 px-4 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-base sm:text-xl shadow-lg transition transform active:scale-95 border-b-4 border-emerald-700 flex items-center justify-center gap-2">
+                            <span class="text-2xl">🐊</span>
+                            <span>${_col('Alkanas Krokodilas (Palygink skaičius)')}</span>
+                        </button>
+                        <button onclick="startGame('baskets')" class="w-full py-3 sm:py-4 px-4 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-black text-base sm:text-xl shadow-lg transition transform active:scale-95 border-b-4 border-amber-700 flex items-center justify-center gap-2">
+                            <span class="text-2xl">🧺</span>
+                            <span>${_col('Daiktų svarstyklės (Kur daugiau?)')}</span>
+                        </button>
+                        <button onclick="startGame('stairs')" class="w-full py-3 sm:py-4 px-4 rounded-2xl bg-indigo-500 hover:bg-indigo-600 text-white font-black text-base sm:text-xl shadow-lg transition transform active:scale-95 border-b-4 border-indigo-700 flex items-center justify-center gap-2">
+                            <span class="text-2xl">🪜</span>
+                            <span>${_col('Skaičių laipteliai (Nuo mažiausio!)')}</span>
+                        </button>
+                    </div>
+                </div>
+            `;
         }
 
-        function nextQuestion() {
-            if (currentQuestion >= totalQuestions) {
-                endGame();
-                return;
-            }
-            currentQuestion++;
-            updateStats();
-            
-            [currentNum1, currentNum2] = generateNumbers();
-            document.getElementById('num1').textContent = currentNum1;
-            document.getElementById('num2').textContent = currentNum2;
-            document.getElementById('operator').textContent = '?';
-            document.getElementById('operator').className = 'text-5xl md:text-7xl font-black text-gray-300 w-16 text-center';
-            document.getElementById('feedback').style.opacity = '0';
-            
-            document.getElementById('num1').classList.remove('shake', 'bounce', 'text-red-500', 'text-green-500');
-            document.getElementById('num2').classList.remove('shake', 'bounce', 'text-red-500', 'text-green-500');
-            document.getElementById('num1').classList.add('text-sky-600');
-            document.getElementById('num2').classList.add('text-sky-600');
-            
-            ['btn-lt', 'btn-eq', 'btn-gt'].forEach(id => {
-                const b = document.getElementById(id);
-                if (b) {
-                    b.disabled = false;
-                    b.style.opacity = '1';
-                    b.classList.remove('opacity-50', 'line-through', 'cursor-not-allowed');
-                }
-            });
-            
-            isWaiting = false;
-            firstTry = true;
+        function startGame(mode) {
+            initAudio();
+            playSound('click');
+            state.mode = mode;
+            state.score = 0;
+            state.streak = 0;
+            state.question = 1;
+            generateQuestion();
         }
 
-        let firstTry = true;
-
-        function updateStats() {
-            document.getElementById('score').textContent = score;
-            document.getElementById('question-counter').textContent = currentQuestion;
-            document.getElementById('streak').textContent = streak;
+        function restartCurrentMode() {
+            startGame(state.mode);
         }
 
-        function checkAnswer(answer, btn) {
-            if (isWaiting) return;
-
-            let correct = false;
-            let correctAnswer = '';
-            
-            if (currentNum1 > currentNum2) correctAnswer = '>';
-            else if (currentNum1 < currentNum2) correctAnswer = '<';
-            else correctAnswer = '=';
-
-            correct = (answer === correctAnswer);
-
-            const feedback = document.getElementById('feedback');
-            const op = document.getElementById('operator');
-
-            if (correct) {
-                isWaiting = true;
-                if (firstTry) {
-                    score++;
-                    streak++;
-                }
-                op.textContent = answer;
-                playSound('correct');
-                feedback.textContent = ['Puiku! 🎉', 'Šaunuolis! 🌟', 'Teisingai! 👏'][Math.floor(Math.random() * 3)];
-                feedback.className = 'text-xl sm:text-2xl font-bold h-7 sm:h-8 mb-3 sm:mb-4 text-green-500';
-                
-                document.getElementById('num1').classList.add('bounce', 'text-green-500');
-                document.getElementById('num2').classList.add('bounce', 'text-green-500');
-                document.getElementById('num1').classList.remove('text-sky-600');
-                document.getElementById('num2').classList.remove('text-sky-600');
-                op.className = 'text-5xl md:text-7xl font-black text-green-500 w-16 text-center bounce';
-                
-                feedback.style.opacity = '1';
-                updateStats();
-                setTimeout(nextQuestion, 1200);
+        function advanceQuestion() {
+            if (state.question >= state.maxQuestions) {
+                renderEndScreen();
             } else {
-                firstTry = false;
-                streak = 0;
+                state.question++;
+                generateQuestion();
+            }
+        }
+
+        function generateQuestion() {
+            state.waiting = false;
+            state.firstTry = true;
+
+            if (state.mode === 'croc') {
+                generateCrocQuestion();
+            } else if (state.mode === 'baskets') {
+                generateBasketsQuestion();
+            } else {
+                generateStairsQuestion();
+            }
+        }
+
+        // ==========================================
+        // 1 REŽIMAS: ALKANAS KROKODILAS (PALYGINK SKAIČIUS)
+        // ==========================================
+        function generateCrocQuestion() {
+            state.crocState = '?';
+            // Progresyvus sudėtingumas: jei pasirinkta iki 20, paskutiniai klausimai gali pasiekti 20, jei iki 100 - iki 100
+            const limit = state.maxNum === 20
+                ? (state.question <= 5 ? 12 : 20)
+                : (state.question <= 3 ? 20 : 100);
+
+            if (Math.random() < 0.22) {
+                const n = randomInt(1, limit);
+                state.num1 = n;
+                state.num2 = n;
+            } else {
+                let n1 = randomInt(1, limit);
+                let n2 = randomInt(1, limit);
+                if (limit > 20 && Math.random() < 0.45) {
+                    // Artimi skaičiai arba sukeistos dešimtys/vienetai
+                    n2 = Math.max(0, Math.min(100, n1 + randomInt(-8, 8)));
+                }
+                while (n1 === n2) {
+                    n2 = randomInt(1, limit);
+                }
+                state.num1 = n1;
+                state.num2 = n2;
+            }
+            renderCrocScreen();
+        }
+
+        function buildVisualBars(num) {
+            if (num > 20) {
+                const tens = Math.floor(num / 10);
+                const ones = num % 10;
+                let tensHtml = '';
+                for (let i = 0; i < tens; i++) {
+                    tensHtml += `<span class="inline-flex items-center justify-center px-1.5 py-0.5 rounded bg-emerald-500 text-white text-[10px] sm:text-xs font-black shadow-sm">10</span>`;
+                }
+                let onesHtml = '';
+                for (let i = 0; i < ones; i++) {
+                    onesHtml += `<span class="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-sky-500 inline-block"></span>`;
+                }
+                return `
+                    <div class="flex flex-col items-center gap-1 mt-1 min-h-[42px] justify-center">
+                        <div class="flex flex-wrap justify-center gap-1">${tensHtml}</div>
+                        <div class="flex flex-wrap justify-center gap-1">${onesHtml}</div>
+                    </div>
+                `;
+            }
+
+            // Skaičiams <= 20: dešimties juostelė (10 taškų) + pavieniai taškai
+            const tens = Math.floor(num / 10);
+            const ones = num % 10;
+            let html = '';
+            for (let t = 0; t < tens; t++) {
+                let barDots = '';
+                for (let d = 0; d < 10; d++) {
+                    barDots += `<span class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-emerald-200 inline-block"></span>`;
+                }
+                html += `<div class="inline-flex items-center gap-0.5 px-1.5 py-1 rounded-lg bg-emerald-600 shadow-sm">${barDots}</div>`;
+            }
+            if (ones > 0) {
+                let dots = '';
+                for (let i = 0; i < ones; i++) {
+                    dots += `<span class="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 rounded-full bg-sky-500 inline-block shadow-sm"></span>`;
+                }
+                html += `<div class="flex flex-wrap justify-center gap-1 max-w-[115px]">${dots}</div>`;
+            }
+            return `<div class="flex flex-col items-center justify-center gap-1.5 mt-1 min-h-[48px]">${html}</div>`;
+        }
+
+        function renderCrocMouth() {
+            if (state.crocState === '?') {
+                return `
+                    <div class="flex flex-col items-center justify-center">
+                        <div class="text-3xl sm:text-4xl bounce">🐊</div>
+                        <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-emerald-100 dark:bg-emerald-950 border-2 border-emerald-400 flex items-center justify-center text-3xl sm:text-4xl font-black text-emerald-600 dark:text-emerald-300 shadow-inner">
+                            ?
+                        </div>
+                    </div>
+                `;
+            }
+            const label = state.crocState === '>'
+                ? 'Krokodilas valgo kairįjį!'
+                : (state.crocState === '<' ? 'Krokodilas valgo dešinįjį!' : 'Abu skaičiai lygūs!');
+            return `
+                <div class="flex flex-col items-center justify-center pop-in">
+                    <div class="text-3xl sm:text-4xl" style="transform: ${state.crocState === '>' ? 'scaleX(-1)' : 'scaleX(1)'}">🐊</div>
+                    <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-emerald-500 text-white border-b-4 border-emerald-700 flex items-center justify-center text-3xl sm:text-5xl font-black shadow-lg">
+                        ${state.crocState}
+                    </div>
+                    <span class="text-[10px] sm:text-xs font-extrabold text-emerald-600 dark:text-emerald-400 mt-0.5 text-center">${_col(label)}</span>
+                </div>
+            `;
+        }
+
+        function renderCrocScreen() {
+            app.innerHTML = `
+                ${renderTopBar()}
+                <div class="flex-1 flex flex-col p-3 sm:p-5 justify-between overflow-hidden fade-in">
+                    <div class="text-center">
+                        <h2 class="text-base sm:text-xl font-black text-slate-800 text-main-title">
+                            🐊 ${_col('Alkanas krokodilas visada ryja didesnį skaičių!')}
+                        </h2>
+                        <p class="text-xs sm:text-sm font-bold text-slate-500 text-sub-title">
+                            ${_col('Pasirink teisingą ženklą:')}
+                        </p>
+                    </div>
+
+                    <div id="croc-arena" class="panel-box rounded-2xl p-3 sm:p-5 flex items-center justify-between gap-2 sm:gap-4 my-1">
+                        <!-- Kairys skaičius -->
+                        <div id="card-left" class="num-card flex-1 rounded-2xl p-2.5 sm:p-4 flex flex-col items-center justify-center shadow-md min-h-[125px] sm:min-h-[155px]">
+                            <div class="text-4xl sm:text-6xl font-black text-sky-600 dark:text-sky-400">${state.num1}</div>
+                            ${buildVisualBars(state.num1)}
+                        </div>
+
+                        <!-- Krokodilo nasrai -->
+                        <div id="croc-center" class="shrink-0 w-20 sm:w-28 flex items-center justify-center">
+                            ${renderCrocMouth()}
+                        </div>
+
+                        <!-- Dešinys skaičius -->
+                        <div id="card-right" class="num-card flex-1 rounded-2xl p-2.5 sm:p-4 flex flex-col items-center justify-center shadow-md min-h-[125px] sm:min-h-[155px]">
+                            <div class="text-4xl sm:text-6xl font-black text-sky-600 dark:text-sky-400">${state.num2}</div>
+                            ${buildVisualBars(state.num2)}
+                        </div>
+                    </div>
+
+                    <div id="feedback" class="h-6 sm:h-7 flex items-center justify-center font-black text-sm sm:text-lg opacity-0 transition-opacity"></div>
+
+                    <div class="grid grid-cols-3 gap-2.5 sm:gap-4">
+                        <button id="btn-lt" onclick="checkCrocAnswer('<', this)" class="py-3 sm:py-4 rounded-2xl bg-purple-500 hover:bg-purple-600 text-white font-black text-3xl sm:text-5xl shadow-lg border-b-4 border-purple-700 transition transform active:scale-95">
+                            &lt;
+                        </button>
+                        <button id="btn-eq" onclick="checkCrocAnswer('=', this)" class="py-3 sm:py-4 rounded-2xl bg-amber-400 hover:bg-amber-500 text-slate-900 font-black text-3xl sm:text-5xl shadow-lg border-b-4 border-amber-600 transition transform active:scale-95">
+                            =
+                        </button>
+                        <button id="btn-gt" onclick="checkCrocAnswer('>', this)" class="py-3 sm:py-4 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white font-black text-3xl sm:text-5xl shadow-lg border-b-4 border-rose-700 transition transform active:scale-95">
+                            &gt;
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function checkCrocAnswer(ans, btn) {
+            if (state.waiting) return;
+            const expected = state.num1 > state.num2 ? '>' : (state.num1 < state.num2 ? '<' : '=');
+            const feedback = document.getElementById('feedback');
+            const center = document.getElementById('croc-center');
+            const arena = document.getElementById('croc-arena');
+
+            if (ans === expected) {
+                state.waiting = true;
+                state.crocState = ans;
+                playSound('correct');
+                if (state.firstTry) {
+                    state.score++;
+                    state.streak++;
+                }
+                if (center) center.innerHTML = renderCrocMouth();
+                const praise = getRandomElement(PRAISE_WORDS);
+                feedback.innerHTML = `${_col(praise)} 🎉`;
+                feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-base sm:text-xl text-emerald-500 opacity-100";
+                setTimeout(advanceQuestion, 1200);
+            } else {
+                state.firstTry = false;
+                state.streak = 0;
                 playSound('wrong');
                 if (btn) {
                     btn.disabled = true;
-                    btn.classList.add('opacity-50', 'line-through', 'cursor-not-allowed');
+                    btn.classList.add('opacity-40', 'cursor-not-allowed', 'shake');
                 }
-                feedback.textContent = 'Bandyk dar kartą! 🤔';
-                feedback.className = 'text-xl sm:text-2xl font-bold h-7 sm:h-8 mb-3 sm:mb-4 text-red-500';
-                
-                document.getElementById('num1').classList.remove('shake');
-                document.getElementById('num2').classList.remove('shake');
-                void document.getElementById('num1').offsetWidth;
-                document.getElementById('num1').classList.add('shake');
-                document.getElementById('num2').classList.add('shake');
-                
-                feedback.style.opacity = '1';
-                updateStats();
+                feedback.innerHTML = `${_col('Bandyk dar kartą! Kuris skaičius didesnis?')} 🤔`;
+                feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-xs sm:text-base text-rose-500 opacity-100";
+                if (arena) {
+                    arena.classList.remove('shake');
+                    void arena.offsetWidth;
+                    arena.classList.add('shake');
+                }
             }
         }
 
-        function endGame() {
-            showScreen('end');
-            playSound('win');
-            document.getElementById('final-score').textContent = score;
-            
-            let starsStr = '';
-            if (score >= 13) starsStr = '⭐⭐⭐';
-            else if (score >= 10) starsStr = '⭐⭐';
-            else starsStr = '⭐';
-            
-            document.getElementById('stars').textContent = starsStr;
+        // ==========================================
+        // 2 REŽIMAS: DAIKTŲ SVARSTYKLĖS (KUR DAUGIAU?)
+        // ==========================================
+        function makeBasketGroup(emoji) {
+            const hasTwoGroups = Math.random() > 0.35;
+            if (hasTwoGroups) {
+                const a = randomInt(1, 5);
+                const b = randomInt(1, 5);
+                return {
+                    a,
+                    b,
+                    total: a + b,
+                    emoji,
+                    label: `${a} ${emoji} ${_col('ir')} ${b} ${emoji}`
+                };
+            } else {
+                const a = randomInt(2, 9);
+                return {
+                    a,
+                    b: 0,
+                    total: a,
+                    emoji,
+                    label: `${a} ${emoji}`
+                };
+            }
         }
+
+        function generateBasketsQuestion() {
+            state.basketResult = '?';
+            const e1 = getRandomElement(BASKET_ITEMS);
+            let e2 = getRandomElement(BASKET_ITEMS);
+            if (e2 === e1) e2 = '🍏';
+
+            state.leftBasket = makeBasketGroup(e1);
+            state.rightBasket = makeBasketGroup(e2);
+            renderBasketsScreen();
+        }
+
+        function renderBasketEmojis(basket) {
+            let html = '';
+            for (let i = 0; i < basket.a; i++) {
+                html += `<span class="text-xl sm:text-2xl inline-block">${basket.emoji}</span>`;
+            }
+            if (basket.b > 0) {
+                html += `<span class="text-sm sm:text-base font-black text-amber-600 px-1">+</span>`;
+                for (let i = 0; i < basket.b; i++) {
+                    html += `<span class="text-xl sm:text-2xl inline-block">${basket.emoji}</span>`;
+                }
+            }
+            return html;
+        }
+
+        function renderBasketsScreen() {
+            app.innerHTML = `
+                ${renderTopBar()}
+                <div class="flex-1 flex flex-col p-3 sm:p-5 justify-between overflow-hidden fade-in">
+                    <div class="text-center">
+                        <h2 class="text-base sm:text-xl font-black text-slate-800 text-main-title">
+                            🧺 ${_col('Suskaičiuok daiktus krepšeliuose! Kur daugiau?')}
+                        </h2>
+                        <p class="text-xs sm:text-sm font-bold text-slate-500 text-sub-title">
+                            ${_col('Paspausk ženklą apačioje arba sunkesnį krepšelį:')}
+                        </p>
+                    </div>
+
+                    <div id="baskets-arena" class="panel-box rounded-2xl p-3 sm:p-4 flex items-center justify-between gap-2 sm:gap-4 my-1">
+                        <!-- Kairys krepšelis -->
+                        <button onclick="checkBasketAnswer('>')" id="basket-left" class="basket-card flex-1 rounded-2xl p-2.5 sm:p-3.5 flex flex-col items-center justify-between shadow-md min-h-[135px] sm:min-h-[160px] active:scale-95">
+                            <span class="text-xs sm:text-sm font-black text-amber-800 dark:text-amber-300">🧺 ${_col('Kairys krepšelis')}</span>
+                            <div class="flex flex-wrap items-center justify-center gap-1 my-1.5">
+                                ${renderBasketEmojis(state.leftBasket)}
+                            </div>
+                            <span class="text-xs sm:text-sm font-extrabold px-2.5 py-0.5 rounded-full bg-amber-200/70 dark:bg-slate-700 text-slate-800 dark:text-slate-100">
+                                ${state.leftBasket.label}
+                            </span>
+                        </button>
+
+                        <!-- Vidurio ženklas -->
+                        <div id="basket-op" class="w-11 h-11 sm:w-14 sm:h-14 rounded-2xl bg-amber-500 text-white font-black text-2xl sm:text-4xl flex items-center justify-center shadow-md shrink-0">
+                            ${state.basketResult}
+                        </div>
+
+                        <!-- Dešinys krepšelis -->
+                        <button onclick="checkBasketAnswer('<')" id="basket-right" class="basket-card flex-1 rounded-2xl p-2.5 sm:p-3.5 flex flex-col items-center justify-between shadow-md min-h-[135px] sm:min-h-[160px] active:scale-95">
+                            <span class="text-xs sm:text-sm font-black text-amber-800 dark:text-amber-300">🧺 ${_col('Dešinys krepšelis')}</span>
+                            <div class="flex flex-wrap items-center justify-center gap-1 my-1.5">
+                                ${renderBasketEmojis(state.rightBasket)}
+                            </div>
+                            <span class="text-xs sm:text-sm font-extrabold px-2.5 py-0.5 rounded-full bg-amber-200/70 dark:bg-slate-700 text-slate-800 dark:text-slate-100">
+                                ${state.rightBasket.label}
+                            </span>
+                        </button>
+                    </div>
+
+                    <div id="feedback" class="h-6 sm:h-7 flex items-center justify-center font-black text-sm sm:text-lg opacity-0 transition-opacity"></div>
+
+                    <div class="grid grid-cols-3 gap-2.5 sm:gap-4">
+                        <button id="bsk-lt" onclick="checkBasketAnswer('<', this)" class="py-3 sm:py-4 rounded-2xl bg-purple-500 hover:bg-purple-600 text-white font-black text-3xl sm:text-5xl shadow-lg border-b-4 border-purple-700 transition transform active:scale-95">
+                            &lt;
+                        </button>
+                        <button id="bsk-eq" onclick="checkBasketAnswer('=', this)" class="py-3 sm:py-4 rounded-2xl bg-amber-400 hover:bg-amber-500 text-slate-900 font-black text-3xl sm:text-5xl shadow-lg border-b-4 border-amber-600 transition transform active:scale-95">
+                            =
+                        </button>
+                        <button id="bsk-gt" onclick="checkBasketAnswer('>', this)" class="py-3 sm:py-4 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white font-black text-3xl sm:text-5xl shadow-lg border-b-4 border-rose-700 transition transform active:scale-95">
+                            &gt;
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function checkBasketAnswer(ans, btn) {
+            if (state.waiting) return;
+            const l = state.leftBasket.total;
+            const r = state.rightBasket.total;
+            const expected = l > r ? '>' : (l < r ? '<' : '=');
+
+            const feedback = document.getElementById('feedback');
+            const opEl = document.getElementById('basket-op');
+            const leftCard = document.getElementById('basket-left');
+            const rightCard = document.getElementById('basket-right');
+            const arena = document.getElementById('baskets-arena');
+
+            if (ans === expected) {
+                state.waiting = true;
+                state.basketResult = ans;
+                playSound('correct');
+                if (state.firstTry) {
+                    state.score++;
+                    state.streak++;
+                }
+                if (opEl) {
+                    opEl.textContent = ans;
+                    opEl.className = "w-11 h-11 sm:w-14 sm:h-14 rounded-2xl bg-emerald-500 text-white font-black text-2xl sm:text-4xl flex items-center justify-center shadow-md shrink-0 bounce";
+                }
+                if (l > r && leftCard) leftCard.style.transform = 'translateY(6px)';
+                if (r > l && rightCard) rightCard.style.transform = 'translateY(6px)';
+
+                feedback.innerHTML = `${_col('Teisingai!')} (${l} ${ans} ${r}) 🎉`;
+                feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-base sm:text-xl text-emerald-500 opacity-100";
+                setTimeout(advanceQuestion, 1200);
+            } else {
+                state.firstTry = false;
+                state.streak = 0;
+                playSound('wrong');
+                if (btn) {
+                    btn.disabled = true;
+                    btn.classList.add('opacity-40', 'cursor-not-allowed', 'shake');
+                }
+                feedback.innerHTML = `${_col('Suskaičiuok dar kartelį!')} 🤔`;
+                feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-xs sm:text-base text-rose-500 opacity-100";
+                if (arena) {
+                    arena.classList.remove('shake');
+                    void arena.offsetWidth;
+                    arena.classList.add('shake');
+                }
+            }
+        }
+
+        // ==========================================
+        // 3 REŽIMAS: SKAIČIŲ LAIPTELIAI (NUO MAŽIAUSIO!)
+        // ==========================================
+        function generateStairsQuestion() {
+            const limit = state.maxNum === 20 ? 20 : 100;
+            const nums = new Set();
+            while (nums.size < 4) {
+                nums.add(randomInt(1, limit));
+            }
+            state.poolNumbers = Array.from(nums).map((val, idx) => ({
+                id: idx,
+                val,
+                placed: false
+            }));
+            state.stairs = [null, null, null, null];
+            state.frogAtFlag = false;
+            renderStairsScreen();
+        }
+
+        function placeNumberOnStair(poolId) {
+            if (state.waiting) return;
+            const item = state.poolNumbers.find(x => x.id === poolId);
+            if (!item || item.placed) return;
+
+            const emptyIdx = state.stairs.findIndex(s => s === null);
+            if (emptyIdx === -1) return;
+
+            item.placed = true;
+            state.stairs[emptyIdx] = poolId;
+            playSound('hop');
+            renderStairsScreen();
+
+            // Jei užpildyti visi 4 laipteliai, patikriname automatiškai
+            if (state.stairs.every(s => s !== null)) {
+                verifyStairsOrder();
+            }
+        }
+
+        function removeNumberFromStair(stepIdx) {
+            if (state.waiting) return;
+            const poolId = state.stairs[stepIdx];
+            if (poolId === null) return;
+            const item = state.poolNumbers.find(x => x.id === poolId);
+            if (item) item.placed = false;
+            state.stairs[stepIdx] = null;
+            playSound('click');
+            renderStairsScreen();
+        }
+
+        function clearAllStairs() {
+            if (state.waiting) return;
+            state.poolNumbers.forEach(x => { x.placed = false; });
+            state.stairs = [null, null, null, null];
+            playSound('click');
+            renderStairsScreen();
+        }
+
+        function verifyStairsOrder() {
+            if (state.waiting) return;
+            const feedback = document.getElementById('feedback');
+
+            if (state.stairs.some(s => s === null)) {
+                playSound('wrong');
+                if (feedback) {
+                    feedback.innerHTML = `${_col('Užpildyk visus 4 laiptelius!')} 🐸`;
+                    feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-xs sm:text-base text-amber-500 opacity-100";
+                }
+                return;
+            }
+
+            const placedVals = state.stairs.map(id => state.poolNumbers.find(x => x.id === id).val);
+            const sortedVals = [...placedVals].sort((a, b) => a - b);
+            const isOrdered = placedVals.every((v, i) => v === sortedVals[i]);
+
+            if (isOrdered) {
+                state.waiting = true;
+                state.frogAtFlag = true;
+                playSound('correct');
+                if (state.firstTry) {
+                    state.score++;
+                    state.streak++;
+                }
+                renderStairsScreen();
+                const newFb = document.getElementById('feedback');
+                if (newFb) {
+                    newFb.innerHTML = `${_col('Puiku! Varlytė užšoko iki vėliavėlės!')} 🐸🚩`;
+                    newFb.className = "h-6 sm:h-7 flex items-center justify-center font-black text-sm sm:text-lg text-emerald-500 opacity-100";
+                }
+                setTimeout(advanceQuestion, 1300);
+            } else {
+                state.firstTry = false;
+                state.streak = 0;
+                playSound('wrong');
+                const arena = document.getElementById('stairs-arena');
+                if (arena) {
+                    arena.classList.remove('shake');
+                    void arena.offsetWidth;
+                    arena.classList.add('shake');
+                }
+                if (feedback) {
+                    feedback.innerHTML = `${_col('Ne iš eilės! Paspausk ant skaičiaus laiptelyje, kad jį pakeistum.')} 🤔`;
+                    feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-xs sm:text-sm text-rose-500 opacity-100";
+                }
+            }
+        }
+
+        function renderStairsScreen() {
+            const heights = ['h-16 sm:h-20', 'h-24 sm:h-28', 'h-32 sm:h-36', 'h-40 sm:h-44'];
+
+            // Kur stovi varlytė
+            let frogStep = -1;
+            for (let i = 0; i < 4; i++) {
+                if (state.stairs[i] !== null) frogStep = i;
+                else break;
+            }
+
+            const stepsHtml = state.stairs.map((poolId, idx) => {
+                const item = poolId !== null ? state.poolNumbers.find(x => x.id === poolId) : null;
+                const hasFrog = !state.frogAtFlag && frogStep === idx;
+                return `
+                    <div class="flex-1 flex flex-col items-center justify-end">
+                        <div class="h-7 sm:h-8 flex items-center justify-center text-xl sm:text-2xl">
+                            ${hasFrog ? '<span class="bounce">🐸</span>' : ''}
+                        </div>
+                        <button onclick="removeNumberFromStair(${idx})" class="stair-slot ${item ? 'filled pop-in' : ''} w-full ${heights[idx]} rounded-t-2xl flex flex-col items-center justify-start pt-2 sm:pt-3 shadow-md">
+                            <span class="text-[10px] sm:text-xs font-bold opacity-60">${idx + 1}</span>
+                            <span class="text-2xl sm:text-4xl font-black mt-0.5">${item ? item.val : '?'}</span>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+
+            const bubblesHtml = state.poolNumbers.map(item => `
+                <button onclick="placeNumberOnStair(${item.id})" ${item.placed ? 'disabled' : ''} class="bubble-btn flex-1 py-2.5 sm:py-3.5 rounded-2xl font-black text-2xl sm:text-3xl border-b-4 shadow-md transition transform active:scale-95 ${item.placed ? 'opacity-25 cursor-not-allowed scale-90' : ''}">
+                    ${item.val}
+                </button>
+            `).join('');
+
+            app.innerHTML = `
+                ${renderTopBar()}
+                <div class="flex-1 flex flex-col p-3 sm:p-5 justify-between overflow-hidden fade-in">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h2 class="text-sm sm:text-lg font-black text-slate-800 text-main-title">
+                                🪜 ${_col('Surikiuok nuo mažiausio iki didžiausio!')}
+                            </h2>
+                            <p class="text-[11px] sm:text-xs font-bold text-slate-500 text-sub-title">
+                                ${_col('Paspausk skaičius iš eilės (paspausk ant laiptelio, jei nori nuimti):')}
+                            </p>
+                        </div>
+                        <button onclick="clearAllStairs()" class="text-xs sm:text-sm font-extrabold text-rose-500 hover:underline shrink-0 ml-2">
+                            🗑️ ${_col('Išvalyti')}
+                        </button>
+                    </div>
+
+                    <!-- Laiptelių laukas -->
+                    <div id="stairs-arena" class="panel-box rounded-2xl px-3 sm:px-5 pt-2 pb-0 flex items-end justify-between gap-2 sm:gap-3 min-h-[185px] sm:min-h-[210px] relative overflow-hidden">
+                        <!-- Pradinė varlytė, jei dar niekas nepadėta -->
+                        <div class="flex flex-col items-center justify-end pb-2 w-8 sm:w-10">
+                            <span class="text-2xl sm:text-3xl ${frogStep === -1 && !state.frogAtFlag ? 'bounce' : 'opacity-20'}">🐸</span>
+                        </div>
+
+                        ${stepsHtml}
+
+                        <!-- Finišo vėliavėlė viršuje -->
+                        <div class="flex flex-col items-center justify-end h-44 sm:h-48 pb-2 w-9 sm:w-12">
+                            <span class="text-2xl sm:text-3xl ${state.frogAtFlag ? 'bounce' : ''}">${state.frogAtFlag ? '🐸🚩' : '🚩'}</span>
+                            <div class="w-1.5 flex-1 bg-amber-500 rounded-full"></div>
+                        </div>
+                    </div>
+
+                    <div id="feedback" class="h-6 sm:h-7 flex items-center justify-center font-black text-xs sm:text-base opacity-0 transition-opacity"></div>
+
+                    <!-- Skaičių burbulai apačioje -->
+                    <div class="flex gap-2.5 sm:gap-3.5">
+                        ${bubblesHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderEndScreen() {
+            playSound('win');
+
+            let stars = 1;
+            if (state.score >= 8) stars = 3;
+            else if (state.score >= 5) stars = 2;
+
+            const starHtml = Array(3).fill(0).map((_, i) =>
+                `<span class="text-5xl sm:text-6xl ${i < stars ? 'text-yellow-400 bounce' : 'text-slate-300 opacity-40'} drop-shadow-md" style="animation-delay: ${i * 0.18}s">⭐</span>`
+            ).join('');
+
+            let message = 'Neblogai!';
+            if (stars === 3) message = 'Puikiai padirbėta!';
+            else if (stars === 2) message = 'Geras rezultatas!';
+
+            app.innerHTML = `
+                <div class="flex-1 flex flex-col items-center justify-center p-6 sm:p-8 text-center fade-in">
+                    <h2 class="text-main-title text-3xl sm:text-4xl font-black text-slate-800 mb-4">${_col('Žaidimas baigtas!')}</h2>
+                    
+                    <div class="flex justify-center gap-2 mb-4">
+                        ${starHtml}
+                    </div>
+                    
+                    <p class="text-sub-title text-xl sm:text-2xl font-bold text-slate-700 mb-2">${_col(message)} 🏆</p>
+                    <p class="text-sub-title text-lg sm:text-xl text-slate-600 mb-6">${_col('Surinkai:')} <span class="font-black text-emerald-500">${state.score} / ${state.maxQuestions}</span></p>
+                    
+                    <div class="flex flex-col sm:flex-row gap-3 w-full max-w-md justify-center">
+                        <button onclick="restartCurrentMode()" class="flex-1 py-3.5 px-5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-lg sm:text-xl shadow-lg transition transform active:scale-95 border-b-4 border-emerald-700">
+                            🔄 ${_col('Žaisti dar kartą')}
+                        </button>
+                        <button onclick="renderStartScreen()" class="flex-1 py-3.5 px-5 rounded-2xl bg-sky-500 hover:bg-sky-600 text-white font-black text-lg sm:text-xl shadow-lg transition transform active:scale-95 border-b-4 border-sky-700">
+                            🏠 ${_col('Meniu')}
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Paleidžiame pradinį ekraną
+        renderStartScreen();
     </script>
 </body>
 </html>

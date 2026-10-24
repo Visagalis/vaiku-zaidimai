@@ -6,66 +6,143 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Linksmoji Matematika</title>
-    <!-- Pridedame Tailwind konfigūraciją, kad veiktų 'dark' klasė -->
-    <script>
-        tailwind = {
-            config: {
-                darkMode: 'class',
-            }
-        }
-    </script>
+    <title>🔢 Linksmoji Matematika</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap');
-        
         body {
             font-family: 'Nunito', sans-serif;
-            background-color: #f0f9ff;
-            background-image: radial-gradient(#bae6fd 2px, transparent 2px);
-            background-size: 30px 30px;
+            background-color: #e0f2fe;
+            background-image: radial-gradient(#7dd3fc 20%, transparent 20%);
+            background-size: 24px 24px;
             touch-action: manipulation;
-            transition: background-color 0.3s, background-image 0.3s;
+            user-select: none;
+            -webkit-user-select: none;
+            color: #1e293b;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        /* Tamsios temos fono taisyklės */
-        html.dark body {
-            background-color: #0f172a;
-            background-image: radial-gradient(#334155 2px, transparent 2px);
-        }
-
-        .bounce {
-            animation: bounce 0.6s cubic-bezier(0.28, 0.84, 0.42, 1);
-        }
-
+        .bounce { animation: bounce 0.45s cubic-bezier(0.28, 0.84, 0.42, 1); }
         @keyframes bounce {
-            0%   { transform: scale(1,1)      translateY(0); }
-            10%  { transform: scale(1.1,.9)   translateY(0); }
-            30%  { transform: scale(.9,1.1)   translateY(-30px); }
-            50%  { transform: scale(1.05,.95) translateY(0); }
-            57%  { transform: scale(1,1)      translateY(-7px); }
-            64%  { transform: scale(1,1)      translateY(0); }
-            100% { transform: scale(1,1)      translateY(0); }
+            0%, 100% { transform: translateY(0) scale(1); }
+            45% { transform: translateY(-12px) scale(1.08); }
         }
 
-        .shake {
-            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
-        }
-
+        .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
         @keyframes shake {
-            10%, 90% { transform: translate3d(-2px, 0, 0); }
-            20%, 80% { transform: translate3d(4px, 0, 0); }
-            30%, 50%, 70% { transform: translate3d(-8px, 0, 0); }
-            40%, 60% { transform: translate3d(8px, 0, 0); }
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
         }
 
-        .btn-option {
-            transition: all 0.2s ease;
+        .fade-in { animation: fadeIn 0.25s ease-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.97); }
+            to { opacity: 1; transform: scale(1); }
         }
-        
-        .btn-option:active {
-            transform: scale(0.95);
+
+        .pop-in { animation: popIn 0.22s cubic-bezier(0.34, 1.56, 0.64, 1); }
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.5); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .float-anim { animation: floatSlow 2.6s ease-in-out infinite; }
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+
+        /* Šviesios temos kortelės ir panelės */
+        .app-card {
+            background-color: rgba(255, 255, 255, 0.97);
+            border-color: #7dd3fc;
+        }
+        .panel-box {
+            background-color: #f0f9ff;
+            border: 2px dashed #38bdf8;
+        }
+        .sub-panel {
+            background-color: #f8fafc;
+            border: 2px solid #cbd5e1;
+        }
+        .opt-btn {
+            background-color: #e0f2fe;
+            color: #0369a1;
+            border-color: #7dd3fc;
+        }
+        .opt-btn:hover {
+            background-color: #bae6fd;
+        }
+        .token-btn {
+            background-color: #ffffff;
+            border: 2px solid #bae6fd;
+            transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+        }
+        .token-btn.counted {
+            background-color: #fef08a;
+            border-color: #eab308;
+            transform: scale(1.1);
+        }
+        .scale-beam {
+            transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-origin: center center;
+        }
+        .scale-pan {
+            background-color: #ffffff;
+            border: 3px solid #38bdf8;
+            transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.3s ease;
+        }
+
+        /* Automatinė tamsioji tema (Dark Mode) */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #0b1120 !important;
+                background-image: radial-gradient(#1e293b 25%, transparent 25%) !important;
+                color: #f8fafc !important;
+            }
+            .app-card {
+                background-color: #0f172a !important;
+                border-color: #334155 !important;
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.7) !important;
+            }
+            .panel-box {
+                background-color: #1e293b !important;
+                border: 2px dashed #475569 !important;
+            }
+            .sub-panel {
+                background-color: #1e293b !important;
+                border-color: #334155 !important;
+            }
+            .opt-btn {
+                background-color: #1e293b !important;
+                color: #f8fafc !important;
+                border-color: #334155 !important;
+            }
+            .opt-btn:hover {
+                background-color: #334155 !important;
+            }
+            .token-btn {
+                background-color: #1e293b !important;
+                border-color: #475569 !important;
+                color: #f8fafc !important;
+            }
+            .token-btn.counted {
+                background-color: #422006 !important;
+                border-color: #eab308 !important;
+            }
+            .scale-pan {
+                background-color: #1e293b !important;
+                border-color: #475569 !important;
+                color: #f8fafc !important;
+            }
+            .text-main-title {
+                color: #f8fafc !important;
+            }
+            .text-sub-title {
+                color: #cbd5e1 !important;
+            }
         }
     </style>
     <!-- Apsauga nuo priartinimo gestais (pinch to zoom) -->
@@ -90,81 +167,109 @@
         }, { passive: false });
     </script>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-2 sm:p-4 overflow-y-auto">
+<body class="h-screen max-h-screen overflow-hidden flex items-center justify-center p-2 sm:p-4">
 
-    <!-- Temos perjungimo mygtukas -->
-    <button onclick="toggleTheme()" class="absolute top-4 right-4 p-3 bg-white dark:bg-slate-800 rounded-full shadow-lg text-2xl hover:scale-110 transition-transform border-2 border-sky-200 dark:border-slate-700 z-10 focus:outline-none">
-        <span id="theme-icon">🌙</span>
-    </button>
-
-    <div class="max-w-md w-full bg-white dark:bg-slate-800 rounded-[2rem] shadow-2xl overflow-hidden border-4 border-sky-200 dark:border-indigo-900 transition-colors duration-300">
-        
-        <!-- Antraštė ir taškai -->
-        <div class="bg-sky-400 dark:bg-indigo-600 p-6 text-center relative transition-colors duration-300">
-            <h1 class="text-3xl font-black text-white tracking-wide mb-2 drop-shadow-md">🔢 Matematika</h1>
-            <div class="inline-block bg-white/30 dark:bg-black/30 rounded-full px-6 py-2 backdrop-blur-sm transition-colors duration-300">
-                <span class="text-sky-900 dark:text-indigo-100 font-bold text-xl transition-colors duration-300">
-                    Taškai: <span id="score" class="text-2xl text-yellow-300 drop-shadow inline-block transition-transform duration-300">0</span> ⭐️
-                </span>
-            </div>
-            <div class="absolute -top-6 -right-4 text-6xl rotate-12 drop-shadow-lg">🦉</div>
-        </div>
-
-        <!-- Žaidimo laukas -->
-        <div class="p-4 sm:p-8 text-center">
-            
-            <!-- Matematikos uždavinys -->
-            <div id="problem-container" class="mb-8 flex items-center justify-center min-h-[80px]">
-                <h2 id="problem" class="text-5xl sm:text-6xl font-black text-slate-700 dark:text-slate-100 tracking-wider whitespace-nowrap transition-colors duration-300">
-                    <!-- Uždavinys atsiras čia -->
-                </h2>
-            </div>
-
-            <!-- Atsakymų mygtukai -->
-            <div id="options" class="grid grid-cols-2 gap-3 sm:gap-4">
-                <!-- Mygtukai bus sugeneruoti per JavaScript -->
-            </div>
-
-            <!-- Pranešimas vaikui -->
-            <div id="feedback" class="mt-6 sm:mt-8 h-8 sm:h-12 text-xl sm:text-2xl font-bold text-sky-500 dark:text-indigo-400 transition-opacity duration-300 opacity-0 flex items-center justify-center">
-                Puiku!
-            </div>
-        </div>
-        
+    <div id="app" class="app-card w-full max-w-2xl rounded-3xl shadow-2xl flex flex-col relative fade-in border-4 overflow-hidden max-h-full">
+        <!-- Turinys generuojamas per JS -->
     </div>
 
     <script>
-        const scoreEl = document.getElementById('score');
-        const problemEl = document.getElementById('problem');
-        const optionsEl = document.getElementById('options');
-        const feedbackEl = document.getElementById('feedback');
-        const problemContainer = document.getElementById('problem-container');
-        const themeIcon = document.getElementById('theme-icon');
+        // === SKIEMENŲ SPALVINIMAS ===
+        const _V = 'aeėęiįyouųūąAEĖĘIĮYOUŲŪĄ';
+        const _D = ['ai','au','ei','eu','ie','uo','ui','oi','ia','io','iu'];
+        const _L = /[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/;
+        const _O = new Set(['bl','br','dr','dv','fl','fr','gl','gr','gn','kl','kr','kn','kv','pl','pr','sk','sl','sm','sn','sp','sr','st','sv','šl','šv','šn','tr','tv','vr','žl','žv','str','skr','spr']);
+        const _SC = ['#dc2626','#2563eb','#16a34a','#ea580c','#9333ea','#db2777'];
 
-        let currentScore = 0;
-        let correctAnswer = 0;
-        let isWaitingForNext = false;
-        let wrongStreak = 0; // Skaičiuojame klaidas iš eilės
-
-        const praiseWords = ["Šaunuolis!", "Puiku!", "Teisingai!", "Nuostabu!", "Super!", "Genialu!"];
-
-        // Temos keitimo logika
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            document.documentElement.classList.add('dark');
-            if (themeIcon) themeIcon.textContent = '☀️';
-        }
-        function toggleTheme() {
-            document.documentElement.classList.toggle('dark');
-            if (document.documentElement.classList.contains('dark')) {
-                themeIcon.textContent = '☀️';
-            } else {
-                themeIcon.textContent = '🌙';
+        function _syl(word) {
+            if (!word || word.length <= 1) return [word || ''];
+            const r = []; let s = '', i = 0, n = word.length;
+            while (i < n) {
+                const c = word[i];
+                if (!_L.test(c)) { s += c; i++; continue; }
+                if (!_V.includes(c)) { s += c; i++; }
+                else {
+                    if (i + 1 < n && _D.includes(word.slice(i, i + 2).toLowerCase())) { s += word.slice(i, i + 2); i += 2; }
+                    else { s += c; i++; }
+                    let j = i;
+                    while (j < n && _L.test(word[j]) && !_V.includes(word[j])) j++;
+                    let cl = word.slice(i, j);
+                    if (j >= n || !_L.test(word[j])) { s += cl; i = j; while (i < n && !_L.test(word[i])) { s += word[i]; i++; } r.push(s); s = ''; }
+                    else if (cl.length === 0) { r.push(s); s = ''; }
+                    else if (cl.length === 1) { r.push(s); s = cl; i = j; }
+                    else {
+                        let u = [];
+                        for (let k = 0; k < cl.length;) {
+                            const p = cl.slice(k, k + 2).toLowerCase();
+                            if (p === 'dz' || p === 'dž' || p === 'ch') { u.push(cl.slice(k, k + 2)); k += 2; }
+                            else { u.push(cl[k]); k++; }
+                        }
+                        let sp = u.length - 1;
+                        if (u.length >= 2) {
+                            const l2 = (u[u.length - 2] + u[u.length - 1]).toLowerCase();
+                            const l3 = u.length >= 3 ? (u[u.length - 3] + l2).toLowerCase() : '';
+                            if (l3 && _O.has(l3)) sp = u.length - 3;
+                            else if (_O.has(l2)) sp = u.length - 2;
+                        }
+                        s += u.slice(0, sp).join(''); r.push(s); s = u.slice(sp).join(''); i = j;
+                    }
+                }
             }
+            if (s) r.push(s);
+            return r.filter(x => x.length > 0);
         }
 
-        // Garso kontekstas
-        let audioCtx;
+        function _col(text) {
+            if (!text) return '';
+            return text.split(/(\s+)/).map(token => {
+                if (!token.trim() || !/[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/.test(token)) return token;
+                const syls = _syl(token);
+                return syls.map((s, i) => '<span style="color:' + _SC[i % _SC.length] + '">' + s + '</span>').join('');
+            }).join('');
+        }
+        // === /SKIEMENŲ SPALVINIMAS ===
 
+        const app = document.getElementById('app');
+
+        const EMOJIS = ['🍎', '🍓', '⭐', '🚗', '🎈', '🦆', '🦋', '🍐', '🍊'];
+        const PRAISE_WORDS = ['Šaunuolis!', 'Puiku!', 'Teisingai!', 'Nuostabu!', 'Super!'];
+
+        const state = {
+            mode: 'objects', // 'objects' | 'scale' | 'balloons'
+            score: 0,
+            streak: 0,
+            question: 1,
+            maxQuestions: 10,
+            waiting: false,
+            firstTry: true,
+
+            // Mode 1: Skaičiuok su daiktais
+            num1: 0,
+            num2: 0,
+            isAddition: true,
+            correctAnswer: 0,
+            emoji: '🍎',
+            countedMap: {},
+            countOrder: 0,
+            options: [],
+
+            // Mode 2: Matematinės svarstyklės
+            leftA: 0,
+            leftB: 0,
+            leftHasSum: false,
+            leftTotal: 0,
+            rightBase: 0,
+            rightGuess: 1,
+            missingTarget: 0,
+
+            // Mode 3: Balionų sprogdinimas
+            balloonTarget: 6,
+            balloons: [],
+            poppedCount: 0
+        };
+
+        // Web Audio API
+        let audioCtx;
         function initAudio() {
             if (!audioCtx) {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -174,180 +279,736 @@
             }
         }
 
-        function playTone(frequency, type, duration) {
-            if (!audioCtx) return;
-            const oscillator = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
-            
-            oscillator.type = type;
-            oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
-            
-            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
-            
-            oscillator.start();
-            oscillator.stop(audioCtx.currentTime + duration);
-        }
-
         function playSound(type) {
             initAudio();
-            if (type === 'correct') {
-                playTone(440, 'sine', 0.1);
-                setTimeout(() => playTone(554.37, 'sine', 0.1), 100);
-                setTimeout(() => playTone(659.25, 'sine', 0.2), 200);
+            if (!audioCtx) return;
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'click') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(700, now);
+                osc.frequency.exponentialRampToValueAtTime(1100, now + 0.07);
+                gain.gain.setValueAtTime(0.18, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.09);
+                osc.start(now);
+                osc.stop(now + 0.09);
+            } else if (type === 'pop') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(520, now);
+                osc.frequency.exponentialRampToValueAtTime(120, now + 0.11);
+                gain.gain.setValueAtTime(0.28, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
+                osc.start(now);
+                osc.stop(now + 0.12);
+            } else if (type === 'correct') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(440, now);
+                osc.frequency.setValueAtTime(554.37, now + 0.09);
+                osc.frequency.setValueAtTime(659.25, now + 0.18);
+                gain.gain.setValueAtTime(0.25, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                osc.start(now);
+                osc.stop(now + 0.35);
             } else if (type === 'wrong') {
-                playTone(250, 'sawtooth', 0.15);
-                setTimeout(() => playTone(200, 'sawtooth', 0.25), 150);
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(280, now);
+                osc.frequency.exponentialRampToValueAtTime(150, now + 0.22);
+                gain.gain.setValueAtTime(0.25, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                osc.start(now);
+                osc.stop(now + 0.25);
+            } else if (type === 'win') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(440, now);
+                osc.frequency.setValueAtTime(554.37, now + 0.1);
+                osc.frequency.setValueAtTime(659.25, now + 0.2);
+                osc.frequency.setValueAtTime(880, now + 0.3);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+                osc.start(now);
+                osc.stop(now + 0.6);
             }
+        }
+
+        function fireConfetti() {
+            if (typeof confetti !== 'function') return;
+            confetti({
+                particleCount: 35,
+                spread: 70,
+                origin: { y: 0.65 },
+                disableForReducedMotion: true
+            });
         }
 
         function randomInt(min, max) {
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
-        function generateProblem() {
-            isWaitingForNext = false;
-            feedbackEl.style.opacity = '0';
-            optionsEl.innerHTML = '';
-            problemContainer.classList.remove('bounce');
-
-            const isAddition = Math.random() > 0.5;
-            
-            // 75% tikimybė, kad generuosime skaičius tik iki 12.
-            // 25% tikimybė, kad generuosime iki 20.
-            const maxLimit = Math.random() < 0.75 ? 12 : 20;
-
-            let num1, num2;
-
-            if (isAddition) {
-                do {
-                    num1 = randomInt(0, maxLimit);
-                    num2 = randomInt(0, maxLimit);
-                } while (num1 + num2 > maxLimit); // Suma neviršys nustatytos ribos
-                
-                correctAnswer = num1 + num2;
-                problemEl.textContent = `${num1} + ${num2} = ?`;
-            } else {
-                do {
-                    num1 = randomInt(0, maxLimit);
-                    num2 = randomInt(0, maxLimit);
-                } while (num1 - num2 < 0); // Atsakymas nebus neigiamas
-                
-                correctAnswer = num1 - num2;
-                problemEl.textContent = `${num1} - ${num2} = ?`;
-            }
-
-            generateOptionButtons();
+        function getRandomElement(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
         }
 
-        function generateOptionButtons() {
-            let options = [correctAnswer];
-
-            while (options.length < 4) {
-                let offset = randomInt(-4, 4);
-                if (offset === 0) offset = 5; 
-                
-                let wrongAnswer = correctAnswer + offset;
-                
-                if (wrongAnswer < 0) wrongAnswer = correctAnswer + randomInt(1, 5);
-                
-                if (!options.includes(wrongAnswer)) {
-                    options.push(wrongAnswer);
-                }
-            }
-
-            options.sort(() => Math.random() - 0.5);
-
-            options.forEach(option => {
-                const btn = document.createElement('button');
-                btn.textContent = option;
-                // Priskiriame stilius (tiek šviesiai, tiek tamsiai temai)
-                btn.className = 'btn-option bg-sky-100 dark:bg-slate-700 hover:bg-sky-200 dark:hover:bg-slate-600 text-sky-800 dark:text-indigo-200 text-3xl sm:text-4xl font-black py-4 sm:py-6 rounded-2xl shadow-sm border-b-4 border-sky-300 dark:border-slate-900 active:border-b-0 focus:outline-none';
-                btn.onclick = () => checkAnswer(btn, option);
-                optionsEl.appendChild(btn);
-            });
+        function renderTopBar() {
+            return `
+                <div class="bg-sky-500 text-white px-3 sm:px-4 py-2 sm:py-2.5 flex justify-between items-center font-bold text-xs sm:text-base shadow-md shrink-0">
+                    <div class="flex items-center gap-1.5">
+                        <button onclick="renderStartScreen()" class="bg-sky-700 hover:bg-sky-800 px-2 py-1 rounded-lg text-xs sm:text-sm transition active:scale-95" title="Meniu">🏠 ${_col('Meniu')}</button>
+                        <span>⭐ ${_col('Taškai:')} <span class="text-yellow-300 font-black">${state.score}</span></span>
+                    </div>
+                    <div class="bg-sky-700 px-2.5 py-0.5 rounded-xl">${_col('Klausimas:')} <span class="text-yellow-300 font-black">${state.question} / ${state.maxQuestions}</span></div>
+                    <div>🔥 ${_col('Serija:')} <span class="text-orange-200 font-black">${state.streak}</span></div>
+                </div>
+            `;
         }
 
-        function checkAnswer(btn, selectedAnswer) {
+        function renderStartScreen() {
+            app.innerHTML = `
+                <div class="flex-1 flex flex-col items-center justify-center p-5 sm:p-8 text-center fade-in">
+                    <div class="text-5xl sm:text-6xl mb-2 bounce">🔢</div>
+                    <h1 class="text-main-title text-3xl sm:text-5xl font-black text-slate-800 mb-1 tracking-tight">${_col('Linksmoji Matematika')}</h1>
+                    <p class="text-sub-title text-sm sm:text-lg text-slate-600 mb-5 sm:mb-6 font-bold">${_col('Pasirink žaidimą ir skaičiuok smagiai!')}</p>
+                    
+                    <div class="flex flex-col gap-3 w-full max-w-md">
+                        <button onclick="startGame('objects')" class="w-full py-3 sm:py-4 px-4 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-base sm:text-xl shadow-lg transition transform active:scale-95 border-b-4 border-emerald-700 flex items-center justify-center gap-2">
+                            <span class="text-2xl">🍎</span>
+                            <span>${_col('Skaičiuok su daiktais (Iki 10 ir 20)')}</span>
+                        </button>
+                        <button onclick="startGame('scale')" class="w-full py-3 sm:py-4 px-4 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-black text-base sm:text-xl shadow-lg transition transform active:scale-95 border-b-4 border-amber-700 flex items-center justify-center gap-2">
+                            <span class="text-2xl">⚖️</span>
+                            <span>${_col('Matematinės svarstyklės')}</span>
+                        </button>
+                        <button onclick="startGame('balloons')" class="w-full py-3 sm:py-4 px-4 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white font-black text-base sm:text-xl shadow-lg transition transform active:scale-95 border-b-4 border-rose-700 flex items-center justify-center gap-2">
+                            <span class="text-2xl">🎈</span>
+                            <span>${_col('Balionų sprogdinimas')}</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function startGame(mode) {
             initAudio();
+            playSound('click');
+            state.mode = mode;
+            state.score = 0;
+            state.streak = 0;
+            state.question = 1;
+            generateQuestion();
+        }
 
-            if (isWaitingForNext) return;
+        function restartCurrentMode() {
+            startGame(state.mode);
+        }
 
-            if (selectedAnswer === correctAnswer) {
-                // TEISINGAI
-                isWaitingForNext = true;
-                wrongStreak = 0; // Nunuliname klaidų skaitliuką
-                currentScore++;
-                scoreEl.textContent = currentScore;
-                
-                playSound('correct');
+        function generateQuestion() {
+            state.waiting = false;
+            state.firstTry = true;
 
-                // Pakeičiame mygtuko stilių visiškai į žalią
-                btn.className = 'btn-option bg-green-400 text-white text-3xl sm:text-4xl font-black py-4 sm:py-6 rounded-2xl shadow-sm border-b-4 border-green-600 active:border-b-0 focus:outline-none';
-                
-                problemEl.textContent = problemEl.textContent.replace('?', correctAnswer);
-                problemContainer.classList.add('bounce');
-
-                feedbackEl.textContent = praiseWords[randomInt(0, praiseWords.length - 1)] + " 🌟";
-                feedbackEl.classList.remove('text-red-500', 'dark:text-red-400');
-                feedbackEl.classList.add('text-green-500', 'dark:text-green-400');
-                feedbackEl.style.opacity = '1';
-
-                fireConfetti();
-
-                setTimeout(generateProblem, 2200);
-
+            if (state.mode === 'objects') {
+                generateObjectsQuestion();
+            } else if (state.mode === 'scale') {
+                generateScaleQuestion();
             } else {
-                // NETEISINGAI
-                playSound('wrong');
-                wrongStreak++;
+                generateBalloonsQuestion();
+            }
+        }
 
-                // Keičiame mygtuko stilių į raudoną (su purtymu)
-                btn.className = 'btn-option bg-red-200 dark:bg-red-900/60 text-red-600 dark:text-red-300 text-3xl sm:text-4xl font-black py-4 sm:py-6 rounded-2xl shadow-sm border-b-4 border-red-300 dark:border-red-800 opacity-50 shake active:border-b-0 focus:outline-none';
-                btn.disabled = true;
+        function advanceQuestion() {
+            if (state.question >= state.maxQuestions) {
+                renderEndScreen();
+            } else {
+                state.question++;
+                generateQuestion();
+            }
+        }
 
-                feedbackEl.classList.remove('text-green-500', 'dark:text-green-400');
-                feedbackEl.classList.add('text-red-500', 'dark:text-red-400');
-                feedbackEl.style.opacity = '1';
+        // ==========================================
+        // 1 REŽIMAS: SKAIČIUOK SU DAIKTAIS (IKI 10 IR 20)
+        // ==========================================
+        function generateObjectsQuestion() {
+            state.emoji = getRandomElement(EMOJIS);
+            state.countedMap = {};
+            state.countOrder = 0;
+            state.isAddition = Math.random() > 0.42;
 
-                // Tikriname baudų sąlygą (2 iš eilės)
-                if (wrongStreak >= 2) {
-                    if (currentScore > 0) {
-                        currentScore--; // Atimame tašką
-                    }
-                    scoreEl.textContent = currentScore;
-                    feedbackEl.textContent = "Oj, praradai tašką! 📉";
-                    
-                    // Raudonas taškų mirktelėjimas
-                    scoreEl.classList.add('text-red-500', 'scale-150');
-                    setTimeout(() => scoreEl.classList.remove('text-red-500', 'scale-150'), 600);
-                    
-                    wrongStreak = 0; // Nunuliname, kad neprarastų vėl, jei spaus 3 kartą klaidingai
-                } else {
-                    feedbackEl.textContent = "Bandyk dar kartą! 💡";
+            // Pirmieji 6 klausimai iki 10, toliau iki 20
+            const maxLimit = state.question <= 6 ? 10 : 20;
+            const minTotal = state.question <= 6 ? 2 : 8;
+
+            if (state.isAddition) {
+                let a, b;
+                do {
+                    a = randomInt(1, maxLimit - 1);
+                    b = randomInt(1, maxLimit - a);
+                } while (a + b < minTotal || a + b > maxLimit);
+                state.num1 = a;
+                state.num2 = b;
+                state.correctAnswer = a + b;
+            } else {
+                let a, b;
+                do {
+                    a = randomInt(minTotal, maxLimit);
+                    b = randomInt(1, a - 1);
+                } while (a - b < 0);
+                state.num1 = a;
+                state.num2 = b;
+                state.correctAnswer = a - b;
+            }
+
+            const opts = new Set([state.correctAnswer]);
+            while (opts.size < 4) {
+                let diff = randomInt(-4, 4);
+                if (diff === 0) diff = 2;
+                let wrong = state.correctAnswer + diff;
+                if (wrong < 0) wrong = state.correctAnswer + randomInt(1, 5);
+                if (wrong !== state.correctAnswer) opts.add(wrong);
+            }
+            state.options = Array.from(opts).sort(() => Math.random() - 0.5);
+            renderObjectsScreen();
+        }
+
+        function toggleToken(idx) {
+            if (state.waiting) return;
+            playSound('click');
+            if (state.countedMap[idx]) {
+                delete state.countedMap[idx];
+            } else {
+                state.countOrder = Object.keys(state.countedMap).length + 1;
+                state.countedMap[idx] = true;
+            }
+            // Perskaičiuojame eilės numerius, kad būtų 1, 2, 3...
+            const keys = Object.keys(state.countedMap);
+            keys.forEach((k, i) => {
+                state.countedMap[k] = i + 1;
+            });
+            updateTokensUI();
+        }
+
+        function buildTokenButton(idx, crossedOut) {
+            const badgeNum = state.countedMap[idx];
+            const isCounted = Boolean(badgeNum);
+            return `
+                <button onclick="toggleToken(${idx})" id="tok-${idx}" class="token-btn ${isCounted ? 'counted bounce' : ''} relative w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center text-xl sm:text-2xl shadow-sm active:scale-90">
+                    <span class="${crossedOut ? 'opacity-40' : ''}">${state.emoji}</span>
+                    ${crossedOut ? '<span class="absolute inset-0 flex items-center justify-center text-red-500 font-black text-lg sm:text-xl pointer-events-none">✕</span>' : ''}
+                    ${isCounted ? `<span class="absolute -top-1.5 -right-1.5 bg-amber-500 text-white text-[10px] sm:text-xs font-black w-4 h-4 sm:w-5 sm:h-5 rounded-full flex items-center justify-center shadow">${badgeNum}</span>` : ''}
+                </button>
+            `;
+        }
+
+        function renderTokensMarkup() {
+            if (state.isAddition) {
+                let leftHtml = '';
+                for (let i = 0; i < state.num1; i++) {
+                    leftHtml += buildTokenButton(i, false);
                 }
-
-                setTimeout(() => btn.classList.remove('shake'), 500);
+                let rightHtml = '';
+                for (let i = 0; i < state.num2; i++) {
+                    rightHtml += buildTokenButton(state.num1 + i, false);
+                }
+                return `
+                    <div class="flex flex-wrap items-center justify-center gap-1 sm:gap-1.5">${leftHtml}</div>
+                    <div class="text-2xl sm:text-3xl font-black text-sky-500 px-1">+</div>
+                    <div class="flex flex-wrap items-center justify-center gap-1 sm:gap-1.5">${rightHtml}</div>
+                `;
+            } else {
+                let allHtml = '';
+                const keepCount = state.num1 - state.num2;
+                for (let i = 0; i < state.num1; i++) {
+                    const isCrossed = i >= keepCount;
+                    allHtml += buildTokenButton(i, isCrossed);
+                }
+                return `
+                    <div class="flex flex-wrap items-center justify-center gap-1 sm:gap-1.5">${allHtml}</div>
+                `;
             }
         }
 
-        function fireConfetti() {
-            var defaults = { spread: 360, ticks: 80, gravity: 0.6, decay: 0.95, startVelocity: 30, shapes: ['star'], colors: ['#FFE400', '#FFBD00', '#E89400', '#FFCA6C', '#FDFFB8'], disableForReducedMotion: true };
-            function shoot() {
-                confetti({ ...defaults, particleCount: 40, scalar: 1.2, shapes: ['star'] });
-                confetti({ ...defaults, particleCount: 10, scalar: 0.75, shapes: ['circle'] });
+        function updateTokensUI() {
+            const box = document.getElementById('tokens-container');
+            const counterEl = document.getElementById('tap-counter');
+            if (box) box.innerHTML = renderTokensMarkup();
+            if (counterEl) {
+                const c = Object.keys(state.countedMap).length;
+                counterEl.innerHTML = `${_col('Paspausta daiktų:')} <strong class="text-amber-500 font-black">${c}</strong>`;
             }
-            setTimeout(shoot, 0);
-            setTimeout(shoot, 100);
-            setTimeout(shoot, 200);
         }
 
-        window.onload = generateProblem;
+        function renderObjectsScreen() {
+            const sign = state.isAddition ? '+' : '-';
+            const optionsHtml = state.options.map((opt, idx) => `
+                <button id="opt-btn-${idx}" onclick="checkObjectsAnswer(${idx}, ${opt})" class="opt-btn py-2.5 sm:py-3.5 rounded-2xl font-black text-2xl sm:text-3xl shadow-md border-b-4 transition transform active:scale-95">
+                    ${opt}
+                </button>
+            `).join('');
+
+            const helperText = state.isAddition
+                ? 'Paspausk ant daiktų ir suskaičiuok, kiek jų iš viso!'
+                : 'Paspausk ir suskaičiuok, kiek neišbrauktų daiktų liko!';
+
+            app.innerHTML = `
+                ${renderTopBar()}
+                <div class="flex-1 flex flex-col p-3 sm:p-5 justify-between overflow-hidden fade-in">
+                    <div class="text-center">
+                        <p class="text-xs sm:text-sm font-bold text-slate-500 text-sub-title mb-1">${_col(helperText)}</p>
+                        <div id="problem-box" class="inline-block px-5 py-1.5 sm:py-2 rounded-2xl bg-sky-100 dark:bg-slate-800 border-2 border-sky-300 dark:border-slate-600 font-black text-3xl sm:text-5xl text-slate-800 text-main-title tracking-wider shadow-sm">
+                            ${state.num1} ${sign} ${state.num2} = <span id="ans-slot" class="text-sky-600 dark:text-sky-400">?</span>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col my-1">
+                        <div class="flex justify-between items-center px-1 mb-1 text-xs sm:text-sm font-bold">
+                            <span id="tap-counter" class="text-sub-title">${_col('Paspausta daiktų:')} <strong class="text-amber-500 font-black">0</strong></span>
+                            <button onclick="state.countedMap={}; playSound('click'); updateTokensUI();" class="text-sky-500 hover:underline font-extrabold text-xs sm:text-sm">🔄 ${_col('Skaičiuoti iš naujo')}</button>
+                        </div>
+                        <div id="tokens-container" class="panel-box rounded-2xl p-2.5 sm:p-3.5 min-h-[104px] sm:min-h-[125px] flex flex-wrap items-center justify-center gap-1.5">
+                            ${renderTokensMarkup()}
+                        </div>
+                    </div>
+
+                    <div id="feedback" class="h-6 sm:h-7 flex items-center justify-center font-black text-sm sm:text-lg opacity-0 transition-opacity"></div>
+
+                    <div class="grid grid-cols-2 gap-2.5 sm:gap-3">
+                        ${optionsHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        function checkObjectsAnswer(idx, val) {
+            if (state.waiting) return;
+            const btn = document.getElementById(`opt-btn-${idx}`);
+            const feedback = document.getElementById('feedback');
+            const problemBox = document.getElementById('problem-box');
+            const ansSlot = document.getElementById('ans-slot');
+
+            if (val === state.correctAnswer) {
+                state.waiting = true;
+                playSound('correct');
+                if (state.firstTry) {
+                    state.score++;
+                    state.streak++;
+                }
+                if (ansSlot) ansSlot.textContent = val;
+                if (problemBox) problemBox.classList.add('bounce');
+                if (btn) {
+                    btn.className = "py-2.5 sm:py-3.5 bg-emerald-500 text-white rounded-2xl font-black text-2xl sm:text-3xl shadow-md border-b-4 border-emerald-700 transform scale-105 bounce";
+                }
+                const praise = getRandomElement(PRAISE_WORDS);
+                feedback.innerHTML = `${_col(praise)} 🌟`;
+                feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-base sm:text-xl text-emerald-500 opacity-100";
+                fireConfetti();
+                setTimeout(advanceQuestion, 1200);
+            } else {
+                state.firstTry = false;
+                state.streak = 0;
+                playSound('wrong');
+                if (btn) {
+                    btn.disabled = true;
+                    btn.className = "py-2.5 sm:py-3.5 bg-red-100 dark:bg-red-950 text-red-400 border-red-300 border-2 rounded-2xl font-bold text-2xl sm:text-3xl line-through opacity-50 shake cursor-not-allowed";
+                }
+                feedback.innerHTML = `${_col('Bandyk dar kartą! Paspausk daiktus ir suskaičiuok.')} 🤔`;
+                feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-xs sm:text-base text-rose-500 opacity-100";
+            }
+        }
+
+        // ==========================================
+        // 2 REŽIMAS: MATEMATINĖS SVARSTYKLĖS
+        // ==========================================
+        function generateScaleQuestion() {
+            const maxSum = state.question <= 5 ? 10 : 15;
+            state.missingTarget = randomInt(1, 9);
+            state.rightBase = randomInt(1, Math.max(2, maxSum - state.missingTarget));
+            state.leftTotal = state.rightBase + state.missingTarget;
+
+            state.leftHasSum = state.question > 3 && Math.random() > 0.4;
+            if (state.leftHasSum) {
+                state.leftA = randomInt(1, state.leftTotal - 1);
+                state.leftB = state.leftTotal - state.leftA;
+            } else {
+                state.leftA = state.leftTotal;
+                state.leftB = 0;
+            }
+
+            // Pradedame su netinkamu svoriu, kad svarstyklės būtų pasvirusios
+            state.rightGuess = state.missingTarget === 1 ? 3 : 1;
+            renderScaleScreen();
+        }
+
+        function setScaleGuess(val) {
+            if (state.waiting) return;
+            const clamped = Math.max(0, Math.min(12, val));
+            state.rightGuess = clamped;
+            playSound('click');
+            updateScaleUI();
+        }
+
+        function adjustScaleGuess(delta) {
+            setScaleGuess(state.rightGuess + delta);
+        }
+
+        function renderScaleScreen() {
+            const leftLabel = state.leftHasSum ? `${state.leftA} + ${state.leftB}` : `${state.leftTotal}`;
+            const numButtons = [1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => `
+                <button id="num-blk-${n}" onclick="setScaleGuess(${n})" class="opt-btn py-2 sm:py-2.5 px-2.5 sm:px-3.5 rounded-xl font-black text-lg sm:text-xl border-b-4 shadow-sm transition transform active:scale-90">
+                    ${n}
+                </button>
+            `).join('');
+
+            app.innerHTML = `
+                ${renderTopBar()}
+                <div class="flex-1 flex flex-col p-3 sm:p-5 justify-between overflow-hidden fade-in">
+                    <div class="text-center">
+                        <h2 class="text-base sm:text-xl font-black text-slate-800 text-main-title">
+                            ⚖️ ${_col('Išlygink svarstykles! Surask trūkstamą skaičių:')}
+                        </h2>
+                    </div>
+
+                    <!-- Svarstyklių vizualizacija -->
+                    <div id="scale-area" class="panel-box rounded-2xl p-3 sm:p-4 flex flex-col items-center justify-center min-h-[150px] sm:min-h-[180px] relative overflow-hidden">
+                        <div id="scale-status" class="text-xs sm:text-sm font-black mb-2 px-3 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300">
+                        </div>
+
+                        <!-- Svarstyklių sija -->
+                        <div id="scale-beam" class="scale-beam w-full max-w-md flex items-center justify-between px-2 sm:px-6 relative my-2">
+                            <!-- Kairė lėkštė -->
+                            <div class="scale-pan rounded-2xl px-3 sm:px-4 py-2 sm:py-3 shadow-md flex flex-col items-center min-w-[110px] sm:min-w-[135px]">
+                                <span class="text-[11px] sm:text-xs font-bold text-slate-400">${_col('Kairė pusė')}</span>
+                                <span class="text-xl sm:text-3xl font-black text-sky-600 dark:text-sky-400">${leftLabel}</span>
+                                <span class="text-xs font-extrabold text-slate-500">(${_col('Svoris:')} ${state.leftTotal})</span>
+                            </div>
+
+                            <!-- Centrinis ženklas -->
+                            <div id="scale-op" class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-amber-500 text-white font-black text-xl sm:text-2xl flex items-center justify-center shadow-md shrink-0 mx-1">
+                                ?
+                            </div>
+
+                            <!-- Dešinė lėkštė -->
+                            <div class="scale-pan rounded-2xl px-3 sm:px-4 py-2 sm:py-3 shadow-md flex flex-col items-center min-w-[110px] sm:min-w-[135px]">
+                                <span class="text-[11px] sm:text-xs font-bold text-slate-400">${_col('Dešinė pusė')}</span>
+                                <div class="text-xl sm:text-3xl font-black text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                                    <span>${state.rightBase} +</span>
+                                    <span id="guess-box" class="inline-block px-2 py-0.5 rounded-lg bg-amber-100 dark:bg-amber-900/60 border-2 border-amber-400 text-amber-700 dark:text-amber-200">${state.rightGuess}</span>
+                                </div>
+                                <span id="right-sum-label" class="text-xs font-extrabold text-slate-500"></span>
+                            </div>
+                        </div>
+
+                        <!-- Svarstyklių stovas -->
+                        <div class="w-full max-w-md h-2 bg-slate-400 dark:bg-slate-500 rounded-full mt-1"></div>
+                        <div class="w-0 h-0 border-l-[18px] border-l-transparent border-r-[18px] border-r-transparent border-b-[22px] border-b-slate-500 dark:border-b-slate-400"></div>
+                    </div>
+
+                    <div id="feedback" class="h-6 flex items-center justify-center font-black text-sm sm:text-lg opacity-0 transition-opacity"></div>
+
+                    <!-- Valdymo mygtukai: -1 / +1 ir skaičių kaladėlės 1..9 -->
+                    <div class="sub-panel rounded-2xl p-2 sm:p-3 flex flex-col gap-2">
+                        <div class="flex items-center justify-center gap-2 sm:gap-3">
+                            <button onclick="adjustScaleGuess(-1)" class="px-3.5 py-1.5 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-black text-base sm:text-lg shadow border-b-4 border-rose-700 active:scale-95">
+                                -1
+                            </button>
+                            <span class="text-xs sm:text-sm font-extrabold text-sub-title">${_col('Pasirink trūkstamą skaičių:')}</span>
+                            <button onclick="adjustScaleGuess(1)" class="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-base sm:text-lg shadow border-b-4 border-emerald-700 active:scale-95">
+                                +1
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-9 gap-1 sm:gap-1.5">
+                            ${numButtons}
+                        </div>
+                    </div>
+
+                    <button onclick="checkScaleAnswer()" class="w-full py-2.5 sm:py-3.5 rounded-2xl bg-green-500 hover:bg-green-600 text-white font-black text-lg sm:text-2xl shadow-md border-b-4 border-green-700 transition transform active:scale-95">
+                        ${_col('Patikrinti!')} ✅
+                    </button>
+                </div>
+            `;
+            updateScaleUI();
+        }
+
+        function updateScaleUI() {
+            const beam = document.getElementById('scale-beam');
+            const guessBox = document.getElementById('guess-box');
+            const rightSumLabel = document.getElementById('right-sum-label');
+            const scaleOp = document.getElementById('scale-op');
+            const scaleStatus = document.getElementById('scale-status');
+
+            if (!beam || !guessBox) return;
+
+            const rightTotal = state.rightBase + state.rightGuess;
+            guessBox.textContent = state.rightGuess;
+            if (rightSumLabel) {
+                rightSumLabel.innerHTML = `(${_col('Svoris:')} ${rightTotal})`;
+            }
+
+            // Paryškiname pasirinktą kaladėlę
+            for (let n = 1; n <= 9; n++) {
+                const b = document.getElementById(`num-blk-${n}`);
+                if (b) {
+                    if (n === state.rightGuess) {
+                        b.className = "py-2 sm:py-2.5 px-2.5 sm:px-3.5 rounded-xl font-black text-lg sm:text-xl border-b-4 bg-amber-400 text-slate-900 border-amber-600 shadow-md scale-105 transition";
+                    } else {
+                        b.className = "opt-btn py-2 sm:py-2.5 px-2.5 sm:px-3.5 rounded-xl font-black text-lg sm:text-xl border-b-4 shadow-sm transition transform active:scale-90";
+                    }
+                }
+            }
+
+            if (rightTotal < state.leftTotal) {
+                beam.style.transform = 'rotate(-8deg)';
+                scaleOp.textContent = '>';
+                scaleOp.className = 'w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-amber-500 text-white font-black text-xl sm:text-2xl flex items-center justify-center shadow-md shrink-0 mx-1';
+                scaleStatus.innerHTML = `⬅️ ${_col('Kairė pusė sunkesnė! Pridėk dar svorio.')}`;
+                scaleStatus.className = 'text-xs sm:text-sm font-black mb-2 px-3 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300';
+            } else if (rightTotal > state.leftTotal) {
+                beam.style.transform = 'rotate(8deg)';
+                scaleOp.textContent = '<';
+                scaleOp.className = 'w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-rose-500 text-white font-black text-xl sm:text-2xl flex items-center justify-center shadow-md shrink-0 mx-1';
+                scaleStatus.innerHTML = `➡️ ${_col('Dešinė pusė per sunki! Sumažink skaičių.')}`;
+                scaleStatus.className = 'text-xs sm:text-sm font-black mb-2 px-3 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-rose-300';
+            } else {
+                beam.style.transform = 'rotate(0deg)';
+                scaleOp.textContent = '=';
+                scaleOp.className = 'w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-emerald-500 text-white font-black text-xl sm:text-2xl flex items-center justify-center shadow-md shrink-0 mx-1';
+                scaleStatus.innerHTML = `⚖️ ${_col('Svarstyklės lygios! Paspausk Patikrinti!')}`;
+                scaleStatus.className = 'text-xs sm:text-sm font-black mb-2 px-3 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300';
+            }
+        }
+
+        function checkScaleAnswer() {
+            if (state.waiting) return;
+            const rightTotal = state.rightBase + state.rightGuess;
+            const feedback = document.getElementById('feedback');
+            const scaleArea = document.getElementById('scale-area');
+
+            if (rightTotal === state.leftTotal) {
+                state.waiting = true;
+                playSound('correct');
+                if (state.firstTry) {
+                    state.score++;
+                    state.streak++;
+                }
+                feedback.innerHTML = `${_col('Puiku! Svarstyklės išlygintos!')} 🎉`;
+                feedback.className = "h-6 flex items-center justify-center font-black text-base sm:text-xl text-emerald-500 opacity-100";
+                if (scaleArea) scaleArea.classList.add('bounce');
+                fireConfetti();
+                setTimeout(advanceQuestion, 1200);
+            } else {
+                state.firstTry = false;
+                state.streak = 0;
+                playSound('wrong');
+                const hint = rightTotal < state.leftTotal
+                    ? 'Dešinėje pusėje dar trūksta svorio!'
+                    : 'Dešinėje pusėje per daug svorio!';
+                feedback.innerHTML = `${_col(hint)} 🤔`;
+                feedback.className = "h-6 flex items-center justify-center font-black text-xs sm:text-base text-rose-500 opacity-100";
+                if (scaleArea) {
+                    scaleArea.classList.remove('shake');
+                    void scaleArea.offsetWidth;
+                    scaleArea.classList.add('shake');
+                }
+            }
+        }
+
+        // ==========================================
+        // 3 REŽIMAS: BALIONŲ SPROGDINIMAS
+        // ==========================================
+        const BALLOON_STYLES = [
+            'bg-gradient-to-br from-rose-400 to-rose-600 border-rose-700',
+            'bg-gradient-to-br from-sky-400 to-blue-600 border-blue-700',
+            'bg-gradient-to-br from-amber-400 to-orange-500 border-orange-700',
+            'bg-gradient-to-br from-emerald-400 to-green-600 border-green-700',
+            'bg-gradient-to-br from-purple-400 to-indigo-600 border-indigo-700',
+            'bg-gradient-to-br from-pink-400 to-fuchsia-600 border-fuchsia-700'
+        ];
+
+        function makeExprWithValue(targetVal) {
+            const useAdd = Math.random() > 0.4;
+            if (useAdd && targetVal >= 1) {
+                const a = randomInt(0, targetVal);
+                const b = targetVal - a;
+                return { label: `${a} + ${b}`, value: targetVal };
+            } else {
+                const sub = randomInt(1, 6);
+                const a = targetVal + sub;
+                return { label: `${a} - ${sub}`, value: targetVal };
+            }
+        }
+
+        function generateBalloonsQuestion() {
+            const maxTarget = state.question <= 5 ? 10 : 15;
+            state.balloonTarget = randomInt(4, maxTarget);
+            state.poppedCount = 0;
+
+            const usedLabels = new Set();
+            const list = [];
+
+            // 3 teisingi balionai
+            while (list.length < 3) {
+                const expr = makeExprWithValue(state.balloonTarget);
+                if (!usedLabels.has(expr.label)) {
+                    usedLabels.add(expr.label);
+                    list.push({ ...expr, isTarget: true, popped: false, wrongTried: false });
+                }
+            }
+
+            // 3 neteisingi balionai
+            while (list.length < 6) {
+                let wrongVal = state.balloonTarget + randomInt(-4, 4);
+                if (wrongVal < 1 || wrongVal === state.balloonTarget) {
+                    wrongVal = state.balloonTarget + randomInt(1, 4);
+                }
+                const expr = makeExprWithValue(wrongVal);
+                if (!usedLabels.has(expr.label)) {
+                    usedLabels.add(expr.label);
+                    list.push({ ...expr, isTarget: false, popped: false, wrongTried: false });
+                }
+            }
+
+            list.sort(() => Math.random() - 0.5);
+            list.forEach((b, i) => {
+                b.colorClass = BALLOON_STYLES[i % BALLOON_STYLES.length];
+            });
+            state.balloons = list;
+            renderBalloonsScreen();
+        }
+
+        function renderBalloonsScreen() {
+            const balloonsHtml = state.balloons.map((b, idx) => {
+                if (b.popped) {
+                    return `
+                        <div class="h-24 sm:h-28 rounded-3xl border-2 border-dashed border-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 flex flex-col items-center justify-center pop-in">
+                            <span class="text-2xl sm:text-3xl">💥</span>
+                            <span class="text-xs sm:text-sm font-black text-emerald-600 dark:text-emerald-400">${b.label} = ${b.value}</span>
+                        </div>
+                    `;
+                }
+                return `
+                    <button id="bal-${idx}" onclick="tapBalloon(${idx})" class="float-anim h-24 sm:h-28 rounded-3xl ${b.colorClass} text-white border-b-4 shadow-lg flex flex-col items-center justify-center relative transition transform active:scale-90 ${b.wrongTried ? 'opacity-50' : ''}" style="animation-delay: ${idx * 0.18}s">
+                        <span class="text-xs opacity-90">🎈</span>
+                        <span class="text-xl sm:text-2xl font-black tracking-wide drop-shadow">${b.label}</span>
+                    </button>
+                `;
+            }).join('');
+
+            app.innerHTML = `
+                ${renderTopBar()}
+                <div class="flex-1 flex flex-col p-3 sm:p-5 justify-between overflow-hidden fade-in">
+                    <div class="text-center">
+                        <p class="text-xs sm:text-sm font-bold text-slate-500 text-sub-title mb-1">
+                            🎯 ${_col('Surask visus 3 balionus, kurių atsakymas yra:')}
+                        </p>
+                        <div class="inline-flex items-center gap-3 px-5 py-1.5 rounded-2xl bg-rose-100 dark:bg-rose-950 border-2 border-rose-400 text-rose-700 dark:text-rose-200 font-black text-2xl sm:text-4xl shadow-sm">
+                            <span>🎈 ${state.balloonTarget}</span>
+                            <span id="pop-progress" class="text-xs sm:text-sm px-2.5 py-1 rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-extrabold">
+                                ${_col('Surasta:')} ${state.poppedCount} / 3
+                            </span>
+                        </div>
+                    </div>
+
+                    <div id="balloons-grid" class="grid grid-cols-3 gap-2.5 sm:gap-4 my-2">
+                        ${balloonsHtml}
+                    </div>
+
+                    <div id="feedback" class="h-7 flex items-center justify-center font-black text-sm sm:text-lg opacity-0 transition-opacity"></div>
+                </div>
+            `;
+        }
+
+        function tapBalloon(idx) {
+            if (state.waiting) return;
+            const b = state.balloons[idx];
+            if (!b || b.popped) return;
+
+            const feedback = document.getElementById('feedback');
+
+            if (b.isTarget) {
+                b.popped = true;
+                state.poppedCount++;
+                playSound('pop');
+                renderBalloonsScreen();
+
+                const newFeedback = document.getElementById('feedback');
+                if (state.poppedCount >= 3) {
+                    state.waiting = true;
+                    playSound('correct');
+                    if (state.firstTry) {
+                        state.score++;
+                        state.streak++;
+                    }
+                    if (newFeedback) {
+                        newFeedback.innerHTML = `${_col('Valio! Susprogdinai visus 3 teisingus balionus!')} 🎉`;
+                        newFeedback.className = "h-7 flex items-center justify-center font-black text-sm sm:text-lg text-emerald-500 opacity-100";
+                    }
+                    fireConfetti();
+                    setTimeout(advanceQuestion, 1250);
+                } else {
+                    if (newFeedback) {
+                        newFeedback.innerHTML = `💥 ${_col('Puiku! Ieškok dar!')} (${state.poppedCount} / 3)`;
+                        newFeedback.className = "h-7 flex items-center justify-center font-black text-sm sm:text-lg text-emerald-500 opacity-100";
+                    }
+                }
+            } else {
+                state.firstTry = false;
+                state.streak = 0;
+                b.wrongTried = true;
+                playSound('wrong');
+                const btn = document.getElementById(`bal-${idx}`);
+                if (btn) {
+                    btn.classList.remove('shake');
+                    void btn.offsetWidth;
+                    btn.classList.add('shake', 'opacity-50');
+                }
+                if (feedback) {
+                    feedback.innerHTML = `${_col('Oho!')} ${b.label} = ${b.value}. ${_col('Ieškok skaičiaus')} ${state.balloonTarget}! 🤔`;
+                    feedback.className = "h-7 flex items-center justify-center font-black text-xs sm:text-base text-rose-500 opacity-100";
+                }
+            }
+        }
+
+        function renderEndScreen() {
+            playSound('win');
+            fireConfetti();
+
+            let stars = 1;
+            if (state.score >= 8) stars = 3;
+            else if (state.score >= 5) stars = 2;
+
+            const starHtml = Array(3).fill(0).map((_, i) =>
+                `<span class="text-5xl sm:text-6xl ${i < stars ? 'text-yellow-400 bounce' : 'text-slate-300 opacity-40'} drop-shadow-md" style="animation-delay: ${i * 0.18}s">⭐</span>`
+            ).join('');
+
+            let message = 'Neblogai!';
+            if (stars === 3) message = 'Puikiai padirbėta!';
+            else if (stars === 2) message = 'Geras rezultatas!';
+
+            app.innerHTML = `
+                <div class="flex-1 flex flex-col items-center justify-center p-6 sm:p-8 text-center fade-in">
+                    <h2 class="text-main-title text-3xl sm:text-4xl font-black text-slate-800 mb-4">${_col('Žaidimas baigtas!')}</h2>
+                    
+                    <div class="flex justify-center gap-2 mb-4">
+                        ${starHtml}
+                    </div>
+                    
+                    <p class="text-sub-title text-xl sm:text-2xl font-bold text-slate-700 mb-2">${_col(message)} 🏆</p>
+                    <p class="text-sub-title text-lg sm:text-xl text-slate-600 mb-6">${_col('Surinkai:')} <span class="font-black text-emerald-500">${state.score} / ${state.maxQuestions}</span></p>
+                    
+                    <div class="flex flex-col sm:flex-row gap-3 w-full max-w-md justify-center">
+                        <button onclick="restartCurrentMode()" class="flex-1 py-3.5 px-5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-lg sm:text-xl shadow-lg transition transform active:scale-95 border-b-4 border-emerald-700">
+                            🔄 ${_col('Žaisti dar kartą')}
+                        </button>
+                        <button onclick="renderStartScreen()" class="flex-1 py-3.5 px-5 rounded-2xl bg-sky-500 hover:bg-sky-600 text-white font-black text-lg sm:text-xl shadow-lg transition transform active:scale-95 border-b-4 border-sky-700">
+                            🏠 ${_col('Meniu')}
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Paleidžiame pradinį ekraną
+        renderStartScreen();
     </script>
 </body>
 </html>
-
-

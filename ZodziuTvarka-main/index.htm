@@ -13,100 +13,92 @@
         body {
             font-family: 'Nunito', sans-serif;
             background-color: #ffecd2;
-            background-image: radial-gradient(#ffb347 10%, transparent 11%), radial-gradient(#ffb347 10%, transparent 11%);
-            background-size: 40px 40px;
-            background-position: 0 0, 20px 20px;
+            background-image: radial-gradient(#ffb347 15%, transparent 16%);
+            background-size: 28px 28px;
             touch-action: manipulation;
             user-select: none;
+            -webkit-user-select: none;
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* Animations */
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-10px); }
-            40%, 80% { transform: translateX(10px); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
         }
-        .shake { animation: shake 0.5s ease-in-out; }
+        .shake { animation: shake 0.45s ease-in-out; }
 
         @keyframes bounce-scale {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+            50% { transform: scale(1.08); }
         }
-        .correct-anim { animation: bounce-scale 0.5s ease-in-out; }
+        .correct-anim { animation: bounce-scale 0.45s ease-in-out; }
 
-        /* Buttons */
         .btn-3d {
             transition: all 0.1s ease;
-            box-shadow: 0 6px 0 rgba(0,0,0,0.2);
+            box-shadow: 0 5px 0 rgba(0,0,0,0.2);
         }
         .btn-3d:active {
-            transform: translateY(6px);
+            transform: translateY(5px);
             box-shadow: 0 0px 0 rgba(0,0,0,0.2);
         }
 
         .word-btn {
             display: inline-block;
             background-color: white;
-            color: #333;
+            color: #1e293b;
             font-weight: 800;
-            padding: 8px 16px;
+            padding: 8px 15px;
             border-radius: 9999px;
-            font-size: 1.25rem;
-            box-shadow: 0 5px 0 #d1d5db;
+            font-size: 1.15rem;
+            box-shadow: 0 4px 0 #cbd5e1;
+            border: 2px solid #e2e8f0;
             cursor: pointer;
-            transition: all 0.1s;
+            transition: all 0.12s;
             margin: 4px;
         }
         @media (min-width: 640px) {
             .word-btn {
                 padding: 10px 20px;
-                font-size: 1.45rem;
+                font-size: 1.4rem;
                 margin: 5px;
             }
         }
         .word-btn:active {
-            transform: translateY(5px);
-            box-shadow: 0 0 0 #d1d5db;
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #cbd5e1;
         }
         
         .slot {
             display: inline-flex;
             justify-content: center;
             align-items: center;
-            min-width: 90px;
-            height: 48px;
+            min-width: 85px;
+            height: 46px;
             border: 3px dashed #f59e0b;
             border-radius: 9999px;
             margin: 3px;
-            background: rgba(255, 255, 255, 0.5);
-            transition: all 0.3s;
+            background: rgba(255, 255, 255, 0.65);
+            transition: all 0.25s;
         }
         @media (min-width: 640px) {
             .slot {
-                min-width: 115px;
-                height: 56px;
+                min-width: 110px;
+                height: 54px;
                 margin: 5px;
             }
-        }
-        
-        .slot.filled {
-            border-style: solid;
-            background: transparent;
         }
         
         .slot-correct {
             border-color: #10b981 !important;
             background: #d1fae5 !important;
-            color: #047857;
-            box-shadow: 0 6px 0 #34d399;
+            box-shadow: 0 4px 0 #34d399 !important;
         }
 
         .slot-wrong {
             border-color: #ef4444 !important;
             background: #fee2e2 !important;
-            color: #b91c1c;
-            box-shadow: 0 6px 0 #fca5a5;
+            box-shadow: 0 4px 0 #fca5a5 !important;
         }
         
         .hidden-word {
@@ -122,7 +114,7 @@
                 background-image: radial-gradient(#1e293b 2px, transparent 2px) !important;
                 color: #f1f5f9 !important;
             }
-            #start-screen, #game-screen, #end-screen {
+            #app {
                 background-color: #0f172a !important;
                 border-color: #334155 !important;
                 box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6) !important;
@@ -131,21 +123,25 @@
             .word-btn {
                 background-color: #1e293b !important;
                 color: #f8fafc !important;
-                box-shadow: 0 5px 0 #0f172a !important;
-                border: 1px solid #334155 !important;
+                box-shadow: 0 4px 0 #020617 !important;
+                border-color: #334155 !important;
             }
             .slot {
-                background: rgba(30, 41, 59, 0.5) !important;
+                background: rgba(30, 41, 59, 0.6) !important;
                 border-color: #f59e0b !important;
             }
             .slot-correct {
                 border-color: #10b981 !important;
-                background: rgba(6, 78, 59, 0.4) !important;
+                background: rgba(6, 78, 59, 0.5) !important;
             }
-            #start-screen h1, #game-screen h1, #end-screen h2 {
+            .sentence-card {
+                background-color: #1e293b !important;
+                border-color: #334155 !important;
+            }
+            .text-main-title {
                 color: #f8fafc !important;
             }
-            #start-screen p, #end-screen p {
+            .text-sub-title {
                 color: #94a3b8 !important;
             }
         }
@@ -172,102 +168,43 @@
         }, { passive: false });
     </script>
 </head>
-<body class="min-h-screen flex items-center justify-center p-2 sm:p-4 overflow-y-auto transition-colors duration-200">
+<body class="h-screen max-h-screen flex items-center justify-center p-2 sm:p-4 overflow-hidden transition-colors duration-200">
 
-    <!-- Start Screen -->
-    <div id="start-screen" class="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full text-center shadow-2xl border-4 border-yellow-400">
-        <h1 class="text-4xl sm:text-5xl font-black text-orange-500 mb-3 sm:mb-4 drop-shadow-sm">📐 Žodžių Tvarka</h1>
-        <p class="text-xl sm:text-2xl text-gray-700 mb-6 sm:mb-8 font-bold">Sudėliok sakinį teisingai!</p>
-        <button onclick="startGame()" class="btn-3d bg-green-500 text-white text-2xl sm:text-4xl font-black py-3.5 sm:py-4 px-8 sm:px-12 rounded-full w-full uppercase tracking-wider">
-            Pradėti
-        </button>
-    </div>
-
-    <!-- Game Screen -->
-    <div id="game-screen" class="hidden bg-white/95 backdrop-blur rounded-3xl p-4 sm:p-6 max-w-2xl w-full text-center shadow-2xl border-4 border-blue-400 flex flex-col my-auto">
-        
-        <div class="flex justify-between items-center mb-3 sm:mb-4 text-base sm:text-xl font-bold text-gray-600">
-            <div class="bg-yellow-100 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border-2 border-yellow-300">🌟 Taškai: <span id="score-display" class="text-orange-500">0</span></div>
-            <div class="bg-blue-100 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border-2 border-blue-300">📝 <span id="question-counter">1</span> / 10</div>
-        </div>
-        
-        <div class="text-5xl sm:text-7xl mb-2 mt-1 drop-shadow-md" id="emoji-hint">🐱</div>
-        
-        <div id="message" class="text-xl sm:text-2xl font-bold h-7 sm:h-8 mb-2 text-blue-500 transition-all flex items-center justify-center"></div>
-
-        <!-- Slots -->
-        <div id="slots-container" class="flex flex-wrap justify-center mb-3 sm:mb-4 min-h-[50px] sm:min-h-[65px]">
-            <!-- Slots injected by JS -->
-        </div>
-
-        <!-- Word Pool -->
-        <div class="mt-auto">
-            <div class="h-2 bg-gray-200 rounded-full mb-3 sm:mb-4 relative overflow-hidden">
-                <div id="progress-bar" class="absolute left-0 top-0 h-full bg-blue-500 transition-all" style="width: 10%;"></div>
-            </div>
-            
-            <div id="pool-container" class="flex flex-wrap justify-center min-h-[80px] sm:min-h-[110px]">
-                <!-- Words injected by JS -->
-            </div>
-            
-            <button id="next-btn" onclick="nextQuestion()" class="hidden btn-3d bg-blue-500 hover:bg-blue-600 text-white text-2xl sm:text-3xl font-black py-3 sm:py-4 px-8 rounded-full w-full mt-3 sm:mt-5 uppercase tracking-wider">
-                Toliau ➔
-            </button>
-        </div>
-    </div>
-
-    <!-- End Screen -->
-    <div id="end-screen" class="hidden bg-white rounded-3xl p-8 max-w-lg w-full text-center shadow-2xl border-4 border-purple-400">
-        <h2 class="text-5xl font-black text-purple-600 mb-6">Pabaiga!</h2>
-        
-        <div id="stars-display" class="text-7xl mb-6 drop-shadow-md">
-            ⭐⭐⭐
-        </div>
-        
-        <p class="text-3xl text-gray-700 mb-8 font-bold">Tavo rezultatas:<br><span class="text-6xl text-orange-500" id="final-score">10</span> / 10</p>
-        
-        <button onclick="init()" class="btn-3d bg-green-500 hover:bg-green-600 text-white text-3xl font-black py-4 px-10 rounded-full w-full uppercase tracking-wider">
-            Žaisti dar kartą 🔄
-        </button>
+    <div id="app" class="bg-white/95 backdrop-blur rounded-3xl max-w-2xl w-full text-center shadow-2xl border-4 border-orange-400 flex flex-col overflow-hidden max-h-full">
     </div>
 
     <script>
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        
-        function playTone(freq, type, duration, vol=0.1) {
+        let audioCtx;
+        function playTone(freq, type, duration, vol=0.12) {
             try {
-                if(audioCtx.state === 'suspended') audioCtx.resume();
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                if (audioCtx.state === 'suspended') audioCtx.resume();
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
                 osc.type = type;
                 osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                
                 gain.gain.setValueAtTime(vol, audioCtx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
-                
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
                 osc.start();
                 osc.stop(audioCtx.currentTime + duration);
-            } catch (e) { console.warn('Audio play failed', e); }
+            } catch (e) {}
         }
 
-        function playTapSound() { playTone(400, 'sine', 0.1, 0.05); }
-        function playReturnSound() { playTone(300, 'sine', 0.1, 0.05); }
+        function playTapSound() { playTone(460, 'sine', 0.09, 0.08); }
+        function playReturnSound() { playTone(320, 'sine', 0.09, 0.08); }
         function playCorrectSound() {
-            playTone(523.25, 'sine', 0.1, 0.1); // C5
-            setTimeout(() => playTone(659.25, 'sine', 0.1, 0.1), 100); // E5
-            setTimeout(() => playTone(783.99, 'sine', 0.2, 0.1), 200); // G5
+            playTone(523.25, 'sine', 0.12, 0.12);
+            setTimeout(() => playTone(659.25, 'sine', 0.12, 0.12), 90);
+            setTimeout(() => playTone(783.99, 'sine', 0.22, 0.12), 180);
         }
         function playWrongSound() {
-            playTone(300, 'square', 0.15, 0.1);
-            setTimeout(() => playTone(250, 'square', 0.3, 0.1), 150);
+            playTone(300, 'sawtooth', 0.15, 0.1);
+            setTimeout(() => playTone(220, 'sawtooth', 0.25, 0.1), 130);
         }
         function playWinSound() {
-            playTone(440, 'sine', 0.1, 0.1);
-            setTimeout(() => playTone(554.37, 'sine', 0.1, 0.1), 100);
-            setTimeout(() => playTone(659.25, 'sine', 0.1, 0.1), 200);
-            setTimeout(() => playTone(880, 'sine', 0.3, 0.1), 300);
+            [440, 554.37, 659.25, 880].forEach((f, i) => setTimeout(() => playTone(f, 'sine', 0.2, 0.12), i * 100));
         }
 
         // === SKIEMENŲ SPALVINIMAS ===
@@ -285,23 +222,28 @@
                 if (!_L.test(c)) { s += c; i++; continue; }
                 if (!_V.includes(c)) { s += c; i++; }
                 else {
-                    s += c; i++;
-                    if (i < n && _V.includes(word[i]) && _D.includes((c + word[i]).toLowerCase())) { s += word[i]; i++; }
-                    let j = i, u = [];
-                    while (j < n && !_V.includes(word[j])) {
-                        if (!_L.test(word[j])) break;
-                        if (j+1 < n) { const p = (word[j]+word[j+1]).toLowerCase(); if (p==='ch'||p==='dz'||p==='dž') { u.push(word[j]+word[j+1]); j+=2; continue; } }
-                        u.push(word[j]); j++;
-                    }
-                    if (j >= n || (j < n && !_V.includes(word[j]) && !_L.test(word[j]))) {
-                        s += u.join(''); while (j < n && !_L.test(word[j])) { s += word[j]; j++; } i = j;
-                        if (i >= n) { r.push(s); s = ''; }
-                    } else if (u.length === 0) { r.push(s); s = ''; }
-                    else if (u.length === 1) { r.push(s); s = u[0]; i = j; }
+                    if (i + 1 < n && _D.includes(word.slice(i, i + 2).toLowerCase())) { s += word.slice(i, i + 2); i += 2; }
+                    else { s += c; i++; }
+                    let j = i;
+                    while (j < n && _L.test(word[j]) && !_V.includes(word[j])) j++;
+                    let cl = word.slice(i, j);
+                    if (j >= n || !_L.test(word[j])) { s += cl; i = j; while (i < n && !_L.test(word[i])) { s += word[i]; i++; } r.push(s); s = ''; }
+                    else if (cl.length === 0) { r.push(s); s = ''; }
+                    else if (cl.length === 1) { r.push(s); s = cl; i = j; }
                     else {
+                        let u = [];
+                        for (let k = 0; k < cl.length;) {
+                            const p = cl.slice(k, k + 2).toLowerCase();
+                            if (p === 'dz' || p === 'dž' || p === 'ch') { u.push(cl.slice(k, k + 2)); k += 2; }
+                            else { u.push(cl[k]); k++; }
+                        }
                         let sp = u.length - 1;
-                        if (u.length >= 3) { const l2 = (u[u.length-2]+u[u.length-1]).toLowerCase(); if (_O.has(l2)) sp = u.length - 2; }
-                        if (u.length >= 4) { const l3 = (u[u.length-3]+u[u.length-2]+u[u.length-1]).toLowerCase(); if (_O.has(l3)) sp = u.length - 3; }
+                        if (u.length >= 2) {
+                            const l2 = (u[u.length - 2] + u[u.length - 1]).toLowerCase();
+                            const l3 = u.length >= 3 ? (u[u.length - 3] + l2).toLowerCase() : '';
+                            if (l3 && _O.has(l3)) sp = u.length - 3;
+                            else if (_O.has(l2)) sp = u.length - 2;
+                        }
                         s += u.slice(0, sp).join(''); r.push(s); s = u.slice(sp).join(''); i = j;
                     }
                 }
@@ -320,7 +262,7 @@
         }
         // === /SKIEMENŲ SPALVINIMAS ===
 
-        const sentencesData = [
+        const SHORT_SENTENCES = [
             { text: "Katė geria pieną.", emoji: "🐱" },
             { text: "Šuo laksto kieme.", emoji: "🐶" },
             { text: "Mama kepa tortą.", emoji: "🎂" },
@@ -332,231 +274,327 @@
             { text: "Mergaitė piešia gėlę.", emoji: "🌸" },
             { text: "Berniukas žaidžia futbolą.", emoji: "⚽" },
             { text: "Lietus lyja lauke.", emoji: "🌧️" },
-            { text: "Sniegas krenta iš dangaus.", emoji: "❄️" },
             { text: "Drugelis skraido sode.", emoji: "🦋" },
             { text: "Pelė graužia sūrį.", emoji: "🐭" },
             { text: "Žuvis plaukia upėje.", emoji: "🐟" },
             { text: "Bitė renka medų.", emoji: "🐝" },
-            { text: "Kiškis bėga miške.", emoji: "🐰" },
-            { text: "Vilkas staugia naktį.", emoji: "🐺" },
-            { text: "Lapė slepiasi krūmuose.", emoji: "🦊" },
-            { text: "Paukštis stato lizdą.", emoji: "🪹" }
+            { text: "Kiškis bėga miške.", emoji: "🐰" }
         ];
 
-        let currentRound = 0;
-        const totalRounds = 10;
-        let score = 0;
-        let firstTry = true;
-        let gameDeck = [];
-        
-        let currentWords = []; 
-        let currentSlots = []; 
-        let lockGame = false;
+        const LONG_SENTENCES = [
+            { text: "Baltas sniegas krenta iš dangaus.", emoji: "❄️" },
+            { text: "Maža mergaitė skaito įdomią knygą.", emoji: "📚" },
+            { text: "Rudens vėjas pučia geltonus lapus.", emoji: "🍁" },
+            { text: "Vikri voveraitė renka skanius riešutus.", emoji: "🐿️" },
+            { text: "Močiutė sode pasodino gražias gėles.", emoji: "🌷" },
+            { text: "Linksmas šuniukas bėgioja žaliame kieme.", emoji: "🐕" },
+            { text: "Ryte vaikai skuba į mokyklą.", emoji: "🎒" },
+            { text: "Žalia varlytė tupi ant lapo.", emoji: "🐸" },
+            { text: "Didelis lėktuvas skrenda virš debesų.", emoji: "✈️" },
+            { text: "Darbšti bitutė neša saldų medų.", emoji: "🍯" }
+        ];
 
-        const startScreen = document.getElementById('start-screen');
-        const gameScreen = document.getElementById('game-screen');
-        const endScreen = document.getElementById('end-screen');
-        const scoreDisplay = document.getElementById('score-display');
-        const questionCounter = document.getElementById('question-counter');
-        const emojiHint = document.getElementById('emoji-hint');
-        const slotsContainer = document.getElementById('slots-container');
-        const poolContainer = document.getElementById('pool-container');
-        const messageEl = document.getElementById('message');
-        const nextBtn = document.getElementById('next-btn');
-        const progressBar = document.getElementById('progress-bar');
+        const FILL_WORD_TASKS = [
+            { before: "Katė dubenėlyje laka baltą", after: ".", correct: "pieną", options: ["pieną", "akmenį", "debesį", "pieštuką"], emoji: "🐱" },
+            { before: "Danguje ryškiai šviečia geltona", after: ".", correct: "saulė", options: ["saulė", "kėdė", "pagalvė", "šakutė"], emoji: "☀️" },
+            { before: "Darbšti bitutė iš gėlių renka", after: ".", correct: "medų", options: ["medų", "sniegą", "popierių", "smėlį"], emoji: "🐝" },
+            { before: "Žiemą iš debesų krenta baltas", after: ".", correct: "sniegas", options: ["sniegas", "uodai", "braškės", "lapai"], emoji: "❄️" },
+            { before: "Kiškutis darže graužia traškią", after: ".", correct: "morką", options: ["morką", "knygą", "lempą", "kepurę"], emoji: "🐰" },
+            { before: "Mokinys ant nugaros neša", after: ".", correct: "kuprinę", options: ["kuprinę", "lovą", "šaldytuvą", "kėdę"], emoji: "🎒" },
+            { before: "Upėje greitai plaukia maža", after: ".", correct: "žuvelė", options: ["žuvelė", "pelėda", "voverė", "karvė"], emoji: "🐟" },
+            { before: "Mama virtuvėje kepa saldų", after: ".", correct: "tortą", options: ["tortą", "kamuolį", "dviratį", "batą"], emoji: "🎂" },
+            { before: "Voveraitė medyje gliaudo kietą", after: ".", correct: "riešutą", options: ["riešutą", "muilą", "laikrodį", "stiklą"], emoji: "🐿️" },
+            { before: "Naktį danguje žiba ryškios", after: ".", correct: "žvaigždės", options: ["žvaigždės", "morkos", "pirštinės", "durys"], emoji: "⭐" }
+        ];
 
-        function shuffle(array) {
-            let currentIndex = array.length, randomIndex;
-            while (currentIndex != 0) {
-                randomIndex = Math.floor(Math.random() * currentIndex);
-                currentIndex--;
-                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
-            }
-            return array;
+        const state = {
+            mode: 'short', // 'short' | 'long' | 'fill'
+            deck: [],
+            round: 0,
+            totalRounds: 10,
+            score: 0,
+            streak: 0,
+            firstTry: true,
+            currentWords: [],
+            currentSlots: [],
+            lockGame: false
+        };
+
+        const app = document.getElementById('app');
+
+        function shuffle(arr) {
+            return [...arr].sort(() => Math.random() - 0.5);
         }
 
-        function init() {
-            gameDeck = shuffle([...sentencesData]).slice(0, totalRounds);
-            currentRound = 0;
-            score = 0;
-            updateStats();
-            
-            startScreen.classList.remove('hidden');
-            gameScreen.classList.add('hidden');
-            endScreen.classList.add('hidden');
+        function renderStartScreen() {
+            app.innerHTML = `
+                <div class="p-6 sm:p-8 flex flex-col items-center justify-center text-center">
+                    <div class="text-5xl sm:text-6xl mb-2">📐</div>
+                    <h1 class="text-main-title text-3xl sm:text-5xl font-black text-orange-600 mb-2">${_col('Žodžių Tvarka')}</h1>
+                    <p class="text-sub-title text-base sm:text-xl text-slate-600 mb-5 sm:mb-7 font-bold">${_col('Sudėliok sakinius ir surask tinkamus žodžius!')}</p>
+                    
+                    <div class="flex flex-col gap-3 w-full max-w-sm">
+                        <button onclick="startGame('short')" class="btn-3d py-3.5 sm:py-4 px-5 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white font-black text-lg sm:text-2xl">
+                            📝 ${_col('Trumpi sakiniai')}
+                        </button>
+                        <button onclick="startGame('long')" class="btn-3d py-3.5 sm:py-4 px-5 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-black text-lg sm:text-2xl">
+                            📖 ${_col('Ilgesni sakiniai')}
+                        </button>
+                        <button onclick="startGame('fill')" class="btn-3d py-3.5 sm:py-4 px-5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-lg sm:text-2xl">
+                            🔍 ${_col('Įstatyk trūkstamą žodį!')}
+                        </button>
+                    </div>
+                </div>
+            `;
         }
 
-        function startGame() {
-            if(audioCtx.state === 'suspended') audioCtx.resume();
-            startScreen.classList.add('hidden');
-            gameScreen.classList.remove('hidden');
+        function startGame(mode) {
+            playTapSound();
+            state.mode = mode;
+            state.round = 0;
+            state.score = 0;
+            state.streak = 0;
+            const pool = mode === 'short' ? SHORT_SENTENCES : mode === 'long' ? LONG_SENTENCES : FILL_WORD_TASKS;
+            state.deck = shuffle(pool).slice(0, state.totalRounds);
             loadQuestion();
         }
 
-        function loadQuestion() {
-            lockGame = false;
-            firstTry = true;
-            nextBtn.classList.add('hidden');
-            messageEl.textContent = "Pasirinkite žodžius iš eilės";
-            messageEl.className = "text-xl font-bold h-10 mb-4 text-gray-400 transition-all flex items-center justify-center";
-            slotsContainer.classList.remove('shake', 'correct-anim');
-            poolContainer.classList.remove('hidden');
-            
-            const item = gameDeck[currentRound];
-            emojiHint.textContent = item.emoji;
-            updateStats();
+        function renderTopBar() {
+            return `
+                <div class="bg-orange-500 text-white px-4 py-2 sm:py-2.5 flex justify-between items-center font-bold text-sm sm:text-base shadow shrink-0">
+                    <div>⭐ ${_col('Taškai:')} <span class="text-yellow-200 font-black">${state.score}</span></div>
+                    <div class="bg-orange-600 px-3 py-0.5 rounded-xl">${_col('Sakinys:')} ${state.round + 1} / ${state.deck.length}</div>
+                    <div>🔥 ${_col('Serija:')} <span class="text-amber-200 font-black">${state.streak}</span></div>
+                </div>
+            `;
+        }
 
-            currentWords = item.text.split(' ').map(w => w.trim()).filter(w => w.length > 0);
-            currentSlots = new Array(currentWords.length).fill(null);
-            
-            slotsContainer.innerHTML = '';
-            for(let i=0; i<currentWords.length; i++) {
+        function loadQuestion() {
+            if (state.round >= state.deck.length) {
+                renderEndScreen();
+                return;
+            }
+            state.lockGame = false;
+            state.firstTry = true;
+
+            if (state.mode === 'fill') {
+                renderFillQuestion();
+            } else {
+                renderOrderQuestion();
+            }
+        }
+
+        function renderOrderQuestion() {
+            const item = state.deck[state.round];
+            state.currentWords = item.text.split(' ').map(w => w.trim()).filter(w => w.length > 0);
+            state.currentSlots = new Array(state.currentWords.length).fill(null);
+
+            const scrambled = shuffle(state.currentWords.map((word, originalIndex) => ({ word, originalIndex })));
+
+            app.innerHTML = `
+                ${renderTopBar()}
+                <div class="p-3 sm:p-5 flex-1 flex flex-col justify-between overflow-hidden">
+                    <div class="text-5xl sm:text-6xl drop-shadow-md">${item.emoji}</div>
+
+                    <div id="message" class="text-base sm:text-xl font-black h-7 text-slate-500 text-sub-title flex items-center justify-center">
+                        ${_col('Spausk žodžius iš eilės ir sudėliok sakinį:')}
+                    </div>
+
+                    <div id="slots-container" class="flex flex-wrap justify-center items-center min-h-[60px] sm:min-h-[75px] py-1"></div>
+
+                    <div id="pool-container" class="flex flex-wrap justify-center items-center min-h-[85px] sm:min-h-[110px] py-1"></div>
+                </div>
+            `;
+
+            const slotsContainer = document.getElementById('slots-container');
+            const poolContainer = document.getElementById('pool-container');
+
+            for (let i = 0; i < state.currentWords.length; i++) {
                 const slot = document.createElement('div');
                 slot.className = 'slot';
-                slot.dataset.index = i;
                 slot.onclick = () => returnWord(i);
                 slotsContainer.appendChild(slot);
             }
 
-            let scrambled = shuffle(currentWords.map((word, originalIndex) => ({word, originalIndex})));
-            poolContainer.innerHTML = '';
-            scrambled.forEach((obj, i) => {
+            scrambled.forEach(obj => {
                 const btn = document.createElement('div');
                 btn.className = 'word-btn';
                 btn.innerHTML = _col(obj.word);
-                btn.dataset.originalIndex = obj.originalIndex;
                 btn.onclick = () => pickWord(btn, obj.word, obj.originalIndex);
                 poolContainer.appendChild(btn);
             });
         }
 
         function pickWord(btnElement, word, originalIndex) {
-            if (lockGame || btnElement.classList.contains('hidden-word')) return;
-            
-            const emptyIndex = currentSlots.findIndex(s => s === null);
-            if (emptyIndex === -1) return; // all full
+            if (state.lockGame || btnElement.classList.contains('hidden-word')) return;
+            const emptyIndex = state.currentSlots.findIndex(s => s === null);
+            if (emptyIndex === -1) return;
 
             playTapSound();
-            
-            currentSlots[emptyIndex] = { word, originalIndex, el: btnElement };
+            state.currentSlots[emptyIndex] = { word, originalIndex, el: btnElement };
             btnElement.classList.add('hidden-word');
-            
             renderSlots();
-            checkCompletion();
+            checkOrderCompletion();
         }
 
         function returnWord(slotIndex) {
-            if (lockGame) return;
-            
-            const item = currentSlots[slotIndex];
+            if (state.lockGame) return;
+            const item = state.currentSlots[slotIndex];
             if (!item) return;
 
             playReturnSound();
-            
             item.el.classList.remove('hidden-word');
-            currentSlots[slotIndex] = null;
-            
-            messageEl.textContent = "Taisykite sakinį";
-            messageEl.className = "text-xl font-bold h-10 mb-4 text-orange-500 transition-all flex items-center justify-center";
-            
-            Array.from(slotsContainer.children).forEach(c => {
-                c.classList.remove('slot-wrong', 'slot-correct');
-            });
-            
+            state.currentSlots[slotIndex] = null;
+
+            const messageEl = document.getElementById('message');
+            messageEl.innerHTML = _col('Pataisyk sakinį:');
+            messageEl.className = "text-base sm:text-xl font-black h-7 text-orange-500 flex items-center justify-center";
             renderSlots();
         }
 
         function renderSlots() {
+            const slotsContainer = document.getElementById('slots-container');
+            if (!slotsContainer) return;
             const children = slotsContainer.children;
-            for(let i=0; i<children.length; i++) {
-                const item = currentSlots[i];
+            for (let i = 0; i < children.length; i++) {
+                const item = state.currentSlots[i];
                 if (item) {
                     children[i].innerHTML = _col(item.word);
-                    children[i].className = 'word-btn filled';
-                    children[i].style.margin = "5px";
+                    children[i].className = 'word-btn';
                 } else {
                     children[i].textContent = '';
                     children[i].className = 'slot';
-                    children[i].style.margin = "5px";
                 }
             }
         }
 
-        function checkCompletion() {
-            if (currentSlots.includes(null)) return; // not full
-
-            let correct = true;
-            for(let i=0; i<currentWords.length; i++) {
-                if (currentSlots[i].originalIndex !== i) {
-                    correct = false;
-                    break;
-                }
-            }
-
+        function checkOrderCompletion() {
+            if (state.currentSlots.includes(null)) return;
+            const slotsContainer = document.getElementById('slots-container');
+            const messageEl = document.getElementById('message');
             const children = slotsContainer.children;
-            if (correct) {
-                lockGame = true;
+
+            const assembled = state.currentSlots.map(s => s.word).join(' ');
+            const expected = state.currentWords.join(' ');
+
+            if (assembled === expected) {
+                state.lockGame = true;
                 playCorrectSound();
-                messageEl.textContent = "Teisingai! 🎉";
-                messageEl.className = "text-3xl font-black h-10 mb-4 text-green-500 transition-all flex items-center justify-center";
-                
-                for(let i=0; i<children.length; i++) {
+                if (state.firstTry) {
+                    state.score++;
+                    state.streak++;
+                }
+                messageEl.innerHTML = `${_col('Teisingai! Šaunuolis!')} 🎉`;
+                messageEl.className = "text-xl sm:text-2xl font-black h-7 text-green-500 flex items-center justify-center";
+                for (let i = 0; i < children.length; i++) {
                     children[i].classList.add('slot-correct', 'correct-anim');
                 }
-                
-                poolContainer.classList.add('hidden');
-                nextBtn.classList.remove('hidden');
-                
-                if (firstTry) {
-                    score++;
-                    updateStats();
-                }
+                setTimeout(() => {
+                    state.round++;
+                    loadQuestion();
+                }, 1300);
             } else {
+                state.firstTry = false;
+                state.streak = 0;
                 playWrongSound();
-                firstTry = false;
-                messageEl.textContent = "Bandyk dar kartą! 🤔";
-                messageEl.className = "text-2xl font-bold h-10 mb-4 text-red-500 transition-all flex items-center justify-center";
-                
+                messageEl.innerHTML = `${_col('Bandyk dar kartą! Paspausk ant žodžio, kad nuimtum.')} 🤔`;
+                messageEl.className = "text-sm sm:text-lg font-black h-7 text-red-500 flex items-center justify-center";
                 slotsContainer.classList.remove('shake');
-                void slotsContainer.offsetWidth; // trigger reflow
+                void slotsContainer.offsetWidth;
                 slotsContainer.classList.add('shake');
-                
-                for(let i=0; i<children.length; i++) {
+                for (let i = 0; i < children.length; i++) {
                     children[i].classList.add('slot-wrong');
                 }
             }
         }
 
-        function nextQuestion() {
-            currentRound++;
-            if (currentRound < totalRounds) {
-                loadQuestion();
+        function renderFillQuestion() {
+            const item = state.deck[state.round];
+            const options = shuffle([...item.options]);
+
+            const optsHtml = options.map((opt, idx) => `
+                <button id="fill-btn-${idx}" onclick="checkFillAnswer('${opt}', this)" class="word-btn py-2.5 sm:py-3.5 px-5 text-lg sm:text-2xl">
+                    ${_col(opt)}
+                </button>
+            `).join('');
+
+            app.innerHTML = `
+                ${renderTopBar()}
+                <div class="p-3 sm:p-5 flex-1 flex flex-col justify-between overflow-hidden">
+                    <div class="text-5xl sm:text-6xl drop-shadow-md">${item.emoji}</div>
+
+                    <div class="sentence-card bg-amber-50 border-2 border-amber-300 rounded-2xl p-4 sm:p-6 shadow-sm flex flex-wrap items-center justify-center gap-2 text-xl sm:text-3xl font-black">
+                        <span>${_col(item.before)}</span>
+                        <span id="fill-blank" class="inline-flex items-center justify-center min-w-[110px] px-4 py-1 border-b-4 border-dashed border-orange-500 bg-white/80 dark:bg-slate-800 rounded-xl text-orange-500">?</span>
+                        <span>${item.after}</span>
+                    </div>
+
+                    <div id="message" class="text-base sm:text-xl font-black h-7 text-slate-500 text-sub-title flex items-center justify-center">
+                        ${_col('Pasirink žodį, kuris tinka šiame sakinyje:')}
+                    </div>
+
+                    <div class="flex flex-wrap justify-center gap-2 sm:gap-3">
+                        ${optsHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        function checkFillAnswer(selected, btn) {
+            if (state.lockGame) return;
+            const item = state.deck[state.round];
+            const blank = document.getElementById('fill-blank');
+            const messageEl = document.getElementById('message');
+
+            if (selected === item.correct) {
+                state.lockGame = true;
+                playCorrectSound();
+                if (state.firstTry) {
+                    state.score++;
+                    state.streak++;
+                }
+                blank.innerHTML = _col(selected);
+                blank.className = "inline-flex items-center justify-center px-4 py-1 bg-green-100 border-2 border-green-500 rounded-xl correct-anim";
+                btn.classList.add('slot-correct', 'correct-anim');
+                messageEl.innerHTML = `${_col('Puiku! Sakinys teisingas!')} 🎉`;
+                messageEl.className = "text-lg sm:text-2xl font-black h-7 text-green-500 flex items-center justify-center";
+
+                setTimeout(() => {
+                    state.round++;
+                    loadQuestion();
+                }, 1300);
             } else {
-                endGame();
+                state.firstTry = false;
+                state.streak = 0;
+                playWrongSound();
+                btn.classList.add('slot-wrong', 'shake', 'opacity-50');
+                btn.disabled = true;
+                messageEl.innerHTML = `${_col('Šis žodis čia netinka, bandyk kitą!')} 🤔`;
+                messageEl.className = "text-sm sm:text-lg font-black h-7 text-red-500 flex items-center justify-center";
             }
         }
 
-        function endGame() {
+        function renderEndScreen() {
             playWinSound();
-            gameScreen.classList.add('hidden');
-            endScreen.classList.remove('hidden');
-            
-            document.getElementById('final-score').textContent = score;
-            
             let stars = "⭐";
-            if (score >= 8) stars = "⭐⭐⭐";
-            else if (score >= 5) stars = "⭐⭐";
-            
-            document.getElementById('stars-display').textContent = stars;
+            if (state.score >= 8) stars = "⭐⭐⭐";
+            else if (state.score >= 5) stars = "⭐⭐";
+
+            app.innerHTML = `
+                <div class="p-6 sm:p-8 flex flex-col items-center justify-center text-center">
+                    <h2 class="text-main-title text-3xl sm:text-4xl font-black text-purple-600 mb-4">${_col('Šaunuolis!')}</h2>
+                    <div class="text-5xl sm:text-6xl mb-4 drop-shadow-md">${stars}</div>
+                    <p class="text-sub-title text-xl sm:text-2xl text-slate-700 mb-6 font-bold">
+                        ${_col('Tavo rezultatas:')} <span class="text-3xl sm:text-4xl text-orange-500 font-black">${state.score} / ${state.deck.length}</span>
+                    </p>
+                    <button onclick="renderStartScreen()" class="btn-3d bg-green-500 hover:bg-green-600 text-white text-xl sm:text-2xl font-black py-4 px-10 rounded-2xl w-full max-w-xs">
+                        ${_col('Žaisti dar kartą')} 🔄
+                    </button>
+                </div>
+            `;
         }
 
-        function updateStats() {
-            scoreDisplay.textContent = score;
-            questionCounter.textContent = Math.min(currentRound + 1, totalRounds);
-            progressBar.style.width = `${(Math.min(currentRound + 1, totalRounds) / totalRounds) * 100}%`;
-        }
-
-        init();
+        renderStartScreen();
     </script>
 </body>
 </html>
