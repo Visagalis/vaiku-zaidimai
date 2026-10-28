@@ -19,12 +19,7 @@
             background-size: 20px 20px;
         }
 
-        .btn-3d {
-            transition: transform 0.1s ease, box-shadow 0.1s ease;
-        }
-        .btn-3d:active {
-            transform: translateY(4px);
-        }
+        
 
         /* Tamsioji tema */
         @media (prefers-color-scheme: dark) {
@@ -286,10 +281,6 @@
 
         const appEl = document.getElementById('app');
 
-        function shuffle(arr) {
-            return [...arr].sort(() => Math.random() - 0.5);
-        }
-
         function renderStartScreen() {
             appEl.innerHTML = `
                 <div class="p-6 sm:p-8 flex flex-col items-center justify-center text-center">
@@ -342,15 +333,7 @@
             `).join('');
 
             appEl.innerHTML = `
-                <!-- Top Status Bar -->
-                <div class="bg-rose-500 text-white px-3 sm:px-4 py-2 sm:py-2.5 flex justify-between items-center font-bold text-xs sm:text-base shadow">
-                    <div class="flex items-center gap-2">
-                        <button onclick="renderStartScreen()" class="bg-rose-600 hover:bg-rose-700 px-2.5 py-1 rounded-xl text-sm" title="Į pradžią">🏠</button>
-                        <span>⭐ <span class="text-yellow-200 font-black">${state.score}</span></span>
-                    </div>
-                    <div class="bg-rose-600 px-2.5 py-1 rounded-xl font-black">🎯 ${state.currentIndex + 1} / ${state.questions.length}</div>
-                    <div>🔥 <span class="text-orange-200 font-black">${state.streak}</span></div>
-                </div>
+                ${renderTopBar({ score: state.score, current: state.currentIndex + 1, total: state.questions.length, streak: state.streak, theme: 'rose' })}
 
                 <div class="p-3 sm:p-5 flex-1 flex flex-col justify-between items-center">
                     <div class="w-full bg-rose-50/80 rounded-2xl p-3 sm:p-4 border-2 border-rose-200 shadow-sm text-center mb-1">
@@ -391,7 +374,7 @@
                 btn.classList.remove('bg-rose-50', 'text-rose-950', 'border-rose-300');
                 btn.classList.add('bg-green-500', 'text-white', 'border-green-600', 'shadow-[0_5px_0_#15803d]', 'bounce-anim');
 
-                feedback.textContent = `Teisingai! ${q.equation} 🎉`;
+                feedback.innerHTML = `<span>Teisingai! ${q.equation} 🎉</span>`;
                 feedback.className = "h-6 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black my-1 text-green-600 opacity-100";
 
                 setTimeout(() => {
@@ -407,7 +390,7 @@
                 btn.classList.add('bg-red-100', 'text-red-400', 'line-through', 'border-red-300', 'opacity-60', 'shake-anim');
                 btn.disabled = true;
 
-                feedback.textContent = "Bandyk dar kartą! 🤔";
+                feedback.innerHTML = `<span>${_col("Bandyk dar kartą!")} 🤔</span>`;
                 feedback.className = "h-6 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black my-1 text-red-500 opacity-100";
 
                 setTimeout(() => {
@@ -417,29 +400,11 @@
         }
 
         function renderEndScreen() {
-            playWinSound();
-            let stars = "⭐";
-            if (state.score >= 7) stars = "⭐⭐⭐";
-            else if (state.score >= 5) stars = "⭐⭐";
-
-            appEl.innerHTML = `
-                <div class="p-6 sm:p-8 flex flex-col items-center justify-center text-center">
-                    <div class="text-7xl mb-2">🎉</div>
-                    <h2 class="text-3xl sm:text-4xl font-black text-green-600 mb-2">Šaunuolis!</h2>
-                    <div class="text-5xl mb-4 tracking-wider">${stars}</div>
-                    <p class="text-xl font-bold text-slate-700 mb-1">Surinkai taškų:</p>
-                    <p class="text-4xl font-black text-rose-600 mb-6">${state.score} / ${state.questions.length}</p>
-                    
-                    <div class="flex flex-col sm:flex-row gap-3 w-full max-w-sm">
-                        <button onclick="startGame(state.mode)" class="btn-3d flex-1 py-3.5 bg-rose-500 hover:bg-rose-600 text-white rounded-2xl text-lg font-black shadow-[0_5px_0_#e11d48] active:shadow-[0_0px_0_#e11d48] transition-all">
-                            🔄 ${_col('Dar kartą')}
-                        </button>
-                        <button onclick="renderStartScreen()" class="btn-3d flex-1 py-3.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-2xl text-lg font-black shadow-[0_5px_0_#94a3b8] active:shadow-[0_0px_0_#94a3b8] transition-all">
-                            🏠
-                        </button>
-                    </div>
-                </div>
-            `;
+            appEl.innerHTML = renderEndScreenHelper({
+                score: state.score,
+                total: state.questions.length,
+                restartFn: "startGame(state.mode)"
+            });
         }
 
         renderStartScreen();

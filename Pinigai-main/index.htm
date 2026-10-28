@@ -137,18 +137,8 @@
 
         const app = document.getElementById('app');
 
-        function formatMoneyCents(cents) {
-            if (cents < 100) {
-                return cents + ' c';
-            }
-            if (cents % 100 === 0) {
-                return (cents / 100) + ' €';
-            }
-            return (cents / 100).toFixed(2).replace('.', ',') + ' €';
-        }
-
         function getRandomElement(arr) {
-            return arr[Math.floor(Math.random() * arr.length)];
+            return pickRandom(arr);
         }
 
         function renderStartScreen() {

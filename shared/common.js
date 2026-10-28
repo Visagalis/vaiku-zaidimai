@@ -501,6 +501,119 @@
         } catch (err) {}
     }
 
+    // === 5. PINIGŲ PAGALBINĖS FUNKCIJOS IR DUOMENYS ===
+    var MONEY = {
+        centCoins: [
+            { cents: 1, label: '1c', class: 'coin coin-copper coin-1c' },
+            { cents: 2, label: '2c', class: 'coin coin-copper coin-2c' },
+            { cents: 5, label: '5c', class: 'coin coin-copper coin-5c' },
+            { cents: 10, label: '10c', class: 'coin coin-gold coin-10c' },
+            { cents: 20, label: '20c', class: 'coin coin-gold coin-20c' },
+            { cents: 50, label: '50c', class: 'coin coin-gold coin-50c' }
+        ],
+        euroCoins: [
+            { cents: 100, label: '1€', class: 'coin coin-1e' },
+            { cents: 200, label: '2€', class: 'coin coin-2e' }
+        ],
+        bills: [
+            { cents: 500, label: '5€', class: 'bill bill-5e' },
+            { cents: 1000, label: '10€', class: 'bill bill-10e' },
+            { cents: 2000, label: '20€', class: 'bill bill-20e' }
+        ]
+    };
+
+    function formatMoneyCents(cents) {
+        if (cents < 100) return cents + ' c';
+        if (cents % 100 === 0) return (cents / 100) + ' €';
+        return (cents / 100).toFixed(2).replace('.', ',') + ' €';
+    }
+
+    // === 6. BENDRAS VIRŠUTINĖS JUOSTOS IR PABAIGOS EKRANO RENDERINIMAS ===
+    function calculateStars(score, total) {
+        if (!total || total <= 0) return 1;
+        var ratio = score / total;
+        if (ratio >= 0.8) return 3;
+        if (ratio >= 0.5) return 2;
+        return 1;
+    }
+
+    function renderTopBar(opts) {
+        opts = opts || {};
+        var homeFn = opts.homeFn || 'renderStartScreen()';
+        var homeTitle = opts.homeTitle || 'Pradžia';
+        var score = (opts.score !== undefined) ? opts.score : 0;
+        var current = opts.current;
+        var total = opts.total;
+        var streak = (opts.streak !== undefined) ? opts.streak : null;
+        var theme = opts.theme || 'sky'; // spalvų paletė: sky, emerald, teal, orange, amber, purple, pink, blue, fuchsia
+
+        var html = '<div class="top-bar bg-' + theme + '-100 border-b-2 border-' + theme + '-300 text-slate-800 px-3 sm:px-5 py-2 sm:py-2.5 flex justify-between items-center font-black text-sm sm:text-base shadow-sm shrink-0">';
+        
+        // Kairė: Pradžios mygtukas ir taškai
+        html += '<div class="flex items-center gap-2 sm:gap-3">';
+        html += '<button onclick="' + homeFn + '" class="top-badge bg-white/90 hover:bg-' + theme + '-200 border border-' + theme + '-300 px-2.5 py-1 rounded-xl text-base sm:text-xl transition active:scale-95" title="' + homeTitle + '">🏠</button>';
+        html += '<span class="flex items-center gap-1.5 text-base sm:text-lg">⭐ <span class="text-' + theme + '-700 dark:text-amber-300 font-black text-lg sm:text-xl">' + score + '</span></span>';
+        html += '</div>';
+
+        // Centras: Klausimo progresas
+        if (current !== undefined && total !== undefined) {
+            html += '<div class="top-badge bg-white/90 border border-' + theme + '-300 px-3 py-1 rounded-xl font-black text-' + theme + '-700 dark:text-amber-300 text-sm sm:text-base">🎯 ' + current + ' / ' + total + '</div>';
+        }
+
+        // Dešinė: Streak (jei pateiktas)
+        if (streak !== null && streak !== undefined) {
+            html += '<div class="flex items-center gap-1.5 text-base sm:text-lg">🔥 <span class="text-' + theme + '-700 dark:text-amber-300 font-black text-lg sm:text-xl">' + streak + '</span></div>';
+        } else {
+            html += '<div></div>';
+        }
+
+        html += '</div>';
+        return html;
+    }
+
+    function renderEndScreen(opts) {
+        opts = opts || {};
+        var score = (opts.score !== undefined) ? opts.score : 0;
+        var total = (opts.total !== undefined) ? opts.total : 10;
+        var stars = opts.stars || calculateStars(score, total);
+        var restartFn = opts.restartFn || 'renderStartScreen()';
+        var restartText = opts.restartText || 'Dar kartą';
+        var title = opts.title || 'Šaunuolis!';
+        
+        var message = opts.message;
+        if (!message) {
+            if (stars === 3) message = 'Puikiai padirbėta!';
+            else if (stars === 2) message = 'Geras rezultatas!';
+            else message = 'Neblogai, bandyk dar kartą!';
+        }
+
+        try {
+            playWinSound();
+        } catch (e) {}
+
+        var starHtml = '';
+        for (var i = 0; i < 3; i++) {
+            if (i < stars) {
+                starHtml += '<span class="text-5xl sm:text-6xl text-yellow-400 bounce drop-shadow-md" style="animation-delay: ' + (i * 0.2) + 's">⭐</span>';
+            } else {
+                starHtml += '<span class="text-5xl sm:text-6xl text-gray-400 opacity-40 drop-shadow-md">⭐</span>';
+            }
+        }
+
+        return '<div class="flex-1 flex flex-col items-center justify-center p-6 sm:p-8 text-center fade-in">' +
+            '<div class="text-6xl sm:text-7xl mb-2">🎉</div>' +
+            '<h2 class="text-3xl sm:text-4xl font-black text-green-600 dark:text-green-400 mb-3">' + _col(title) + '</h2>' +
+            '<div class="flex justify-center gap-2 mb-3">' + starHtml + '</div>' +
+            '<p class="text-xl sm:text-2xl font-bold text-slate-700 dark:text-slate-200 mb-2">' + _col(message) + ' 🏆</p>' +
+            '<p class="text-lg sm:text-xl text-slate-600 dark:text-slate-300 mb-6">' + _col('Surinkai:') + ' <span class="font-black text-green-500 text-xl sm:text-2xl">' + score + ' / ' + total + '</span></p>' +
+            '<div class="flex flex-col sm:flex-row gap-3 w-full max-w-xs">' +
+                '<button onclick="' + restartFn + '" class="btn-tinted w-full py-3.5 sm:py-4 px-4 rounded-2xl bg-blue-100 hover:bg-blue-200 text-slate-800 font-black text-lg sm:text-xl shadow-lg transition transform active:scale-95 border-2 border-b-4 border-blue-400">' +
+                    '🔄 ' + _col(restartText) +
+                '</button>' +
+            '</div>' +
+        '</div>';
+    }
+
     if (typeof document !== 'undefined') {
         preventZoom(document);
     }
@@ -539,4 +652,10 @@
     global.shuffleArray = shuffle;
     global.pickRandom = pickRandom;
     global.preventZoom = preventZoom;
+    global.MONEY = MONEY;
+    global.formatMoneyCents = formatMoneyCents;
+    global.calculateStars = calculateStars;
+    global.renderTopBar = renderTopBar;
+    global.renderEndScreen = renderEndScreen;
+    global.renderEndScreenHelper = renderEndScreen;
 })(typeof window !== 'undefined' ? window : this);

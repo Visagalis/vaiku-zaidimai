@@ -81,6 +81,14 @@ body {
     to { opacity: 1; transform: scale(1); }
 }
 
+/* Bendras 3D mygtukų stilius ir paspaudimo efektas */
+.btn-3d {
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+.btn-3d:active {
+    transform: translateY(3px);
+}
+
 /* Bendra eurų monetų ir banknotų išvaizda (Pinigai, Parduotuvė, Grąža, Taupyklė) */
 .coin {
     display: flex;

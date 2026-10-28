@@ -19,12 +19,7 @@
             background-size: 20px 20px;
         }
 
-        .btn-3d {
-            transition: transform 0.1s ease, box-shadow 0.1s ease;
-        }
-        .btn-3d:active {
-            transform: translateY(4px);
-        }
+        
 
         @keyframes drop-in {
             0% { transform: translateY(-30px) scale(0.8); opacity: 0; }
@@ -248,15 +243,7 @@
                    </div>`;
 
             appEl.innerHTML = `
-                <!-- Top Status Bar -->
-                <div class="bg-emerald-600 text-white px-3 sm:px-5 py-2 sm:py-2.5 flex justify-between items-center font-bold text-xs sm:text-base shadow">
-                    <div class="flex items-center gap-2">
-                        <button onclick="renderStartScreen()" class="bg-emerald-700 hover:bg-emerald-800 px-2 py-0.5 rounded-lg text-sm" title="Pradžia">🏠</button>
-                        <span>⭐ <span class="text-yellow-200 font-black">${state.score}</span></span>
-                    </div>
-                    <div class="bg-emerald-700 px-2.5 py-0.5 rounded-xl font-black">🎯 ${state.currentIndex + 1} / ${state.questions.length}</div>
-                    <div>🔥 <span class="text-orange-200 font-black">${state.streak}</span></div>
-                </div>
+                ${renderTopBar({ score: state.score, current: state.currentIndex + 1, total: state.questions.length, streak: state.streak, theme: 'emerald' })}
 
                 <div class="p-2.5 sm:p-4 flex-1 flex flex-col justify-between items-center gap-1.5">
                     <h2 class="text-lg sm:text-2xl font-black text-slate-800 text-center">♻️ ${_col('Rūšiuok!')}</h2>
@@ -381,15 +368,7 @@
             }).join('');
 
             appEl.innerHTML = `
-                <!-- Top Status Bar -->
-                <div class="bg-emerald-600 text-white px-3 sm:px-5 py-2 sm:py-2.5 flex justify-between items-center font-bold text-xs sm:text-base shadow">
-                    <div class="flex items-center gap-2">
-                        <button onclick="renderStartScreen()" class="bg-emerald-700 hover:bg-emerald-800 px-2 py-0.5 rounded-lg text-sm" title="Pradžia">🏠</button>
-                        <span>⭐ <span class="text-yellow-200 font-black">${state.score}</span></span>
-                    </div>
-                    <div class="bg-emerald-700 px-2.5 py-0.5 rounded-xl font-black">🎯 ${state.currentIndex + 1} / 10</div>
-                    <div>🔥 <span class="text-orange-200 font-black">${state.streak}</span></div>
-                </div>
+                ${renderTopBar({ score: state.score, current: state.currentIndex + 1, total: 10, streak: state.streak, theme: 'emerald' })}
 
                 <div class="p-3 sm:p-5 flex-1 flex flex-col justify-between items-center">
                     <h2 class="text-xl sm:text-2xl font-black text-slate-800 text-center mb-1">♻️ ❓</h2>
@@ -456,26 +435,11 @@
         }
 
         function renderEndScreen() {
-            playWinSound();
-            const ratio = state.score / state.totalPossible;
-            let stars = "⭐";
-            if (ratio >= 0.8) stars = "⭐⭐⭐";
-            else if (ratio >= 0.5) stars = "⭐⭐";
-
-            appEl.innerHTML = `
-                <div class="p-6 sm:p-8 flex flex-col items-center justify-center text-center">
-                    <div class="text-7xl mb-2">🎉</div>
-                    <h2 class="text-3xl sm:text-4xl font-black text-green-600 mb-2">${_col('Šaunuolis!')}</h2>
-                    <div class="text-5xl mb-4 tracking-wider">${stars}</div>
-                    <p class="text-3xl font-black text-emerald-600 mb-6">⭐ ${state.score} / ${state.totalPossible}</p>
-                    
-                    <div class="flex flex-col sm:flex-row gap-3 w-full max-w-sm">
-                        <button onclick="startGame(state.mode)" class="btn-3d flex-1 py-3.5 bg-emerald-100 hover:bg-emerald-200 border-2 border-emerald-400 rounded-2xl text-lg font-black shadow-[0_5px_0_#059669] active:shadow-[0_0px_0_#059669] transition-all">
-                            🔄 ${_col('Dar kartą')}
-                        </button>
-                    </div>
-                </div>
-            `;
+            appEl.innerHTML = renderEndScreenHelper({
+                score: state.score,
+                total: state.totalPossible,
+                restartFn: "startGame(state.mode)"
+            });
         }
 
         renderStartScreen();
