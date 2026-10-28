@@ -104,9 +104,9 @@ button.coin:active, button.bill:active {
     border: 2px solid #fdba74;
     text-shadow: 0 1px 2px rgba(0,0,0,0.8);
 }
-.coin-1c { width: 2.75rem; height: 2.75rem; font-size: 1rem; }
-.coin-2c { width: 3.0rem; height: 3.0rem; font-size: 1.05rem; }
-.coin-5c { width: 3.3rem; height: 3.3rem; font-size: 1.15rem; }
+.coin-1c { width: 2.85rem; height: 2.85rem; font-size: 1.15rem; }
+.coin-2c { width: 3.1rem; height: 3.1rem; font-size: 1.2rem; }
+.coin-5c { width: 3.4rem; height: 3.4rem; font-size: 1.25rem; }
 
 .coin-gold {
     background: radial-gradient(circle at 35% 35%, #fef08a 0%, #eab308 50%, #b45309 100%);
@@ -114,28 +114,28 @@ button.coin:active, button.bill:active {
     border: 2px solid #fef9c3;
     text-shadow: 0 1px 0 rgba(255,255,255,0.6);
 }
-.coin-10c { width: 2.9rem; height: 2.9rem; font-size: 1.05rem; }
-.coin-20c { width: 3.2rem; height: 3.2rem; font-size: 1.15rem; }
-.coin-50c { width: 3.55rem; height: 3.55rem; font-size: 1.25rem; }
+.coin-10c { width: 3.05rem; height: 3.05rem; font-size: 1.2rem; }
+.coin-20c { width: 3.35rem; height: 3.35rem; font-size: 1.25rem; }
+.coin-50c { width: 3.65rem; height: 3.65rem; font-size: 1.35rem; }
 
 .coin-1e {
-    width: 3.35rem;
-    height: 3.35rem;
+    width: 3.45rem;
+    height: 3.45rem;
     background: radial-gradient(circle at 35% 35%, #ffffff 0%, #cbd5e1 60%, #94a3b8 100%);
     color: #0f172a;
     border: 4px solid #d97706;
-    font-size: 1.15rem;
+    font-size: 1.25rem;
     text-shadow: 0 1px 1px rgba(255,255,255,0.8);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.35);
 }
 
 .coin-2e {
-    width: 3.65rem;
-    height: 3.65rem;
+    width: 3.75rem;
+    height: 3.75rem;
     background: radial-gradient(circle at 35% 35%, #fef08a 0%, #eab308 60%, #b45309 100%);
     color: #3b1803;
     border: 4px solid #94a3b8;
-    font-size: 1.25rem;
+    font-size: 1.35rem;
     text-shadow: 0 1px 1px rgba(255,255,255,0.6);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.35);
 }
@@ -149,9 +149,9 @@ button.coin:active, button.bill:active {
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.25);
     flex-shrink: 0;
     user-select: none;
-    width: 4.1rem;
-    height: 2.4rem;
-    font-size: 1.1rem;
+    width: 4.4rem;
+    height: 2.6rem;
+    font-size: 1.2rem;
     border: 2px solid;
     letter-spacing: 0.5px;
     transition: transform 0.12s ease;
@@ -161,15 +161,15 @@ button.coin:active, button.bill:active {
 .bill-20e { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: #ffffff; border-color: #1e40af; }
 
 @media (min-width: 640px) {
-    .bill { width: 4.9rem; height: 2.9rem; font-size: 1.3rem; }
-    .coin-1c { width: 3.1rem; height: 3.1rem; font-size: 1.1rem; }
-    .coin-2c { width: 3.4rem; height: 3.4rem; font-size: 1.2rem; }
-    .coin-5c { width: 3.8rem; height: 3.8rem; font-size: 1.3rem; }
-    .coin-10c { width: 3.3rem; height: 3.3rem; font-size: 1.2rem; }
-    .coin-20c { width: 3.65rem; height: 3.65rem; font-size: 1.3rem; }
-    .coin-50c { width: 4.05rem; height: 4.05rem; font-size: 1.4rem; }
-    .coin-1e { width: 3.8rem; height: 3.8rem; font-size: 1.35rem; border-width: 5px; }
-    .coin-2e { width: 4.15rem; height: 4.15rem; font-size: 1.45rem; border-width: 5px; }
+    .bill { width: 5.0rem; height: 3.0rem; font-size: 1.35rem; }
+    .coin-1c { width: 3.2rem; height: 3.2rem; font-size: 1.25rem; }
+    .coin-2c { width: 3.5rem; height: 3.5rem; font-size: 1.3rem; }
+    .coin-5c { width: 3.9rem; height: 3.9rem; font-size: 1.4rem; }
+    .coin-10c { width: 3.4rem; height: 3.4rem; font-size: 1.3rem; }
+    .coin-20c { width: 3.75rem; height: 3.75rem; font-size: 1.4rem; }
+    .coin-50c { width: 4.15rem; height: 4.15rem; font-size: 1.5rem; }
+    .coin-1e { width: 3.9rem; height: 3.9rem; font-size: 1.45rem; border-width: 5px; }
+    .coin-2e { width: 4.25rem; height: 4.25rem; font-size: 1.55rem; border-width: 5px; }
 }
 
 /* Monetų dydžiai ypač mažiems ekranams (iki 330px) */
@@ -281,8 +281,15 @@ button.coin:active, button.bill:active {
     }
 
     .top-bar {
-        padding-top: 0.25rem !important;
-        padding-bottom: 0.25rem !important;
+        padding-top: 0.35rem !important;
+        padding-bottom: 0.35rem !important;
+        font-size: 1rem !important;
+        font-weight: 900 !important;
+    }
+
+    .top-badge {
+        font-size: 0.95rem !important;
+        font-weight: 900 !important;
     }
 }
 
@@ -325,10 +332,17 @@ button.coin:active, button.bill:active {
 /* Atsiliepimo (feedback) pranešimai — užtikrina taisyklingus tarpus tarp žodžių, skiemenų ir jaustukų flex konteineryje */
 #feedback {
     text-align: center;
+    font-size: 1.05rem !important;
+    font-weight: 900 !important;
 }
 #feedback > span {
     display: inline-block;
     max-width: 100%;
     line-height: inherit;
+}
+@media (min-width: 640px) {
+    #feedback {
+        font-size: 1.25rem !important;
+    }
 }
 

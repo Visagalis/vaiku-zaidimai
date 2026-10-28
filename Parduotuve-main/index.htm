@@ -316,13 +316,13 @@
 
         function renderTopBar() {
             return `
-                <div class="top-bar bg-orange-100 border-b-2 border-orange-300 text-slate-800 px-3 sm:px-5 py-2 sm:py-2.5 flex justify-between items-center font-bold text-sm sm:text-base shadow-sm shrink-0">
-                    <div class="flex items-center gap-2">
-                        <button onclick="renderStartScreen()" class="top-badge bg-white/90 hover:bg-orange-200 border border-orange-300 px-2 py-0.5 rounded-lg text-sm sm:text-base transition active:scale-95" title="Pradžia">🏠</button>
-                        <span class="flex items-center gap-1">⭐ <span class="text-orange-700 dark:text-amber-300 font-black">${state.score}</span></span>
+                <div class="top-bar bg-orange-100 border-b-2 border-orange-300 text-slate-800 px-3 sm:px-5 py-2 sm:py-2.5 flex justify-between items-center font-black text-base sm:text-lg shadow-sm shrink-0">
+                    <div class="flex items-center gap-2 sm:gap-3">
+                        <button onclick="renderStartScreen()" class="top-badge bg-white/90 hover:bg-orange-200 border border-orange-300 px-2.5 py-1 rounded-xl text-base sm:text-xl transition active:scale-95" title="Pradžia">🏠</button>
+                        <span class="flex items-center gap-1.5 text-base sm:text-lg">⭐ <span class="text-orange-700 dark:text-amber-300 font-black text-lg sm:text-xl">${state.score}</span></span>
                     </div>
-                    <div class="top-badge bg-white/90 border border-orange-300 px-2.5 py-0.5 rounded-xl font-black text-orange-700 dark:text-amber-300">🎯 ${state.question} / ${state.maxQuestions}</div>
-                    <div class="flex items-center gap-1">🔥 <span class="text-orange-700 dark:text-amber-300 font-black">${state.streak}</span></div>
+                    <div class="top-badge bg-white/90 border border-orange-300 px-3 py-1 rounded-xl font-black text-orange-700 dark:text-amber-300 text-base sm:text-lg">🎯 ${state.question} / ${state.maxQuestions}</div>
+                    <div class="flex items-center gap-1.5 text-base sm:text-lg">🔥 <span class="text-orange-700 dark:text-amber-300 font-black text-lg sm:text-xl">${state.streak}</span></div>
                 </div>
             `;
         }
@@ -392,8 +392,8 @@
             if (state.mode === 'single') {
                 const it = state.currentTask;
                 shelfHtml = `
-                    <div class="shop-shelf p-2.5 sm:p-3.5 rounded-2xl flex items-center justify-center gap-3 sm:gap-5 shadow-sm shrink-0">
-                        <div class="text-5xl sm:text-6xl drop-shadow">${it.emoji}</div>
+                    <div class="shop-shelf p-2.5 sm:p-3.5 rounded-2xl flex items-center justify-center gap-3 sm:gap-5 shadow-sm shrink-0 w-full">
+                        <div class="text-4xl sm:text-6xl drop-shadow">${it.emoji}</div>
                         <div class="text-left">
                             <div class="text-xl sm:text-2xl font-black text-slate-800 text-main-title">${_col(it.name)}</div>
                         </div>
@@ -405,19 +405,21 @@
             } else {
                 const { item1, item2 } = state.currentTask;
                 shelfHtml = `
-                    <div class="shop-shelf p-2.5 sm:p-3.5 rounded-2xl flex flex-col items-center justify-center gap-1.5 shadow-sm shrink-0">
-                        <div class="flex items-center justify-center gap-2 sm:gap-4 flex-wrap">
-                            <div class="flex items-center gap-2 bg-white/80 dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-amber-300 shadow-sm">
-                                <span class="text-3xl sm:text-4xl">${item1.emoji}</span>
-                                <span class="font-black text-base sm:text-lg">${_col(item1.name)}</span>
-                                <span class="price-tag bg-amber-200 text-amber-900 font-black px-2.5 py-1 rounded-lg text-sm sm:text-base">${formatMoneyCents(item1.cents)}</span>
+                    <div class="shop-shelf p-2 sm:p-3 rounded-2xl flex items-center justify-between gap-1.5 sm:gap-3 shadow-sm shrink-0 w-full">
+                        <div class="flex-1 min-w-0 flex items-center justify-between gap-1 sm:gap-2 bg-white/90 dark:bg-slate-800 px-2 sm:px-3 py-1.5 rounded-xl border border-amber-300 shadow-sm">
+                            <div class="flex items-center gap-1.5 sm:gap-2 min-w-0">
+                                <span class="text-2xl sm:text-3xl shrink-0">${item1.emoji}</span>
+                                <span class="font-black text-xs sm:text-base truncate">${_col(item1.name)}</span>
                             </div>
-                            <span class="font-black text-2xl text-orange-500">+</span>
-                            <div class="flex items-center gap-2 bg-white/80 dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-amber-300 shadow-sm">
-                                <span class="text-3xl sm:text-4xl">${item2.emoji}</span>
-                                <span class="font-black text-base sm:text-lg">${_col(item2.name)}</span>
-                                <span class="price-tag bg-amber-200 text-amber-900 font-black px-2.5 py-1 rounded-lg text-sm sm:text-base">${formatMoneyCents(item2.cents)}</span>
+                            <span class="price-tag bg-amber-200 text-amber-900 font-black px-1.5 sm:px-2 py-0.5 rounded-lg text-xs sm:text-base shrink-0">${formatMoneyCents(item1.cents)}</span>
+                        </div>
+                        <span class="font-black text-xl sm:text-2xl text-orange-500 shrink-0 px-0.5">+</span>
+                        <div class="flex-1 min-w-0 flex items-center justify-between gap-1 sm:gap-2 bg-white/90 dark:bg-slate-800 px-2 sm:px-3 py-1.5 rounded-xl border border-amber-300 shadow-sm">
+                            <div class="flex items-center gap-1.5 sm:gap-2 min-w-0">
+                                <span class="text-2xl sm:text-3xl shrink-0">${item2.emoji}</span>
+                                <span class="font-black text-xs sm:text-base truncate">${_col(item2.name)}</span>
                             </div>
+                            <span class="price-tag bg-amber-200 text-amber-900 font-black px-1.5 sm:px-2 py-0.5 rounded-lg text-xs sm:text-base shrink-0">${formatMoneyCents(item2.cents)}</span>
                         </div>
                     </div>
                 `;
@@ -436,15 +438,15 @@
 
                     <!-- Prekystalis -->
                     <div class="flex-1 flex flex-col min-h-0 my-1 sm:my-2">
-                        <div class="flex justify-between items-center px-1 mb-1 text-sm sm:text-base font-extrabold shrink-0">
-                            <span class="text-sub-title flex items-center gap-1.5">💰 Prekystalis: <strong id="counter-sum" class="text-emerald-500 font-black text-lg sm:text-2xl">0 c</strong></span>
-                            <button onclick="clearCounter()" class="text-rose-500 hover:scale-110 active:scale-95 font-bold text-lg p-1" title="Išvalyti">🗑️</button>
+                        <div class="flex justify-between items-center px-1 mb-1.5 text-base sm:text-lg font-black shrink-0">
+                            <span class="text-sub-title flex items-center gap-2">💰 Prekystalis: <strong id="counter-sum" class="text-emerald-500 font-black text-xl sm:text-3xl">0 c</strong></span>
+                            <button onclick="clearCounter()" class="text-rose-500 hover:scale-110 active:scale-95 text-xl p-1.5 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/30 transition" title="Išvalyti">🗑️</button>
                         </div>
                         <div id="counter-tray" class="counter-tray flex-1 flex flex-wrap items-center justify-center content-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-2xl min-h-[120px] sm:min-h-[160px]">
                         </div>
                     </div>
 
-                    <div id="feedback" class="h-6 sm:h-7 flex items-center justify-center font-black text-xs sm:text-base opacity-0 transition-opacity shrink-0"></div>
+                    <div id="feedback" class="h-6 sm:h-7 flex items-center justify-center font-black text-sm sm:text-lg opacity-0 transition-opacity shrink-0"></div>
 
                     <!-- Piniginė -->
                     <div class="wallet-box p-2.5 sm:p-3.5 rounded-2xl flex flex-col items-center gap-1.5 shrink-0">
@@ -469,7 +471,12 @@
             sumEl.textContent = formatMoneyCents(getCollectedSum());
 
             if (state.collectedItems.length === 0) {
-                tray.innerHTML = `<span class="text-slate-400 font-bold text-xs sm:text-sm text-center">${_col('Spausk ant pinigų apačioje, kad padėtum ant prekystalio')}</span>`;
+                tray.innerHTML = `
+                    <div class="flex flex-col items-center justify-center gap-1.5 text-slate-400 dark:text-slate-500 select-none pointer-events-none">
+                        <span class="text-3xl sm:text-4xl animate-bounce">🪙</span>
+                        <span class="font-black text-sm sm:text-base text-slate-500 dark:text-slate-400">Padėk pinigėlius čia</span>
+                    </div>
+                `;
             } else {
                 tray.innerHTML = state.collectedItems.map((item, idx) => `
                     <button onclick="removeCoin(${idx})" class="${item.class} pop-in cursor-pointer hover:opacity-80" title="Nuimti">
@@ -493,7 +500,7 @@
                     state.streak++;
                 }
                 feedback.innerHTML = `<span>${_col('Puikus pirkinys! Sumokėjai tiksliai!')} 🎉</span>`;
-                feedback.className = "h-6 flex items-center justify-center font-black text-sm sm:text-lg text-green-500 opacity-100";
+                feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-sm sm:text-lg text-green-500 opacity-100";
                 tray.classList.add('bounce');
 
                 setTimeout(() => {
@@ -512,7 +519,7 @@
                     ? 'Dar trūksta pinigėlių!'
                     : 'Padėjai per daug! Paspausk ant monetos, kad nuimtum.';
                 feedback.innerHTML = `<span>${_col(msg)} 🤔</span>`;
-                feedback.className = "h-6 flex items-center justify-center font-black text-xs sm:text-base text-red-500 opacity-100";
+                feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-sm sm:text-lg text-red-500 opacity-100";
                 tray.classList.remove('shake');
                 void tray.offsetWidth;
                 tray.classList.add('shake');
