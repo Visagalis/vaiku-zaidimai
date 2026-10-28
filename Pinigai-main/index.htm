@@ -352,30 +352,30 @@
             app.innerHTML = `
                 ${renderTopBar()}
                 <div class="flex-1 flex flex-col p-2.5 sm:p-4 fade-in justify-between overflow-hidden">
-                    <div class="text-center">
-                        <div class="inline-block mt-0.5 px-6 py-1.5 rounded-2xl bg-amber-100 border-2 border-amber-400 text-amber-900 font-black text-2xl sm:text-4xl shadow-sm">
+                    <div class="text-center shrink-0">
+                        <div class="inline-block mt-0.5 px-6 py-2 rounded-2xl bg-amber-100 border-2 border-amber-400 text-amber-900 font-black text-2xl sm:text-4xl shadow-sm">
                             🎯 ${formatMoneyCents(state.targetCents)}
                         </div>
                     </div>
 
                     <!-- Padėklas su surinktais pinigais -->
-                    <div class="flex flex-col">
-                        <div class="flex justify-between items-center px-1 mb-1 text-sm font-extrabold">
-                            <span class="text-sub-title">💰 <strong id="current-sum-label" class="text-emerald-600 text-base sm:text-lg">0 c</strong></span>
-                            <button onclick="clearTray()" class="text-rose-500 hover:scale-110 font-bold text-lg" title="Išvalyti">🗑️</button>
+                    <div class="flex-1 flex flex-col min-h-0 my-1 sm:my-2">
+                        <div class="flex justify-between items-center px-1 mb-1 text-sm sm:text-base font-extrabold shrink-0">
+                            <span class="text-sub-title flex items-center gap-1.5">💰 Padėklas: <strong id="current-sum-label" class="text-emerald-500 font-black text-lg sm:text-2xl">0 c</strong></span>
+                            <button onclick="clearTray()" class="text-rose-500 hover:scale-110 active:scale-95 font-bold text-lg p-1" title="Išvalyti">🗑️</button>
                         </div>
-                        <div id="money-container" class="money-tray flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5 p-2.5 sm:p-3.5 rounded-2xl min-h-[82px] sm:min-h-[105px]">
+                        <div id="money-container" class="money-tray flex-1 flex flex-wrap items-center justify-center content-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-2xl min-h-[120px] sm:min-h-[160px]">
                         </div>
                     </div>
 
-                    <div id="feedback" class="h-6 sm:h-7 flex items-center justify-center font-black text-sm sm:text-lg opacity-0 transition-opacity"></div>
+                    <div id="feedback" class="h-6 sm:h-7 flex items-center justify-center font-black text-sm sm:text-lg opacity-0 transition-opacity shrink-0"></div>
 
                     <!-- Piniginė su monetomis pasirinkimui -->
-                    <div class="wallet-box p-2 sm:p-3 rounded-2xl flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+                    <div class="wallet-box p-2.5 sm:p-3.5 rounded-2xl flex flex-wrap items-center justify-center gap-2 sm:gap-3 shrink-0">
                         ${walletHtml}
                     </div>
 
-                    <button id="check-collect-btn" onclick="checkCollectAnswer()" class="btn-tinted w-full py-2.5 sm:py-3.5 rounded-2xl bg-green-100 hover:bg-green-200 text-slate-800 font-black text-xl sm:text-3xl shadow-md border-2 border-b-4 border-green-400 transition transform active:scale-95">
+                    <button id="check-collect-btn" onclick="checkCollectAnswer()" class="w-full py-3.5 sm:py-4 rounded-2xl bg-green-500 hover:bg-green-600 text-white font-black text-xl sm:text-3xl shadow-lg border-2 border-b-4 border-green-700 transition transform active:scale-95 shrink-0 mt-1">
                         ✅
                     </button>
                 </div>

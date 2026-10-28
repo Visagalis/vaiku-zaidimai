@@ -392,8 +392,8 @@
             if (state.mode === 'single') {
                 const it = state.currentTask;
                 shelfHtml = `
-                    <div class="shop-shelf p-2 sm:p-3 rounded-2xl flex items-center justify-center gap-3 sm:gap-5 shadow-sm">
-                        <div class="text-4xl sm:text-6xl drop-shadow">${it.emoji}</div>
+                    <div class="shop-shelf p-2.5 sm:p-3.5 rounded-2xl flex items-center justify-center gap-3 sm:gap-5 shadow-sm shrink-0">
+                        <div class="text-5xl sm:text-6xl drop-shadow">${it.emoji}</div>
                         <div class="text-left">
                             <div class="text-xl sm:text-2xl font-black text-slate-800 text-main-title">${_col(it.name)}</div>
                         </div>
@@ -405,18 +405,18 @@
             } else {
                 const { item1, item2 } = state.currentTask;
                 shelfHtml = `
-                    <div class="shop-shelf p-2 sm:p-3 rounded-2xl flex flex-col items-center justify-center gap-1 shadow-sm">
+                    <div class="shop-shelf p-2.5 sm:p-3.5 rounded-2xl flex flex-col items-center justify-center gap-1.5 shadow-sm shrink-0">
                         <div class="flex items-center justify-center gap-2 sm:gap-4 flex-wrap">
-                            <div class="flex items-center gap-1.5 bg-white/80 dark:bg-slate-800 px-2.5 py-1 rounded-xl border border-amber-300">
-                                <span class="text-2xl sm:text-3xl">${item1.emoji}</span>
-                                <span class="font-extrabold text-sm sm:text-base">${_col(item1.name)}</span>
-                                <span class="price-tag bg-amber-200 text-amber-900 font-black px-2 py-0.5 rounded-lg text-sm sm:text-base">${formatMoneyCents(item1.cents)}</span>
+                            <div class="flex items-center gap-2 bg-white/80 dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-amber-300 shadow-sm">
+                                <span class="text-3xl sm:text-4xl">${item1.emoji}</span>
+                                <span class="font-black text-base sm:text-lg">${_col(item1.name)}</span>
+                                <span class="price-tag bg-amber-200 text-amber-900 font-black px-2.5 py-1 rounded-lg text-sm sm:text-base">${formatMoneyCents(item1.cents)}</span>
                             </div>
-                            <span class="font-black text-xl text-orange-500">+</span>
-                            <div class="flex items-center gap-1.5 bg-white/80 dark:bg-slate-800 px-2.5 py-1 rounded-xl border border-amber-300">
-                                <span class="text-2xl sm:text-3xl">${item2.emoji}</span>
-                                <span class="font-extrabold text-sm sm:text-base">${_col(item2.name)}</span>
-                                <span class="price-tag bg-amber-200 text-amber-900 font-black px-2 py-0.5 rounded-lg text-sm sm:text-base">${formatMoneyCents(item2.cents)}</span>
+                            <span class="font-black text-2xl text-orange-500">+</span>
+                            <div class="flex items-center gap-2 bg-white/80 dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-amber-300 shadow-sm">
+                                <span class="text-3xl sm:text-4xl">${item2.emoji}</span>
+                                <span class="font-black text-base sm:text-lg">${_col(item2.name)}</span>
+                                <span class="price-tag bg-amber-200 text-amber-900 font-black px-2.5 py-1 rounded-lg text-sm sm:text-base">${formatMoneyCents(item2.cents)}</span>
                             </div>
                         </div>
                     </div>
@@ -424,7 +424,7 @@
             }
 
             const walletHtml = state.walletPool.map((item, idx) => `
-                <button onclick="addCoin(${idx})" class="${item.class} cursor-pointer hover:scale-105">
+                <button onclick="addCoin(${idx})" class="${item.class} cursor-pointer hover:scale-105 active:scale-95">
                     ${item.label}
                 </button>
             `).join('');
@@ -435,25 +435,25 @@
                     ${shelfHtml}
 
                     <!-- Prekystalis -->
-                    <div class="flex flex-col">
-                        <div class="flex justify-between items-center px-1 mb-1 text-sm font-extrabold">
-                            <span class="text-sub-title">💰 <strong id="counter-sum" class="text-emerald-600 text-base sm:text-lg">0 c</strong></span>
-                            <button onclick="clearCounter()" class="text-rose-500 hover:scale-110 font-bold text-lg" title="Išvalyti">🗑️</button>
+                    <div class="flex-1 flex flex-col min-h-0 my-1 sm:my-2">
+                        <div class="flex justify-between items-center px-1 mb-1 text-sm sm:text-base font-extrabold shrink-0">
+                            <span class="text-sub-title flex items-center gap-1.5">💰 Prekystalis: <strong id="counter-sum" class="text-emerald-500 font-black text-lg sm:text-2xl">0 c</strong></span>
+                            <button onclick="clearCounter()" class="text-rose-500 hover:scale-110 active:scale-95 font-bold text-lg p-1" title="Išvalyti">🗑️</button>
                         </div>
-                        <div id="counter-tray" class="counter-tray flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5 p-2 sm:p-3 rounded-2xl min-h-[76px] sm:min-h-[96px]">
+                        <div id="counter-tray" class="counter-tray flex-1 flex flex-wrap items-center justify-center content-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-2xl min-h-[120px] sm:min-h-[160px]">
                         </div>
                     </div>
 
-                    <div id="feedback" class="h-6 flex items-center justify-center font-black text-xs sm:text-base opacity-0 transition-opacity"></div>
+                    <div id="feedback" class="h-6 sm:h-7 flex items-center justify-center font-black text-xs sm:text-base opacity-0 transition-opacity shrink-0"></div>
 
                     <!-- Piniginė -->
-                    <div class="wallet-box p-2 sm:p-3 rounded-2xl flex flex-col items-center gap-1">
-                        <div class="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5">
+                    <div class="wallet-box p-2.5 sm:p-3.5 rounded-2xl flex flex-col items-center gap-1.5 shrink-0">
+                        <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3 max-w-lg">
                             ${walletHtml}
                         </div>
                     </div>
 
-                    <button onclick="checkPayAnswer()" class="btn-tinted w-full py-2.5 sm:py-3.5 rounded-2xl bg-green-100 hover:bg-green-200 text-slate-800 font-black text-xl sm:text-2xl shadow-md border-2 border-b-4 border-green-500 transition transform active:scale-95">
+                    <button onclick="checkPayAnswer()" class="w-full py-3.5 sm:py-4 rounded-2xl bg-green-500 hover:bg-green-600 text-white font-black text-xl sm:text-2xl shadow-lg border-2 border-b-4 border-green-700 transition transform active:scale-95 shrink-0 mt-1">
                         🛒 ${_col('Mokėti')}
                     </button>
                 </div>
@@ -527,28 +527,29 @@
 
             const allOptions = shuffle([task.correct, ...task.wrong]);
             const optionsHtml = allOptions.map((opt, idx) => `
-                <button id="afford-btn-${idx}" onclick="checkAffordAnswer(${idx}, ${opt.cents})" class="item-card p-2.5 sm:p-3.5 rounded-2xl shadow-sm border-b-4 transition transform active:scale-95 flex flex-col items-center justify-center gap-1">
-                    <span class="text-3xl sm:text-4xl">${opt.emoji}</span>
-                    <span class="font-extrabold text-sm sm:text-base">${_col(opt.name)}</span>
-                    <span class="price-tag bg-amber-100 border border-amber-400 text-amber-900 font-black text-sm sm:text-lg px-2.5 py-0.5 rounded-xl">${formatMoneyCents(opt.cents)}</span>
+                <button id="afford-btn-${idx}" onclick="checkAffordAnswer(${idx}, ${opt.cents})" class="item-card p-3 sm:p-4 rounded-2xl shadow-sm border-b-4 transition transform active:scale-95 flex flex-col items-center justify-center gap-1.5">
+                    <span class="text-4xl sm:text-5xl">${opt.emoji}</span>
+                    <span class="font-extrabold text-base sm:text-lg">${_col(opt.name)}</span>
+                    <span class="price-tag bg-amber-100 border border-amber-400 text-amber-900 font-black text-base sm:text-xl px-3 py-1 rounded-xl">${formatMoneyCents(opt.cents)}</span>
                 </button>
             `).join('');
 
             app.innerHTML = `
                 ${renderTopBar()}
                 <div class="flex-1 flex flex-col p-3 sm:p-5 fade-in justify-between overflow-hidden">
-                    <div class="text-center">
-                        <h2 class="text-xl sm:text-3xl font-black text-slate-700 text-main-title mb-1 flex items-center justify-center gap-2">
-                            <span>🛍️ ❓</span>
+                    <div class="text-center flex-1 flex flex-col min-h-0">
+                        <h2 class="text-xl sm:text-2xl font-black text-slate-700 text-main-title mb-1.5 flex items-center justify-center gap-2 shrink-0">
+                            <span>🛍️</span>
+                            <span>${_col('Ką gali nupirkti?')}</span>
                         </h2>
-                        <div id="afford-wallet" class="counter-tray flex flex-wrap items-center justify-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-2xl min-h-[85px] sm:min-h-[110px]">
+                        <div id="afford-wallet" class="counter-tray flex-1 flex flex-wrap items-center justify-center content-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-2xl min-h-[110px] sm:min-h-[140px] w-full">
                             ${walletCoinsHtml}
                         </div>
                     </div>
 
-                    <div id="feedback" class="h-6 sm:h-7 flex items-center justify-center font-black text-sm sm:text-lg opacity-0 transition-opacity"></div>
+                    <div id="feedback" class="h-6 sm:h-7 flex items-center justify-center font-black text-sm sm:text-lg opacity-0 transition-opacity shrink-0 my-1"></div>
 
-                    <div class="grid grid-cols-2 gap-2.5 sm:gap-3.5">
+                    <div class="grid grid-cols-2 gap-3 sm:gap-4 shrink-0">
                         ${optionsHtml}
                     </div>
                 </div>
