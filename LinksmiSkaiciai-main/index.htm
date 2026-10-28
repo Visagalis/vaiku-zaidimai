@@ -10,51 +10,16 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../shared/common.css">
+    <script src="../shared/common.js"></script>
     <style>
-        :root {
-            --sc-0: #dc2626;
-            --sc-1: #1d4ed8;
-            --sc-2: #15803d;
-            --sc-3: #c2410c;
-            --sc-4: #7e22ce;
-            --sc-5: #be185d;
-        }
-
         body {
             font-family: 'Nunito', sans-serif;
             background-color: #e0f2fe;
             background-image: radial-gradient(#7dd3fc 20%, transparent 20%);
             background-size: 24px 24px;
-            touch-action: manipulation;
-            user-select: none;
-            -webkit-user-select: none;
             color: #1e293b;
             transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        .bounce { animation: bounce 0.45s cubic-bezier(0.28, 0.84, 0.42, 1); }
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0) scale(1); }
-            45% { transform: translateY(-12px) scale(1.08); }
-        }
-
-        .shake { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; }
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-8px); }
-            75% { transform: translateX(8px); }
-        }
-
-        .fade-in { animation: fadeIn 0.25s ease-out; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.97); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        .pop-in { animation: popIn 0.22s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        @keyframes popIn {
-            from { opacity: 0; transform: scale(0.5); }
-            to { opacity: 1; transform: scale(1); }
         }
 
         .float-anim { animation: floatSlow 2.6s ease-in-out infinite; }
@@ -106,14 +71,6 @@
 
         /* Automatinė tamsioji tema (Dark Mode) */
         @media (prefers-color-scheme: dark) {
-            :root {
-                --sc-0: #ff6b6b;
-                --sc-1: #38bdf8;
-                --sc-2: #4ade80;
-                --sc-3: #facc15;
-                --sc-4: #c084fc;
-                --sc-5: #f472b6;
-            }
             body {
                 background-color: #0b1120 !important;
                 background-image: radial-gradient(#1e293b 25%, transparent 25%) !important;
@@ -123,22 +80,6 @@
                 background-color: #0f172a !important;
                 border-color: #334155 !important;
                 box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.7) !important;
-            }
-            .top-bar {
-                background-color: #1e293b !important;
-                border-color: #334155 !important;
-                color: #f1f5f9 !important;
-            }
-            .top-badge {
-                background-color: #0f172a !important;
-                border-color: #475569 !important;
-            }
-            .btn-tinted {
-                background-color: #1e293b !important;
-                color: #f8fafc !important;
-            }
-            .btn-tinted:hover {
-                background-color: #334155 !important;
             }
             #scale-status, #problem-box, #guess-box, #pop-progress {
                 background-color: #0f172a !important;
@@ -183,27 +124,6 @@
             }
         }
     </style>
-    <!-- Apsauga nuo priartinimo gestais (pinch to zoom) -->
-    <script>
-        document.addEventListener("gesturestart", function(e) { e.preventDefault(); }, { passive: false });
-        document.addEventListener("gesturechange", function(e) { e.preventDefault(); }, { passive: false });
-        document.addEventListener("gestureend", function(e) { e.preventDefault(); }, { passive: false });
-        document.addEventListener("touchstart", function(e) {
-            if (e.touches && e.touches.length > 1) {
-                e.preventDefault();
-            }
-        }, { passive: false });
-        document.addEventListener("touchmove", function(e) {
-            if (e.touches && e.touches.length > 1) {
-                e.preventDefault();
-            }
-        }, { passive: false });
-        document.addEventListener("wheel", function(e) {
-            if (e.ctrlKey) {
-                e.preventDefault();
-            }
-        }, { passive: false });
-    </script>
 </head>
 <body class="h-screen max-h-screen overflow-hidden flex items-center justify-center p-2 sm:p-4">
 
@@ -212,61 +132,6 @@
     </div>
 
     <script>
-        // === SKIEMENŲ SPALVINIMAS ===
-        const _V = 'aeėęiįyouųūąAEĖĘIĮYOUŲŪĄ';
-        const _D = ['ai','au','ei','eu','ie','uo','ui','oi','ia','io','iu'];
-        const _L = /[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/;
-        const _O = new Set(['bl','br','dr','dv','fl','fr','gl','gr','gn','kl','kr','kn','kv','pl','pr','sk','sl','sm','sn','sp','sr','st','sv','šl','šv','šn','tr','tv','vr','žl','žv','str','skr','spr']);
-        const _SC = ['var(--sc-0, #dc2626)','var(--sc-1, #1d4ed8)','var(--sc-2, #15803d)','var(--sc-3, #c2410c)','var(--sc-4, #7e22ce)','var(--sc-5, #be185d)'];
-
-        function _syl(word) {
-            if (!word || word.length <= 1) return [word || ''];
-            const r = []; let s = '', i = 0, n = word.length;
-            while (i < n) {
-                const c = word[i];
-                if (!_L.test(c)) { s += c; i++; continue; }
-                if (!_V.includes(c)) { s += c; i++; }
-                else {
-                    if (i + 1 < n && _D.includes(word.slice(i, i + 2).toLowerCase())) { s += word.slice(i, i + 2); i += 2; }
-                    else { s += c; i++; }
-                    let j = i;
-                    while (j < n && _L.test(word[j]) && !_V.includes(word[j])) j++;
-                    let cl = word.slice(i, j);
-                    if (j >= n || !_L.test(word[j])) { s += cl; i = j; while (i < n && !_L.test(word[i])) { s += word[i]; i++; } r.push(s); s = ''; }
-                    else if (cl.length === 0) { r.push(s); s = ''; }
-                    else if (cl.length === 1) { r.push(s); s = cl; i = j; }
-                    else {
-                        let u = [];
-                        for (let k = 0; k < cl.length;) {
-                            const p = cl.slice(k, k + 2).toLowerCase();
-                            if (p === 'dz' || p === 'dž' || p === 'ch') { u.push(cl.slice(k, k + 2)); k += 2; }
-                            else { u.push(cl[k]); k++; }
-                        }
-                        let sp = u.length - 1;
-                        if (u.length >= 2) {
-                            const l2 = (u[u.length - 2] + u[u.length - 1]).toLowerCase();
-                            const l3 = u.length >= 3 ? (u[u.length - 3] + l2).toLowerCase() : '';
-                            if (l3 && _O.has(l3)) sp = u.length - 3;
-                            else if (_O.has(l2)) sp = u.length - 2;
-                        }
-                        s += u.slice(0, sp).join(''); r.push(s); s = u.slice(sp).join(''); i = j;
-                    }
-                }
-            }
-            if (s) r.push(s);
-            return r.filter(x => x.length > 0);
-        }
-
-        function _col(text) {
-            if (!text) return '';
-            return text.split(/(\s+)/).map(token => {
-                if (!token.trim() || !/[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/.test(token)) return token;
-                const syls = _syl(token);
-                return syls.map((s, i) => '<span style="color:' + _SC[i % _SC.length] + '">' + s + '</span>').join('');
-            }).join('');
-        }
-        // === /SKIEMENŲ SPALVINIMAS ===
-
         const app = document.getElementById('app');
 
         const EMOJIS = ['🍎', '🍓', '⭐', '🚗', '🎈', '🦆', '🦋', '🍐', '🍊'];
@@ -305,72 +170,6 @@
             balloons: [],
             poppedCount: 0
         };
-
-        // Web Audio API
-        let audioCtx;
-        function initAudio() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-        }
-
-        function playSound(type) {
-            initAudio();
-            if (!audioCtx) return;
-            const now = audioCtx.currentTime;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-
-            if (type === 'click') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(700, now);
-                osc.frequency.exponentialRampToValueAtTime(1100, now + 0.07);
-                gain.gain.setValueAtTime(0.18, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.09);
-                osc.start(now);
-                osc.stop(now + 0.09);
-            } else if (type === 'pop') {
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(520, now);
-                osc.frequency.exponentialRampToValueAtTime(120, now + 0.11);
-                gain.gain.setValueAtTime(0.28, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
-                osc.start(now);
-                osc.stop(now + 0.12);
-            } else if (type === 'correct') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(440, now);
-                osc.frequency.setValueAtTime(554.37, now + 0.09);
-                osc.frequency.setValueAtTime(659.25, now + 0.18);
-                gain.gain.setValueAtTime(0.25, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
-                osc.start(now);
-                osc.stop(now + 0.35);
-            } else if (type === 'wrong') {
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(280, now);
-                osc.frequency.exponentialRampToValueAtTime(150, now + 0.22);
-                gain.gain.setValueAtTime(0.25, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
-                osc.start(now);
-                osc.stop(now + 0.25);
-            } else if (type === 'win') {
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(440, now);
-                osc.frequency.setValueAtTime(554.37, now + 0.1);
-                osc.frequency.setValueAtTime(659.25, now + 0.2);
-                osc.frequency.setValueAtTime(880, now + 0.3);
-                gain.gain.setValueAtTime(0.2, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
-                osc.start(now);
-                osc.stop(now + 0.6);
-            }
-        }
 
         function fireConfetti() {
             if (typeof confetti !== 'function') return;

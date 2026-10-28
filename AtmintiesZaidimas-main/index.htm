@@ -9,11 +9,11 @@
     <title>Atminties Žaidimas</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../shared/common.css">
+    <script src="../shared/common.js"></script>
     <style>
         body {
             font-family: 'Nunito', sans-serif;
-            touch-action: manipulation;
-            user-select: none;
             background-color: #f0fdf4;
             background-image: radial-gradient(#86efac 2px, transparent 2px);
             background-size: 30px 30px;
@@ -23,12 +23,6 @@
             --card-emoji-size: 2.5rem;
             --card-word-size: 1rem;
             --card-radius: 1rem;
-            --sc-0: #dc2626;
-            --sc-1: #1d4ed8;
-            --sc-2: #15803d;
-            --sc-3: #c2410c;
-            --sc-4: #7e22ce;
-            --sc-5: #be185d;
         }
 
         /* 3D Flip Card Styles */
@@ -109,16 +103,6 @@
             box-shadow: 0 0 12px #22c55e;
         }
 
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-5px); }
-            40%, 80% { transform: translateX(5px); }
-        }
-
-        .shake {
-            animation: shake 0.4s ease-in-out;
-        }
-
         .feedback-popup {
             position: absolute;
             top: 50%;
@@ -142,14 +126,6 @@
 
         /* Tamsioji tema */
         @media (prefers-color-scheme: dark) {
-            :root {
-                --sc-0: #ff6b6b;
-                --sc-1: #38bdf8;
-                --sc-2: #4ade80;
-                --sc-3: #facc15;
-                --sc-4: #c084fc;
-                --sc-5: #f472b6;
-            }
             body {
                 background-color: #0b1120 !important;
                 background-image: radial-gradient(#1e293b 2px, transparent 2px) !important;
@@ -206,64 +182,15 @@
             }
         }
     </style>
-    <!-- Apsauga nuo priartinimo gestais (pinch to zoom) -->
-    <script>
-        document.addEventListener("gesturestart", function(e) { e.preventDefault(); }, { passive: false });
-        document.addEventListener("gesturechange", function(e) { e.preventDefault(); }, { passive: false });
-        document.addEventListener("gestureend", function(e) { e.preventDefault(); }, { passive: false });
-        document.addEventListener("touchstart", function(e) {
-            if (e.touches && e.touches.length > 1) {
-                e.preventDefault();
-            }
-        }, { passive: false });
-        document.addEventListener("touchmove", function(e) {
-            if (e.touches && e.touches.length > 1) {
-                e.preventDefault();
-            }
-        }, { passive: false });
-        document.addEventListener("wheel", function(e) {
-            if (e.ctrlKey) {
-                e.preventDefault();
-            }
-        }, { passive: false });
-    </script>
 </head>
 <body class="h-screen max-h-screen text-slate-800 flex flex-col relative overflow-hidden p-2 sm:p-3 transition-colors duration-200">
     
     <!-- Audio Context & Synthesis -->
     <script>
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        
-        function playTone(freq, type, duration, vol) {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = type;
-            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            
-            gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
-            
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            osc.stop(audioCtx.currentTime + duration);
-        }
-
-        function playFlip() { playTone(400, 'sine', 0.1, 0.3); }
-        function playMatch() { 
-            playTone(600, 'sine', 0.1, 0.3); 
-            setTimeout(() => playTone(800, 'sine', 0.2, 0.3), 100); 
-        }
-        function playMismatch() { 
-            playTone(300, 'sawtooth', 0.2, 0.3); 
-            setTimeout(() => playTone(250, 'sawtooth', 0.2, 0.3), 150);
-        }
-        function playWin() {
-            [400, 500, 600, 800, 1000].forEach((freq, i) => {
-                setTimeout(() => playTone(freq, 'sine', 0.2, 0.3), i * 150);
-            });
-        }
+        function playFlip() { playTone(400, 'sine', 0.1, 0, 0.3); }
+        function playMatch() { playCorrectSound(); }
+        function playMismatch() { playWrongSound(); }
+        function playWin() { playWinSound(); }
     </script>
 
     <!-- UI Containers -->
@@ -315,56 +242,6 @@
     <div id="feedback" class="feedback-popup">Puiku!</div>
 
     <script>
-        // === SKIEMENŲ SPALVINIMAS ===
-        const _V = 'aeėęiįyouųūąAEĖĘIĮYOUŲŪĄ';
-        const _D = ['ai','au','ei','eu','ie','uo','ui','oi','ia','io','iu'];
-        const _L = /[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/;
-        const _O = new Set(['bl','br','dr','dv','fl','fr','gl','gr','gn','kl','kr','kn','kv','pl','pr','sk','sl','sm','sn','sp','sr','st','sv','šl','šv','šn','tr','tv','vr','žl','žv','str','skr','spr']);
-        const _SC = ['var(--sc-0, #dc2626)','var(--sc-1, #1d4ed8)','var(--sc-2, #15803d)','var(--sc-3, #c2410c)','var(--sc-4, #7e22ce)','var(--sc-5, #be185d)'];
-
-        function _syl(word) {
-            if (!word || word.length <= 1) return [word || ''];
-            const r = []; let s = '', i = 0, n = word.length;
-            while (i < n) {
-                const c = word[i];
-                if (!_L.test(c)) { s += c; i++; continue; }
-                if (!_V.includes(c)) { s += c; i++; }
-                else {
-                    s += c; i++;
-                    if (i < n && _V.includes(word[i]) && _D.includes((c + word[i]).toLowerCase())) { s += word[i]; i++; }
-                    let j = i, u = [];
-                    while (j < n && !_V.includes(word[j])) {
-                        if (!_L.test(word[j])) break;
-                        if (j+1 < n) { const p = (word[j]+word[j+1]).toLowerCase(); if (p==='ch'||p==='dz'||p==='dž') { u.push(word[j]+word[j+1]); j+=2; continue; } }
-                        u.push(word[j]); j++;
-                    }
-                    if (j >= n || (j < n && !_V.includes(word[j]) && !_L.test(word[j]))) {
-                        s += u.join(''); while (j < n && !_L.test(word[j])) { s += word[j]; j++; } i = j;
-                        if (i >= n) { r.push(s); s = ''; }
-                    } else if (u.length === 0) { r.push(s); s = ''; }
-                    else if (u.length === 1) { r.push(s); s = u[0]; i = j; }
-                    else {
-                        let sp = u.length - 1;
-                        if (u.length >= 3) { const l2 = (u[u.length-2]+u[u.length-1]).toLowerCase(); if (_O.has(l2)) sp = u.length - 2; }
-                        if (u.length >= 4) { const l3 = (u[u.length-3]+u[u.length-2]+u[u.length-1]).toLowerCase(); if (_O.has(l3)) sp = u.length - 3; }
-                        s += u.slice(0, sp).join(''); r.push(s); s = u.slice(sp).join(''); i = j;
-                    }
-                }
-            }
-            if (s) r.push(s);
-            return r.filter(x => x.length > 0);
-        }
-
-        function _col(text) {
-            if (!text) return '';
-            return text.split(/(\s+)/).map(token => {
-                if (!token.trim() || !/[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/.test(token)) return token;
-                const syls = _syl(token);
-                return syls.map((s, i) => '<span style="color:' + _SC[i % _SC.length] + '">' + s + '</span>').join('');
-            }).join('');
-        }
-        // === /SKIEMENŲ SPALVINIMAS ===
-
         const ALL_PAIRS = [
             { emoji: "🐱", word: "KATĖ" }, { emoji: "🐶", word: "ŠUO" }, { emoji: "🐸", word: "VARLĖ" },
             { emoji: "🌞", word: "SAULĖ" }, { emoji: "🌳", word: "MEDIS" }, { emoji: "🌸", word: "GĖLĖ" },
@@ -448,14 +325,6 @@
             if (cont) ro.observe(cont);
         }
 
-        function shuffle(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        }
-
         function formatTime(secs) {
             const m = Math.floor(secs / 60).toString().padStart(2, '0');
             const s = (secs % 60).toString().padStart(2, '0');
@@ -498,7 +367,7 @@
         }
 
         function startGame(pairsCount) {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
+            initAudio();
             
             currentPairs = pairsCount;
             pairsFound = 0;

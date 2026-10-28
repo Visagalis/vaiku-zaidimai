@@ -9,6 +9,8 @@
     <title>Žaidimai Vaikams</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="shared/common.css">
+    <script src="shared/common.js"></script>
     <style>
         body {
             font-family: 'Nunito', sans-serif;
@@ -361,37 +363,11 @@
             });
         }
 
-        // Apsauga nuo priartinimo gestais (pinch to zoom ir double tap zoom)
-        function preventZoom(doc) {
-            if (!doc) return;
-            try {
-                doc.addEventListener('gesturestart', function(e) { e.preventDefault(); }, { passive: false });
-                doc.addEventListener('gesturechange', function(e) { e.preventDefault(); }, { passive: false });
-                doc.addEventListener('gestureend', function(e) { e.preventDefault(); }, { passive: false });
-                doc.addEventListener('touchstart', function(e) {
-                    if (e.touches && e.touches.length > 1) {
-                        e.preventDefault();
-                    }
-                }, { passive: false });
-                doc.addEventListener('touchmove', function(e) {
-                    if (e.touches && e.touches.length > 1) {
-                        e.preventDefault();
-                    }
-                }, { passive: false });
-                doc.addEventListener('wheel', function(e) {
-                    if (e.ctrlKey) {
-                        e.preventDefault();
-                    }
-                }, { passive: false });
-            } catch (err) {}
-        }
-        preventZoom(document);
-
-        // Apsaugome ir įkeliamą žaidimo iframe
+        // Apsaugome ir įkeliamą žaidimo iframe (preventZoom iš shared/common.js)
         gameFrame.addEventListener('load', function() {
             try {
                 const fDoc = gameFrame.contentDocument || (gameFrame.contentWindow && gameFrame.contentWindow.document);
-                if (fDoc) {
+                if (fDoc && typeof preventZoom === 'function') {
                     preventZoom(fDoc);
                 }
             } catch (err) {}

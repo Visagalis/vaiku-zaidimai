@@ -15,41 +15,17 @@
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link rel="stylesheet" href="../shared/common.css">
+  <script src="../shared/common.js"></script>
 
   <style>
-    :root {
-      --sc-0: #dc2626;
-      --sc-1: #1d4ed8;
-      --sc-2: #15803d;
-      --sc-3: #c2410c;
-      --sc-4: #7e22ce;
-      --sc-5: #be185d;
-    }
-
     body {
-        touch-action: manipulation;
       margin: 0;
       padding: 0;
       -webkit-tap-highlight-color: transparent;
     }
     
-    /* Vaikams draugiškos klaidos animacija */
-    @keyframes shake {
-      10%, 90% { transform: translate3d(-1px, 0, 0); }
-      20%, 80% { transform: translate3d(2px, 0, 0); }
-      30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-      40%, 60% { transform: translate3d(4px, 0, 0); }
-    }
-    
     @media (prefers-color-scheme: dark) {
-      :root {
-        --sc-0: #ff6b6b;
-        --sc-1: #38bdf8;
-        --sc-2: #4ade80;
-        --sc-3: #facc15;
-        --sc-4: #c084fc;
-        --sc-5: #f472b6;
-      }
       body, .bg-yellow-50, .bg-blue-100 {
         background-color: #0b1120 !important;
         color: #f8fafc;
@@ -111,27 +87,6 @@
       }
     }
   </style>
-    <!-- Apsauga nuo priartinimo gestais (pinch to zoom) -->
-    <script>
-        document.addEventListener("gesturestart", function(e) { e.preventDefault(); }, { passive: false });
-        document.addEventListener("gesturechange", function(e) { e.preventDefault(); }, { passive: false });
-        document.addEventListener("gestureend", function(e) { e.preventDefault(); }, { passive: false });
-        document.addEventListener("touchstart", function(e) {
-            if (e.touches && e.touches.length > 1) {
-                e.preventDefault();
-            }
-        }, { passive: false });
-        document.addEventListener("touchmove", function(e) {
-            if (e.touches && e.touches.length > 1) {
-                e.preventDefault();
-            }
-        }, { passive: false });
-        document.addEventListener("wheel", function(e) {
-            if (e.ctrlKey) {
-                e.preventDefault();
-            }
-        }, { passive: false });
-    </script>
 </head>
 <body>
   <div id="root"></div>
@@ -209,27 +164,7 @@
       { word: "ZEBRAS", syllables: ["ZEB", "RAS"], emoji: "🦓" }
     ];
 
-    // Ryškios ir vaikams draugiškos spalvos skiemenims
-    const SYLLABLE_COLORS = [
-      "var(--sc-0, #dc2626)", // Raudona
-      "var(--sc-1, #1d4ed8)", // Mėlyna
-      "var(--sc-2, #15803d)", // Žalia
-      "var(--sc-3, #c2410c)", // Oranžinė
-      "var(--sc-4, #7e22ce)", // Violetinė
-      "var(--sc-5, #be185d)"  // Rausva
-    ];
-
     const PRAISE_WORDS = ["Puiku!", "Šaunuolis!", "Teisingai!", "Nuostabu!", "Labai gerai!"];
-
-    // Fisher-Yates maišymo algoritmas
-    const shuffleArray = (array) => {
-      const shuffled = [...array];
-      for (let i = shuffled.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-      }
-      return shuffled;
-    };
 
     function App() {
       const [gameState, setGameState] = useState('start');
@@ -244,50 +179,7 @@
       
       const [wordPool, setWordPool] = useState([]);
 
-      const audioCtxRef = useRef(null);
-
-      const initAudio = () => {
-        if (!audioCtxRef.current) {
-          audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        if (audioCtxRef.current.state === 'suspended') {
-          audioCtxRef.current.resume();
-        }
-      };
-
-      const playTone = (freq, type, duration, startTimeOffset = 0) => {
-        if (!audioCtxRef.current) return;
-        const ctx = audioCtxRef.current;
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        
-        osc.type = type;
-        osc.frequency.setValueAtTime(freq, ctx.currentTime + startTimeOffset);
-        
-        gain.gain.setValueAtTime(0.1, ctx.currentTime + startTimeOffset);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + startTimeOffset + duration);
-        
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        
-        osc.start(ctx.currentTime + startTimeOffset);
-        osc.stop(ctx.currentTime + startTimeOffset + duration);
-      };
-
-      const playCorrectSound = () => {
-        playTone(440, 'sine', 0.1, 0);    
-        playTone(554.37, 'sine', 0.1, 0.1); 
-        playTone(659.25, 'sine', 0.3, 0.2); 
-      };
-
-      const playIncorrectSound = () => {
-        playTone(200, 'triangle', 0.3, 0); 
-        playTone(150, 'triangle', 0.4, 0.15);
-      };
-
-      const playSelectSound = () => {
-        playTone(600, 'sine', 0.05, 0);
-      };
+      const playIncorrectSound = playWrongSound;
 
       const getNextWord = useCallback(() => {
         let currentPool = [...wordPool];

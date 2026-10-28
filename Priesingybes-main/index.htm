@@ -9,24 +9,14 @@
     <title>⚖️ Priešingybės</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../shared/common.css">
+    <script src="../shared/common.js"></script>
     <style>
-        :root {
-            --sc-0: #dc2626;
-            --sc-1: #1d4ed8;
-            --sc-2: #15803d;
-            --sc-3: #c2410c;
-            --sc-4: #7e22ce;
-            --sc-5: #be185d;
-        }
-
         body {
             font-family: 'Nunito', sans-serif;
             background-color: #eff6ff;
             background-image: radial-gradient(#93c5fd 20%, transparent 20%);
             background-size: 20px 20px;
-            touch-action: manipulation;
-            user-select: none;
-            -webkit-user-select: none;
         }
 
         .btn-3d {
@@ -36,37 +26,8 @@
             transform: translateY(4px);
         }
 
-        @keyframes bounce-scale {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.08); }
-        }
-        .bounce-anim {
-            animation: bounce-scale 0.4s ease-in-out;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-8px); }
-            75% { transform: translateX(8px); }
-        }
-        .shake-anim {
-            animation: shake 0.4s ease-in-out;
-        }
-
-        .bg-green-500 span {
-            color: #ffffff !important;
-        }
-
         /* Tamsioji tema */
         @media (prefers-color-scheme: dark) {
-            :root {
-                --sc-0: #ff6b6b;
-                --sc-1: #38bdf8;
-                --sc-2: #4ade80;
-                --sc-3: #facc15;
-                --sc-4: #c084fc;
-                --sc-5: #f472b6;
-            }
             body {
                 background-color: #0b1120 !important;
                 background-image: radial-gradient(#1e293b 20%, transparent 20%) !important;
@@ -108,27 +69,6 @@
             }
         }
     </style>
-    <!-- Apsauga nuo priartinimo gestais (pinch to zoom) -->
-    <script>
-        document.addEventListener("gesturestart", function(e) { e.preventDefault(); }, { passive: false });
-        document.addEventListener("gesturechange", function(e) { e.preventDefault(); }, { passive: false });
-        document.addEventListener("gestureend", function(e) { e.preventDefault(); }, { passive: false });
-        document.addEventListener("touchstart", function(e) {
-            if (e.touches && e.touches.length > 1) {
-                e.preventDefault();
-            }
-        }, { passive: false });
-        document.addEventListener("touchmove", function(e) {
-            if (e.touches && e.touches.length > 1) {
-                e.preventDefault();
-            }
-        }, { passive: false });
-        document.addEventListener("wheel", function(e) {
-            if (e.ctrlKey) {
-                e.preventDefault();
-            }
-        }, { passive: false });
-    </script>
 </head>
 <body class="h-screen max-h-screen flex items-center justify-center p-2 sm:p-4 overflow-hidden transition-colors duration-200">
 
@@ -137,99 +77,6 @@
     </div>
 
     <script>
-        // Web Audio API
-        let audioCtx;
-        function getAudioCtx() {
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            return audioCtx;
-        }
-
-        function playTone(freq, type, duration, startTime=0) {
-            const ctx = getAudioCtx();
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.type = type;
-            osc.frequency.setValueAtTime(freq, ctx.currentTime + startTime);
-            gain.gain.setValueAtTime(0.15, ctx.currentTime + startTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + startTime + duration);
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            osc.start(ctx.currentTime + startTime);
-            osc.stop(ctx.currentTime + startTime + duration);
-        }
-
-        function playSelectSound() {
-            playTone(520, 'sine', 0.08, 0);
-        }
-
-        function playCorrectSound() {
-            playTone(440, 'sine', 0.15, 0);
-            playTone(554.37, 'sine', 0.15, 0.08);
-            playTone(659.25, 'sine', 0.25, 0.16);
-        }
-
-        function playWrongSound() {
-            playTone(280, 'sawtooth', 0.2, 0);
-            playTone(200, 'sawtooth', 0.25, 0.1);
-        }
-
-        function playWinSound() {
-            [440, 554, 659, 880].forEach((freq, idx) => {
-                playTone(freq, 'sine', 0.25, idx * 0.12);
-            });
-        }
-
-        // === SKIEMENŲ SPALVINIMAS ===
-        const _V = 'aeėęiįyouųūąAEĖĘIĮYOUŲŪĄ';
-        const _D = ['ai','au','ei','eu','ie','uo','ui','oi','ia','io','iu'];
-        const _L = /[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/;
-        const _O = new Set(['bl','br','dr','dv','fl','fr','gl','gr','gn','kl','kr','kn','kv','pl','pr','sk','sl','sm','sn','sp','sr','st','sv','šl','šv','šn','tr','tv','vr','žl','žv','str','skr','spr']);
-        const _SC = ['var(--sc-0, #dc2626)','var(--sc-1, #1d4ed8)','var(--sc-2, #15803d)','var(--sc-3, #c2410c)','var(--sc-4, #7e22ce)','var(--sc-5, #be185d)'];
-
-        function _syl(word) {
-            if (!word || word.length <= 1) return [word || ''];
-            const r = []; let s = '', i = 0, n = word.length;
-            while (i < n) {
-                const c = word[i];
-                if (!_L.test(c)) { s += c; i++; continue; }
-                if (!_V.includes(c)) { s += c; i++; }
-                else {
-                    s += c; i++;
-                    if (i < n && _V.includes(word[i]) && _D.includes((c + word[i]).toLowerCase())) { s += word[i]; i++; }
-                    let j = i, u = [];
-                    while (j < n && !_V.includes(word[j])) {
-                        if (!_L.test(word[j])) break;
-                        if (j+1 < n) { const p = (word[j]+word[j+1]).toLowerCase(); if (p==='ch'||p==='dz'||p==='dž') { u.push(word[j]+word[j+1]); j+=2; continue; } }
-                        u.push(word[j]); j++;
-                    }
-                    if (j >= n || (j < n && !_V.includes(word[j]) && !_L.test(word[j]))) {
-                        s += u.join(''); while (j < n && !_L.test(word[j])) { s += word[j]; j++; } i = j;
-                        if (i >= n) { r.push(s); s = ''; }
-                    } else if (u.length === 0) { r.push(s); s = ''; }
-                    else if (u.length === 1) { r.push(s); s = u[0]; i = j; }
-                    else {
-                        let sp = u.length - 1;
-                        if (u.length >= 3) { const l2 = (u[u.length-2]+u[u.length-1]).toLowerCase(); if (_O.has(l2)) sp = u.length - 2; }
-                        if (u.length >= 4) { const l3 = (u[u.length-3]+u[u.length-2]+u[u.length-1]).toLowerCase(); if (_O.has(l3)) sp = u.length - 3; }
-                        s += u.slice(0, sp).join(''); r.push(s); s = u.slice(sp).join(''); i = j;
-                    }
-                }
-            }
-            if (s) r.push(s);
-            return r.filter(x => x.length > 0);
-        }
-
-        function _col(text) {
-            if (!text) return '';
-            return text.split(/(\s+)/).map(token => {
-                if (!token.trim() || !/[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/.test(token)) return token;
-                const syls = _syl(token);
-                return syls.map((s, i) => '<span style="color:' + _SC[i % _SC.length] + '">' + s + '</span>').join('');
-            }).join('');
-        }
-        // === /SKIEMENŲ SPALVINIMAS ===
-
         // Priešingybių žodynas
         const EASY_ANTONYMS = [
             { word: "ŠALTAS", emoji: "🧊", correct: "KARŠTAS", wrong: ["MAŽAS", "LIŪDNAS", "NAKTIS"] },
@@ -298,15 +145,6 @@
         };
 
         const appEl = document.getElementById('app');
-
-        function shuffle(arr) {
-            const copy = [...arr];
-            for (let i = copy.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [copy[i], copy[j]] = [copy[j], copy[i]];
-            }
-            return copy;
-        }
 
         function renderStartScreen() {
             appEl.innerHTML = `

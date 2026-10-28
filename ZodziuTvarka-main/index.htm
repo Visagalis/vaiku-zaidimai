@@ -9,38 +9,17 @@
     <title>📐 Žodžių Tvarka</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../shared/common.css">
+    <script src="../shared/common.js"></script>
     <style>
-        :root {
-            --sc-0: #dc2626;
-            --sc-1: #1d4ed8;
-            --sc-2: #15803d;
-            --sc-3: #c2410c;
-            --sc-4: #7e22ce;
-            --sc-5: #be185d;
-        }
-
         body {
             font-family: 'Nunito', sans-serif;
             background-color: #ffecd2;
             background-image: radial-gradient(#ffb347 15%, transparent 16%);
             background-size: 28px 28px;
-            touch-action: manipulation;
-            user-select: none;
-            -webkit-user-select: none;
             -webkit-tap-highlight-color: transparent;
         }
 
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-8px); }
-            40%, 80% { transform: translateX(8px); }
-        }
-        .shake { animation: shake 0.45s ease-in-out; }
-
-        @keyframes bounce-scale {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.08); }
-        }
         .correct-anim { animation: bounce-scale 0.45s ease-in-out; }
 
         .btn-3d {
@@ -118,14 +97,6 @@
 
         /* Tamsioji tema */
         @media (prefers-color-scheme: dark) {
-            :root {
-                --sc-0: #ff6b6b;
-                --sc-1: #38bdf8;
-                --sc-2: #4ade80;
-                --sc-3: #facc15;
-                --sc-4: #c084fc;
-                --sc-5: #f472b6;
-            }
             body {
                 background-color: #0b1120 !important;
                 background-image: radial-gradient(#1e293b 2px, transparent 2px) !important;
@@ -136,15 +107,6 @@
                 border-color: #334155 !important;
                 box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6) !important;
                 color: #f8fafc !important;
-            }
-            .top-bar {
-                background-color: #1e293b !important;
-                border-color: #334155 !important;
-                color: #f1f5f9 !important;
-            }
-            .top-badge {
-                background-color: #0f172a !important;
-                border-color: #475569 !important;
             }
             .btn-3d {
                 background-color: #1e293b !important;
@@ -182,27 +144,6 @@
             }
         }
     </style>
-    <!-- Apsauga nuo priartinimo gestais (pinch to zoom) -->
-    <script>
-        document.addEventListener("gesturestart", function(e) { e.preventDefault(); }, { passive: false });
-        document.addEventListener("gesturechange", function(e) { e.preventDefault(); }, { passive: false });
-        document.addEventListener("gestureend", function(e) { e.preventDefault(); }, { passive: false });
-        document.addEventListener("touchstart", function(e) {
-            if (e.touches && e.touches.length > 1) {
-                e.preventDefault();
-            }
-        }, { passive: false });
-        document.addEventListener("touchmove", function(e) {
-            if (e.touches && e.touches.length > 1) {
-                e.preventDefault();
-            }
-        }, { passive: false });
-        document.addEventListener("wheel", function(e) {
-            if (e.ctrlKey) {
-                e.preventDefault();
-            }
-        }, { passive: false });
-    </script>
 </head>
 <body class="h-screen max-h-screen flex items-center justify-center p-2 sm:p-4 overflow-hidden transition-colors duration-200">
 
@@ -210,94 +151,6 @@
     </div>
 
     <script>
-        let audioCtx;
-        function playTone(freq, type, duration, vol=0.12) {
-            try {
-                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                if (audioCtx.state === 'suspended') audioCtx.resume();
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = type;
-                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                gain.gain.setValueAtTime(vol, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + duration);
-            } catch (e) {}
-        }
-
-        function playTapSound() { playTone(460, 'sine', 0.09, 0.08); }
-        function playReturnSound() { playTone(320, 'sine', 0.09, 0.08); }
-        function playCorrectSound() {
-            playTone(523.25, 'sine', 0.12, 0.12);
-            setTimeout(() => playTone(659.25, 'sine', 0.12, 0.12), 90);
-            setTimeout(() => playTone(783.99, 'sine', 0.22, 0.12), 180);
-        }
-        function playWrongSound() {
-            playTone(300, 'sawtooth', 0.15, 0.1);
-            setTimeout(() => playTone(220, 'sawtooth', 0.25, 0.1), 130);
-        }
-        function playWinSound() {
-            [440, 554.37, 659.25, 880].forEach((f, i) => setTimeout(() => playTone(f, 'sine', 0.2, 0.12), i * 100));
-        }
-
-        // === SKIEMENŲ SPALVINIMAS ===
-        const _V = 'aeėęiįyouųūąAEĖĘIĮYOUŲŪĄ';
-        const _D = ['ai','au','ei','eu','ie','uo','ui','oi','ia','io','iu'];
-        const _L = /[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/;
-        const _O = new Set(['bl','br','dr','dv','fl','fr','gl','gr','gn','kl','kr','kn','kv','pl','pr','sk','sl','sm','sn','sp','sr','st','sv','šl','šv','šn','tr','tv','vr','žl','žv','str','skr','spr']);
-        const _SC = ['var(--sc-0, #dc2626)','var(--sc-1, #1d4ed8)','var(--sc-2, #15803d)','var(--sc-3, #c2410c)','var(--sc-4, #7e22ce)','var(--sc-5, #be185d)'];
-
-        function _syl(word) {
-            if (!word || word.length <= 1) return [word || ''];
-            const r = []; let s = '', i = 0, n = word.length;
-            while (i < n) {
-                const c = word[i];
-                if (!_L.test(c)) { s += c; i++; continue; }
-                if (!_V.includes(c)) { s += c; i++; }
-                else {
-                    if (i + 1 < n && _D.includes(word.slice(i, i + 2).toLowerCase())) { s += word.slice(i, i + 2); i += 2; }
-                    else { s += c; i++; }
-                    let j = i;
-                    while (j < n && _L.test(word[j]) && !_V.includes(word[j])) j++;
-                    let cl = word.slice(i, j);
-                    if (j >= n || !_L.test(word[j])) { s += cl; i = j; while (i < n && !_L.test(word[i])) { s += word[i]; i++; } r.push(s); s = ''; }
-                    else if (cl.length === 0) { r.push(s); s = ''; }
-                    else if (cl.length === 1) { r.push(s); s = cl; i = j; }
-                    else {
-                        let u = [];
-                        for (let k = 0; k < cl.length;) {
-                            const p = cl.slice(k, k + 2).toLowerCase();
-                            if (p === 'dz' || p === 'dž' || p === 'ch') { u.push(cl.slice(k, k + 2)); k += 2; }
-                            else { u.push(cl[k]); k++; }
-                        }
-                        let sp = u.length - 1;
-                        if (u.length >= 2) {
-                            const l2 = (u[u.length - 2] + u[u.length - 1]).toLowerCase();
-                            const l3 = u.length >= 3 ? (u[u.length - 3] + l2).toLowerCase() : '';
-                            if (l3 && _O.has(l3)) sp = u.length - 3;
-                            else if (_O.has(l2)) sp = u.length - 2;
-                        }
-                        s += u.slice(0, sp).join(''); r.push(s); s = u.slice(sp).join(''); i = j;
-                    }
-                }
-            }
-            if (s) r.push(s);
-            return r.filter(x => x.length > 0);
-        }
-
-        function _col(text) {
-            if (!text) return '';
-            return text.split(/(\s+)/).map(token => {
-                if (!token.trim() || !/[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/.test(token)) return token;
-                const syls = _syl(token);
-                return syls.map((s, i) => '<span style="color:' + _SC[i % _SC.length] + '">' + s + '</span>').join('');
-            }).join('');
-        }
-        // === /SKIEMENŲ SPALVINIMAS ===
-
         const SHORT_SENTENCES = [
             { text: "Katė geria pieną.", emoji: "🐱" },
             { text: "Šuo laksto kieme.", emoji: "🐶" },

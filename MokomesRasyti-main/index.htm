@@ -26,42 +26,22 @@
   
   <!-- Babel -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <link rel="stylesheet" href="../shared/common.css">
+  <script src="../shared/common.js"></script>
   
   <style>
-    :root {
-      --sc-0: #dc2626;
-      --sc-1: #1d4ed8;
-      --sc-2: #15803d;
-      --sc-3: #c2410c;
-      --sc-4: #7e22ce;
-      --sc-5: #be185d;
-    }
     ::-webkit-scrollbar { width: 8px; }
     ::-webkit-scrollbar-track { background: #f1f1f1; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     body {
       overscroll-behavior-y: none; 
-      touch-action: manipulation;
-      -webkit-user-select: none; /* Safari */
-      -moz-user-select: none; /* Firefox */
-      -ms-user-select: none; /* IE10+/Edge */
-      user-select: none; /* Standard */
-      /* Neleidžiame highlightinti teksto, kad jaustųsi kaip App'sas */
     }
     input {
       -webkit-user-select: text; /* Leidžiame žymėti tik įvesties lauke */
       user-select: text;
     }
     @media (prefers-color-scheme: dark) {
-      :root {
-        --sc-0: #ff6b6b;
-        --sc-1: #38bdf8;
-        --sc-2: #4ade80;
-        --sc-3: #facc15;
-        --sc-4: #c084fc;
-        --sc-5: #f472b6;
-      }
       ::-webkit-scrollbar-track { background: #0f172a; }
       ::-webkit-scrollbar-thumb { background: #334155; }
       ::-webkit-scrollbar-thumb:hover { background: #475569; }
@@ -212,83 +192,12 @@
       });
     }
   </script>
-    <!-- Apsauga nuo priartinimo gestais (pinch to zoom) -->
-    <script>
-        document.addEventListener("gesturestart", function(e) { e.preventDefault(); }, { passive: false });
-        document.addEventListener("gesturechange", function(e) { e.preventDefault(); }, { passive: false });
-        document.addEventListener("gestureend", function(e) { e.preventDefault(); }, { passive: false });
-        document.addEventListener("touchstart", function(e) {
-            if (e.touches && e.touches.length > 1) {
-                e.preventDefault();
-            }
-        }, { passive: false });
-        document.addEventListener("touchmove", function(e) {
-            if (e.touches && e.touches.length > 1) {
-                e.preventDefault();
-            }
-        }, { passive: false });
-        document.addEventListener("wheel", function(e) {
-            if (e.ctrlKey) {
-                e.preventDefault();
-            }
-        }, { passive: false });
-    </script>
 </head>
 <body class="bg-sky-50">
   <div id="root"></div>
 
   <script type="text/babel">
     const { useState, useEffect, useCallback, useRef, Fragment } = React;
-
-    // === SKIEMENŲ SPALVINIMAS ===
-    const _V = 'aeėęiįyouųūąAEĖĘIĮYOUŲŪĄ';
-    const _D = ['ai','au','ei','eu','ie','uo','ui','oi','ia','io','iu'];
-    const _L = /[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/;
-    const _O = new Set(['bl','br','dr','dv','fl','fr','gl','gr','gn','kl','kr','kn','kv','pl','pr','sk','sl','sm','sn','sp','sr','st','sv','šl','šv','šn','tr','tv','vr','žl','žv','str','skr','spr']);
-    const _SC = ['var(--sc-0, #dc2626)','var(--sc-1, #1d4ed8)','var(--sc-2, #15803d)','var(--sc-3, #c2410c)','var(--sc-4, #7e22ce)','var(--sc-5, #be185d)'];
-
-    function _syl(word) {
-        if (!word || word.length <= 1) return [word || ''];
-        const r = []; let s = '', i = 0, n = word.length;
-        while (i < n) {
-            const c = word[i];
-            if (!_L.test(c)) { s += c; i++; continue; }
-            if (!_V.includes(c)) { s += c; i++; }
-            else {
-                s += c; i++;
-                if (i < n && _V.includes(word[i]) && _D.includes((c + word[i]).toLowerCase())) { s += word[i]; i++; }
-                let j = i, u = [];
-                while (j < n && !_V.includes(word[j])) {
-                    if (!_L.test(word[j])) break;
-                    if (j+1 < n) { const p = (word[j]+word[j+1]).toLowerCase(); if (p==='ch'||p==='dz'||p==='dž') { u.push(word[j]+word[j+1]); j+=2; continue; } }
-                    u.push(word[j]); j++;
-                }
-                if (j >= n || (j < n && !_V.includes(word[j]) && !_L.test(word[j]))) {
-                    s += u.join(''); while (j < n && !_L.test(word[j])) { s += word[j]; j++; } i = j;
-                    if (i >= n) { r.push(s); s = ''; }
-                } else if (u.length === 0) { r.push(s); s = ''; }
-                else if (u.length === 1) { r.push(s); s = u[0]; i = j; }
-                else {
-                    let sp = u.length - 1;
-                    if (u.length >= 3) { const l2 = (u[u.length-2]+u[u.length-1]).toLowerCase(); if (_O.has(l2)) sp = u.length - 2; }
-                    if (u.length >= 4) { const l3 = (u[u.length-3]+u[u.length-2]+u[u.length-1]).toLowerCase(); if (_O.has(l3)) sp = u.length - 3; }
-                    s += u.slice(0, sp).join(''); r.push(s); s = u.slice(sp).join(''); i = j;
-                }
-            }
-        }
-        if (s) r.push(s);
-        return r.filter(x => x.length > 0);
-    }
-
-    function _col(text) {
-        if (!text) return '';
-        return text.split(/(\s+)/).map(token => {
-            if (!token.trim() || !/[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/.test(token)) return token;
-            const syls = _syl(token);
-            return syls.map((s, i) => '<span style="color:' + _SC[i % _SC.length] + '">' + s + '</span>').join('');
-        }).join('');
-    }
-    // === /SKIEMENŲ SPALVINIMAS ===
 
     const VALID_CHARS = "ĄČĘĖĮŠŲŪŽQWERTYUIOPASDFGHJKLZXCVBNM ";
 

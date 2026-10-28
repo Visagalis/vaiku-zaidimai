@@ -23,6 +23,8 @@
     <title>Žodžių Dėlionė</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../shared/common.css">
+    <script src="../shared/common.js"></script>
     <style>
         :root {
             --bg-color: #fdfcf0;
@@ -32,6 +34,9 @@
             --border-color: #fef08a;
             --pool-bg: #fffbeb;
             --overlay-bg: #ffffff;
+        }
+
+        body:not(.dark-mode) {
             --sc-0: #dc2626;
             --sc-1: #1d4ed8;
             --sc-2: #15803d;
@@ -48,12 +53,6 @@
             --border-color: #334155;
             --pool-bg: #0f172a;
             --overlay-bg: #0f172a;
-            --sc-0: #ff6b6b;
-            --sc-1: #38bdf8;
-            --sc-2: #4ade80;
-            --sc-3: #facc15;
-            --sc-4: #c084fc;
-            --sc-5: #f472b6;
         }
 
         body:not(.dark-mode) .letter-tile:not(.slot-locked):not(.pool-btn-disabled):not(.bg-rose-500) {
@@ -163,45 +162,10 @@
             color: #475569 !important;
             border-color: #1e293b !important;
         }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-6px); }
-            75% { transform: translateX(6px); }
-        }
-        .error-shake { animation: shake 0.3s ease-in-out; }
-
-        @keyframes celebration {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1) rotate(3deg); }
-            100% { transform: scale(1); }
-        }
-        .win-anim { animation: celebration 0.5s ease-in-out infinite; }
         
         .star-gold { color: #fbbf24; text-shadow: 0 0 8px rgba(251, 191, 36, 0.4); }
         .star-lost { color: #94a3b8; opacity: 0.2; }
     </style>
-    <!-- Apsauga nuo priartinimo gestais (pinch to zoom) -->
-    <script>
-        document.addEventListener("gesturestart", function(e) { e.preventDefault(); }, { passive: false });
-        document.addEventListener("gesturechange", function(e) { e.preventDefault(); }, { passive: false });
-        document.addEventListener("gestureend", function(e) { e.preventDefault(); }, { passive: false });
-        document.addEventListener("touchstart", function(e) {
-            if (e.touches && e.touches.length > 1) {
-                e.preventDefault();
-            }
-        }, { passive: false });
-        document.addEventListener("touchmove", function(e) {
-            if (e.touches && e.touches.length > 1) {
-                e.preventDefault();
-            }
-        }, { passive: false });
-        document.addEventListener("wheel", function(e) {
-            if (e.ctrlKey) {
-                e.preventDefault();
-            }
-        }, { passive: false });
-    </script>
 </head>
 <body class="dark-mode">
 
@@ -351,112 +315,6 @@
             }
         });
 
-        // --- AUDIO ENGINE ---
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        let audioCtx = null;
-
-        function playSound(type) {
-            if (!audioCtx) audioCtx = new AudioCtx();
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            const now = audioCtx.currentTime;
-
-            if (type === 'correct') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(550, now);
-                osc.frequency.exponentialRampToValueAtTime(1100, now + 0.1);
-                gain.gain.setValueAtTime(0.2, now);
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-                osc.start(now); osc.stop(now + 0.3);
-            } else if (type === 'error') {
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(120, now);
-                osc.frequency.linearRampToValueAtTime(45, now + 0.2);
-                gain.gain.setValueAtTime(0.1, now);
-                gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
-                osc.start(now); osc.stop(now + 0.2);
-            } else if (type === 'win') {
-                [523, 659, 783, 1046].forEach((f, i) => {
-                    const o = audioCtx.createOscillator();
-                    const g = audioCtx.createGain();
-                    o.connect(g); g.connect(audioCtx.destination);
-                    o.frequency.setValueAtTime(f, now + (i * 0.1));
-                    g.gain.setValueAtTime(0.1, now + (i * 0.1));
-                    g.gain.exponentialRampToValueAtTime(0.01, now + (i * 0.1) + 0.4);
-                    o.start(now + (i * 0.1)); o.stop(now + (i * 0.1) + 0.4);
-                });
-            }
-        }
-
-        // === SKIEMENŲ SPALVINIMAS ===
-        const _V = 'aeėęiįyouųūąAEĖĘIĮYOUŲŪĄ';
-        const _D = ['ai','au','ei','eu','ie','uo','ui','oi','ia','io','iu'];
-        const _L = /[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/;
-        const _O = new Set(['bl','br','dr','dv','fl','fr','gl','gr','gn','kl','kr','kn','kv','pl','pr','sk','sl','sm','sn','sp','sr','st','sv','šl','šv','šn','tr','tv','vr','žl','žv','str','skr','spr']);
-        const _SC = ['var(--sc-0, #dc2626)','var(--sc-1, #1d4ed8)','var(--sc-2, #15803d)','var(--sc-3, #c2410c)','var(--sc-4, #7e22ce)','var(--sc-5, #be185d)'];
-
-        function _syl(word) {
-            if (!word || word.length <= 1) return [word || ''];
-            const r = []; let s = '', i = 0, n = word.length;
-            while (i < n) {
-                const c = word[i];
-                if (!_L.test(c)) { s += c; i++; continue; }
-                if (!_V.includes(c)) { s += c; i++; }
-                else {
-                    s += c; i++;
-                    if (i < n && _V.includes(word[i]) && _D.includes((c + word[i]).toLowerCase())) { s += word[i]; i++; }
-                    let j = i, u = [];
-                    while (j < n && !_V.includes(word[j])) {
-                        if (!_L.test(word[j])) break;
-                        if (j+1 < n) { const p = (word[j]+word[j+1]).toLowerCase(); if (p==='ch'||p==='dz'||p==='dž') { u.push(word[j]+word[j+1]); j+=2; continue; } }
-                        u.push(word[j]); j++;
-                    }
-                    if (j >= n || (j < n && !_V.includes(word[j]) && !_L.test(word[j]))) {
-                        s += u.join(''); while (j < n && !_L.test(word[j])) { s += word[j]; j++; } i = j;
-                        if (i >= n) { r.push(s); s = ''; }
-                    } else if (u.length === 0) { r.push(s); s = ''; }
-                    else if (u.length === 1) { r.push(s); s = u[0]; i = j; }
-                    else {
-                        let sp = u.length - 1;
-                        if (u.length >= 3) { const l2 = (u[u.length-2]+u[u.length-1]).toLowerCase(); if (_O.has(l2)) sp = u.length - 2; }
-                        if (u.length >= 4) { const l3 = (u[u.length-3]+u[u.length-2]+u[u.length-1]).toLowerCase(); if (_O.has(l3)) sp = u.length - 3; }
-                        s += u.slice(0, sp).join(''); r.push(s); s = u.slice(sp).join(''); i = j;
-                    }
-                }
-            }
-            if (s) r.push(s);
-            return r.filter(x => x.length > 0);
-        }
-
-        function _col(text) {
-            if (!text) return '';
-            return text.split(/(\s+)/).map(token => {
-                if (!token.trim() || !/[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/.test(token)) return token;
-                const syls = _syl(token);
-                return syls.map((s, i) => '<span style="color:' + _SC[i % _SC.length] + '">' + s + '</span>').join('');
-            }).join('');
-        }
-
-        function getWordLetterColors(word) {
-            if (!word) return [];
-            const syls = _syl(word);
-            const colors = [];
-            syls.forEach((s, i) => {
-                const c = _SC[i % _SC.length];
-                for (let k = 0; k < s.length; k++) {
-                    colors.push(c);
-                }
-            });
-            while (colors.length < word.length) {
-                colors.push(_SC[0]);
-            }
-            return colors;
-        }
-        // === /SKIEMENŲ SPALVINIMAS ===
-
         const wordsData = [
             { word: 'KATĖ', emoji: '🐱' }, 
             { word: 'ŠUO', emoji: '🐶' },
@@ -515,10 +373,6 @@
         const maxWordsNumEl = document.getElementById('max-words-num');
         const starPotentialUI = document.getElementById('current-word-stars-ui');
         const retryBtn = document.getElementById('retry-mistakes-btn');
-
-        function shuffle(array) {
-            return array.sort(() => Math.random() - 0.5);
-        }
 
         function toggleDarkMode() {
             isDarkMode = !isDarkMode;
