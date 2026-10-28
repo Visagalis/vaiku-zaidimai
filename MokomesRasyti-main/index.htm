@@ -28,6 +28,14 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   
   <style>
+    :root {
+      --sc-0: #dc2626;
+      --sc-1: #1d4ed8;
+      --sc-2: #15803d;
+      --sc-3: #c2410c;
+      --sc-4: #7e22ce;
+      --sc-5: #be185d;
+    }
     ::-webkit-scrollbar { width: 8px; }
     ::-webkit-scrollbar-track { background: #f1f1f1; }
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -46,6 +54,14 @@
       user-select: text;
     }
     @media (prefers-color-scheme: dark) {
+      :root {
+        --sc-0: #ff6b6b;
+        --sc-1: #38bdf8;
+        --sc-2: #4ade80;
+        --sc-3: #facc15;
+        --sc-4: #c084fc;
+        --sc-5: #f472b6;
+      }
       ::-webkit-scrollbar-track { background: #0f172a; }
       ::-webkit-scrollbar-thumb { background: #334155; }
       ::-webkit-scrollbar-thumb:hover { background: #475569; }
@@ -69,8 +85,25 @@
         border-color: #334155 !important;
         color: #f8fafc !important;
       }
-      li.bg-white span {
-        color: #f8fafc !important;
+      h2.bg-white {
+        background-color: #0f172a !important;
+        border: 1px solid #334155 !important;
+      }
+      .border-dashed .text-green-600 {
+        color: #4ade80 !important;
+      }
+      .border-dashed .text-red-500 {
+        color: #ff6b6b !important;
+      }
+      .bg-orange-100.text-orange-700 {
+        background-color: #431407 !important;
+        color: #fdba74 !important;
+        border-color: #ea580c !important;
+      }
+      .bg-blue-50.text-blue-700 {
+        background-color: #1e293b !important;
+        color: #93c5fd !important;
+        border-color: #3b82f6 !important;
       }
       input[type="text"], input[type="password"] {
         background-color: #1e293b !important;
@@ -212,7 +245,7 @@
     const _D = ['ai','au','ei','eu','ie','uo','ui','oi','ia','io','iu'];
     const _L = /[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/;
     const _O = new Set(['bl','br','dr','dv','fl','fr','gl','gr','gn','kl','kr','kn','kv','pl','pr','sk','sl','sm','sn','sp','sr','st','sv','šl','šv','šn','tr','tv','vr','žl','žv','str','skr','spr']);
-    const _SC = ['#dc2626','#2563eb','#16a34a','#ea580c','#9333ea','#db2777'];
+    const _SC = ['var(--sc-0, #dc2626)','var(--sc-1, #1d4ed8)','var(--sc-2, #15803d)','var(--sc-3, #c2410c)','var(--sc-4, #7e22ce)','var(--sc-5, #be185d)'];
 
     function _syl(word) {
         if (!word || word.length <= 1) return [word || ''];

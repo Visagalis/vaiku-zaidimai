@@ -10,6 +10,15 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --sc-0: #dc2626;
+            --sc-1: #1d4ed8;
+            --sc-2: #15803d;
+            --sc-3: #c2410c;
+            --sc-4: #7e22ce;
+            --sc-5: #be185d;
+        }
+
         body {
             font-family: 'Nunito', sans-serif;
             background-color: #fff7ed;
@@ -164,6 +173,14 @@
 
         /* Tamsioji Tema (Dark Mode) */
         @media (prefers-color-scheme: dark) {
+            :root {
+                --sc-0: #ff6b6b;
+                --sc-1: #38bdf8;
+                --sc-2: #4ade80;
+                --sc-3: #facc15;
+                --sc-4: #c084fc;
+                --sc-5: #f472b6;
+            }
             body {
                 background-color: #0b1120 !important;
                 background-image: radial-gradient(#1e293b 25%, transparent 25%) !important;
@@ -173,6 +190,22 @@
                 background-color: #0f172a !important;
                 border-color: #334155 !important;
                 box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6) !important;
+            }
+            .top-bar {
+                background-color: #1e293b !important;
+                border-color: #334155 !important;
+                color: #f1f5f9 !important;
+            }
+            .top-badge {
+                background-color: #0f172a !important;
+                border-color: #475569 !important;
+            }
+            .btn-tinted {
+                background-color: #1e293b !important;
+                color: #f8fafc !important;
+            }
+            .btn-tinted:hover {
+                background-color: #334155 !important;
             }
             .shop-shelf {
                 background-color: #1e293b !important;
@@ -206,6 +239,9 @@
             .text-sub-title {
                 color: #94a3b8 !important;
             }
+        }
+        .bg-green-500.text-white span:not(.price-tag) {
+            color: #ffffff !important;
         }
     </style>
     <!-- Apsauga nuo priartinimo gestais (pinch to zoom) -->
@@ -241,7 +277,7 @@
         const _D = ['ai','au','ei','eu','ie','uo','ui','oi','ia','io','iu'];
         const _L = /[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/;
         const _O = new Set(['bl','br','dr','dv','fl','fr','gl','gr','gn','kl','kr','kn','kv','pl','pr','sk','sl','sm','sn','sp','sr','st','sv','šl','šv','šn','tr','tv','vr','žl','žv','str','skr','spr']);
-        const _SC = ['#dc2626','#2563eb','#16a34a','#ea580c','#9333ea','#db2777'];
+        const _SC = ['var(--sc-0, #dc2626)','var(--sc-1, #1d4ed8)','var(--sc-2, #15803d)','var(--sc-3, #c2410c)','var(--sc-4, #7e22ce)','var(--sc-5, #be185d)'];
 
         function _syl(word) {
             if (!word || word.length <= 1) return [word || ''];
@@ -542,13 +578,13 @@
                     <p class="text-sub-title text-base sm:text-xl text-slate-600 mb-5 sm:mb-7 font-bold">${_col('Išsirink prekes ir sumokėk pinigėliais!')}</p>
                     
                     <div class="flex flex-col gap-3 w-full max-w-sm">
-                        <button onclick="startGame('single')" class="w-full py-3.5 sm:py-4 px-4 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white font-black text-lg sm:text-2xl shadow-lg transition transform active:scale-95 border-b-4 border-orange-700">
+                        <button onclick="startGame('single')" class="btn-tinted w-full py-3.5 sm:py-4 px-4 rounded-2xl bg-orange-100 hover:bg-orange-200 text-slate-800 font-black text-lg sm:text-2xl shadow-lg transition transform active:scale-95 border-2 border-b-4 border-orange-400">
                             🍭 ${_col('Perku vieną prekę')}
                         </button>
-                        <button onclick="startGame('basket')" class="w-full py-3.5 sm:py-4 px-4 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-lg sm:text-2xl shadow-lg transition transform active:scale-95 border-b-4 border-emerald-700">
+                        <button onclick="startGame('basket')" class="btn-tinted w-full py-3.5 sm:py-4 px-4 rounded-2xl bg-emerald-100 hover:bg-emerald-200 text-slate-800 font-black text-lg sm:text-2xl shadow-lg transition transform active:scale-95 border-2 border-b-4 border-emerald-400">
                             🧺 ${_col('Pirkinių krepšelis')}
                         </button>
-                        <button onclick="startGame('afford')" class="w-full py-3.5 sm:py-4 px-4 rounded-2xl bg-sky-500 hover:bg-sky-600 text-white font-black text-lg sm:text-2xl shadow-lg transition transform active:scale-95 border-b-4 border-sky-700">
+                        <button onclick="startGame('afford')" class="btn-tinted w-full py-3.5 sm:py-4 px-4 rounded-2xl bg-sky-100 hover:bg-sky-200 text-slate-800 font-black text-lg sm:text-2xl shadow-lg transition transform active:scale-95 border-2 border-b-4 border-sky-400">
                             🛍️ ${_col('Ką galiu nupirkti?')}
                         </button>
                     </div>
@@ -567,10 +603,10 @@
 
         function renderTopBar() {
             return `
-                <div class="bg-orange-500 text-white px-4 py-2 sm:py-2.5 flex justify-between items-center font-bold text-sm sm:text-base shadow-md shrink-0">
-                    <div>⭐ ${_col('Taškai:')} <span class="text-yellow-200 font-black">${state.score}</span></div>
-                    <div class="bg-orange-600 px-2.5 py-0.5 rounded-xl">${_col('Pirkimas:')} <span class="text-yellow-200">${state.question} / ${state.maxQuestions}</span></div>
-                    <div>🔥 ${_col('Serija:')} <span class="text-amber-200 font-black">${state.streak}</span></div>
+                <div class="top-bar bg-orange-100 border-b-2 border-orange-300 text-slate-800 px-4 py-2 sm:py-2.5 flex justify-between items-center font-bold text-sm sm:text-base shadow-sm shrink-0">
+                    <div>⭐ ${_col('Taškai:')} <span class="text-orange-700 dark:text-amber-300 font-black">${state.score}</span></div>
+                    <div class="top-badge bg-white/90 border border-orange-300 px-2.5 py-0.5 rounded-xl">${_col('Pirkimas:')} <span class="text-orange-700 dark:text-amber-300 font-black">${state.question} / ${state.maxQuestions}</span></div>
+                    <div>🔥 ${_col('Serija:')} <span class="text-orange-700 dark:text-amber-300 font-black">${state.streak}</span></div>
                 </div>
             `;
         }
@@ -704,7 +740,7 @@
                         </div>
                     </div>
 
-                    <button onclick="checkPayAnswer()" class="w-full py-2.5 sm:py-3.5 rounded-2xl bg-green-500 hover:bg-green-600 text-white font-black text-lg sm:text-2xl shadow-md border-b-4 border-green-700 transition transform active:scale-95">
+                    <button onclick="checkPayAnswer()" class="btn-tinted w-full py-2.5 sm:py-3.5 rounded-2xl bg-green-100 hover:bg-green-200 text-slate-800 font-black text-lg sm:text-2xl shadow-md border-2 border-b-4 border-green-500 transition transform active:scale-95">
                         🛒 ${_col('Pirkti!')}
                     </button>
                 </div>
@@ -865,7 +901,7 @@
                     <div class="flex justify-center gap-2 mb-4">${starHtml}</div>
                     <p class="text-sub-title text-xl sm:text-2xl font-bold text-gray-700 mb-2">${_col(message)} 🛍️</p>
                     <p class="text-sub-title text-lg sm:text-xl text-gray-600 mb-8">${_col('Taškai:')} <span class="font-black text-green-500">${state.score} / ${state.maxQuestions}</span></p>
-                    <button onclick="renderStartScreen()" class="w-full max-w-xs py-4 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white font-black text-xl sm:text-2xl shadow-lg transition transform active:scale-95 border-b-4 border-orange-700">
+                    <button onclick="renderStartScreen()" class="btn-tinted w-full max-w-xs py-4 rounded-2xl bg-orange-100 hover:bg-orange-200 text-slate-800 font-black text-xl sm:text-2xl shadow-lg transition transform active:scale-95 border-2 border-b-4 border-orange-400">
                         ${_col('Žaisti dar kartą')} 🔄
                     </button>
                 </div>

@@ -32,6 +32,12 @@
             --border-color: #fef08a;
             --pool-bg: #fffbeb;
             --overlay-bg: #ffffff;
+            --sc-0: #dc2626;
+            --sc-1: #1d4ed8;
+            --sc-2: #15803d;
+            --sc-3: #c2410c;
+            --sc-4: #7e22ce;
+            --sc-5: #be185d;
         }
 
         .dark-mode {
@@ -42,18 +48,36 @@
             --border-color: #334155;
             --pool-bg: #0f172a;
             --overlay-bg: #0f172a;
+            --sc-0: #ff6b6b;
+            --sc-1: #38bdf8;
+            --sc-2: #4ade80;
+            --sc-3: #facc15;
+            --sc-4: #c084fc;
+            --sc-5: #f472b6;
         }
 
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg-color: #0f172a;
-                --card-bg: #1e293b;
-                --text-main: #f8fafc;
-                --text-muted: #94a3b8;
-                --border-color: #334155;
-                --pool-bg: #0f172a;
-                --overlay-bg: #0f172a;
-            }
+        body:not(.dark-mode) .letter-tile:not(.slot-locked):not(.pool-btn-disabled):not(.bg-rose-500) {
+            background-color: #ffffff !important;
+            border-color: #e2e8f0 !important;
+        }
+
+        .dark-mode .letter-tile:not(.slot-locked):not(.pool-btn-disabled):not(.bg-rose-500) {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+        }
+
+        .dark-mode #letters-pool .letter-tile:not(.pool-btn-disabled) {
+            background-color: #334155 !important;
+            border-color: #0f172a !important;
+        }
+
+        .dark-mode #end-screen .bg-yellow-100 {
+            background-color: rgba(113, 63, 18, 0.35) !important;
+        }
+
+        body:not(.dark-mode) #end-screen .bg-yellow-100 {
+            background-color: #fef9c3 !important;
+            color: #1f2937 !important;
         }
 
         body {
@@ -113,7 +137,7 @@
         }
 
         .dark-mode .slot-locked {
-            background-color: #064e3b40 !important;
+            background-color: #064e3b !important;
             border-color: #10b981 !important;
             box-shadow: 0 3px 0 #047857;
         }
@@ -372,7 +396,7 @@
         const _D = ['ai','au','ei','eu','ie','uo','ui','oi','ia','io','iu'];
         const _L = /[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/;
         const _O = new Set(['bl','br','dr','dv','fl','fr','gl','gr','gn','kl','kr','kn','kv','pl','pr','sk','sl','sm','sn','sp','sr','st','sv','šl','šv','šn','tr','tv','vr','žl','žv','str','skr','spr']);
-        const _SC = ['#dc2626','#2563eb','#16a34a','#ea580c','#9333ea','#db2777'];
+        const _SC = ['var(--sc-0, #dc2626)','var(--sc-1, #1d4ed8)','var(--sc-2, #15803d)','var(--sc-3, #c2410c)','var(--sc-4, #7e22ce)','var(--sc-5, #be185d)'];
 
         function _syl(word) {
             if (!word || word.length <= 1) return [word || ''];

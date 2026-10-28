@@ -10,6 +10,15 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --sc-0: #dc2626;
+            --sc-1: #1d4ed8;
+            --sc-2: #15803d;
+            --sc-3: #c2410c;
+            --sc-4: #7e22ce;
+            --sc-5: #be185d;
+        }
+
         body {
             font-family: 'Nunito', sans-serif;
             background-color: #ffecd2;
@@ -109,6 +118,14 @@
 
         /* Tamsioji tema */
         @media (prefers-color-scheme: dark) {
+            :root {
+                --sc-0: #ff6b6b;
+                --sc-1: #38bdf8;
+                --sc-2: #4ade80;
+                --sc-3: #facc15;
+                --sc-4: #c084fc;
+                --sc-5: #f472b6;
+            }
             body {
                 background-color: #0b1120 !important;
                 background-image: radial-gradient(#1e293b 2px, transparent 2px) !important;
@@ -119,6 +136,25 @@
                 border-color: #334155 !important;
                 box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6) !important;
                 color: #f8fafc !important;
+            }
+            .top-bar {
+                background-color: #1e293b !important;
+                border-color: #334155 !important;
+                color: #f1f5f9 !important;
+            }
+            .top-badge {
+                background-color: #0f172a !important;
+                border-color: #475569 !important;
+            }
+            .btn-3d {
+                background-color: #1e293b !important;
+                color: #f8fafc !important;
+            }
+            .btn-3d:hover {
+                background-color: #334155 !important;
+            }
+            #fill-blank {
+                background-color: #0f172a !important;
             }
             .word-btn {
                 background-color: #1e293b !important;
@@ -212,7 +248,7 @@
         const _D = ['ai','au','ei','eu','ie','uo','ui','oi','ia','io','iu'];
         const _L = /[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/;
         const _O = new Set(['bl','br','dr','dv','fl','fr','gl','gr','gn','kl','kr','kn','kv','pl','pr','sk','sl','sm','sn','sp','sr','st','sv','šl','šv','šn','tr','tv','vr','žl','žv','str','skr','spr']);
-        const _SC = ['#dc2626','#2563eb','#16a34a','#ea580c','#9333ea','#db2777'];
+        const _SC = ['var(--sc-0, #dc2626)','var(--sc-1, #1d4ed8)','var(--sc-2, #15803d)','var(--sc-3, #c2410c)','var(--sc-4, #7e22ce)','var(--sc-5, #be185d)'];
 
         function _syl(word) {
             if (!word || word.length <= 1) return [word || ''];
@@ -334,13 +370,13 @@
                     <p class="text-sub-title text-base sm:text-xl text-slate-600 mb-5 sm:mb-7 font-bold">${_col('Sudėliok sakinius ir surask tinkamus žodžius!')}</p>
                     
                     <div class="flex flex-col gap-3 w-full max-w-sm">
-                        <button onclick="startGame('short')" class="btn-3d py-3.5 sm:py-4 px-5 rounded-2xl bg-orange-500 hover:bg-orange-600 text-white font-black text-lg sm:text-2xl">
+                        <button onclick="startGame('short')" class="btn-3d py-3.5 sm:py-4 px-5 rounded-2xl bg-orange-100 hover:bg-orange-200 text-slate-800 border-2 border-orange-400 font-black text-lg sm:text-2xl">
                             📝 ${_col('Trumpi sakiniai')}
                         </button>
-                        <button onclick="startGame('long')" class="btn-3d py-3.5 sm:py-4 px-5 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-black text-lg sm:text-2xl">
+                        <button onclick="startGame('long')" class="btn-3d py-3.5 sm:py-4 px-5 rounded-2xl bg-amber-100 hover:bg-amber-200 text-slate-800 border-2 border-amber-400 font-black text-lg sm:text-2xl">
                             📖 ${_col('Ilgesni sakiniai')}
                         </button>
-                        <button onclick="startGame('fill')" class="btn-3d py-3.5 sm:py-4 px-5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-lg sm:text-2xl">
+                        <button onclick="startGame('fill')" class="btn-3d py-3.5 sm:py-4 px-5 rounded-2xl bg-emerald-100 hover:bg-emerald-200 text-slate-800 border-2 border-emerald-400 font-black text-lg sm:text-2xl">
                             🔍 ${_col('Įstatyk trūkstamą žodį!')}
                         </button>
                     </div>
@@ -361,10 +397,10 @@
 
         function renderTopBar() {
             return `
-                <div class="bg-orange-500 text-white px-4 py-2 sm:py-2.5 flex justify-between items-center font-bold text-sm sm:text-base shadow shrink-0">
-                    <div>⭐ ${_col('Taškai:')} <span class="text-yellow-200 font-black">${state.score}</span></div>
-                    <div class="bg-orange-600 px-3 py-0.5 rounded-xl">${_col('Sakinys:')} ${state.round + 1} / ${state.deck.length}</div>
-                    <div>🔥 ${_col('Serija:')} <span class="text-amber-200 font-black">${state.streak}</span></div>
+                <div class="top-bar bg-orange-100 border-b-2 border-orange-300 text-slate-800 px-4 py-2 sm:py-2.5 flex justify-between items-center font-bold text-sm sm:text-base shadow-sm shrink-0">
+                    <div>⭐ ${_col('Taškai:')} <span class="text-orange-700 dark:text-amber-300 font-black">${state.score}</span></div>
+                    <div class="top-badge bg-white/90 border border-orange-300 px-3 py-0.5 rounded-xl">${_col('Sakinys:')} <span class="text-orange-700 dark:text-amber-300 font-black">${state.round + 1} / ${state.deck.length}</span></div>
+                    <div>🔥 ${_col('Serija:')} <span class="text-orange-700 dark:text-amber-300 font-black">${state.streak}</span></div>
                 </div>
             `;
         }
@@ -587,7 +623,7 @@
                     <p class="text-sub-title text-xl sm:text-2xl text-slate-700 mb-6 font-bold">
                         ${_col('Tavo rezultatas:')} <span class="text-3xl sm:text-4xl text-orange-500 font-black">${state.score} / ${state.deck.length}</span>
                     </p>
-                    <button onclick="renderStartScreen()" class="btn-3d bg-green-500 hover:bg-green-600 text-white text-xl sm:text-2xl font-black py-4 px-10 rounded-2xl w-full max-w-xs">
+                    <button onclick="renderStartScreen()" class="btn-3d bg-green-100 hover:bg-green-200 text-slate-800 border-2 border-green-400 text-xl sm:text-2xl font-black py-4 px-10 rounded-2xl w-full max-w-xs">
                         ${_col('Žaisti dar kartą')} 🔄
                     </button>
                 </div>

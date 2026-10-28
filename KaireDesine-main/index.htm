@@ -10,6 +10,15 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --sc-0: #dc2626;
+            --sc-1: #1d4ed8;
+            --sc-2: #15803d;
+            --sc-3: #c2410c;
+            --sc-4: #7e22ce;
+            --sc-5: #be185d;
+        }
+
         body {
             font-family: 'Nunito', sans-serif;
             background-color: #fdf4ff;
@@ -44,11 +53,33 @@
             animation: shake 0.38s ease-in-out;
         }
 
+        .bg-green-500.text-white span {
+            color: #ffffff !important;
+        }
+
         /* Tamsioji tema */
         @media (prefers-color-scheme: dark) {
+            :root {
+                --sc-0: #ff6b6b;
+                --sc-1: #38bdf8;
+                --sc-2: #4ade80;
+                --sc-3: #facc15;
+                --sc-4: #c084fc;
+                --sc-5: #f472b6;
+            }
             body {
                 background-color: #0b1120 !important;
                 background-image: radial-gradient(#1e293b 20%, transparent 20%) !important;
+                color: #f8fafc !important;
+            }
+            .top-bar {
+                background-color: #1e293b !important;
+                border-color: #334155 !important;
+                color: #f8fafc !important;
+            }
+            .top-badge {
+                background-color: #0f172a !important;
+                border-color: #475569 !important;
                 color: #f8fafc !important;
             }
             #app {
@@ -180,7 +211,7 @@
         const _D = ['ai','au','ei','eu','ie','uo','ui','oi','ia','io','iu'];
         const _L = /[a-ząčęėįšųūžA-ZĄČĘĖĮŠŲŪŽ]/;
         const _O = new Set(['bl','br','dr','dv','fl','fr','gl','gr','gn','kl','kr','kn','kv','pl','pr','sk','sl','sm','sn','sp','sr','st','sv','šl','šv','šn','tr','tv','vr','žl','žv','str','skr','spr']);
-        const _SC = ['#dc2626','#2563eb','#16a34a','#ea580c','#9333ea','#db2777'];
+        const _SC = ['var(--sc-0, #dc2626)','var(--sc-1, #1d4ed8)','var(--sc-2, #15803d)','var(--sc-3, #c2410c)','var(--sc-4, #7e22ce)','var(--sc-5, #be185d)'];
 
         function _syl(word) {
             if (!word || word.length <= 1) return [word || ''];
@@ -567,10 +598,10 @@
 
         function renderTopBar() {
             return `
-                <div class="bg-fuchsia-500 text-white px-4 py-2 flex justify-between items-center font-bold text-sm sm:text-base shadow">
-                    <div>⭐ ${_col('Taškai:')} <span class="text-yellow-200">${state.score}</span></div>
-                    <div class="bg-fuchsia-600 px-3 py-0.5 rounded-xl">${_col('Klausimas:')} ${state.currentIndex + 1} / 10</div>
-                    <div>🔥 ${_col('Serija:')} <span class="text-orange-200">${state.streak}</span></div>
+                <div class="top-bar bg-fuchsia-100 border-b-2 border-fuchsia-300 text-slate-800 px-4 py-2 flex justify-between items-center font-bold text-sm sm:text-base shadow">
+                    <div>⭐ ${_col('Taškai:')} <span class="text-amber-600 font-black">${state.score}</span></div>
+                    <div class="top-badge bg-white border border-fuchsia-300 px-3 py-0.5 rounded-xl">${_col('Klausimas:')} ${state.currentIndex + 1} / 10</div>
+                    <div>🔥 ${_col('Serija:')} <span class="text-orange-600 font-black">${state.streak}</span></div>
                 </div>
             `;
         }

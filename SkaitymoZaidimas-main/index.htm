@@ -17,6 +17,15 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
   <style>
+    :root {
+      --sc-0: #dc2626;
+      --sc-1: #1d4ed8;
+      --sc-2: #15803d;
+      --sc-3: #c2410c;
+      --sc-4: #7e22ce;
+      --sc-5: #be185d;
+    }
+
     body {
         touch-action: manipulation;
       margin: 0;
@@ -33,9 +42,35 @@
     }
     
     @media (prefers-color-scheme: dark) {
+      :root {
+        --sc-0: #ff6b6b;
+        --sc-1: #38bdf8;
+        --sc-2: #4ade80;
+        --sc-3: #facc15;
+        --sc-4: #c084fc;
+        --sc-5: #f472b6;
+      }
       body, .bg-yellow-50, .bg-blue-100 {
         background-color: #0b1120 !important;
         color: #f8fafc;
+      }
+      h1.text-blue-600, span.text-blue-600 {
+        color: #38bdf8 !important;
+      }
+      .bg-green-100.text-green-600 {
+        background-color: #064e3b !important;
+        color: #4ade80 !important;
+        border-color: #22c55e !important;
+      }
+      .bg-red-100.text-red-600 {
+        background-color: #7f1d1d !important;
+        color: #fca5a5 !important;
+        border-color: #ef4444 !important;
+      }
+      .bg-gray-300.text-gray-500 {
+        background-color: #1e293b !important;
+        color: #64748b !important;
+        border: 2px solid #334155 !important;
       }
       .bg-white {
         background-color: #0f172a !important;
@@ -176,12 +211,12 @@
 
     // Ryškios ir vaikams draugiškos spalvos skiemenims
     const SYLLABLE_COLORS = [
-      "text-red-600",     // Raudona
-      "text-blue-600",    // Mėlyna
-      "text-green-600",   // Žalia
-      "text-orange-500",  // Oranžinė
-      "text-purple-600",  // Violetinė
-      "text-pink-600"     // Rausva
+      "var(--sc-0, #dc2626)", // Raudona
+      "var(--sc-1, #1d4ed8)", // Mėlyna
+      "var(--sc-2, #15803d)", // Žalia
+      "var(--sc-3, #c2410c)", // Oranžinė
+      "var(--sc-4, #7e22ce)", // Violetinė
+      "var(--sc-5, #be185d)"  // Rausva
     ];
 
     const PRAISE_WORDS = ["Puiku!", "Šaunuolis!", "Teisingai!", "Nuostabu!", "Labai gerai!"];
@@ -410,7 +445,7 @@
           <div className="w-full max-w-4xl flex flex-col items-center mb-4">
             <h2 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-wide text-center uppercase break-all flex flex-wrap justify-center drop-shadow-sm">
               {currentWord?.syllables.map((syl, index) => (
-                <span key={index} className={SYLLABLE_COLORS[index % SYLLABLE_COLORS.length]}>
+                <span key={index} style={{ color: SYLLABLE_COLORS[index % SYLLABLE_COLORS.length] }}>
                   {syl}
                 </span>
               ))}
