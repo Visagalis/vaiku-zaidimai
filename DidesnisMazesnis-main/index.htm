@@ -40,6 +40,11 @@
             border: 3px solid #fcd34d;
             transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.25s ease;
         }
+        .basket-badge {
+            background-color: #fde68a;
+            color: #78350f;
+            border: 1px solid #f59e0b;
+        }
         .stair-slot {
             background-color: #f8fafc;
             border: 3px dashed #94a3b8;
@@ -71,9 +76,10 @@
                 border-color: #334155 !important;
                 box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.7) !important;
             }
-            .bg-amber-200\/70 {
-                background-color: #334155 !important;
-                color: #f8fafc !important;
+            .basket-badge {
+                background-color: #78350f !important;
+                border-color: #f59e0b !important;
+                color: #fef3c7 !important;
             }
             .bg-emerald-100 {
                 background-color: #064e3b !important;
@@ -339,7 +345,7 @@
                 return `
                     <div class="flex flex-col items-center justify-center">
                         <div class="text-3xl sm:text-4xl bounce">🐊</div>
-                        <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-emerald-100 dark:bg-emerald-950 border-2 border-emerald-400 flex items-center justify-center text-3xl sm:text-4xl font-black text-emerald-600 dark:text-emerald-300 shadow-inner">
+                        <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-emerald-100 border-2 border-emerald-400 flex items-center justify-center text-3xl sm:text-4xl font-black text-emerald-600 dark:text-emerald-300 shadow-inner">
                             ?
                         </div>
                     </div>
@@ -510,7 +516,7 @@
                             <div class="flex flex-wrap items-center justify-center gap-1 my-1.5">
                                 ${renderBasketEmojis(state.leftBasket)}
                             </div>
-                            <span class="text-xs sm:text-sm font-extrabold px-2.5 py-0.5 rounded-full bg-amber-200/70 dark:bg-slate-700 text-slate-800 dark:text-slate-100">
+                            <span class="basket-badge text-sm sm:text-base font-black px-3 py-1 rounded-full shadow-sm">
                                 ${state.leftBasket.label}
                             </span>
                         </button>
@@ -526,7 +532,7 @@
                             <div class="flex flex-wrap items-center justify-center gap-1 my-1.5">
                                 ${renderBasketEmojis(state.rightBasket)}
                             </div>
-                            <span class="text-xs sm:text-sm font-extrabold px-2.5 py-0.5 rounded-full bg-amber-200/70 dark:bg-slate-700 text-slate-800 dark:text-slate-100">
+                            <span class="basket-badge text-sm sm:text-base font-black px-3 py-1 rounded-full shadow-sm">
                                 ${state.rightBasket.label}
                             </span>
                         </button>

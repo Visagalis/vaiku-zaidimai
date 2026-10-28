@@ -413,13 +413,13 @@
                     ${headerHtml}
 
                     <div class="flex items-center gap-2 my-0.5">
-                        <button id="toggle-hour-btn" onclick="setActiveHand('hour')" class="px-2.5 py-1 rounded-xl text-xs sm:text-sm font-black border-2 transition ${state.activeHand === 'hour' ? 'btn-tinted bg-amber-100 border-amber-500 shadow-sm' : 'ctrl-btn opacity-70'}">
+                        <button id="toggle-hour-btn" onclick="setActiveHand('hour')" class="px-3 py-1.5 rounded-xl text-sm sm:text-base font-black border-2 transition ${state.activeHand === 'hour' ? 'btn-tinted bg-amber-100 border-amber-500 shadow-sm' : 'ctrl-btn opacity-70'}">
                             🕐 ${_col('Valandos')}
                         </button>
-                        <button id="toggle-min-btn" onclick="setActiveHand('minute')" class="px-2.5 py-1 rounded-xl text-xs sm:text-sm font-black border-2 transition ${state.activeHand === 'minute' ? 'btn-tinted bg-sky-100 border-sky-500 shadow-sm' : 'ctrl-btn opacity-70'}">
+                        <button id="toggle-min-btn" onclick="setActiveHand('minute')" class="px-3 py-1.5 rounded-xl text-sm sm:text-base font-black border-2 transition ${state.activeHand === 'minute' ? 'btn-tinted bg-sky-100 border-sky-500 shadow-sm' : 'ctrl-btn opacity-70'}">
                             ⏱️ ${_col('Minutės')}
                         </button>
-                        <span id="user-time-badge" class="px-2.5 py-1 rounded-xl bg-emerald-100 text-emerald-900 font-black text-xs sm:text-sm border border-emerald-300">
+                        <span id="user-time-badge" class="px-3 py-1.5 rounded-xl bg-emerald-100 text-emerald-900 font-black text-sm sm:text-base border border-emerald-300">
                             ${formatTime(state.userH, state.userM)}
                         </span>
                     </div>
@@ -428,7 +428,7 @@
                         ${buildClockSvgHTML(true)}
                     </div>
 
-                    <div id="feedback" class="h-5 sm:h-6 flex items-center justify-center font-black text-xs sm:text-base opacity-0 transition-opacity"></div>
+                    <div id="feedback" class="h-6 sm:h-7 flex items-center justify-center font-black text-sm sm:text-lg opacity-0 transition-opacity"></div>
 
                     <!-- Tactile adjustment buttons -->
                     <div class="grid grid-cols-4 gap-1.5 sm:gap-2.5 w-full">
@@ -461,8 +461,8 @@
             const hBtn = document.getElementById('toggle-hour-btn');
             const mBtn = document.getElementById('toggle-min-btn');
             if (hBtn && mBtn) {
-                hBtn.className = `px-2.5 py-1 rounded-xl text-xs sm:text-sm font-black border-2 transition ${hand === 'hour' ? 'btn-tinted bg-amber-100 border-amber-500 shadow-sm' : 'ctrl-btn opacity-70'}`;
-                mBtn.className = `px-2.5 py-1 rounded-xl text-xs sm:text-sm font-black border-2 transition ${hand === 'minute' ? 'btn-tinted bg-sky-100 border-sky-500 shadow-sm' : 'ctrl-btn opacity-70'}`;
+                hBtn.className = `px-3 py-1.5 rounded-xl text-sm sm:text-base font-black border-2 transition ${hand === 'hour' ? 'btn-tinted bg-amber-100 border-amber-500 shadow-sm' : 'ctrl-btn opacity-70'}`;
+                mBtn.className = `px-3 py-1.5 rounded-xl text-sm sm:text-base font-black border-2 transition ${hand === 'minute' ? 'btn-tinted bg-sky-100 border-sky-500 shadow-sm' : 'ctrl-btn opacity-70'}`;
             }
         }
 
@@ -535,7 +535,7 @@
                 if (!isHourMatch && isMinMatch) hint = 'Minutės teisingos, bet patikrink valandų rodyklę!';
                 else if (isHourMatch && !isMinMatch) hint = 'Valandos teisingos, bet patikrink minučių rodyklę!';
                 feedback.innerHTML = `<span>${_col(hint)} 🤔</span>`;
-                feedback.className = "h-5 sm:h-6 flex items-center justify-center font-black text-xs sm:text-sm text-red-500 opacity-100";
+                feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-sm sm:text-lg text-red-500 opacity-100";
                 clockWrap.classList.remove('shake');
                 void clockWrap.offsetWidth;
                 clockWrap.classList.add('shake');

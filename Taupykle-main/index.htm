@@ -373,7 +373,7 @@
                     <div class="flex flex-col my-1 sm:my-2 shrink-0">
                         <div class="flex justify-between items-center px-1 mb-1.5 text-base sm:text-lg font-black shrink-0">
                             <span class="text-sub-title flex items-center gap-2">💰 Iškeista: <strong id="ex-sum" class="text-pink-500 font-black text-xl sm:text-3xl">0 c</strong></span>
-                            <button onclick="clearExchange()" class="text-rose-500 hover:scale-110 active:scale-95 text-xl p-1.5 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/30 transition" title="Išvalyti">🗑️</button>
+                            <button onclick="clearExchange()" class="text-rose-500 hover:scale-110 active:scale-95 text-2xl p-2 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/30 transition" title="Išvalyti">🗑️</button>
                         </div>
                         <div id="ex-tray" class="piggy-box flex flex-wrap items-center justify-center content-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-2xl h-28 sm:h-36">
                         </div>
@@ -382,7 +382,7 @@
                     <div id="feedback" class="h-6 sm:h-7 flex items-center justify-center font-black text-sm sm:text-lg opacity-0 transition-opacity shrink-0"></div>
 
                     <div class="wallet-panel p-2.5 sm:p-3.5 rounded-2xl flex flex-col items-center gap-1.5 shrink-0">
-                        <div class="text-xs sm:text-sm font-extrabold text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                        <div class="text-sm sm:text-base font-extrabold text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
                             <span>👛</span> <span>${_col('Monetos iškeitimui (spausk monetą):')}</span>
                         </div>
                         <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3 max-w-lg">
@@ -409,7 +409,7 @@
                 tray.innerHTML = `
                     <div class="flex items-center justify-center gap-2 text-slate-400 dark:text-slate-500 select-none pointer-events-none">
                         <span class="text-2xl animate-bounce">🪙</span>
-                        <span class="font-black text-sm sm:text-base text-slate-500 dark:text-slate-400">Padėk monetas čia</span>
+                        <span class="font-black text-base sm:text-lg text-slate-500 dark:text-slate-400">Padėk monetas čia</span>
                     </div>
                 `;
             } else {
@@ -477,7 +477,7 @@
                     </div>
 
                     <div id="piggy-container" class="piggy-box flex-1 p-3 sm:p-4 rounded-2xl flex flex-col items-center justify-center gap-2 min-h-[130px] sm:min-h-[170px] my-2">
-                        <div class="text-sm font-black text-pink-600">🐷</div>
+                        <div class="text-3xl sm:text-4xl font-black">🐷</div>
                         <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
                             ${piggyCoinsHtml}
                         </div>

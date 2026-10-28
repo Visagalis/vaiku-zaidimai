@@ -11,6 +11,16 @@
 (function (global) {
     'use strict';
 
+    // Užtikriname, kad Tailwind Play CDN naudotų 'class' pagrindu veikiančią tamsiąją temą
+    // vietoje sistemos @media užklausų, kad šviesi tema niekada netyčia neįgautų tamsių elementų.
+    try {
+        if (typeof global !== 'undefined') {
+            global.tailwind = global.tailwind || {};
+            global.tailwind.config = global.tailwind.config || {};
+            global.tailwind.config.darkMode = 'class';
+        }
+    } catch (e) {}
+
     // === 1. SKIEMENŲ SPALVINIMAS ===
     var _V = 'aeėęiįyouųūąAEĖĘIĮYOUŲŪĄ';
     var _D = new Set(['ai','au','ei','eu','ui','oi','ie','uo','ia','io','iu']);

@@ -574,7 +574,7 @@
                     ? `Skaičiuok nuo ${state.frogStart} į dešinę po vieną lapelį!`
                     : `Skaičiuok nuo ${state.frogStart} į kairę atgal!`;
                 feedback.innerHTML = `<span>${_col(hint)} 🤔</span>`;
-                feedback.className = "h-7 sm:h-8 flex items-center justify-center font-black text-xs sm:text-base text-red-500 opacity-100";
+                feedback.className = "h-7 sm:h-8 flex items-center justify-center font-black text-sm sm:text-lg text-red-500 opacity-100";
                 pond.classList.remove('shake');
                 void pond.offsetWidth;
                 pond.classList.add('shake');
@@ -720,7 +720,7 @@
                     tileBtn.className = "py-3 sm:py-3.5 bg-red-100 text-red-400 border-red-200 border-2 rounded-2xl font-bold text-2xl sm:text-3xl line-through opacity-50 cursor-not-allowed shake";
                 }
                 feedback.innerHTML = `<span>${_col('Pagalvok: kas eina prieš ir po')} ${state.centerNum}? 🤔</span>`;
-                feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-xs sm:text-base text-red-500 opacity-100";
+                feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-sm sm:text-lg text-red-500 opacity-100";
                 housesContainer.classList.remove('shake');
                 void housesContainer.offsetWidth;
                 housesContainer.classList.add('shake');
