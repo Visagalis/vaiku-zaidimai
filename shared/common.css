@@ -232,10 +232,14 @@ button.coin:active, button.bill:active {
         -webkit-overflow-scrolling: touch;
     }
 
-    /* Pagrindinės žaidimų lentelės ir padėklai užpildo laisvą erdvę */
+    /* Monetų padėklai — kompaktiški, kad neperpildytų ekrano ir paliktų vietos prekių kortelei bei piniginei */
     .counter-tray,
     .money-tray,
     .change-tray,
+    #ex-tray {
+        min-height: 100px;
+        max-height: 145px;
+    }
     .piggy-box {
         min-height: 110px;
     }
