@@ -24,6 +24,18 @@
     --sc-5: #f472b6;
 }
 
+/* Skiemenų spalvinimas išjungtas nustatymuose (klasę `syl-off` ant <html> uždeda shared/common.js).
+   Visos skiemenų spalvos pakeičiamos į `currentColor`, t. y. tekstas paveldi įprastą aplinkos spalvą. */
+.syl-off,
+.syl-off * {
+    --sc-0: currentColor !important;
+    --sc-1: currentColor !important;
+    --sc-2: currentColor !important;
+    --sc-3: currentColor !important;
+    --sc-4: currentColor !important;
+    --sc-5: currentColor !important;
+}
+
 /* Bendra apsauga nuo teksto žymėjimo ir priartinimo */
 body {
     touch-action: manipulation;

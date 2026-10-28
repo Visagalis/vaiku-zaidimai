@@ -2,7 +2,8 @@
  * Vaikų Žaidimai — Bendra funkcionalumo biblioteka (shared/common.js)
  *
  * Šiame faile aprašytos funkcijos, naudojamos visuose žaidimuose:
- * 1. Lietuviškų žodžių skiemenavimas (`_syl`) ir spalvinimas (`_col`, `getWordLetterColors`).
+ * 1. Lietuviškų žodžių skiemenavimas (`_syl`) ir spalvinimas (`_col`, `getWordLetterColors`),
+ *    įskaitant spalvinimo įjungimo/išjungimo nustatymą (`setSyllableColoringEnabled`).
  * 2. Garso efektų sistema (Web Audio API: `playSound`, `playTone`, `playCorrectSound`, ir kt.).
  * 3. Apsauga nuo priartinimo gestais (`preventZoom`).
  * 4. Pagalbinės masyvų funkcijos (`shuffle`, `shuffleArray`, `pickRandom`).
@@ -102,6 +103,42 @@
                 return '<span style="color:' + _SC[i % _SC.length] + '">' + s + '</span>';
             }).join('');
         }).join('');
+    }
+
+    // --- Skiemenų spalvinimo nustatymas (įjungta / išjungta) ---
+    // Saugoma localStorage, todėl galioja visiems žaidimams. Išjungus, ant <html>
+    // uždedama klasė `syl-off`, kuri (shared/common.css) skiemenų spalvas pakeičia
+    // į įprastą teksto spalvą — žaidimų kodo keisti nereikia.
+    var SYL_STORAGE_KEY = 'vz-syllable-colors';
+
+    function isSyllableColoringEnabled() {
+        try {
+            return global.localStorage.getItem(SYL_STORAGE_KEY) !== '0';
+        } catch (e) {
+            return true;
+        }
+    }
+
+    function applySyllableColoring(enabled, doc) {
+        doc = doc || (typeof document !== 'undefined' ? document : null);
+        if (!doc || !doc.documentElement) return;
+        if (enabled === undefined) enabled = isSyllableColoringEnabled();
+        doc.documentElement.classList.toggle('syl-off', !enabled);
+    }
+
+    function setSyllableColoringEnabled(enabled) {
+        try {
+            global.localStorage.setItem(SYL_STORAGE_KEY, enabled ? '1' : '0');
+        } catch (e) {}
+        applySyllableColoring(!!enabled);
+    }
+
+    if (typeof document !== 'undefined') {
+        applySyllableColoring();
+        // Jei nustatymas pakeičiamas kitame lange / iframe, pritaikome iškart
+        global.addEventListener('storage', function (e) {
+            if (e.key === SYL_STORAGE_KEY) applySyllableColoring();
+        });
     }
 
     function getWordLetterColors(word) {
@@ -349,6 +386,9 @@
     global._syl = _syl;
     global._col = _col;
     global.getWordLetterColors = getWordLetterColors;
+    global.isSyllableColoringEnabled = isSyllableColoringEnabled;
+    global.setSyllableColoringEnabled = setSyllableColoringEnabled;
+    global.applySyllableColoring = applySyllableColoring;
     global.getAudioCtx = getAudioCtx;
     global.initAudio = initAudio;
     global.playTone = playTone;

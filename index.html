@@ -87,6 +87,38 @@
                 border-color: #22c55e !important;
                 color: #ffffff !important;
             }
+            .settings-btn {
+                background-color: #1e293b !important;
+                border-color: #334155 !important;
+                color: #e2e8f0 !important;
+            }
+            .settings-card {
+                background-color: #1e293b !important;
+                border-color: #334155 !important;
+            }
+            .settings-card h2 {
+                color: #f8fafc !important;
+            }
+            .settings-row {
+                background-color: #0f172a !important;
+                border-color: #334155 !important;
+            }
+            .settings-row .settings-title {
+                color: #f8fafc !important;
+            }
+            .settings-row .settings-desc {
+                color: #94a3b8 !important;
+            }
+            .settings-close {
+                background-color: #334155 !important;
+                color: #e2e8f0 !important;
+            }
+            .settings-preview {
+                border-color: #475569 !important;
+            }
+            #syl-preview {
+                color: #f8fafc !important;
+            }
         }
         .cat-pill {
             transition: all 0.15s ease;
@@ -97,12 +129,51 @@
             color: #ffffff;
             transform: scale(1.04);
         }
+
+        /* Nustatymų jungiklis */
+        .toggle-track {
+            position: relative;
+            flex-shrink: 0;
+            width: 3.5rem;
+            height: 2rem;
+            border-radius: 9999px;
+            background-color: #cbd5e1;
+            transition: background-color 0.2s ease;
+        }
+        .toggle-track::after {
+            content: '';
+            position: absolute;
+            top: 0.25rem;
+            left: 0.25rem;
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: 9999px;
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+            transition: transform 0.2s ease;
+        }
+        #syl-toggle:checked + .toggle-track {
+            background-color: #22c55e;
+        }
+        #syl-toggle:checked + .toggle-track::after {
+            transform: translateX(1.5rem);
+        }
+        #syl-toggle:focus-visible + .toggle-track {
+            outline: 3px solid #86efac;
+            outline-offset: 2px;
+        }
     </style>
 </head>
 <body class="min-h-screen text-slate-800 flex flex-col items-center transition-colors duration-200">
 
     <!-- Menu Screen -->
     <div id="menu" class="w-full max-w-6xl px-3 sm:px-4 py-6 sm:py-8 flex flex-col items-center">
+        <div class="w-full flex justify-end -mb-1 sm:-mb-3">
+            <button onclick="openSettings()" title="Nustatymai" class="settings-btn bg-white border-2 border-b-4 border-emerald-300 text-emerald-900 font-extrabold text-xs sm:text-base px-3 py-1.5 sm:py-2 rounded-2xl shadow-sm flex items-center gap-1.5 transition-transform active:scale-95">
+                <span class="text-base sm:text-lg leading-none">⚙️</span>
+                <span>Nustatymai</span>
+            </button>
+        </div>
         <h1 class="text-2xl min-[360px]:text-[1.7rem] min-[420px]:text-3xl sm:text-4xl md:text-5xl font-black text-center mt-2 sm:mt-4 mb-4 sm:mb-6 text-white drop-shadow-md whitespace-nowrap flex items-center justify-center gap-1.5 sm:gap-3" 
             style="text-shadow: 3px 3px 0 #22c55e, -2px -2px 0 #22c55e, 2px -2px 0 #22c55e, -2px 2px 0 #22c55e;">
             <span class="text-xl min-[360px]:text-2xl sm:text-4xl select-none">🦉</span>
@@ -333,14 +404,43 @@
                 Žaidimas
             </div>
 
-            <button onclick="reloadGame()" title="Pradėti iš naujo" class="flex items-center gap-1.5 bg-slate-700 hover:bg-slate-600 active:bg-slate-900 text-slate-200 font-bold text-xs sm:text-sm py-2 px-3 rounded-xl border border-slate-600 shadow-sm transition-all transform active:scale-95">
-                <span class="text-base leading-none">🔄</span>
-                <span class="hidden sm:inline">Iš naujo</span>
-            </button>
+            <div class="flex items-center gap-1.5 sm:gap-2">
+                <button onclick="openSettings()" title="Nustatymai" class="flex items-center bg-slate-700 hover:bg-slate-600 active:bg-slate-900 text-slate-200 font-bold text-xs sm:text-sm py-2 px-3 rounded-xl border border-slate-600 shadow-sm transition-all transform active:scale-95">
+                    <span class="text-base leading-none">⚙️</span>
+                </button>
+                <button onclick="reloadGame()" title="Pradėti iš naujo" class="flex items-center gap-1.5 bg-slate-700 hover:bg-slate-600 active:bg-slate-900 text-slate-200 font-bold text-xs sm:text-sm py-2 px-3 rounded-xl border border-slate-600 shadow-sm transition-all transform active:scale-95">
+                    <span class="text-base leading-none">🔄</span>
+                    <span class="hidden sm:inline">Iš naujo</span>
+                </button>
+            </div>
         </header>
 
         <div class="flex-1 w-full h-full relative overflow-hidden bg-white">
             <iframe id="game-frame" src="" allow="autoplay" class="w-full h-full border-none block" style="width:100%;height:100%;border:none;"></iframe>
+        </div>
+    </div>
+
+    <!-- Nustatymų langas -->
+    <div id="settings-modal" class="hidden fixed inset-0 z-[60] items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4" onclick="if (event.target === this) closeSettings()">
+        <div class="settings-card bg-white rounded-3xl shadow-2xl border-2 border-b-[6px] border-emerald-300 w-full max-w-md p-5 sm:p-6 fade-in" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+            <div class="flex items-center justify-between mb-4">
+                <h2 id="settings-title" class="text-2xl sm:text-3xl font-black text-emerald-800">⚙️ Nustatymai</h2>
+                <button onclick="closeSettings()" class="settings-close w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-black text-xl transition-transform active:scale-95" aria-label="Uždaryti">✕</button>
+            </div>
+
+            <label for="syl-toggle" class="settings-row flex items-center justify-between gap-4 bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4 cursor-pointer">
+                <div>
+                    <div class="settings-title font-extrabold text-base sm:text-lg text-slate-800">🌈 Skiemenų spalvinimas</div>
+                    <div class="settings-desc text-xs sm:text-sm font-bold text-slate-500 leading-snug">Žodžiai žaidimuose nuspalvinami pagal skiemenis</div>
+                </div>
+                <input id="syl-toggle" type="checkbox" class="sr-only" onchange="onSyllableToggle(this.checked)">
+                <span class="toggle-track" aria-hidden="true"></span>
+            </label>
+
+            <div class="settings-preview mt-4 rounded-2xl border-2 border-dashed border-slate-200 p-4 text-center">
+                <div class="settings-desc text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Pavyzdys</div>
+                <div id="syl-preview" class="text-2xl sm:text-3xl font-black text-slate-800"></div>
+            </div>
         </div>
     </div>
 
@@ -370,7 +470,43 @@
                 if (fDoc && typeof preventZoom === 'function') {
                     preventZoom(fDoc);
                 }
+                syncFrameSyllableColoring();
             } catch (err) {}
+        });
+
+        // === NUSTATYMAI ===
+        const settingsModal = document.getElementById('settings-modal');
+        const sylToggle = document.getElementById('syl-toggle');
+        const sylPreview = document.getElementById('syl-preview');
+
+        // Pritaiko nustatymą ir šiuo metu atidarytam žaidimui (be perkrovimo)
+        function syncFrameSyllableColoring() {
+            try {
+                const fDoc = gameFrame.contentDocument || (gameFrame.contentWindow && gameFrame.contentWindow.document);
+                if (fDoc) applySyllableColoring(isSyllableColoringEnabled(), fDoc);
+            } catch (err) {}
+        }
+
+        function openSettings() {
+            sylToggle.checked = isSyllableColoringEnabled();
+            sylPreview.innerHTML = _col('Katė geria pieną');
+            settingsModal.classList.remove('hidden');
+            settingsModal.classList.add('flex');
+        }
+
+        function closeSettings() {
+            settingsModal.classList.add('hidden');
+            settingsModal.classList.remove('flex');
+        }
+
+        function onSyllableToggle(enabled) {
+            setSyllableColoringEnabled(enabled);
+            syncFrameSyllableColoring();
+            if (typeof playSound === 'function') playSound('click');
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && !settingsModal.classList.contains('hidden')) closeSettings();
         });
 
         function getCacheBustedUrl(url) {
