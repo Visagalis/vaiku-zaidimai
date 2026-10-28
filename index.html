@@ -119,7 +119,127 @@
             #syl-preview {
                 color: #f8fafc !important;
             }
+            .theme-opt-btn {
+                background-color: #1e293b !important;
+                border-color: #334155 !important;
+                color: #cbd5e1 !important;
+            }
+            .theme-opt-btn:hover {
+                background-color: #334155 !important;
+            }
+            .theme-opt-btn.active-theme {
+                background-color: #10b981 !important;
+                border-color: #059669 !important;
+                color: #ffffff !important;
+                box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.4) !important;
+            }
         }
+
+        /* Priverstinė tamsi tema per nustatymus (.dark arba .dark-theme) */
+        html.dark body,
+        html.dark-theme body {
+            background-color: #0b1120 !important;
+            background-image: radial-gradient(#1e293b 2px, transparent 2px) !important;
+            color: #f1f5f9 !important;
+        }
+        html.dark .card-3d,
+        html.dark-theme .card-3d {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5) !important;
+        }
+        html.dark .card-3d:hover,
+        html.dark-theme .card-3d:hover {
+            background-color: #273549 !important;
+        }
+        html.dark .card-3d h2,
+        html.dark-theme .card-3d h2 {
+            color: #f8fafc !important;
+        }
+        html.dark .card-3d p,
+        html.dark-theme .card-3d p {
+            color: #94a3b8 !important;
+        }
+        html.dark .cat-pill,
+        html.dark-theme .cat-pill {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+            color: #e2e8f0 !important;
+        }
+        html.dark .settings-btn,
+        html.dark-theme .settings-btn {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+            color: #e2e8f0 !important;
+        }
+        html.dark .settings-card,
+        html.dark-theme .settings-card {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+        }
+        html.dark .settings-card h2,
+        html.dark-theme .settings-card h2 {
+            color: #f8fafc !important;
+        }
+        html.dark .settings-row,
+        html.dark-theme .settings-row {
+            background-color: #0f172a !important;
+            border-color: #334155 !important;
+        }
+        html.dark .settings-row .settings-title,
+        html.dark-theme .settings-row .settings-title {
+            color: #f8fafc !important;
+        }
+        html.dark .settings-row .settings-desc,
+        html.dark-theme .settings-row .settings-desc {
+            color: #94a3b8 !important;
+        }
+        html.dark .settings-close,
+        html.dark-theme .settings-close {
+            background-color: #334155 !important;
+            color: #e2e8f0 !important;
+        }
+        html.dark .settings-preview,
+        html.dark-theme .settings-preview {
+            border-color: #475569 !important;
+        }
+        html.dark #syl-preview,
+        html.dark-theme #syl-preview {
+            color: #f8fafc !important;
+        }
+        html.dark .theme-opt-btn,
+        html.dark-theme .theme-opt-btn {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+            color: #cbd5e1 !important;
+        }
+        html.dark .theme-opt-btn:hover,
+        html.dark-theme .theme-opt-btn:hover {
+            background-color: #334155 !important;
+        }
+        html.dark .theme-opt-btn.active-theme,
+        html.dark-theme .theme-opt-btn.active-theme {
+            background-color: #10b981 !important;
+            border-color: #059669 !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.4) !important;
+        }
+
+        .theme-opt-btn {
+            background-color: #ffffff;
+            border-color: #cbd5e1;
+            color: #334155;
+        }
+        .theme-opt-btn:hover {
+            background-color: #f8fafc;
+        }
+        .theme-opt-btn.active-theme {
+            background-color: #10b981 !important;
+            border-color: #059669 !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3) !important;
+        }
+
         .cat-pill {
             transition: all 0.15s ease;
         }
@@ -428,6 +548,27 @@
                 <button onclick="closeSettings()" class="settings-close w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 font-black text-xl transition-transform active:scale-95" aria-label="Uždaryti">✕</button>
             </div>
 
+            <!-- Ekrano tema -->
+            <div class="settings-row flex flex-col gap-2.5 bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4 mb-3">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="settings-title font-extrabold text-base sm:text-lg text-slate-800">🌓 Ekrano tema</div>
+                        <div class="settings-desc text-xs sm:text-sm font-bold text-slate-500 leading-snug">Šviesi, tamsi arba automatinė sistemos tema</div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-3 gap-2 mt-0.5">
+                    <button type="button" onclick="onThemeSelect('auto')" id="theme-btn-auto" class="theme-opt-btn flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl font-black text-xs sm:text-sm border-2 transition active:scale-95" title="Pagal sistemą">
+                        <span class="text-base sm:text-lg">💻</span> <span>Auto</span>
+                    </button>
+                    <button type="button" onclick="onThemeSelect('light')" id="theme-btn-light" class="theme-opt-btn flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl font-black text-xs sm:text-sm border-2 transition active:scale-95" title="Šviesi tema">
+                        <span class="text-base sm:text-lg">☀️</span> <span>Šviesi</span>
+                    </button>
+                    <button type="button" onclick="onThemeSelect('dark')" id="theme-btn-dark" class="theme-opt-btn flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl font-black text-xs sm:text-sm border-2 transition active:scale-95" title="Tamsi tema">
+                        <span class="text-base sm:text-lg">🌙</span> <span>Tamsi</span>
+                    </button>
+                </div>
+            </div>
+
             <label for="syl-toggle" class="settings-row flex items-center justify-between gap-4 bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4 cursor-pointer">
                 <div>
                     <div class="settings-title font-extrabold text-base sm:text-lg text-slate-800">🌈 Skiemenų spalvinimas</div>
@@ -470,6 +611,7 @@
                 if (fDoc && typeof preventZoom === 'function') {
                     preventZoom(fDoc);
                 }
+                syncFrameTheme();
                 syncFrameSyllableColoring();
             } catch (err) {}
         });
@@ -478,6 +620,36 @@
         const settingsModal = document.getElementById('settings-modal');
         const sylToggle = document.getElementById('syl-toggle');
         const sylPreview = document.getElementById('syl-preview');
+
+        // Pritaiko temą atidarytam žaidimo iframe
+        function syncFrameTheme() {
+            try {
+                const fDoc = gameFrame.contentDocument || (gameFrame.contentWindow && gameFrame.contentWindow.document);
+                if (fDoc && typeof applyTheme === 'function') {
+                    applyTheme(getThemeMode(), fDoc);
+                }
+            } catch (err) {}
+        }
+
+        function updateThemeButtonsUI() {
+            const currentMode = typeof getThemeMode === 'function' ? getThemeMode() : 'auto';
+            ['auto', 'light', 'dark'].forEach(m => {
+                const btn = document.getElementById(`theme-btn-${m}`);
+                if (btn) {
+                    btn.classList.toggle('active-theme', m === currentMode);
+                    btn.setAttribute('aria-pressed', m === currentMode ? 'true' : 'false');
+                }
+            });
+        }
+
+        function onThemeSelect(mode) {
+            if (typeof setThemeMode === 'function') {
+                setThemeMode(mode);
+            }
+            updateThemeButtonsUI();
+            syncFrameTheme();
+            if (typeof playSound === 'function') playSound('click');
+        }
 
         // Pritaiko nustatymą ir šiuo metu atidarytam žaidimui (be perkrovimo)
         function syncFrameSyllableColoring() {
@@ -489,6 +661,7 @@
 
         function openSettings() {
             sylToggle.checked = isSyllableColoringEnabled();
+            updateThemeButtonsUI();
             sylPreview.innerHTML = _col('Katė geria pieną');
             settingsModal.classList.remove('hidden');
             settingsModal.classList.add('flex');

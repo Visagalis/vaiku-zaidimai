@@ -297,36 +297,78 @@ button.coin:active, button.bill:active {
     }
 }
 
-/* Sistemos tamsioji tema (Dark Mode) */
+/* ==========================================================================
+   Tamsioji tema (Dark Mode) — palaikoma ir per media query, ir per .dark-theme / .dark
+   ========================================================================== */
+:root.dark,
+:root.dark-theme,
+.dark-mode {
+    --sc-0: #ff6b6b; /* Šviesi koralų raudona */
+    --sc-1: #38bdf8; /* Šviesi dangaus mėlyna */
+    --sc-2: #4ade80; /* Šviesi mėtų žalia */
+    --sc-3: #facc15; /* Ryški auksinė geltona */
+    --sc-4: #c084fc; /* Šviesi levandų violetinė */
+    --sc-5: #f472b6; /* Šviesi rožinė */
+}
+
+:root.dark .btn-tinted,
+:root.dark-theme .btn-tinted,
+.dark-mode .btn-tinted {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+    box-shadow: 0 5px 0 #090d16 !important;
+}
+:root.dark .btn-tinted:hover,
+:root.dark-theme .btn-tinted:hover,
+.dark-mode .btn-tinted:hover {
+    background-color: #334155 !important;
+}
+
+:root.dark .top-bar,
+:root.dark-theme .top-bar,
+.dark-mode .top-bar {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+}
+
+:root.dark .top-badge,
+:root.dark-theme .top-badge,
+.dark-mode .top-badge {
+    background-color: #0f172a !important;
+    border-color: #475569 !important;
+    color: #f8fafc !important;
+}
+
 @media (prefers-color-scheme: dark) {
-    :root {
-        /* Tamsios temos skiemenų spalvos (aukštas kontrastas ant tamsaus fono) */
-        --sc-0: #ff6b6b; /* Šviesi koralų raudona */
-        --sc-1: #38bdf8; /* Šviesi dangaus mėlyna */
-        --sc-2: #4ade80; /* Šviesi mėtų žalia */
-        --sc-3: #facc15; /* Ryški auksinė geltona */
-        --sc-4: #c084fc; /* Šviesi levandų violetinė */
-        --sc-5: #f472b6; /* Šviesi rožinė */
+    :root:not(.light-theme) {
+        --sc-0: #ff6b6b;
+        --sc-1: #38bdf8;
+        --sc-2: #4ade80;
+        --sc-3: #facc15;
+        --sc-4: #c084fc;
+        --sc-5: #f472b6;
     }
 
     /* Bendros tamsios temos mygtukų ir viršutinės juostos klasės */
-    .btn-tinted {
+    :root:not(.light-theme) .btn-tinted {
         background-color: #1e293b !important;
         border-color: #334155 !important;
         color: #f8fafc !important;
         box-shadow: 0 5px 0 #090d16 !important;
     }
-    .btn-tinted:hover {
+    :root:not(.light-theme) .btn-tinted:hover {
         background-color: #334155 !important;
     }
 
-    .top-bar {
+    :root:not(.light-theme) .top-bar {
         background-color: #1e293b !important;
         border-color: #334155 !important;
         color: #f8fafc !important;
     }
 
-    .top-badge {
+    :root:not(.light-theme) .top-badge {
         background-color: #0f172a !important;
         border-color: #475569 !important;
         color: #f8fafc !important;

@@ -133,12 +133,141 @@
         applySyllableColoring(!!enabled);
     }
 
+    // --- 1.1 Ekrano temos (šviesios / tamsios / auto) nustatymas ---
+    // Saugoma localStorage (raktas 'vz-theme-mode': 'auto' | 'light' | 'dark').
+    // Galioja visame portale ir žaidimuose. Pritaiko klases ant <html> bei <body>,
+    // ir dinamiškai valdo @media (prefers-color-scheme: dark) taisykles.
+    var THEME_STORAGE_KEY = 'vz-theme-mode';
+
+    function getThemeMode() {
+        try {
+            return global.localStorage.getItem(THEME_STORAGE_KEY) || 'auto';
+        } catch (e) {
+            return 'auto';
+        }
+    }
+
+    function isDarkMode(mode) {
+        if (mode === undefined) mode = getThemeMode();
+        if (mode === 'dark') return true;
+        if (mode === 'light') return false;
+        if (typeof window !== 'undefined' && window.matchMedia) {
+            try {
+                return window.matchMedia('(prefers-color-scheme: dark)').matches;
+            } catch (e) {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    function applyTheme(mode, doc) {
+        doc = doc || (typeof document !== 'undefined' ? document : null);
+        if (!doc || !doc.documentElement) return;
+        if (mode === undefined) mode = getThemeMode();
+        var isDark = isDarkMode(mode);
+
+        var root = doc.documentElement;
+        var body = doc.body;
+
+        if (mode === 'dark') {
+            root.classList.add('dark', 'dark-theme', 'dark-mode');
+            root.classList.remove('light', 'light-theme');
+            if (body) {
+                body.classList.add('dark-mode');
+                body.classList.remove('light-mode');
+            }
+        } else if (mode === 'light') {
+            root.classList.add('light', 'light-theme');
+            root.classList.remove('dark', 'dark-theme', 'dark-mode');
+            if (body) {
+                body.classList.remove('dark-mode');
+                body.classList.add('light-mode');
+            }
+        } else {
+            root.classList.remove('light-theme', 'dark-theme');
+            root.classList.toggle('dark', isDark);
+            root.classList.toggle('dark-mode', isDark);
+            if (body) {
+                body.classList.toggle('dark-mode', isDark);
+                body.classList.toggle('light-mode', !isDark);
+            }
+        }
+
+        // Valdome CSS Media taisykles (@media (prefers-color-scheme: dark))
+        try {
+            var sheets = doc.styleSheets;
+            if (sheets) {
+                for (var i = 0; i < sheets.length; i++) {
+                    try {
+                        var rules = sheets[i].cssRules || sheets[i].rules;
+                        if (!rules) continue;
+                        for (var j = 0; j < rules.length; j++) {
+                            var rule = rules[j];
+                            if (rule && rule.media && rule.media.mediaText) {
+                                var mText = rule.media.mediaText;
+                                if (mText.indexOf('prefers-color-scheme') !== -1 || rule._vzOrigMedia) {
+                                    if (!rule._vzOrigMedia) rule._vzOrigMedia = mText;
+                                    if (mode === 'dark') {
+                                        rule.media.mediaText = 'all';
+                                    } else if (mode === 'light') {
+                                        rule.media.mediaText = 'not all';
+                                    } else {
+                                        rule.media.mediaText = rule._vzOrigMedia;
+                                    }
+                                }
+                            }
+                        }
+                    } catch (sheetErr) {
+                        // Apsauga nuo CORS klaidų
+                    }
+                }
+            }
+        } catch (e) {}
+
+        // Specialus palaikymas žaidimams su savo mygtukais (pvz. RaidziuDelione)
+        if (body) {
+            var toggleBtn = body.querySelector('#dark-toggle');
+            if (toggleBtn) {
+                if (isDark) {
+                    toggleBtn.innerHTML = '☀️ Diena';
+                    toggleBtn.className = 'bg-indigo-600 text-white border-2 border-indigo-400 px-3 py-1.5 rounded-xl font-bold hover:bg-indigo-500 transition-colors text-xs shadow-sm';
+                } else {
+                    toggleBtn.innerHTML = '🌙 Naktis';
+                    toggleBtn.className = 'bg-slate-800 text-white border-2 border-slate-600 px-3 py-1.5 rounded-xl font-bold text-xs shadow-sm';
+                }
+            }
+        }
+    }
+
+    function setThemeMode(mode) {
+        try {
+            global.localStorage.setItem(THEME_STORAGE_KEY, mode);
+        } catch (e) {}
+        applyTheme(mode);
+    }
+
     if (typeof document !== 'undefined') {
         applySyllableColoring();
+        applyTheme();
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function () {
+                applyTheme();
+            });
+        }
         // Jei nustatymas pakeičiamas kitame lange / iframe, pritaikome iškart
         global.addEventListener('storage', function (e) {
             if (e.key === SYL_STORAGE_KEY) applySyllableColoring();
+            if (e.key === THEME_STORAGE_KEY) applyTheme();
         });
+        // Kai režimas 'auto', reaguojame į sistemos pasikeitimą (pvz., atėjus vakarui)
+        if (global.matchMedia) {
+            try {
+                global.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
+                    if (getThemeMode() === 'auto') applyTheme('auto');
+                });
+            } catch (e) {}
+        }
     }
 
     function getWordLetterColors(word) {
@@ -389,6 +518,10 @@
     global.isSyllableColoringEnabled = isSyllableColoringEnabled;
     global.setSyllableColoringEnabled = setSyllableColoringEnabled;
     global.applySyllableColoring = applySyllableColoring;
+    global.getThemeMode = getThemeMode;
+    global.setThemeMode = setThemeMode;
+    global.isDarkMode = isDarkMode;
+    global.applyTheme = applyTheme;
     global.getAudioCtx = getAudioCtx;
     global.initAudio = initAudio;
     global.playTone = playTone;
