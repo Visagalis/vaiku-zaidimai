@@ -172,6 +172,124 @@ button.coin:active, button.bill:active {
     .coin-2e { width: 4.15rem; height: 4.15rem; font-size: 1.45rem; border-width: 5px; }
 }
 
+/* Monetų dydžiai siauriems mobiliems ekranams (iki 390px / iki 340px) */
+@media (max-width: 390px) {
+    .coin-1c { width: 2.45rem; height: 2.45rem; font-size: 0.95rem; }
+    .coin-2c { width: 2.7rem; height: 2.7rem; font-size: 1rem; }
+    .coin-5c { width: 2.95rem; height: 2.95rem; font-size: 1.05rem; }
+    .coin-10c { width: 2.7rem; height: 2.7rem; font-size: 1rem; }
+    .coin-20c { width: 2.95rem; height: 2.95rem; font-size: 1.05rem; }
+    .coin-50c { width: 3.25rem; height: 3.25rem; font-size: 1.15rem; }
+    .coin-1e { width: 3.05rem; height: 3.05rem; font-size: 1.1rem; }
+    .coin-2e { width: 3.35rem; height: 3.35rem; font-size: 1.2rem; }
+    .bill { width: 3.7rem; height: 2.15rem; font-size: 0.95rem; }
+}
+
+@media (max-width: 340px) {
+    .coin-1c { width: 2.2rem; height: 2.2rem; font-size: 0.85rem; }
+    .coin-2c { width: 2.4rem; height: 2.4rem; font-size: 0.9rem; }
+    .coin-5c { width: 2.65rem; height: 2.65rem; font-size: 0.95rem; }
+    .coin-10c { width: 2.4rem; height: 2.4rem; font-size: 0.9rem; }
+    .coin-20c { width: 2.65rem; height: 2.65rem; font-size: 0.95rem; }
+    .coin-50c { width: 2.95rem; height: 2.95rem; font-size: 1.05rem; }
+    .coin-1e { width: 2.8rem; height: 2.8rem; font-size: 1rem; }
+    .coin-2e { width: 3.05rem; height: 3.05rem; font-size: 1.05rem; }
+    .bill { width: 3.3rem; height: 1.95rem; font-size: 0.85rem; }
+}
+
+/* ==========================================================================
+   Mobiliesiems ir mažiems ekranams pritaikytas išdėstymas (Small screen / Mobile)
+   ========================================================================== */
+@media (max-width: 639px) {
+    /* Pašaliname nereikalingus išorinius atstumus ir užtikriname 100dvh ekrano užpildymą */
+    html, body {
+        height: 100% !important;
+        height: 100dvh !important;
+        max-height: 100% !important;
+        max-height: 100dvh !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+    }
+
+    /* Pagrindinis žaidimo rėmelis užima visą ekrano erdvę be tuščių kraštinių */
+    #app,
+    #main-app,
+    .app-card,
+    .glass-panel {
+        height: 100% !important;
+        height: 100dvh !important;
+        max-height: 100% !important;
+        max-height: 100dvh !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        border-radius: 0 !important;
+        border-width: 0 !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+    }
+
+    /* Sklandus slinkimas esant trumpam ekranui arba gulsčiam (landscape) režimui */
+    #app,
+    #main-app {
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Vidiniai flex konteineriai automatiškai užpildo vertikalią erdvę */
+    #app > .flex-1,
+    #app > div:not(.top-bar) {
+        min-height: 0;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Užtikriname, kad pradžios ir pabaigos ekranai užpildytų visą aukštį */
+    #app > div:only-child {
+        flex: 1 1 0% !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    /* Užtikriname, kad viršutinė juosta nesusitrauktų */
+    .top-bar,
+    #app > div:first-child:not(:only-child) {
+        flex-shrink: 0 !important;
+    }
+
+    /* Saugi zona (Safe area) apačioje telefonams su gestų linija (iPhone home indicator) */
+    #app,
+    #main-app,
+    #game-screen {
+        padding-bottom: max(0.5rem, env(safe-area-inset-bottom)) !important;
+    }
+}
+
+/* Peizažo (Landscape) ir žemų ekranų optimizavimas */
+@media (max-height: 520px) {
+    body {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    #app,
+    #main-app,
+    .app-card,
+    .glass-panel {
+        height: 100% !important;
+        max-height: 100% !important;
+        border-radius: 0 !important;
+        border-width: 0 !important;
+        box-shadow: none !important;
+        overflow-y: auto !important;
+    }
+
+    .top-bar {
+        padding-top: 0.25rem !important;
+        padding-bottom: 0.25rem !important;
+    }
+}
+
 /* Sistemos tamsioji tema (Dark Mode) */
 @media (prefers-color-scheme: dark) {
     :root {

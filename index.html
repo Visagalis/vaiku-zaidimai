@@ -167,14 +167,14 @@
 <body class="min-h-screen text-slate-800 flex flex-col items-center transition-colors duration-200">
 
     <!-- Menu Screen -->
-    <div id="menu" class="w-full max-w-6xl px-3 sm:px-4 py-6 sm:py-8 flex flex-col items-center">
+    <div id="menu" class="w-full max-w-6xl px-2.5 sm:px-4 py-4 sm:py-8 flex flex-col items-center">
         <div class="w-full flex justify-end -mb-1 sm:-mb-3">
-            <button onclick="openSettings()" title="Nustatymai" class="settings-btn bg-white border-2 border-b-4 border-emerald-300 text-emerald-900 font-extrabold text-xs sm:text-base px-3 py-1.5 sm:py-2 rounded-2xl shadow-sm flex items-center gap-1.5 transition-transform active:scale-95">
+            <button onclick="openSettings()" title="Nustatymai" class="settings-btn bg-white border-2 border-b-4 border-emerald-300 text-emerald-900 font-extrabold text-xs sm:text-base px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-2xl shadow-sm flex items-center gap-1.5 transition-transform active:scale-95">
                 <span class="text-base sm:text-lg leading-none">⚙️</span>
                 <span>Nustatymai</span>
             </button>
         </div>
-        <h1 class="text-2xl min-[360px]:text-[1.7rem] min-[420px]:text-3xl sm:text-4xl md:text-5xl font-black text-center mt-2 sm:mt-4 mb-4 sm:mb-6 text-white drop-shadow-md whitespace-nowrap flex items-center justify-center gap-1.5 sm:gap-3" 
+        <h1 class="text-2xl min-[360px]:text-[1.7rem] min-[420px]:text-3xl sm:text-4xl md:text-5xl font-black text-center mt-2 sm:mt-4 mb-3 sm:mb-6 text-white drop-shadow-md whitespace-nowrap flex items-center justify-center gap-1.5 sm:gap-3" 
             style="text-shadow: 3px 3px 0 #22c55e, -2px -2px 0 #22c55e, 2px -2px 0 #22c55e, -2px 2px 0 #22c55e;">
             <span class="text-xl min-[360px]:text-2xl sm:text-4xl select-none">🦉</span>
             <span>Žaidimai Vaikams</span>
@@ -182,25 +182,25 @@
         </h1>
 
         <!-- Category Filter Bar -->
-        <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 mb-6 sm:mb-8 w-full">
-            <button onclick="filterCategory('all', this)" class="cat-pill active-cat bg-white border-2 border-b-4 border-emerald-300 text-emerald-900 font-extrabold text-xs sm:text-base px-3.5 py-2 rounded-2xl shadow-sm">
+        <div class="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5 mb-4 sm:mb-8 w-full">
+            <button onclick="filterCategory('all', this)" class="cat-pill active-cat bg-white border-2 border-b-4 border-emerald-300 text-emerald-900 font-extrabold text-xs sm:text-base px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-2xl shadow-sm">
                 🌟 Visi (21)
             </button>
-            <button onclick="filterCategory('money', this)" class="cat-pill bg-white border-2 border-b-4 border-amber-300 text-amber-900 font-extrabold text-xs sm:text-base px-3.5 py-2 rounded-2xl shadow-sm">
+            <button onclick="filterCategory('money', this)" class="cat-pill bg-white border-2 border-b-4 border-amber-300 text-amber-900 font-extrabold text-xs sm:text-base px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-2xl shadow-sm">
                 💰 Pinigai (4)
             </button>
-            <button onclick="filterCategory('math', this)" class="cat-pill bg-white border-2 border-b-4 border-sky-300 text-sky-900 font-extrabold text-xs sm:text-base px-3.5 py-2 rounded-2xl shadow-sm">
+            <button onclick="filterCategory('math', this)" class="cat-pill bg-white border-2 border-b-4 border-sky-300 text-sky-900 font-extrabold text-xs sm:text-base px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-2xl shadow-sm">
                 🔢 Matematika (5)
             </button>
-            <button onclick="filterCategory('lang', this)" class="cat-pill bg-white border-2 border-b-4 border-rose-300 text-rose-900 font-extrabold text-xs sm:text-base px-3.5 py-2 rounded-2xl shadow-sm">
+            <button onclick="filterCategory('lang', this)" class="cat-pill bg-white border-2 border-b-4 border-rose-300 text-rose-900 font-extrabold text-xs sm:text-base px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-2xl shadow-sm">
                 📚 Skaitymas (7)
             </button>
-            <button onclick="filterCategory('world', this)" class="cat-pill bg-white border-2 border-b-4 border-purple-300 text-purple-900 font-extrabold text-xs sm:text-base px-3.5 py-2 rounded-2xl shadow-sm">
+            <button onclick="filterCategory('world', this)" class="cat-pill bg-white border-2 border-b-4 border-purple-300 text-purple-900 font-extrabold text-xs sm:text-base px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-2xl shadow-sm">
                 🌍 Logika (5)
             </button>
         </div>
         
-        <div id="games-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 w-full">
+        <div id="games-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 sm:gap-5 w-full">
             <!-- Card 1 -->
             <button data-cat="math" onclick="showGame('LinksmiSkaiciai-main/index.htm', '🔢 Linksmoji Matematika')" class="card-3d bg-sky-100 hover:bg-sky-50 border-sky-400 border-2 border-b-[8px] rounded-3xl p-5 flex items-center shadow-xl transform hover:-translate-y-1 text-left w-full group">
                 <div class="text-5xl sm:text-6xl mr-4 flex-shrink-0 group-hover:scale-110 transition-transform">🔢</div>
@@ -393,29 +393,29 @@
     </div>
 
     <!-- Game Container with Top Navigation Bar -->
-    <div id="game-container" class="hidden fixed inset-0 z-40 flex flex-col bg-slate-900 overflow-hidden" style="position:fixed;top:0;left:0;right:0;bottom:0;">
-        <header class="h-14 sm:h-16 bg-slate-800/95 backdrop-blur border-b border-slate-700 px-3 sm:px-6 flex items-center justify-between shrink-0 shadow-lg z-50 text-white select-none">
-            <button onclick="goBack()" class="flex items-center gap-1.5 sm:gap-2 bg-slate-700 hover:bg-slate-600 active:bg-slate-900 text-white font-extrabold text-sm sm:text-base py-2 px-3 sm:px-4 rounded-xl border border-slate-600 shadow-sm transition-all transform active:scale-95" title="Meniu">
-                <span class="text-lg sm:text-xl leading-none">🏠</span>
+    <div id="game-container" class="hidden fixed inset-0 z-40 flex flex-col bg-slate-900 overflow-hidden" style="position:fixed;top:0;left:0;right:0;bottom:0;height:100dvh;max-height:100dvh;">
+        <header class="h-12 sm:h-14 bg-slate-800/95 backdrop-blur border-b border-slate-700 px-2.5 sm:px-6 flex items-center justify-between shrink-0 shadow-lg z-50 text-white select-none">
+            <button onclick="goBack()" class="flex items-center gap-1.5 sm:gap-2 bg-slate-700 hover:bg-slate-600 active:bg-slate-900 text-white font-extrabold text-xs sm:text-base py-1.5 px-2.5 sm:py-2 sm:px-4 rounded-xl border border-slate-600 shadow-sm transition-all transform active:scale-95" title="Meniu">
+                <span class="text-base sm:text-xl leading-none">🏠</span>
                 <span class="hidden sm:inline">Meniu</span>
             </button>
 
-            <div id="current-game-title" class="text-sm sm:text-lg font-black tracking-wide text-amber-300 truncate max-w-[45%] text-center">
+            <div id="current-game-title" class="text-xs min-[360px]:text-sm sm:text-base font-black tracking-wide text-amber-300 truncate max-w-[48%] text-center">
                 Žaidimas
             </div>
 
-            <div class="flex items-center gap-1.5 sm:gap-2">
-                <button onclick="openSettings()" title="Nustatymai" class="flex items-center bg-slate-700 hover:bg-slate-600 active:bg-slate-900 text-slate-200 font-bold text-xs sm:text-sm py-2 px-3 rounded-xl border border-slate-600 shadow-sm transition-all transform active:scale-95">
-                    <span class="text-base leading-none">⚙️</span>
+            <div class="flex items-center gap-1 sm:gap-1.5">
+                <button onclick="openSettings()" title="Nustatymai" class="flex items-center bg-slate-700 hover:bg-slate-600 active:bg-slate-900 text-slate-200 font-bold text-xs sm:text-sm py-1.5 px-2.5 sm:py-2 sm:px-3 rounded-xl border border-slate-600 shadow-sm transition-all transform active:scale-95">
+                    <span class="text-sm sm:text-base leading-none">⚙️</span>
                 </button>
-                <button onclick="reloadGame()" title="Pradėti iš naujo" class="flex items-center gap-1.5 bg-slate-700 hover:bg-slate-600 active:bg-slate-900 text-slate-200 font-bold text-xs sm:text-sm py-2 px-3 rounded-xl border border-slate-600 shadow-sm transition-all transform active:scale-95">
-                    <span class="text-base leading-none">🔄</span>
+                <button onclick="reloadGame()" title="Pradėti iš naujo" class="flex items-center gap-1 bg-slate-700 hover:bg-slate-600 active:bg-slate-900 text-slate-200 font-bold text-xs sm:text-sm py-1.5 px-2.5 sm:py-2 sm:px-3 rounded-xl border border-slate-600 shadow-sm transition-all transform active:scale-95">
+                    <span class="text-sm sm:text-base leading-none">🔄</span>
                     <span class="hidden sm:inline">Iš naujo</span>
                 </button>
             </div>
         </header>
 
-        <div class="flex-1 w-full h-full relative overflow-hidden bg-white">
+        <div class="flex-1 w-full h-full relative overflow-hidden bg-slate-900">
             <iframe id="game-frame" src="" allow="autoplay" class="w-full h-full border-none block" style="width:100%;height:100%;border:none;"></iframe>
         </div>
     </div>
