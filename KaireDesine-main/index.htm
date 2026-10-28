@@ -554,7 +554,7 @@
                 btn.classList.remove('bg-fuchsia-50', 'text-fuchsia-900', 'border-fuchsia-300');
                 btn.classList.add('bg-green-500', 'text-white', 'border-green-600', 'shadow-[0_5px_0_#15803d]', 'bounce-anim');
 
-                feedback.innerHTML = _col("Puiku! Teisingai! 🎉");
+                feedback.innerHTML = `<span>${_col("Puiku! Teisingai! 🎉")}</span>`;
                 feedback.className = "h-6 sm:h-7 flex items-center justify-center text-base sm:text-lg font-black my-1 text-green-600 opacity-100";
 
                 setTimeout(() => {
@@ -570,7 +570,7 @@
                 btn.classList.add('bg-red-100', 'text-red-400', 'line-through', 'border-red-300', 'opacity-60', 'shake-anim');
                 btn.disabled = true;
 
-                feedback.innerHTML = _col("Bandyk dar kartą! 🤔");
+                feedback.innerHTML = `<span>${_col("Bandyk dar kartą! 🤔")}</span>`;
                 feedback.className = "h-6 sm:h-7 flex items-center justify-center text-base sm:text-lg font-black my-1 text-red-500 opacity-100";
 
                 setTimeout(() => {
@@ -684,7 +684,7 @@
                     void gridEl.offsetWidth;
                     gridEl.classList.add('shake-anim');
                 }
-                feedback.innerHTML = _col(hitObstacle ? 'Ten kliūtis! Pasirink kitą kryptį! 🌳' : 'Ten eiti negalima! Pasirink kitą kryptį! 🚧');
+                feedback.innerHTML = `<span>${_col(hitObstacle ? 'Ten kliūtis! Pasirink kitą kryptį! 🌳' : 'Ten eiti negalima! Pasirink kitą kryptį! 🚧')}</span>`;
                 feedback.className = 'h-6 flex items-center justify-center text-sm sm:text-base font-black text-red-500 opacity-100';
                 return;
             }

@@ -389,7 +389,7 @@
                     state.score++;
                     state.streak++;
                 }
-                feedback.innerHTML = `${_col('Puiku! Grąža atiduota teisingai!')} 🎉`;
+                feedback.innerHTML = `<span>${_col('Puiku! Grąža atiduota teisingai!')} 🎉</span>`;
                 feedback.className = "h-6 flex items-center justify-center font-black text-sm sm:text-lg text-green-500 opacity-100";
                 tray.classList.add('bounce');
 
@@ -408,7 +408,7 @@
                 let msg = currentSum < state.targetChange
                     ? 'Pirkėjui dar trūksta grąžos!'
                     : 'Per daug grąžos! Paspausk ant monetos, kad nuimtum.';
-                feedback.innerHTML = `${_col(msg)} 🤔`;
+                feedback.innerHTML = `<span>${_col(msg)} 🤔</span>`;
                 feedback.className = "h-6 flex items-center justify-center font-black text-xs sm:text-base text-red-500 opacity-100";
                 tray.classList.remove('shake');
                 void tray.offsetWidth;
@@ -458,7 +458,7 @@
                     state.streak++;
                 }
                 btn.className = "py-3.5 sm:py-4 bg-green-500 text-white rounded-2xl font-black text-xl sm:text-2xl shadow-md border-b-4 border-green-700 bounce";
-                feedback.innerHTML = `${_col('Teisingai! Puikiai suskaičiavai grąžą!')} 🎉`;
+                feedback.innerHTML = `<span>${_col('Teisingai! Puikiai suskaičiavai grąžą!')} 🎉</span>`;
                 feedback.className = "h-7 flex items-center justify-center font-black text-sm sm:text-lg text-green-500 opacity-100";
 
                 setTimeout(() => {
@@ -475,7 +475,7 @@
                 playSound('wrong');
                 btn.disabled = true;
                 btn.className = "py-3.5 sm:py-4 bg-red-100 text-red-400 border-red-200 border-2 rounded-2xl font-bold text-xl sm:text-2xl line-through opacity-50 shake";
-                feedback.innerHTML = `${_col('Bandyk dar kartą!')} 🤔`;
+                feedback.innerHTML = `<span>${_col('Bandyk dar kartą!')} 🤔</span>`;
                 feedback.className = "h-7 flex items-center justify-center font-black text-sm sm:text-lg text-red-500 opacity-100";
                 box.classList.remove('shake');
                 void box.offsetWidth;

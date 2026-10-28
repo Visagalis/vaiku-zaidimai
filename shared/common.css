@@ -207,3 +207,14 @@ button.coin:active, button.bill:active {
         color: #f8fafc !important;
     }
 }
+
+/* Atsiliepimo (feedback) pranešimai — užtikrina taisyklingus tarpus tarp žodžių, skiemenų ir jaustukų flex konteineryje */
+#feedback {
+    text-align: center;
+}
+#feedback > span {
+    display: inline-block;
+    max-width: 100%;
+    line-height: inherit;
+}
+

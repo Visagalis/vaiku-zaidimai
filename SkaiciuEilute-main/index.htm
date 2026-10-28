@@ -438,7 +438,7 @@
                     missingCarriage.textContent = val;
                     missingCarriage.className = "carriage bg-green-500 border-green-700 text-white bounce";
                 }
-                feedback.innerHTML = `${_col('Teisingai! Traukinukas važiuoja toliau!')} 🚂🎉`;
+                feedback.innerHTML = `<span>${_col('Teisingai! Traukinukas važiuoja toliau!')} 🚂🎉</span>`;
                 feedback.className = "h-6 sm:h-8 flex items-center justify-center font-black text-base sm:text-xl text-green-500 opacity-100";
 
                 setTimeout(() => {
@@ -455,7 +455,7 @@
                 playSound('wrong');
                 btn.disabled = true;
                 btn.className = "py-3 sm:py-4 bg-red-100 text-red-400 border-red-200 border-2 rounded-2xl font-bold text-2xl sm:text-4xl line-through opacity-60 cursor-not-allowed shake";
-                feedback.innerHTML = `${_col('Bandyk dar kartą!')} 🤔`;
+                feedback.innerHTML = `<span>${_col('Bandyk dar kartą!')} 🤔</span>`;
                 feedback.className = "h-6 sm:h-8 flex items-center justify-center font-black text-base sm:text-xl text-red-500 opacity-100";
                 trainContainer.classList.remove('shake');
                 void trainContainer.offsetWidth;
@@ -552,7 +552,7 @@
                     clickedPad.classList.add('ring-4', 'ring-green-400', 'bounce');
                 }
 
-                feedback.innerHTML = `${_col('Kva kva! Puikus šuolis ant')} ${padNum}! 🐸🎉`;
+                feedback.innerHTML = `<span>${_col('Kva kva! Puikus šuolis ant')} ${padNum}! 🐸🎉</span>`;
                 feedback.className = "h-7 sm:h-8 flex items-center justify-center font-black text-base sm:text-xl text-green-500 opacity-100";
 
                 setTimeout(() => {
@@ -573,7 +573,7 @@
                 const hint = state.frogDelta > 0
                     ? `Skaičiuok nuo ${state.frogStart} į dešinę po vieną lapelį!`
                     : `Skaičiuok nuo ${state.frogStart} į kairę atgal!`;
-                feedback.innerHTML = `${_col(hint)} 🤔`;
+                feedback.innerHTML = `<span>${_col(hint)} 🤔</span>`;
                 feedback.className = "h-7 sm:h-8 flex items-center justify-center font-black text-xs sm:text-base text-red-500 opacity-100";
                 pond.classList.remove('shake');
                 void pond.offsetWidth;
@@ -719,7 +719,7 @@
                     tileBtn.disabled = true;
                     tileBtn.className = "py-3 sm:py-3.5 bg-red-100 text-red-400 border-red-200 border-2 rounded-2xl font-bold text-2xl sm:text-3xl line-through opacity-50 cursor-not-allowed shake";
                 }
-                feedback.innerHTML = `${_col('Pagalvok: kas eina prieš ir po')} ${state.centerNum}? 🤔`;
+                feedback.innerHTML = `<span>${_col('Pagalvok: kas eina prieš ir po')} ${state.centerNum}? 🤔</span>`;
                 feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-xs sm:text-base text-red-500 opacity-100";
                 housesContainer.classList.remove('shake');
                 void housesContainer.offsetWidth;
@@ -735,7 +735,7 @@
                     state.score++;
                     state.streak++;
                 }
-                feedback.innerHTML = `${_col('Puiku! Abu kaimynai surasti!')} 🏠🎉`;
+                feedback.innerHTML = `<span>${_col('Puiku! Abu kaimynai surasti!')} 🏠🎉</span>`;
                 feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-base sm:text-xl text-green-500 opacity-100";
 
                 setTimeout(() => {

@@ -515,7 +515,7 @@
                     state.score++;
                     state.streak++;
                 }
-                feedback.innerHTML = `${_col('Puiku! Laikrodis nustatytas tiksliai!')} 🎉`;
+                feedback.innerHTML = `<span>${_col('Puiku! Laikrodis nustatytas tiksliai!')} 🎉</span>`;
                 feedback.className = "h-5 sm:h-6 flex items-center justify-center font-black text-sm sm:text-lg text-green-500 opacity-100";
                 clockWrap.classList.add('bounce');
 
@@ -534,7 +534,7 @@
                 let hint = 'Patikrink valandų ir minučių rodykles!';
                 if (!isHourMatch && isMinMatch) hint = 'Minutės teisingos, bet patikrink valandų rodyklę!';
                 else if (isHourMatch && !isMinMatch) hint = 'Valandos teisingos, bet patikrink minučių rodyklę!';
-                feedback.innerHTML = `${_col(hint)} 🤔`;
+                feedback.innerHTML = `<span>${_col(hint)} 🤔</span>`;
                 feedback.className = "h-5 sm:h-6 flex items-center justify-center font-black text-xs sm:text-sm text-red-500 opacity-100";
                 clockWrap.classList.remove('shake');
                 void clockWrap.offsetWidth;
@@ -556,7 +556,7 @@
                     state.streak++;
                 }
                 btn.className = "py-2.5 sm:py-3.5 bg-green-500 text-white rounded-2xl font-black text-xl sm:text-3xl shadow-md border-b-4 border-green-700 transform scale-105 bounce";
-                feedback.innerHTML = `${_col('Teisingai! Šaunuolis!')} 🎉`;
+                feedback.innerHTML = `<span>${_col('Teisingai! Šaunuolis!')} 🎉</span>`;
                 feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-base sm:text-xl text-green-500 opacity-100";
 
                 setTimeout(() => {
@@ -573,7 +573,7 @@
                 playSound('wrong');
                 btn.disabled = true;
                 btn.className = "py-2.5 sm:py-3.5 bg-red-100 text-red-400 border-red-200 border-2 rounded-2xl font-bold text-xl sm:text-3xl shadow-sm line-through cursor-not-allowed opacity-60 shake";
-                feedback.innerHTML = `${_col('Bandyk dar kartą!')} 🤔`;
+                feedback.innerHTML = `<span>${_col('Bandyk dar kartą!')} 🤔</span>`;
                 feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-base sm:text-xl text-red-500 opacity-100";
                 clockWrap.classList.remove('shake');
                 void clockWrap.offsetWidth;

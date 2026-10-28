@@ -314,7 +314,7 @@
                     state.streak++;
                 }
                 if (btn) btn.className = "py-3 sm:py-4 px-2 bg-green-500 text-white rounded-2xl font-black text-sm sm:text-lg shadow-md border-b-4 border-green-700 bounce";
-                feedback.innerHTML = `${_col('Teisingai!')} (${formatMoneyCents(leftSum)} ir ${formatMoneyCents(rightSum)}) 🎉`;
+                feedback.innerHTML = `<span>${_col('Teisingai!')} (${formatMoneyCents(leftSum)} ir ${formatMoneyCents(rightSum)}) 🎉</span>`;
                 feedback.className = "h-7 flex items-center justify-center font-black text-sm sm:text-lg text-green-500 opacity-100";
 
                 setTimeout(() => {
@@ -329,7 +329,7 @@
                     btn.disabled = true;
                     btn.classList.add('opacity-40', 'line-through');
                 }
-                feedback.innerHTML = `${_col('Suskaičiuok abi pinigines dar kartą!')} 🤔`;
+                feedback.innerHTML = `<span>${_col('Suskaičiuok abi pinigines dar kartą!')} 🤔</span>`;
                 feedback.className = "h-7 flex items-center justify-center font-black text-sm sm:text-lg text-red-500 opacity-100";
                 area.classList.remove('shake');
                 void area.offsetWidth;
@@ -432,7 +432,7 @@
                     state.score++;
                     state.streak++;
                 }
-                feedback.innerHTML = `${_col('Puikiai iškeitei pinigą!')} 🎉`;
+                feedback.innerHTML = `<span>${_col('Puikiai iškeitei pinigą!')} 🎉</span>`;
                 feedback.className = "h-6 flex items-center justify-center font-black text-sm sm:text-lg text-green-500 opacity-100";
                 tray.classList.add('bounce');
 
@@ -445,7 +445,7 @@
                 state.streak = 0;
                 playSound('wrong');
                 const msg = currentSum < targetSum ? 'Dar trūksta smulkių pinigėlių!' : 'Per daug! Paspausk ant monetos, kad nuimtum.';
-                feedback.innerHTML = `${_col(msg)} 🤔`;
+                feedback.innerHTML = `<span>${_col(msg)} 🤔</span>`;
                 feedback.className = "h-6 flex items-center justify-center font-black text-xs sm:text-base text-red-500 opacity-100";
                 tray.classList.remove('shake');
                 void tray.offsetWidth;
@@ -513,7 +513,7 @@
                     state.streak++;
                 }
                 btn.classList.add('bounce');
-                feedback.innerHTML = `${_col('Teisingai! Taupyklėje yra')} ${formatMoneyCents(piggySum)}! 🎉`;
+                feedback.innerHTML = `<span>${_col('Teisingai! Taupyklėje yra')} ${formatMoneyCents(piggySum)}! 🎉</span>`;
                 feedback.className = "h-6 flex items-center justify-center font-black text-sm sm:text-lg text-green-500 opacity-100";
 
                 setTimeout(() => {
@@ -526,7 +526,7 @@
                 playSound('wrong');
                 btn.disabled = true;
                 btn.classList.add('opacity-40');
-                feedback.innerHTML = `${_col('Suskaičiuok dar kartą: taupyklėje yra')} ${formatMoneyCents(piggySum)}! 🤔`;
+                feedback.innerHTML = `<span>${_col('Suskaičiuok dar kartą: taupyklėje yra')} ${formatMoneyCents(piggySum)}! 🤔</span>`;
                 feedback.className = "h-6 flex items-center justify-center font-black text-xs sm:text-base text-red-500 opacity-100";
                 box.classList.remove('shake');
                 void box.offsetWidth;

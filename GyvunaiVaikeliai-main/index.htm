@@ -346,14 +346,14 @@
                 const feedback = document.getElementById('feedback');
                 if (state.matchedIds.length === 3) {
                     state.waiting = true;
-                    feedback.innerHTML = _col("Puiku! Visos poros sujungtos!") + " 🎉";
+                    feedback.innerHTML = `<span>${_col("Puiku! Visos poros sujungtos!")} 🎉</span>`;
                     feedback.className = "h-7 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black mt-2 text-green-600 opacity-100";
                     setTimeout(() => {
                         state.currentIndex++;
                         prepareMatchingBoard();
                     }, 1100);
                 } else {
-                    feedback.innerHTML = _col("Teisinga pora!") + " 👍";
+                    feedback.innerHTML = `<span>${_col("Teisinga pora!")} 👍</span>`;
                     feedback.className = "h-7 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black mt-2 text-green-600 opacity-100";
                 }
             } else {
@@ -370,7 +370,7 @@
 
                 const feedback = document.getElementById('feedback');
                 if (feedback) {
-                    feedback.innerHTML = _col("Ši pora netinka, bandyk dar kartą!") + " 🤔";
+                    feedback.innerHTML = `<span>${_col("Ši pora netinka, bandyk dar kartą!")} 🤔</span>`;
                     feedback.className = "h-7 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black mt-2 text-red-500 opacity-100";
                 }
 
@@ -450,7 +450,7 @@
                 btn.classList.remove('bg-amber-50', 'text-amber-950', 'border-amber-300');
                 btn.classList.add('bg-green-500', 'text-white', 'border-green-600', 'shadow-[0_5px_0_#15803d]', 'bounce-anim');
 
-                feedback.innerHTML = _col("Teisingai! Puiku!") + " 🎉";
+                feedback.innerHTML = `<span>${_col("Teisingai! Puiku!")} 🎉</span>`;
                 feedback.className = "h-6 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black my-1 text-green-600 opacity-100";
 
                 setTimeout(() => {
@@ -466,7 +466,7 @@
                 btn.classList.add('bg-red-100', 'text-red-400', 'line-through', 'border-red-300', 'opacity-60', 'shake-anim');
                 btn.disabled = true;
 
-                feedback.innerHTML = _col("Bandyk dar kartą!") + " 🤔";
+                feedback.innerHTML = `<span>${_col("Bandyk dar kartą!")} 🤔</span>`;
                 feedback.className = "h-6 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black my-1 text-red-500 opacity-100";
 
                 setTimeout(() => {

@@ -461,7 +461,7 @@
                     renderTrainQuestion();
                     const feedback = document.getElementById('feedback');
                     if (feedback) {
-                        feedback.innerHTML = _col("Šaunu! Traukinukas pajuda!") + " 🚂💨";
+                        feedback.innerHTML = `<span>${_col("Šaunu! Traukinukas pajuda!")} 🚂💨</span>`;
                         feedback.className = "h-6 sm:h-8 flex items-center justify-center text-sm sm:text-lg font-black my-1 text-green-600 opacity-100";
                     }
                     setTimeout(() => {
@@ -473,7 +473,7 @@
                     renderTrainQuestion();
                     const feedback = document.getElementById('feedback');
                     if (feedback) {
-                        feedback.innerHTML = _col("Puiku! Kas eina toliau?") + " 👍";
+                        feedback.innerHTML = `<span>${_col("Puiku! Kas eina toliau?")} 👍</span>`;
                         feedback.className = "h-6 sm:h-8 flex items-center justify-center text-sm sm:text-lg font-black my-1 text-green-600 opacity-100";
                     }
                 }
@@ -490,7 +490,7 @@
                     }, 450);
                 }
                 if (feedback) {
-                    feedback.innerHTML = _col("Šis vagonėlis eina vėliau! Bandyk kitą!") + " 🤔";
+                    feedback.innerHTML = `<span>${_col("Šis vagonėlis eina vėliau! Bandyk kitą!")} 🤔</span>`;
                     feedback.className = "h-6 sm:h-8 flex items-center justify-center text-sm sm:text-lg font-black my-1 text-red-500 opacity-100";
                 }
             }
@@ -560,7 +560,7 @@
                 btn.classList.remove('bg-cyan-50', 'text-cyan-950', 'border-cyan-300');
                 btn.classList.add('bg-green-500', 'text-white', 'border-green-600', 'shadow-[0_5px_0_#15803d]', 'bounce-anim');
 
-                feedback.innerHTML = _col("Puiku! Teisingai!") + " 🎉";
+                feedback.innerHTML = `<span>${_col("Puiku! Teisingai!")} 🎉</span>`;
                 feedback.className = "h-6 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black my-1 text-green-600 opacity-100";
 
                 setTimeout(() => {
@@ -576,7 +576,7 @@
                 btn.classList.add('bg-red-100', 'text-red-400', 'line-through', 'border-red-300', 'opacity-60', 'shake-anim');
                 btn.disabled = true;
 
-                feedback.innerHTML = _col("Bandyk dar kartą!") + " 🤔";
+                feedback.innerHTML = `<span>${_col("Bandyk dar kartą!")} 🤔</span>`;
                 feedback.className = "h-6 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black my-1 text-red-500 opacity-100";
 
                 setTimeout(() => {

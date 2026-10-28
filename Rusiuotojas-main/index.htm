@@ -320,7 +320,7 @@
                     renderMeadow();
                     const fb = document.getElementById('feedback');
                     if (fb) {
-                        fb.innerHTML = _col("Puiku! Dar viena vieta išvalyta!") + " 🌸";
+                        fb.innerHTML = `<span>${_col("Puiku! Dar viena vieta išvalyta!")} 🌸</span>`;
                         fb.className = "h-5 sm:h-7 flex items-center justify-center text-sm sm:text-base font-black text-green-600 opacity-100";
                     }
                 } else {
@@ -328,7 +328,7 @@
                     renderMeadow();
                     const fb = document.getElementById('feedback');
                     if (fb) {
-                        fb.innerHTML = _col("Valio! Visa miško pievelė švari!") + " 🎉🌳";
+                        fb.innerHTML = `<span>${_col("Valio! Visa miško pievelė švari!")} 🎉🌳</span>`;
                         fb.className = "h-5 sm:h-7 flex items-center justify-center text-sm sm:text-base font-black text-green-600 opacity-100";
                     }
                     setTimeout(() => {
@@ -347,7 +347,7 @@
                     }, 400);
                 }
                 if (feedback) {
-                    feedback.innerHTML = _col("Bandyk kitą konteinerį!") + " 🤔";
+                    feedback.innerHTML = `<span>${_col("Bandyk kitą konteinerį!")} 🤔</span>`;
                     feedback.className = "h-5 sm:h-7 flex items-center justify-center text-sm sm:text-base font-black text-red-500 opacity-100";
                 }
             }
@@ -431,7 +431,7 @@
                 binBtn.classList.add('bounce-anim');
                 itemCard.classList.add('scale-75', 'opacity-0', 'transition-all', 'duration-300');
 
-                feedback.innerHTML = _col("Puiku! Švaru ir teisinga!") + " 🌍";
+                feedback.innerHTML = `<span>${_col("Puiku! Švaru ir teisinga!")} 🌍</span>`;
                 feedback.className = "h-6 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black my-1 text-green-600 opacity-100";
 
                 setTimeout(() => {
@@ -446,7 +446,7 @@
                 binBtn.classList.add('shake-anim', 'opacity-40');
                 binBtn.disabled = true;
 
-                feedback.innerHTML = _col("Bandyk kitą konteinerį!") + " 🤔";
+                feedback.innerHTML = `<span>${_col("Bandyk kitą konteinerį!")} 🤔</span>`;
                 feedback.className = "h-6 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black my-1 text-red-500 opacity-100";
 
                 setTimeout(() => {

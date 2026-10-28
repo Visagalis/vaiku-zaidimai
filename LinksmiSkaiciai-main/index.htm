@@ -430,7 +430,7 @@
                     btn.className = "py-2.5 sm:py-3.5 bg-emerald-500 text-white rounded-2xl font-black text-2xl sm:text-3xl shadow-md border-b-4 border-emerald-700 transform scale-105 bounce";
                 }
                 const praise = getRandomElement(PRAISE_WORDS);
-                feedback.innerHTML = `${_col(praise)} 🌟`;
+                feedback.innerHTML = `<span>${_col(praise)} 🌟</span>`;
                 feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-base sm:text-xl text-emerald-500 opacity-100";
                 fireConfetti();
                 setTimeout(advanceQuestion, 1200);
@@ -442,7 +442,7 @@
                     btn.disabled = true;
                     btn.className = "py-2.5 sm:py-3.5 bg-red-100 dark:bg-red-950 text-red-400 border-red-300 border-2 rounded-2xl font-bold text-2xl sm:text-3xl line-through opacity-50 shake cursor-not-allowed";
                 }
-                feedback.innerHTML = `${_col('Bandyk dar kartą! Paspausk daiktus ir suskaičiuok.')} 🤔`;
+                feedback.innerHTML = `<span>${_col('Bandyk dar kartą! Paspausk daiktus ir suskaičiuok.')} 🤔</span>`;
                 feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-xs sm:text-base text-rose-500 opacity-100";
             }
         }
@@ -620,7 +620,7 @@
                     state.score++;
                     state.streak++;
                 }
-                feedback.innerHTML = `${_col('Puiku! Svarstyklės išlygintos!')} 🎉`;
+                feedback.innerHTML = `<span>${_col('Puiku! Svarstyklės išlygintos!')} 🎉</span>`;
                 feedback.className = "h-6 flex items-center justify-center font-black text-base sm:text-xl text-emerald-500 opacity-100";
                 if (scaleArea) scaleArea.classList.add('bounce');
                 fireConfetti();
@@ -632,7 +632,7 @@
                 const hint = rightTotal < state.leftTotal
                     ? 'Dešinėje pusėje dar trūksta svorio!'
                     : 'Dešinėje pusėje per daug svorio!';
-                feedback.innerHTML = `${_col(hint)} 🤔`;
+                feedback.innerHTML = `<span>${_col(hint)} 🤔</span>`;
                 feedback.className = "h-6 flex items-center justify-center font-black text-xs sm:text-base text-rose-500 opacity-100";
                 if (scaleArea) {
                     scaleArea.classList.remove('shake');
@@ -789,7 +789,7 @@
                     btn.classList.add('shake', 'opacity-50');
                 }
                 if (feedback) {
-                    feedback.innerHTML = `${_col('Oho!')} ${b.label} = ${b.value}. ${_col('Ieškok skaičiaus')} ${state.balloonTarget}! 🤔`;
+                    feedback.innerHTML = `<span>${_col('Oho!')} ${b.label} = ${b.value}. ${_col('Ieškok skaičiaus')} ${state.balloonTarget}! 🤔</span>`;
                     feedback.className = "h-7 flex items-center justify-center font-black text-xs sm:text-base text-rose-500 opacity-100";
                 }
             }

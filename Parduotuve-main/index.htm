@@ -492,7 +492,7 @@
                     state.score++;
                     state.streak++;
                 }
-                feedback.innerHTML = `${_col('Puikus pirkinys! Sumokėjai tiksliai!')} 🎉`;
+                feedback.innerHTML = `<span>${_col('Puikus pirkinys! Sumokėjai tiksliai!')} 🎉</span>`;
                 feedback.className = "h-6 flex items-center justify-center font-black text-sm sm:text-lg text-green-500 opacity-100";
                 tray.classList.add('bounce');
 
@@ -511,7 +511,7 @@
                 let msg = currentSum < state.targetCents
                     ? 'Dar trūksta pinigėlių!'
                     : 'Padėjai per daug! Paspausk ant monetos, kad nuimtum.';
-                feedback.innerHTML = `${_col(msg)} 🤔`;
+                feedback.innerHTML = `<span>${_col(msg)} 🤔</span>`;
                 feedback.className = "h-6 flex items-center justify-center font-black text-xs sm:text-base text-red-500 opacity-100";
                 tray.classList.remove('shake');
                 void tray.offsetWidth;
@@ -569,7 +569,7 @@
                     state.streak++;
                 }
                 btn.className = "p-2.5 sm:p-3.5 rounded-2xl bg-green-500 text-white border-b-4 border-green-700 flex flex-col items-center justify-center gap-1 bounce";
-                feedback.innerHTML = `${_col('Teisingai! Pinigų užtenka lygiai šiai prekei!')} 🎉`;
+                feedback.innerHTML = `<span>${_col('Teisingai! Pinigų užtenka lygiai šiai prekei!')} 🎉</span>`;
                 feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-sm sm:text-lg text-green-500 opacity-100";
 
                 setTimeout(() => {
@@ -586,7 +586,7 @@
                 playSound('wrong');
                 btn.disabled = true;
                 btn.classList.add('opacity-40', 'cursor-not-allowed', 'shake');
-                feedback.innerHTML = `${_col('Suskaičiuok pinigus dar kartą!')} 🤔`;
+                feedback.innerHTML = `<span>${_col('Suskaičiuok pinigus dar kartą!')} 🤔</span>`;
                 feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-sm sm:text-lg text-red-500 opacity-100";
                 walletEl.classList.remove('shake');
                 void walletEl.offsetWidth;

@@ -419,7 +419,7 @@
                 }
                 if (center) center.innerHTML = renderCrocMouth();
                 const praise = getRandomElement(PRAISE_WORDS);
-                feedback.innerHTML = `${_col(praise)} 🎉`;
+                feedback.innerHTML = `<span>${_col(praise)} 🎉</span>`;
                 feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-base sm:text-xl text-emerald-500 opacity-100";
                 setTimeout(advanceQuestion, 1200);
             } else {
@@ -430,7 +430,7 @@
                     btn.disabled = true;
                     btn.classList.add('opacity-40', 'cursor-not-allowed', 'shake');
                 }
-                feedback.innerHTML = `${_col('Bandyk dar kartą! Kuris skaičius didesnis?')} 🤔`;
+                feedback.innerHTML = `<span>${_col('Bandyk dar kartą! Kuris skaičius didesnis?')} 🤔</span>`;
                 feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-xs sm:text-base text-rose-500 opacity-100";
                 if (arena) {
                     arena.classList.remove('shake');
@@ -576,7 +576,7 @@
                 if (l > r && leftCard) leftCard.style.transform = 'translateY(6px)';
                 if (r > l && rightCard) rightCard.style.transform = 'translateY(6px)';
 
-                feedback.innerHTML = `${_col('Teisingai!')} (${l} ${ans} ${r}) 🎉`;
+                feedback.innerHTML = `<span>${_col('Teisingai!')} (${l} ${ans} ${r}) 🎉</span>`;
                 feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-base sm:text-xl text-emerald-500 opacity-100";
                 setTimeout(advanceQuestion, 1200);
             } else {
@@ -587,7 +587,7 @@
                     btn.disabled = true;
                     btn.classList.add('opacity-40', 'cursor-not-allowed', 'shake');
                 }
-                feedback.innerHTML = `${_col('Suskaičiuok dar kartelį!')} 🤔`;
+                feedback.innerHTML = `<span>${_col('Suskaičiuok dar kartelį!')} 🤔</span>`;
                 feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-xs sm:text-base text-rose-500 opacity-100";
                 if (arena) {
                     arena.classList.remove('shake');
@@ -661,7 +661,7 @@
             if (state.stairs.some(s => s === null)) {
                 playSound('wrong');
                 if (feedback) {
-                    feedback.innerHTML = `${_col('Užpildyk visus 4 laiptelius!')} 🐸`;
+                    feedback.innerHTML = `<span>${_col('Užpildyk visus 4 laiptelius!')} 🐸</span>`;
                     feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-xs sm:text-base text-amber-500 opacity-100";
                 }
                 return;
@@ -682,7 +682,7 @@
                 renderStairsScreen();
                 const newFb = document.getElementById('feedback');
                 if (newFb) {
-                    newFb.innerHTML = `${_col('Puiku! Varlytė užšoko iki vėliavėlės!')} 🐸🚩`;
+                    newFb.innerHTML = `<span>${_col('Puiku! Varlytė užšoko iki vėliavėlės!')} 🐸🚩</span>`;
                     newFb.className = "h-6 sm:h-7 flex items-center justify-center font-black text-sm sm:text-lg text-emerald-500 opacity-100";
                 }
                 setTimeout(advanceQuestion, 1300);
@@ -697,7 +697,7 @@
                     arena.classList.add('shake');
                 }
                 if (feedback) {
-                    feedback.innerHTML = `${_col('Ne iš eilės! Paspausk ant skaičiaus laiptelyje, kad jį pakeistum.')} 🤔`;
+                    feedback.innerHTML = `<span>${_col('Ne iš eilės! Paspausk ant skaičiaus laiptelyje, kad jį pakeistum.')} 🤔</span>`;
                     feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-xs sm:text-sm text-rose-500 opacity-100";
                 }
             }
