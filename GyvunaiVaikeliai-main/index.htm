@@ -165,18 +165,20 @@
             appEl.innerHTML = `
                 <div class="p-5 sm:p-8 flex flex-col items-center justify-center text-center">
                     <div class="text-5xl sm:text-7xl mb-2 animate-bounce">🐾</div>
-                    <h1 class="text-2xl sm:text-4xl font-black text-amber-800 mb-1 sm:mb-2">${_col('Gyvūnai ir Vaikeliai')}</h1>
-                    <p class="text-base sm:text-lg font-bold text-slate-600 mb-5 sm:mb-6">${_col('Mokykis gyvūnų, jauniklių, namų ir ką jie mėgsta!')}</p>
+                    <h1 class="text-2xl sm:text-4xl font-black text-amber-800 mb-4 sm:mb-5">${_col('Gyvūnai ir Vaikeliai')}</h1>
                     
-                    <div class="flex flex-col gap-3 w-full max-w-md">
-                        <button onclick="startGame('babies')" class="btn-3d py-3 sm:py-3.5 px-5 bg-amber-100 hover:bg-amber-200 border-2 border-amber-400 rounded-2xl text-lg sm:text-xl font-black shadow-[0_5px_0_#d97706] active:shadow-[0_0px_0_#d97706] transition-all">
-                            🐮 ${_col('Mamos ir Mažyliai')}
+                    <div class="flex flex-col gap-3 w-full max-w-sm">
+                        <button onclick="startGame('babies')" class="btn-3d py-3 sm:py-3.5 px-5 bg-amber-100 hover:bg-amber-200 border-2 border-amber-400 rounded-2xl text-lg sm:text-xl font-black shadow-[0_5px_0_#d97706] active:shadow-[0_0px_0_#d97706] transition-all flex items-center justify-center gap-2.5">
+                            <span class="text-2xl">🐮</span>
+                            <span>${_col('Mažyliai')}</span>
                         </button>
-                        <button onclick="startGame('homes')" class="btn-3d py-3 sm:py-3.5 px-5 bg-emerald-100 hover:bg-emerald-200 border-2 border-emerald-400 rounded-2xl text-lg sm:text-xl font-black shadow-[0_5px_0_#059669] active:shadow-[0_0px_0_#059669] transition-all">
-                            🏡 ${_col('Kas kur gyvena?')}
+                        <button onclick="startGame('homes')" class="btn-3d py-3 sm:py-3.5 px-5 bg-emerald-100 hover:bg-emerald-200 border-2 border-emerald-400 rounded-2xl text-lg sm:text-xl font-black shadow-[0_5px_0_#059669] active:shadow-[0_0px_0_#059669] transition-all flex items-center justify-center gap-2.5">
+                            <span class="text-2xl">🏡</span>
+                            <span>${_col('Namai')}</span>
                         </button>
-                        <button onclick="startGame('matching')" class="btn-3d py-3 sm:py-3.5 px-5 bg-orange-100 hover:bg-orange-200 border-2 border-orange-400 rounded-2xl text-lg sm:text-xl font-black shadow-[0_5px_0_#ea580c] active:shadow-[0_0px_0_#ea580c] transition-all">
-                            🥕 ${_col('Ką mėgsta gyvūnai? (Sujunk poras)')}
+                        <button onclick="startGame('matching')" class="btn-3d py-3 sm:py-3.5 px-5 bg-orange-100 hover:bg-orange-200 border-2 border-orange-400 rounded-2xl text-lg sm:text-xl font-black shadow-[0_5px_0_#ea580c] active:shadow-[0_0px_0_#ea580c] transition-all flex items-center justify-center gap-2.5">
+                            <span class="text-2xl">🥕</span>
+                            <span>${_col('Ką valgo?')}</span>
                         </button>
                     </div>
                 </div>
@@ -196,12 +198,12 @@
                 const shuffledHomes = shuffle(HOMES_PAIRS);
 
                 state.boards = [
-                    { prompt: "Ką mėgsta valgyti gyvūnai? Sujunk poras!", pairs: shuffledFoods.slice(0, 3) },
-                    { prompt: "Pamaitink gyvūnėlius! Ką jie mėgsta?", pairs: shuffledFoods.slice(3, 6) },
-                    { prompt: "Ką mėgsta šie gyvūnai? Sujunk!", pairs: shuffledFoods.slice(6, 9) },
-                    { prompt: "Sujunk gyvūną ir jo mėgstamą maistą!", pairs: shuffledFoods.slice(9, 12) },
-                    { prompt: "Sujunk mamą ir jos vaikelį!", pairs: shuffledBabies.slice(0, 3) },
-                    { prompt: "Kas kur gyvena? Sujunk poras!", pairs: shuffledHomes.slice(0, 3) }
+                    { prompt: "🥕 Ką valgo?", pairs: shuffledFoods.slice(0, 3) },
+                    { prompt: "🥕 Ką valgo?", pairs: shuffledFoods.slice(3, 6) },
+                    { prompt: "🥕 Ką valgo?", pairs: shuffledFoods.slice(6, 9) },
+                    { prompt: "🥕 Ką valgo?", pairs: shuffledFoods.slice(9, 12) },
+                    { prompt: "🐾 Kieno mažylis?", pairs: shuffledBabies.slice(0, 3) },
+                    { prompt: "🏡 Kur gyvena?", pairs: shuffledHomes.slice(0, 3) }
                 ];
                 state.totalPossible = state.boards.length * 3;
                 prepareMatchingBoard();
@@ -275,18 +277,17 @@
 
             appEl.innerHTML = `
                 <!-- Top Status Bar -->
-                <div class="bg-amber-500 text-white px-3 sm:px-4 py-2 sm:py-2.5 flex justify-between items-center font-bold text-xs sm:text-base shadow">
+                <div class="bg-amber-500 text-white px-3 sm:px-5 py-2 sm:py-2.5 flex justify-between items-center font-bold text-xs sm:text-base shadow">
                     <div class="flex items-center gap-2">
-                        <button onclick="renderStartScreen()" class="bg-amber-600 hover:bg-amber-700 px-2.5 py-1 rounded-xl text-sm" title="Į pradžią">🏠</button>
-                        <span>⭐ Taškai: <span class="text-yellow-200">${state.score}</span></span>
+                        <button onclick="renderStartScreen()" class="bg-amber-600 hover:bg-amber-700 px-2 py-0.5 rounded-lg text-sm" title="Pradžia">🏠</button>
+                        <span>⭐ <span class="text-yellow-200 font-black">${state.score}</span></span>
                     </div>
-                    <div class="bg-amber-600 px-2.5 py-1 rounded-xl">Lenta: ${state.currentIndex + 1} / ${state.boards.length}</div>
-                    <div>🔥 Serija: <span class="text-orange-200">${state.streak}</span></div>
+                    <div class="bg-amber-600 px-2.5 py-0.5 rounded-xl font-black">🎯 ${state.currentIndex + 1} / ${state.boards.length}</div>
+                    <div>🔥 <span class="text-orange-200 font-black">${state.streak}</span></div>
                 </div>
 
                 <div class="p-3 sm:p-5 flex-1 flex flex-col justify-between items-center">
-                    <h2 class="text-lg sm:text-2xl font-black text-slate-800 text-center mb-1">${_col(board.prompt)}</h2>
-                    <p class="text-xs sm:text-sm font-bold text-slate-500 mb-2">${_col('Paspausk gyvūną kairėje ir tinkamą žodį dešinėje!')}</p>
+                    <h2 class="text-xl sm:text-2xl font-black text-slate-800 text-center mb-2">${_col(board.prompt)}</h2>
 
                     <div class="grid grid-cols-2 gap-3 sm:gap-5 w-full my-auto">
                         <div class="flex flex-col gap-2.5 sm:gap-3.5">
@@ -402,17 +403,19 @@
 
             appEl.innerHTML = `
                 <!-- Top Status Bar -->
-                <div class="bg-amber-500 text-white px-3 sm:px-4 py-2 sm:py-2.5 flex justify-between items-center font-bold text-xs sm:text-base shadow">
+                <div class="bg-amber-500 text-white px-3 sm:px-5 py-2 sm:py-2.5 flex justify-between items-center font-bold text-xs sm:text-base shadow">
                     <div class="flex items-center gap-2">
-                        <button onclick="renderStartScreen()" class="bg-amber-600 hover:bg-amber-700 px-2.5 py-1 rounded-xl text-sm" title="Į pradžią">🏠</button>
-                        <span>⭐ Taškai: <span class="text-yellow-200">${state.score}</span></span>
+                        <button onclick="renderStartScreen()" class="bg-amber-600 hover:bg-amber-700 px-2 py-0.5 rounded-lg text-sm" title="Pradžia">🏠</button>
+                        <span>⭐ <span class="text-yellow-200 font-black">${state.score}</span></span>
                     </div>
-                    <div class="bg-amber-600 px-3 py-1 rounded-xl">Klausimas: ${state.currentIndex + 1} / 10</div>
-                    <div>🔥 Serija: <span class="text-orange-200">${state.streak}</span></div>
+                    <div class="bg-amber-600 px-2.5 py-0.5 rounded-xl font-black">🎯 ${state.currentIndex + 1} / 10</div>
+                    <div>🔥 <span class="text-orange-200 font-black">${state.streak}</span></div>
                 </div>
 
                 <div class="p-3 sm:p-5 flex-1 flex flex-col justify-between items-center">
-                    <h2 class="text-xl sm:text-2xl font-black text-slate-800 text-center mb-2 sm:mb-3">${_col(q.prompt)}</h2>
+                    <h2 class="text-xl sm:text-2xl font-black text-slate-800 text-center mb-2 sm:mb-3">
+                        ${state.mode === 'babies' ? '🐾 ' + _col('Kieno mažylis?') : '🏡 ' + _col('Kur gyvena?')}
+                    </h2>
 
                     <div class="my-auto py-3 px-6 flex flex-col items-center justify-center bg-amber-100/60 rounded-3xl border-3 border-amber-200 min-h-[120px] sm:min-h-[140px] shadow-inner">
                         <div class="text-6xl sm:text-8xl mb-1">${q.parent.split(' ').pop()}</div>
@@ -484,15 +487,11 @@
                     <div class="text-7xl mb-2">🎉</div>
                     <h2 class="text-3xl sm:text-4xl font-black text-green-600 mb-2">${_col('Šaunuolis!')}</h2>
                     <div class="text-5xl mb-4 tracking-wider">${stars}</div>
-                    <p class="text-xl font-bold text-slate-700 mb-1">${_col('Surinkai taškų:')}</p>
-                    <p class="text-4xl font-black text-amber-600 mb-6">${state.score} / ${state.totalPossible}</p>
+                    <p class="text-3xl font-black text-amber-600 mb-6">⭐ ${state.score} / ${state.totalPossible}</p>
                     
                     <div class="flex flex-col sm:flex-row gap-3 w-full max-w-sm">
                         <button onclick="startGame(state.mode)" class="btn-3d flex-1 py-3.5 bg-amber-100 hover:bg-amber-200 border-2 border-amber-400 rounded-2xl text-lg font-black shadow-[0_5px_0_#b45309] active:shadow-[0_0px_0_#b45309] transition-all">
                             🔄 ${_col('Dar kartą')}
-                        </button>
-                        <button onclick="renderStartScreen()" class="btn-3d flex-1 py-3.5 bg-slate-100 hover:bg-slate-200 border-2 border-slate-300 rounded-2xl text-lg font-black shadow-[0_5px_0_#94a3b8] active:shadow-[0_0px_0_#94a3b8] transition-all">
-                            🏠 ${_col('Iš pradžių')}
                         </button>
                     </div>
                 </div>

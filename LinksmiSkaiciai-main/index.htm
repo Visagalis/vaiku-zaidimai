@@ -192,12 +192,12 @@
         function renderTopBar() {
             return `
                 <div class="top-bar bg-sky-100 border-b-2 border-sky-300 text-slate-800 px-3 sm:px-4 py-2 sm:py-2.5 flex justify-between items-center font-bold text-xs sm:text-base shadow-sm shrink-0">
-                    <div class="flex items-center gap-1.5">
-                        <button onclick="renderStartScreen()" class="top-badge bg-white/90 hover:bg-sky-200 border border-sky-300 px-2 py-1 rounded-lg text-xs sm:text-sm transition active:scale-95" title="Meniu">🏠 ${_col('Meniu')}</button>
-                        <span>⭐ ${_col('Taškai:')} <span class="text-sky-700 dark:text-amber-300 font-black">${state.score}</span></span>
+                    <div class="flex items-center gap-2">
+                        <button onclick="renderStartScreen()" class="top-badge bg-white/90 hover:bg-sky-200 border border-sky-300 px-2.5 py-1 rounded-xl text-sm sm:text-base transition active:scale-95" title="Meniu">🏠</button>
+                        <span class="flex items-center gap-1">⭐ <span class="text-sky-700 dark:text-amber-300 font-black">${state.score}</span></span>
                     </div>
-                    <div class="top-badge bg-white/90 border border-sky-300 px-2.5 py-0.5 rounded-xl">${_col('Klausimas:')} <span class="text-sky-700 dark:text-amber-300 font-black">${state.question} / ${state.maxQuestions}</span></div>
-                    <div>🔥 ${_col('Serija:')} <span class="text-sky-700 dark:text-amber-300 font-black">${state.streak}</span></div>
+                    <div class="top-badge bg-white/90 border border-sky-300 px-2.5 py-0.5 rounded-xl text-sky-700 dark:text-amber-300 font-black">🎯 ${state.question} / ${state.maxQuestions}</div>
+                    <div class="flex items-center gap-1">🔥 <span class="text-sky-700 dark:text-amber-300 font-black">${state.streak}</span></div>
                 </div>
             `;
         }
@@ -206,21 +206,20 @@
             app.innerHTML = `
                 <div class="flex-1 flex flex-col items-center justify-center p-5 sm:p-8 text-center fade-in">
                     <div class="text-5xl sm:text-6xl mb-2 bounce">🔢</div>
-                    <h1 class="text-main-title text-3xl sm:text-5xl font-black text-slate-800 mb-1 tracking-tight">${_col('Linksmoji Matematika')}</h1>
-                    <p class="text-sub-title text-sm sm:text-lg text-slate-600 mb-5 sm:mb-6 font-bold">${_col('Pasirink žaidimą ir skaičiuok smagiai!')}</p>
+                    <h1 class="text-main-title text-3xl sm:text-5xl font-black text-slate-800 mb-4 tracking-tight">${_col('Linksmoji Matematika')}</h1>
                     
                     <div class="flex flex-col gap-3 w-full max-w-md">
-                        <button onclick="startGame('objects')" class="btn-tinted w-full py-3 sm:py-4 px-4 rounded-2xl bg-emerald-100 hover:bg-emerald-200 text-slate-800 font-black text-base sm:text-xl shadow-lg transition transform active:scale-95 border-2 border-b-4 border-emerald-400 flex items-center justify-center gap-2">
-                            <span class="text-2xl">🍎</span>
-                            <span>${_col('Skaičiuok su daiktais (Iki 10 ir 20)')}</span>
+                        <button onclick="startGame('objects')" class="btn-tinted w-full py-3.5 sm:py-4 px-4 rounded-2xl bg-emerald-100 hover:bg-emerald-200 text-slate-800 font-black text-base sm:text-xl shadow-lg transition transform active:scale-95 border-2 border-b-4 border-emerald-400 flex items-center justify-center gap-2.5">
+                            <span class="text-3xl">🍎</span>
+                            <span>${_col('Daiktai (1–20)')}</span>
                         </button>
-                        <button onclick="startGame('scale')" class="btn-tinted w-full py-3 sm:py-4 px-4 rounded-2xl bg-amber-100 hover:bg-amber-200 text-slate-800 font-black text-base sm:text-xl shadow-lg transition transform active:scale-95 border-2 border-b-4 border-amber-400 flex items-center justify-center gap-2">
-                            <span class="text-2xl">⚖️</span>
-                            <span>${_col('Matematinės svarstyklės')}</span>
+                        <button onclick="startGame('scale')" class="btn-tinted w-full py-3.5 sm:py-4 px-4 rounded-2xl bg-amber-100 hover:bg-amber-200 text-slate-800 font-black text-base sm:text-xl shadow-lg transition transform active:scale-95 border-2 border-b-4 border-amber-400 flex items-center justify-center gap-2.5">
+                            <span class="text-3xl">⚖️</span>
+                            <span>${_col('Svarstyklės')}</span>
                         </button>
-                        <button onclick="startGame('balloons')" class="btn-tinted w-full py-3 sm:py-4 px-4 rounded-2xl bg-rose-100 hover:bg-rose-200 text-slate-800 font-black text-base sm:text-xl shadow-lg transition transform active:scale-95 border-2 border-b-4 border-rose-400 flex items-center justify-center gap-2">
-                            <span class="text-2xl">🎈</span>
-                            <span>${_col('Balionų sprogdinimas')}</span>
+                        <button onclick="startGame('balloons')" class="btn-tinted w-full py-3.5 sm:py-4 px-4 rounded-2xl bg-rose-100 hover:bg-rose-200 text-slate-800 font-black text-base sm:text-xl shadow-lg transition transform active:scale-95 border-2 border-b-4 border-rose-400 flex items-center justify-center gap-2.5">
+                            <span class="text-3xl">🎈</span>
+                            <span>${_col('Balionai')}</span>
                         </button>
                     </div>
                 </div>
@@ -371,7 +370,7 @@
             if (box) box.innerHTML = renderTokensMarkup();
             if (counterEl) {
                 const c = Object.keys(state.countedMap).length;
-                counterEl.innerHTML = `${_col('Paspausta daiktų:')} <strong class="text-amber-500 font-black">${c}</strong>`;
+                counterEl.innerHTML = `👆 <strong class="text-amber-500 font-black">${c}</strong>`;
             }
         }
 
@@ -383,24 +382,19 @@
                 </button>
             `).join('');
 
-            const helperText = state.isAddition
-                ? 'Paspausk ant daiktų ir suskaičiuok, kiek jų iš viso!'
-                : 'Paspausk ir suskaičiuok, kiek neišbrauktų daiktų liko!';
-
             app.innerHTML = `
                 ${renderTopBar()}
                 <div class="flex-1 flex flex-col p-3 sm:p-5 justify-between overflow-hidden fade-in">
                     <div class="text-center">
-                        <p class="text-xs sm:text-sm font-bold text-slate-500 text-sub-title mb-1">${_col(helperText)}</p>
-                        <div id="problem-box" class="inline-block px-5 py-1.5 sm:py-2 rounded-2xl bg-sky-100 dark:bg-slate-800 border-2 border-sky-300 dark:border-slate-600 font-black text-3xl sm:text-5xl text-slate-800 text-main-title tracking-wider shadow-sm">
+                        <div id="problem-box" class="inline-block px-5 py-2 rounded-2xl bg-sky-100 dark:bg-slate-800 border-2 border-sky-300 dark:border-slate-600 font-black text-3xl sm:text-5xl text-slate-800 text-main-title tracking-wider shadow-sm">
                             ${state.num1} ${sign} ${state.num2} = <span id="ans-slot" class="text-sky-600 dark:text-sky-400">?</span>
                         </div>
                     </div>
 
                     <div class="flex flex-col my-1">
-                        <div class="flex justify-between items-center px-1 mb-1 text-xs sm:text-sm font-bold">
-                            <span id="tap-counter" class="text-sub-title">${_col('Paspausta daiktų:')} <strong class="text-amber-500 font-black">0</strong></span>
-                            <button onclick="state.countedMap={}; playSound('click'); updateTokensUI();" class="text-sky-500 hover:underline font-extrabold text-xs sm:text-sm">🔄 ${_col('Skaičiuoti iš naujo')}</button>
+                        <div class="flex justify-between items-center px-1 mb-1 text-sm font-bold">
+                            <span id="tap-counter" class="text-sub-title">👆 <strong class="text-amber-500 font-black">0</strong></span>
+                            <button onclick="state.countedMap={}; playSound('click'); updateTokensUI();" class="text-sky-500 hover:underline font-extrabold text-sm" title="Iš naujo">🔄</button>
                         </div>
                         <div id="tokens-container" class="panel-box rounded-2xl p-2.5 sm:p-3.5 min-h-[104px] sm:min-h-[125px] flex flex-wrap items-center justify-center gap-1.5">
                             ${renderTokensMarkup()}
@@ -526,7 +520,6 @@
 
                             <!-- Dešinė lėkštė -->
                             <div class="scale-pan rounded-2xl px-3 sm:px-4 py-2 sm:py-3 shadow-md flex flex-col items-center min-w-[110px] sm:min-w-[135px]">
-                                <span class="text-[11px] sm:text-xs font-bold text-slate-400">${_col('Dešinė pusė')}</span>
                                 <div class="text-xl sm:text-3xl font-black text-amber-600 dark:text-amber-400 flex items-center gap-1">
                                     <span>${state.rightBase} +</span>
                                     <span id="guess-box" class="inline-block px-2 py-0.5 rounded-lg bg-amber-100 dark:bg-amber-900/60 border-2 border-amber-400 text-amber-700 dark:text-amber-200">${state.rightGuess}</span>
@@ -548,7 +541,7 @@
                             <button onclick="adjustScaleGuess(-1)" class="px-3.5 py-1.5 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-black text-base sm:text-lg shadow border-b-4 border-rose-700 active:scale-95">
                                 -1
                             </button>
-                            <span class="text-xs sm:text-sm font-extrabold text-sub-title">${_col('Pasirink trūkstamą skaičių:')}</span>
+                            <span class="text-base font-black">❓</span>
                             <button onclick="adjustScaleGuess(1)" class="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-base sm:text-lg shadow border-b-4 border-emerald-700 active:scale-95">
                                 +1
                             </button>
@@ -558,8 +551,8 @@
                         </div>
                     </div>
 
-                    <button onclick="checkScaleAnswer()" class="btn-tinted w-full py-2.5 sm:py-3.5 rounded-2xl bg-green-100 hover:bg-green-200 text-slate-800 font-black text-lg sm:text-2xl shadow-md border-2 border-b-4 border-green-400 transition transform active:scale-95">
-                        ${_col('Patikrinti!')} ✅
+                    <button onclick="checkScaleAnswer()" class="btn-tinted w-full py-2.5 sm:py-3.5 rounded-2xl bg-green-100 hover:bg-green-200 text-slate-800 font-black text-xl sm:text-3xl shadow-md border-2 border-b-4 border-green-400 transition transform active:scale-95">
+                        ✅
                     </button>
                 </div>
             `;
@@ -578,7 +571,7 @@
             const rightTotal = state.rightBase + state.rightGuess;
             guessBox.textContent = state.rightGuess;
             if (rightSumLabel) {
-                rightSumLabel.innerHTML = `(${_col('Svoris:')} ${rightTotal})`;
+                rightSumLabel.innerHTML = `(${rightTotal})`;
             }
 
             // Paryškiname pasirinktą kaladėlę
@@ -597,19 +590,19 @@
                 beam.style.transform = 'rotate(-8deg)';
                 scaleOp.textContent = '>';
                 scaleOp.className = 'w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-amber-500 text-white font-black text-xl sm:text-2xl flex items-center justify-center shadow-md shrink-0 mx-1';
-                scaleStatus.innerHTML = `⬅️ ${_col('Kairė pusė sunkesnė! Pridėk dar svorio.')}`;
+                scaleStatus.innerHTML = `⬅️ ➕`;
                 scaleStatus.className = 'text-xs sm:text-sm font-black mb-2 px-3 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300';
             } else if (rightTotal > state.leftTotal) {
                 beam.style.transform = 'rotate(8deg)';
                 scaleOp.textContent = '<';
                 scaleOp.className = 'w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-rose-500 text-white font-black text-xl sm:text-2xl flex items-center justify-center shadow-md shrink-0 mx-1';
-                scaleStatus.innerHTML = `➡️ ${_col('Dešinė pusė per sunki! Sumažink skaičių.')}`;
+                scaleStatus.innerHTML = `➡️ ➖`;
                 scaleStatus.className = 'text-xs sm:text-sm font-black mb-2 px-3 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-rose-300';
             } else {
                 beam.style.transform = 'rotate(0deg)';
                 scaleOp.textContent = '=';
                 scaleOp.className = 'w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-emerald-500 text-white font-black text-xl sm:text-2xl flex items-center justify-center shadow-md shrink-0 mx-1';
-                scaleStatus.innerHTML = `⚖️ ${_col('Svarstyklės lygios! Paspausk Patikrinti!')}`;
+                scaleStatus.innerHTML = `⚖️ ✅`;
                 scaleStatus.className = 'text-xs sm:text-sm font-black mb-2 px-3 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300';
             }
         }
@@ -734,13 +727,10 @@
                 ${renderTopBar()}
                 <div class="flex-1 flex flex-col p-3 sm:p-5 justify-between overflow-hidden fade-in">
                     <div class="text-center">
-                        <p class="text-xs sm:text-sm font-bold text-slate-500 text-sub-title mb-1">
-                            🎯 ${_col('Surask visus 3 balionus, kurių atsakymas yra:')}
-                        </p>
-                        <div class="inline-flex items-center gap-3 px-5 py-1.5 rounded-2xl bg-rose-100 dark:bg-rose-950 border-2 border-rose-400 text-rose-700 dark:text-rose-200 font-black text-2xl sm:text-4xl shadow-sm">
+                        <div class="inline-flex items-center gap-3 px-5 py-2 rounded-2xl bg-rose-100 dark:bg-rose-950 border-2 border-rose-400 text-rose-700 dark:text-rose-200 font-black text-2xl sm:text-4xl shadow-sm">
                             <span>🎈 ${state.balloonTarget}</span>
-                            <span id="pop-progress" class="text-xs sm:text-sm px-2.5 py-1 rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-extrabold">
-                                ${_col('Surasta:')} ${state.poppedCount} / 3
+                            <span id="pop-progress" class="text-sm sm:text-base px-3 py-1 rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-extrabold">
+                                💥 ${state.poppedCount} / 3
                             </span>
                         </div>
                     </div>
@@ -834,10 +824,10 @@
                     
                     <div class="flex flex-col sm:flex-row gap-3 w-full max-w-md justify-center">
                         <button onclick="restartCurrentMode()" class="btn-tinted flex-1 py-3.5 px-5 rounded-2xl bg-emerald-100 hover:bg-emerald-200 text-slate-800 font-black text-lg sm:text-xl shadow-lg transition transform active:scale-95 border-2 border-b-4 border-emerald-400">
-                            🔄 ${_col('Žaisti dar kartą')}
+                            🔄 ${_col('Dar kartą')}
                         </button>
                         <button onclick="renderStartScreen()" class="btn-tinted flex-1 py-3.5 px-5 rounded-2xl bg-sky-100 hover:bg-sky-200 text-slate-800 font-black text-lg sm:text-xl shadow-lg transition transform active:scale-95 border-2 border-b-4 border-sky-400">
-                            🏠 ${_col('Meniu')}
+                            🏠
                         </button>
                     </div>
                 </div>

@@ -298,14 +298,14 @@
                     <p class="text-lg sm:text-xl font-bold text-slate-600 mb-5 sm:mb-7">${_col('Perskaityk trumpą istoriją ir suskaičiuok!')}</p>
                     
                     <div class="flex flex-col gap-3 sm:gap-3.5 w-full max-w-sm">
-                        <button onclick="startGame('easy')" class="btn-3d py-3 sm:py-3.5 px-6 bg-rose-100 hover:bg-rose-200 text-slate-800 border-2 border-rose-400 rounded-2xl text-xl sm:text-2xl font-black shadow-[0_6px_0_#fb7185] active:shadow-[0_0px_0_#fb7185] transition-all">
-                            🟢 ${_col('Lengva (Iki 10)')}
+                        <button onclick="startGame('easy')" class="btn-3d py-3.5 px-6 bg-rose-100 hover:bg-rose-200 text-slate-800 border-2 border-rose-400 rounded-2xl text-xl sm:text-2xl font-black shadow-[0_6px_0_#fb7185] active:shadow-[0_0px_0_#fb7185] transition-all">
+                            🟢 ${_col('Iki 10')}
                         </button>
-                        <button onclick="startGame('hard')" class="btn-3d py-3 sm:py-3.5 px-6 bg-orange-100 hover:bg-orange-200 text-slate-800 border-2 border-orange-400 rounded-2xl text-xl sm:text-2xl font-black shadow-[0_6px_0_#fb923c] active:shadow-[0_0px_0_#fb923c] transition-all">
-                            🟠 ${_col('Sunkiau (Iki 20)')}
+                        <button onclick="startGame('hard')" class="btn-3d py-3.5 px-6 bg-orange-100 hover:bg-orange-200 text-slate-800 border-2 border-orange-400 rounded-2xl text-xl sm:text-2xl font-black shadow-[0_6px_0_#fb923c] active:shadow-[0_0px_0_#fb923c] transition-all">
+                            🟠 ${_col('Iki 20')}
                         </button>
-                        <button onclick="startGame('money')" class="btn-3d py-3 sm:py-3.5 px-6 bg-emerald-100 hover:bg-emerald-200 text-slate-800 border-2 border-emerald-400 rounded-2xl text-xl sm:text-2xl font-black shadow-[0_6px_0_#34d399] active:shadow-[0_0px_0_#34d399] transition-all">
-                            💰 ${_col('Pinigų uždavinukai')}
+                        <button onclick="startGame('money')" class="btn-3d py-3.5 px-6 bg-emerald-100 hover:bg-emerald-200 text-slate-800 border-2 border-emerald-400 rounded-2xl text-xl sm:text-2xl font-black shadow-[0_6px_0_#34d399] active:shadow-[0_0px_0_#34d399] transition-all">
+                            💰 ${_col('Pinigai')}
                         </button>
                     </div>
                 </div>
@@ -343,10 +343,13 @@
 
             appEl.innerHTML = `
                 <!-- Top Status Bar -->
-                <div class="bg-rose-500 text-white px-4 py-2 sm:py-2.5 flex justify-between items-center font-bold text-sm sm:text-base shadow">
-                    <div>⭐ Taškai: <span class="text-yellow-200">${state.score}</span></div>
-                    <div class="bg-rose-600 px-3 py-1 rounded-xl">Uždavinys: ${state.currentIndex + 1} / ${state.questions.length}</div>
-                    <div>🔥 Serija: <span class="text-orange-200">${state.streak}</span></div>
+                <div class="bg-rose-500 text-white px-3 sm:px-4 py-2 sm:py-2.5 flex justify-between items-center font-bold text-xs sm:text-base shadow">
+                    <div class="flex items-center gap-2">
+                        <button onclick="renderStartScreen()" class="bg-rose-600 hover:bg-rose-700 px-2.5 py-1 rounded-xl text-sm" title="Į pradžią">🏠</button>
+                        <span>⭐ <span class="text-yellow-200 font-black">${state.score}</span></span>
+                    </div>
+                    <div class="bg-rose-600 px-2.5 py-1 rounded-xl font-black">🎯 ${state.currentIndex + 1} / ${state.questions.length}</div>
+                    <div>🔥 <span class="text-orange-200 font-black">${state.streak}</span></div>
                 </div>
 
                 <div class="p-3 sm:p-5 flex-1 flex flex-col justify-between items-center">
@@ -429,10 +432,10 @@
                     
                     <div class="flex flex-col sm:flex-row gap-3 w-full max-w-sm">
                         <button onclick="startGame(state.mode)" class="btn-3d flex-1 py-3.5 bg-rose-500 hover:bg-rose-600 text-white rounded-2xl text-lg font-black shadow-[0_5px_0_#e11d48] active:shadow-[0_0px_0_#e11d48] transition-all">
-                            Dar kartą
+                            🔄 ${_col('Dar kartą')}
                         </button>
                         <button onclick="renderStartScreen()" class="btn-3d flex-1 py-3.5 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-2xl text-lg font-black shadow-[0_5px_0_#94a3b8] active:shadow-[0_0px_0_#94a3b8] transition-all">
-                            Iš pradžių
+                            🏠
                         </button>
                     </div>
                 </div>

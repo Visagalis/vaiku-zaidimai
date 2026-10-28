@@ -219,18 +219,20 @@
             app.innerHTML = `
                 <div class="p-6 sm:p-8 flex flex-col items-center justify-center text-center">
                     <div class="text-5xl sm:text-6xl mb-2">📐</div>
-                    <h1 class="text-main-title text-3xl sm:text-5xl font-black text-orange-600 mb-2">${_col('Žodžių Tvarka')}</h1>
-                    <p class="text-sub-title text-base sm:text-xl text-slate-600 mb-5 sm:mb-7 font-bold">${_col('Sudėliok sakinius ir surask tinkamus žodžius!')}</p>
+                    <h1 class="text-main-title text-3xl sm:text-5xl font-black text-orange-600 mb-4">${_col('Žodžių Tvarka')}</h1>
                     
                     <div class="flex flex-col gap-3 w-full max-w-sm">
-                        <button onclick="startGame('short')" class="btn-3d py-3.5 sm:py-4 px-5 rounded-2xl bg-orange-100 hover:bg-orange-200 text-slate-800 border-2 border-orange-400 font-black text-lg sm:text-2xl">
-                            📝 ${_col('Trumpi sakiniai')}
+                        <button onclick="startGame('short')" class="btn-3d py-3.5 sm:py-4 px-5 rounded-2xl bg-orange-100 hover:bg-orange-200 text-slate-800 border-2 border-orange-400 font-black text-lg sm:text-2xl flex items-center justify-center gap-2">
+                            <span>📝</span>
+                            <span>${_col('Trumpi')}</span>
                         </button>
-                        <button onclick="startGame('long')" class="btn-3d py-3.5 sm:py-4 px-5 rounded-2xl bg-amber-100 hover:bg-amber-200 text-slate-800 border-2 border-amber-400 font-black text-lg sm:text-2xl">
-                            📖 ${_col('Ilgesni sakiniai')}
+                        <button onclick="startGame('long')" class="btn-3d py-3.5 sm:py-4 px-5 rounded-2xl bg-amber-100 hover:bg-amber-200 text-slate-800 border-2 border-amber-400 font-black text-lg sm:text-2xl flex items-center justify-center gap-2">
+                            <span>📖</span>
+                            <span>${_col('Ilgi')}</span>
                         </button>
-                        <button onclick="startGame('fill')" class="btn-3d py-3.5 sm:py-4 px-5 rounded-2xl bg-emerald-100 hover:bg-emerald-200 text-slate-800 border-2 border-emerald-400 font-black text-lg sm:text-2xl">
-                            🔍 ${_col('Įstatyk trūkstamą žodį!')}
+                        <button onclick="startGame('fill')" class="btn-3d py-3.5 sm:py-4 px-5 rounded-2xl bg-emerald-100 hover:bg-emerald-200 text-slate-800 border-2 border-emerald-400 font-black text-lg sm:text-2xl flex items-center justify-center gap-2">
+                            <span>✏️</span>
+                            <span>${_col('Užpildyk')}</span>
                         </button>
                     </div>
                 </div>
@@ -250,10 +252,13 @@
 
         function renderTopBar() {
             return `
-                <div class="top-bar bg-orange-100 border-b-2 border-orange-300 text-slate-800 px-4 py-2 sm:py-2.5 flex justify-between items-center font-bold text-sm sm:text-base shadow-sm shrink-0">
-                    <div>⭐ ${_col('Taškai:')} <span class="text-orange-700 dark:text-amber-300 font-black">${state.score}</span></div>
-                    <div class="top-badge bg-white/90 border border-orange-300 px-3 py-0.5 rounded-xl">${_col('Sakinys:')} <span class="text-orange-700 dark:text-amber-300 font-black">${state.round + 1} / ${state.deck.length}</span></div>
-                    <div>🔥 ${_col('Serija:')} <span class="text-orange-700 dark:text-amber-300 font-black">${state.streak}</span></div>
+                <div class="top-bar bg-orange-100 border-b-2 border-orange-300 text-slate-800 px-3 sm:px-5 py-2 sm:py-2.5 flex justify-between items-center font-bold text-sm sm:text-base shadow-sm shrink-0">
+                    <div class="flex items-center gap-2">
+                        <button onclick="renderStartScreen()" class="top-badge bg-white/90 hover:bg-orange-200 border border-orange-300 px-2 py-0.5 rounded-lg text-sm sm:text-base transition active:scale-95" title="Pradžia">🏠</button>
+                        <span class="flex items-center gap-1">⭐ <span class="text-orange-700 dark:text-amber-300 font-black">${state.score}</span></span>
+                    </div>
+                    <div class="top-badge bg-white/90 border border-orange-300 px-2.5 py-0.5 rounded-xl font-black text-orange-700 dark:text-amber-300">🎯 ${state.round + 1} / ${state.deck.length}</div>
+                    <div class="flex items-center gap-1">🔥 <span class="text-orange-700 dark:text-amber-300 font-black">${state.streak}</span></div>
                 </div>
             `;
         }
@@ -285,9 +290,7 @@
                 <div class="p-3 sm:p-5 flex-1 flex flex-col justify-between overflow-hidden">
                     <div class="text-5xl sm:text-6xl drop-shadow-md">${item.emoji}</div>
 
-                    <div id="message" class="text-base sm:text-xl font-black h-7 text-slate-500 text-sub-title flex items-center justify-center">
-                        ${_col('Spausk žodžius iš eilės ir sudėliok sakinį:')}
-                    </div>
+                    <div id="message" class="text-base sm:text-xl font-black h-7 text-slate-500 text-sub-title flex items-center justify-center"></div>
 
                     <div id="slots-container" class="flex flex-wrap justify-center items-center min-h-[60px] sm:min-h-[75px] py-1"></div>
 
@@ -418,9 +421,7 @@
                         <span>${item.after}</span>
                     </div>
 
-                    <div id="message" class="text-base sm:text-xl font-black h-7 text-slate-500 text-sub-title flex items-center justify-center">
-                        ${_col('Pasirink žodį, kuris tinka šiame sakinyje:')}
-                    </div>
+                    <div id="message" class="text-base sm:text-xl font-black h-7 text-slate-500 text-sub-title flex items-center justify-center"></div>
 
                     <div class="flex flex-wrap justify-center gap-2 sm:gap-3">
                         ${optsHtml}
@@ -471,13 +472,13 @@
 
             app.innerHTML = `
                 <div class="p-6 sm:p-8 flex flex-col items-center justify-center text-center">
-                    <h2 class="text-main-title text-3xl sm:text-4xl font-black text-purple-600 mb-4">${_col('Šaunuolis!')}</h2>
+                    <h2 class="text-main-title text-3xl sm:text-4xl font-black text-purple-600 mb-4">🎉 ${_col('Šaunuolis!')}</h2>
                     <div class="text-5xl sm:text-6xl mb-4 drop-shadow-md">${stars}</div>
                     <p class="text-sub-title text-xl sm:text-2xl text-slate-700 mb-6 font-bold">
-                        ${_col('Tavo rezultatas:')} <span class="text-3xl sm:text-4xl text-orange-500 font-black">${state.score} / ${state.deck.length}</span>
+                        ⭐ <span class="text-3xl sm:text-4xl text-orange-500 font-black">${state.score} / ${state.deck.length}</span>
                     </p>
-                    <button onclick="renderStartScreen()" class="btn-3d bg-green-100 hover:bg-green-200 text-slate-800 border-2 border-green-400 text-xl sm:text-2xl font-black py-4 px-10 rounded-2xl w-full max-w-xs">
-                        ${_col('Žaisti dar kartą')} 🔄
+                    <button onclick="renderStartScreen()" class="btn-3d bg-green-100 hover:bg-green-200 text-slate-800 border-2 border-green-400 text-xl sm:text-2xl font-black py-3.5 px-8 rounded-2xl w-full max-w-xs">
+                        🔄 ${_col('Dar kartą')}
                     </button>
                 </div>
             `;

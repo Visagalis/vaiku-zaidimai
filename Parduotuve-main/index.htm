@@ -285,18 +285,20 @@
             app.innerHTML = `
                 <div class="flex-1 flex flex-col items-center justify-center p-5 sm:p-8 text-center fade-in">
                     <div class="text-5xl sm:text-6xl mb-2 bounce">🛒</div>
-                    <h1 class="text-main-title text-3xl sm:text-5xl font-black text-orange-700 mb-1 tracking-tight">${_col('Mažoji Parduotuvė')}</h1>
-                    <p class="text-sub-title text-base sm:text-xl text-slate-600 mb-5 sm:mb-7 font-bold">${_col('Išsirink prekes ir sumokėk pinigėliais!')}</p>
+                    <h1 class="text-main-title text-3xl sm:text-5xl font-black text-orange-700 mb-4 tracking-tight">${_col('Mažoji Parduotuvė')}</h1>
                     
                     <div class="flex flex-col gap-3 w-full max-w-sm">
-                        <button onclick="startGame('single')" class="btn-tinted w-full py-3.5 sm:py-4 px-4 rounded-2xl bg-orange-100 hover:bg-orange-200 text-slate-800 font-black text-lg sm:text-2xl shadow-lg transition transform active:scale-95 border-2 border-b-4 border-orange-400">
-                            🍭 ${_col('Perku vieną prekę')}
+                        <button onclick="startGame('single')" class="btn-tinted w-full py-3.5 sm:py-4 px-4 rounded-2xl bg-orange-100 hover:bg-orange-200 text-slate-800 font-black text-lg sm:text-2xl shadow-lg transition transform active:scale-95 border-2 border-b-4 border-orange-400 flex items-center justify-center gap-2.5">
+                            <span class="text-3xl">🍭</span>
+                            <span>${_col('1 prekė')}</span>
                         </button>
-                        <button onclick="startGame('basket')" class="btn-tinted w-full py-3.5 sm:py-4 px-4 rounded-2xl bg-emerald-100 hover:bg-emerald-200 text-slate-800 font-black text-lg sm:text-2xl shadow-lg transition transform active:scale-95 border-2 border-b-4 border-emerald-400">
-                            🧺 ${_col('Pirkinių krepšelis')}
+                        <button onclick="startGame('basket')" class="btn-tinted w-full py-3.5 sm:py-4 px-4 rounded-2xl bg-emerald-100 hover:bg-emerald-200 text-slate-800 font-black text-lg sm:text-2xl shadow-lg transition transform active:scale-95 border-2 border-b-4 border-emerald-400 flex items-center justify-center gap-2.5">
+                            <span class="text-3xl">🧺</span>
+                            <span>${_col('Krepšelis')}</span>
                         </button>
-                        <button onclick="startGame('afford')" class="btn-tinted w-full py-3.5 sm:py-4 px-4 rounded-2xl bg-sky-100 hover:bg-sky-200 text-slate-800 font-black text-lg sm:text-2xl shadow-lg transition transform active:scale-95 border-2 border-b-4 border-sky-400">
-                            🛍️ ${_col('Ką galiu nupirkti?')}
+                        <button onclick="startGame('afford')" class="btn-tinted w-full py-3.5 sm:py-4 px-4 rounded-2xl bg-sky-100 hover:bg-sky-200 text-slate-800 font-black text-lg sm:text-2xl shadow-lg transition transform active:scale-95 border-2 border-b-4 border-sky-400 flex items-center justify-center gap-2.5">
+                            <span class="text-3xl">🛍️</span>
+                            <span>${_col('Ką nupirkti?')}</span>
                         </button>
                     </div>
                 </div>
@@ -314,10 +316,13 @@
 
         function renderTopBar() {
             return `
-                <div class="top-bar bg-orange-100 border-b-2 border-orange-300 text-slate-800 px-4 py-2 sm:py-2.5 flex justify-between items-center font-bold text-sm sm:text-base shadow-sm shrink-0">
-                    <div>⭐ ${_col('Taškai:')} <span class="text-orange-700 dark:text-amber-300 font-black">${state.score}</span></div>
-                    <div class="top-badge bg-white/90 border border-orange-300 px-2.5 py-0.5 rounded-xl">${_col('Pirkimas:')} <span class="text-orange-700 dark:text-amber-300 font-black">${state.question} / ${state.maxQuestions}</span></div>
-                    <div>🔥 ${_col('Serija:')} <span class="text-orange-700 dark:text-amber-300 font-black">${state.streak}</span></div>
+                <div class="top-bar bg-orange-100 border-b-2 border-orange-300 text-slate-800 px-3 sm:px-5 py-2 sm:py-2.5 flex justify-between items-center font-bold text-sm sm:text-base shadow-sm shrink-0">
+                    <div class="flex items-center gap-2">
+                        <button onclick="renderStartScreen()" class="top-badge bg-white/90 hover:bg-orange-200 border border-orange-300 px-2 py-0.5 rounded-lg text-sm sm:text-base transition active:scale-95" title="Pradžia">🏠</button>
+                        <span class="flex items-center gap-1">⭐ <span class="text-orange-700 dark:text-amber-300 font-black">${state.score}</span></span>
+                    </div>
+                    <div class="top-badge bg-white/90 border border-orange-300 px-2.5 py-0.5 rounded-xl font-black text-orange-700 dark:text-amber-300">🎯 ${state.question} / ${state.maxQuestions}</div>
+                    <div class="flex items-center gap-1">🔥 <span class="text-orange-700 dark:text-amber-300 font-black">${state.streak}</span></div>
                 </div>
             `;
         }
@@ -390,7 +395,6 @@
                     <div class="shop-shelf p-2 sm:p-3 rounded-2xl flex items-center justify-center gap-3 sm:gap-5 shadow-sm">
                         <div class="text-4xl sm:text-6xl drop-shadow">${it.emoji}</div>
                         <div class="text-left">
-                            <div class="text-xs sm:text-sm font-bold text-slate-500 text-sub-title">${_col('Prekė parduotuvėje:')}</div>
                             <div class="text-xl sm:text-2xl font-black text-slate-800 text-main-title">${_col(it.name)}</div>
                         </div>
                         <div class="price-tag bg-amber-300 border-2 border-amber-500 text-amber-950 font-black text-xl sm:text-3xl px-3 sm:px-4 py-1 sm:py-1.5 rounded-2xl shadow-sm">
@@ -402,7 +406,6 @@
                 const { item1, item2 } = state.currentTask;
                 shelfHtml = `
                     <div class="shop-shelf p-2 sm:p-3 rounded-2xl flex flex-col items-center justify-center gap-1 shadow-sm">
-                        <div class="text-xs sm:text-sm font-bold text-slate-500 text-sub-title">${_col('Suskaičiuok krepšelio kainą ir sumokėk:')}</div>
                         <div class="flex items-center justify-center gap-2 sm:gap-4 flex-wrap">
                             <div class="flex items-center gap-1.5 bg-white/80 dark:bg-slate-800 px-2.5 py-1 rounded-xl border border-amber-300">
                                 <span class="text-2xl sm:text-3xl">${item1.emoji}</span>
@@ -433,9 +436,9 @@
 
                     <!-- Prekystalis -->
                     <div class="flex flex-col">
-                        <div class="flex justify-between items-center px-1 mb-1 text-xs sm:text-sm font-extrabold">
-                            <span class="text-sub-title">${_col('Ant prekystalio padėta:')} <strong id="counter-sum" class="text-emerald-600 text-sm sm:text-base">0 c</strong></span>
-                            <button onclick="clearCounter()" class="text-rose-500 hover:underline font-bold text-xs sm:text-sm">🗑️ ${_col('Išvalyti')}</button>
+                        <div class="flex justify-between items-center px-1 mb-1 text-sm font-extrabold">
+                            <span class="text-sub-title">💰 <strong id="counter-sum" class="text-emerald-600 text-base sm:text-lg">0 c</strong></span>
+                            <button onclick="clearCounter()" class="text-rose-500 hover:scale-110 font-bold text-lg" title="Išvalyti">🗑️</button>
                         </div>
                         <div id="counter-tray" class="counter-tray flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5 p-2 sm:p-3 rounded-2xl min-h-[76px] sm:min-h-[96px]">
                         </div>
@@ -445,14 +448,13 @@
 
                     <!-- Piniginė -->
                     <div class="wallet-box p-2 sm:p-3 rounded-2xl flex flex-col items-center gap-1">
-                        <span class="text-[11px] sm:text-xs font-bold text-slate-400">${_col('Tavo piniginė (spausk ant pinigų):')}</span>
                         <div class="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5">
                             ${walletHtml}
                         </div>
                     </div>
 
-                    <button onclick="checkPayAnswer()" class="btn-tinted w-full py-2.5 sm:py-3.5 rounded-2xl bg-green-100 hover:bg-green-200 text-slate-800 font-black text-lg sm:text-2xl shadow-md border-2 border-b-4 border-green-500 transition transform active:scale-95">
-                        🛒 ${_col('Pirkti!')}
+                    <button onclick="checkPayAnswer()" class="btn-tinted w-full py-2.5 sm:py-3.5 rounded-2xl bg-green-100 hover:bg-green-200 text-slate-800 font-black text-xl sm:text-2xl shadow-md border-2 border-b-4 border-green-500 transition transform active:scale-95">
+                        🛒 ${_col('Mokėti')}
                     </button>
                 </div>
             `;
@@ -536,8 +538,8 @@
                 ${renderTopBar()}
                 <div class="flex-1 flex flex-col p-3 sm:p-5 fade-in justify-between overflow-hidden">
                     <div class="text-center">
-                        <h2 class="text-base sm:text-xl font-black text-slate-700 text-main-title mb-1">
-                            ${_col('Kurią prekę gali nupirkti lygiai už šiuos pinigus?')}
+                        <h2 class="text-xl sm:text-3xl font-black text-slate-700 text-main-title mb-1 flex items-center justify-center gap-2">
+                            <span>🛍️ ❓</span>
                         </h2>
                         <div id="afford-wallet" class="counter-tray flex flex-wrap items-center justify-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-2xl min-h-[85px] sm:min-h-[110px]">
                             ${walletCoinsHtml}
@@ -613,7 +615,7 @@
                     <p class="text-sub-title text-xl sm:text-2xl font-bold text-gray-700 mb-2">${_col(message)} 🛍️</p>
                     <p class="text-sub-title text-lg sm:text-xl text-gray-600 mb-8">${_col('Taškai:')} <span class="font-black text-green-500">${state.score} / ${state.maxQuestions}</span></p>
                     <button onclick="renderStartScreen()" class="btn-tinted w-full max-w-xs py-4 rounded-2xl bg-orange-100 hover:bg-orange-200 text-slate-800 font-black text-xl sm:text-2xl shadow-lg transition transform active:scale-95 border-2 border-b-4 border-orange-400">
-                        ${_col('Žaisti dar kartą')} 🔄
+                        🔄 ${_col('Dar kartą')}
                     </button>
                 </div>
             `;

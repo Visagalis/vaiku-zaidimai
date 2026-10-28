@@ -174,6 +174,9 @@
         <!-- Header -->
         <div id="header-ui" class="flex justify-between items-center px-4 py-3 z-20 hidden w-full flex-shrink-0 border-b border-black/5 dark:border-white/5" style="background-color: rgba(0,0,0,0.02)">
             <div class="flex gap-2">
+                <button onclick="location.reload()" class="bg-white dark:bg-slate-700 border-2 border-slate-300 dark:border-slate-600 px-2.5 py-1.5 rounded-xl font-bold hover:bg-slate-100 transition-colors text-sm shadow-sm" title="Pradžia">
+                    🏠
+                </button>
                 <button onclick="toggleDarkMode()" id="dark-toggle" class="bg-indigo-600 text-white border-2 border-indigo-400 px-3 py-1.5 rounded-xl font-bold hover:bg-indigo-500 transition-colors text-xs shadow-sm">
                     ☀️ Diena
                 </button>
@@ -182,12 +185,12 @@
                 </button>
             </div>
             <div class="flex gap-3 items-center">
-                <div class="text-right">
-                    <p class="text-[10px] uppercase opacity-60 font-bold leading-none" style="color: var(--text-main)">Mano ⭐</p>
-                    <p id="total-stars-display" class="text-lg font-black text-yellow-500">0</p>
+                <div class="flex items-center gap-1">
+                    <span class="text-lg">⭐</span>
+                    <span id="total-stars-display" class="text-lg font-black text-yellow-500">0</span>
                 </div>
                 <div class="bg-yellow-400 text-white px-2.5 py-1 rounded-lg text-xs font-black">
-                    <span id="current-word-num">1</span> / <span id="max-words-num">10</span>
+                    🎯 <span id="current-word-num">1</span> / <span id="max-words-num">10</span>
                 </div>
             </div>
         </div>
@@ -195,8 +198,7 @@
         <!-- Start Screen -->
         <div id="start-screen" class="fullscreen-overlay absolute inset-0 z-[110] flex flex-col items-center justify-center p-4 text-center overflow-y-auto">
             <div class="text-8xl mb-2 mt-auto md:mt-0">🦉</div>
-            <h1 class="text-4xl md:text-6xl font-black mb-2 uppercase tracking-tighter italic">Žodžių Naktis</h1>
-            <p class="mb-6 text-lg font-bold" style="color: var(--text-muted)">Kiek žodžių mokysimės?</p>
+            <h1 class="text-4xl md:text-6xl font-black mb-6 uppercase tracking-tighter italic">Žodžių Naktis</h1>
             
             <div class="grid grid-cols-2 gap-3 w-full max-w-md mb-6">
                 <button onclick="startGame(5)" class="bg-sky-500 hover:bg-sky-600 text-white font-black py-4 rounded-2xl text-2xl shadow-lg active:scale-95">5</button>
@@ -230,7 +232,6 @@
                 </div>
 
                 <div class="w-full max-w-xl p-3 md:p-8 rounded-[2rem] border-2 border-dashed border-gray-300 dark:border-slate-600 flex flex-col justify-center" style="background-color: var(--pool-bg)">
-                    <p class="text-center text-[10px] font-bold opacity-30 uppercase mb-2 tracking-widest italic" style="color: var(--text-main)">Raidžių bankas:</p>
                     <div id="letters-pool" class="flex flex-wrap justify-center gap-2 md:gap-4 min-h-[50px]">
                         <!-- Letters -->
                     </div>
@@ -241,7 +242,7 @@
         <!-- Success Overlay -->
         <div id="success-overlay" class="fullscreen-overlay hidden absolute inset-0 z-[120] flex flex-col items-center justify-center p-4 text-center overflow-y-auto">
             <div id="success-emoji-large" class="text-[8rem] md:text-[11rem] mb-2 win-anim drop-shadow-2xl mt-auto md:mt-0">🌟</div>
-            <h3 class="text-3xl md:text-6xl font-black text-emerald-500 mb-2 uppercase italic">TEISINGAI!</h3>
+            <h3 class="text-3xl md:text-6xl font-black text-emerald-500 mb-2 uppercase italic">🎉 PUIKU!</h3>
             
             <div id="success-stars-container" class="flex flex-wrap justify-center gap-2 mb-6 text-4xl md:text-5xl max-w-full">
                 <!-- Stars -->
@@ -250,31 +251,29 @@
             <div class="mb-8 w-full px-4">
                 <span id="success-word-text" class="text-4xl md:text-8xl font-black uppercase tracking-tighter break-words leading-none"></span>
             </div>
-            <button onclick="loadNextWord()" class="bg-emerald-500 hover:bg-emerald-600 text-white text-2xl md:text-5xl font-black py-5 px-12 rounded-[2.5rem] shadow-2xl transition-all transform hover:scale-105 active:scale-95 border-b-8 border-emerald-700 mb-auto md:mb-0">
-                TOLIAU ➔
+            <button onclick="loadNextWord()" class="bg-emerald-500 hover:bg-emerald-600 text-white text-2xl md:text-5xl font-black py-4 md:py-5 px-12 rounded-[2.5rem] shadow-2xl transition-all transform hover:scale-105 active:scale-95 border-b-8 border-emerald-700 mb-auto md:mb-0 flex items-center justify-center gap-3">
+                <span>Toliau</span> <span>➔</span>
             </button>
         </div>
 
         <!-- End Screen -->
         <div id="end-screen" class="fullscreen-overlay hidden absolute inset-0 z-[130] flex flex-col items-center justify-center p-4 text-center overflow-y-auto">
             <div class="text-[6rem] md:text-[10rem] mb-4 mt-auto md:mt-0">🏆</div>
-            <h2 class="text-4xl md:text-7xl font-black mb-4 uppercase italic">BAIGTA!</h2>
+            <h2 class="text-4xl md:text-7xl font-black mb-4 uppercase italic">🎉 Šaunuolis!</h2>
             
             <div class="bg-yellow-100 dark:bg-yellow-900/30 p-6 rounded-[2rem] mb-6 border-4 border-yellow-400 w-full max-w-lg">
-                <p class="text-lg md:text-2xl font-bold mb-1 opacity-70">Tavo žvaigždutės:</p>
                 <p class="text-4xl md:text-7xl font-black text-yellow-500">
-                    <span id="final-stars-earned">0</span> / <span id="final-stars-possible">0</span>
+                    ⭐ <span id="final-stars-earned">0</span> / <span id="final-stars-possible">0</span>
                 </p>
-                <p class="mt-2 text-lg font-bold text-yellow-600 dark:text-yellow-400 uppercase tracking-widest">Šaunuolis!</p>
             </div>
 
             <div class="flex flex-col gap-3 w-full max-w-sm mb-auto md:mb-0">
                 <button id="retry-mistakes-btn" onclick="retryMistakes()" class="hidden bg-orange-500 hover:bg-orange-600 text-white text-xl font-black py-4 px-8 rounded-[2rem] shadow-xl active:scale-95 border-b-4 border-orange-700">
-                    PATAISYTI KLAIDAS 🛠️
+                    🛠️ Pataisyti
                 </button>
                 
                 <button onclick="location.reload()" class="bg-sky-500 hover:bg-sky-600 text-white text-xl font-black py-4 px-8 rounded-[2rem] shadow-xl active:scale-95 border-b-4 border-sky-700">
-                    ŽAISTI IŠ NAUJO 🔄
+                    🔄 Dar kartą
                 </button>
             </div>
         </div>

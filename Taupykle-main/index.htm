@@ -178,18 +178,20 @@
             app.innerHTML = `
                 <div class="flex-1 flex flex-col items-center justify-center p-5 sm:p-8 text-center fade-in">
                     <div class="text-5xl sm:text-6xl mb-2 bounce">🐷</div>
-                    <h1 class="text-main-title text-3xl sm:text-5xl font-black text-pink-600 mb-1 tracking-tight">${_col('Taupyklė ir Piniginės')}</h1>
-                    <p class="text-sub-title text-base sm:text-xl text-slate-600 mb-5 sm:mb-7 font-bold">${_col('Palygink pinigines, iškeisk monetas ir taupyk!')}</p>
+                    <h1 class="text-main-title text-3xl sm:text-5xl font-black text-pink-600 mb-4 tracking-tight">${_col('Taupyklė ir Piniginės')}</h1>
                     
                     <div class="flex flex-col gap-3 w-full max-w-sm">
-                        <button onclick="startGame('compare')" class="btn-tinted w-full py-3.5 sm:py-4 px-4 rounded-2xl bg-pink-100 hover:bg-pink-200 text-slate-800 font-black text-lg sm:text-2xl shadow-lg transition transform active:scale-95 border-2 border-b-4 border-pink-400">
-                            ⚖️ ${_col('Kurioje piniginėje daugiau?')}
+                        <button onclick="startGame('compare')" class="btn-tinted w-full py-3.5 sm:py-4 px-4 rounded-2xl bg-pink-100 hover:bg-pink-200 text-slate-800 font-black text-lg sm:text-2xl shadow-lg transition transform active:scale-95 border-2 border-b-4 border-pink-400 flex items-center justify-center gap-2.5">
+                            <span class="text-3xl">👛</span>
+                            <span>${_col('Kuri didesnė?')}</span>
                         </button>
-                        <button onclick="startGame('exchange')" class="btn-tinted w-full py-3.5 sm:py-4 px-4 rounded-2xl bg-purple-100 hover:bg-purple-200 text-slate-800 font-black text-lg sm:text-2xl shadow-lg transition transform active:scale-95 border-2 border-b-4 border-purple-400">
-                            🔄 ${_col('Pinigų keitykla')}
+                        <button onclick="startGame('exchange')" class="btn-tinted w-full py-3.5 sm:py-4 px-4 rounded-2xl bg-purple-100 hover:bg-purple-200 text-slate-800 font-black text-lg sm:text-2xl shadow-lg transition transform active:scale-95 border-2 border-b-4 border-purple-400 flex items-center justify-center gap-2.5">
+                            <span class="text-3xl">🔄</span>
+                            <span>${_col('Keitykla')}</span>
                         </button>
-                        <button onclick="startGame('piggy')" class="btn-tinted w-full py-3.5 sm:py-4 px-4 rounded-2xl bg-emerald-100 hover:bg-emerald-200 text-slate-800 font-black text-lg sm:text-2xl shadow-lg transition transform active:scale-95 border-2 border-b-4 border-emerald-400">
-                            🐷 ${_col('Ar užteks taupyklėje?')}
+                        <button onclick="startGame('piggy')" class="btn-tinted w-full py-3.5 sm:py-4 px-4 rounded-2xl bg-emerald-100 hover:bg-emerald-200 text-slate-800 font-black text-lg sm:text-2xl shadow-lg transition transform active:scale-95 border-2 border-b-4 border-emerald-400 flex items-center justify-center gap-2.5">
+                            <span class="text-3xl">🐷</span>
+                            <span>${_col('Ar užteks?')}</span>
                         </button>
                     </div>
                 </div>
@@ -207,10 +209,13 @@
 
         function renderTopBar() {
             return `
-                <div class="top-bar bg-pink-100 border-b-2 border-pink-300 text-slate-800 px-4 py-2 sm:py-2.5 flex justify-between items-center font-bold text-sm sm:text-base shadow-sm shrink-0">
-                    <div>⭐ ${_col('Taškai:')} <span class="text-pink-700 dark:text-amber-300 font-black">${state.score}</span></div>
-                    <div class="top-badge bg-white/90 border border-pink-300 px-2.5 py-0.5 rounded-xl">${_col('Užduotis:')} <span class="text-pink-700 dark:text-amber-300 font-black">${state.question} / ${state.maxQuestions}</span></div>
-                    <div>🔥 ${_col('Serija:')} <span class="text-pink-700 dark:text-amber-300 font-black">${state.streak}</span></div>
+                <div class="top-bar bg-pink-100 border-b-2 border-pink-300 text-slate-800 px-3 sm:px-5 py-2 sm:py-2.5 flex justify-between items-center font-bold text-sm sm:text-base shadow-sm shrink-0">
+                    <div class="flex items-center gap-2">
+                        <button onclick="renderStartScreen()" class="top-badge bg-white/90 hover:bg-pink-200 border border-pink-300 px-2 py-0.5 rounded-lg text-sm sm:text-base transition active:scale-95" title="Pradžia">🏠</button>
+                        <span class="flex items-center gap-1">⭐ <span class="text-pink-700 dark:text-amber-300 font-black">${state.score}</span></span>
+                    </div>
+                    <div class="top-badge bg-white/90 border border-pink-300 px-2.5 py-0.5 rounded-xl font-black text-pink-700 dark:text-amber-300">🎯 ${state.question} / ${state.maxQuestions}</div>
+                    <div class="flex items-center gap-1">🔥 <span class="text-pink-700 dark:text-amber-300 font-black">${state.streak}</span></div>
                 </div>
             `;
         }
@@ -253,20 +258,20 @@
             app.innerHTML = `
                 ${renderTopBar()}
                 <div class="flex-1 flex flex-col p-3 sm:p-5 fade-in justify-between overflow-hidden">
-                    <h2 class="text-center text-base sm:text-2xl font-black text-slate-700 text-main-title">
-                        ${_col('Kurioje piniginėje yra daugiau pinigų?')}
+                    <h2 class="text-center text-lg sm:text-2xl font-black text-slate-700 text-main-title flex items-center justify-center gap-2">
+                        <span>👛</span> <span>Kur daugiau?</span> <span>👛</span>
                     </h2>
 
                     <div id="compare-area" class="grid grid-cols-2 gap-2.5 sm:gap-4 my-1">
                         <div onclick="checkCompare('left', document.getElementById('btn-left'))" class="piggy-box p-2.5 sm:p-4 rounded-2xl flex flex-col items-center justify-between min-h-[135px] sm:min-h-[175px] cursor-pointer hover:scale-[1.01] transition">
-                            <span class="text-xs sm:text-sm font-black uppercase tracking-wider text-pink-600">👛 ${_col('Kairė')}</span>
+                            <span class="text-sm font-black uppercase tracking-wider text-pink-600">👛 👈</span>
                             <div class="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 my-auto py-1">
                                 ${leftHtml}
                             </div>
                         </div>
 
                         <div onclick="checkCompare('right', document.getElementById('btn-right'))" class="piggy-box p-2.5 sm:p-4 rounded-2xl flex flex-col items-center justify-between min-h-[135px] sm:min-h-[175px] cursor-pointer hover:scale-[1.01] transition">
-                            <span class="text-xs sm:text-sm font-black uppercase tracking-wider text-indigo-600">👛 ${_col('Dešinė')}</span>
+                            <span class="text-sm font-black uppercase tracking-wider text-indigo-600">👛 👉</span>
                             <div class="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 my-auto py-1">
                                 ${rightHtml}
                             </div>
@@ -276,14 +281,14 @@
                     <div id="feedback" class="h-7 flex items-center justify-center font-black text-sm sm:text-lg opacity-0 transition-opacity"></div>
 
                     <div class="grid grid-cols-3 gap-2 sm:gap-3">
-                        <button id="btn-left" onclick="checkCompare('left', this)" class="choice-btn py-3 sm:py-4 px-2 rounded-2xl font-black text-sm sm:text-lg shadow-md border-b-4 transition transform active:scale-95">
-                            👈 ${_col('Kairėje')}
+                        <button id="btn-left" onclick="checkCompare('left', this)" class="choice-btn py-3 sm:py-4 px-2 rounded-2xl font-black text-2xl sm:text-3xl shadow-md border-b-4 transition transform active:scale-95 flex items-center justify-center">
+                            👈
                         </button>
-                        <button id="btn-eq" onclick="checkCompare('equal', this)" class="choice-btn py-3 sm:py-4 px-2 rounded-2xl font-black text-sm sm:text-lg shadow-md border-b-4 transition transform active:scale-95">
-                            🟰 ${_col('Po lygiai')}
+                        <button id="btn-eq" onclick="checkCompare('equal', this)" class="choice-btn py-3 sm:py-4 px-2 rounded-2xl font-black text-2xl sm:text-3xl shadow-md border-b-4 transition transform active:scale-95 flex items-center justify-center">
+                            🟰
                         </button>
-                        <button id="btn-right" onclick="checkCompare('right', this)" class="choice-btn py-3 sm:py-4 px-2 rounded-2xl font-black text-sm sm:text-lg shadow-md border-b-4 transition transform active:scale-95">
-                            👉 ${_col('Dešinėje')}
+                        <button id="btn-right" onclick="checkCompare('right', this)" class="choice-btn py-3 sm:py-4 px-2 rounded-2xl font-black text-2xl sm:text-3xl shadow-md border-b-4 transition transform active:scale-95 flex items-center justify-center">
+                            👉
                         </button>
                     </div>
                 </div>
@@ -367,17 +372,14 @@
                 ${renderTopBar()}
                 <div class="flex-1 flex flex-col p-2.5 sm:p-4 fade-in justify-between overflow-hidden">
                     <div class="wallet-panel p-2 sm:p-3 rounded-2xl flex items-center justify-center gap-3 sm:gap-4">
-                        <div class="text-left">
-                            <div class="text-xs sm:text-sm font-bold text-slate-500 text-sub-title">${_col('Iškeisk šį pinigą į smulkesnius:')}</div>
-                            <div class="text-base sm:text-xl font-black text-slate-800 text-main-title">${_col('Vertė:')} ${formatMoneyCents(target.cents)}</div>
-                        </div>
+                        <span class="text-2xl sm:text-3xl font-black text-slate-800">🔄</span>
                         <div class="${target.class} bounce">${target.label}</div>
                     </div>
 
                     <div class="flex flex-col">
                         <div class="flex justify-between items-center px-1 mb-1 text-xs sm:text-sm font-extrabold">
-                            <span class="text-sub-title">${_col('Surinkta smulkiais:')} <strong id="ex-sum" class="text-pink-600 text-sm sm:text-base">0 c</strong></span>
-                            <button onclick="clearExchange()" class="text-rose-500 hover:underline font-bold text-xs sm:text-sm">🗑️ ${_col('Išvalyti')}</button>
+                            <span class="text-sub-title">💰 <strong id="ex-sum" class="text-pink-600 text-sm sm:text-base">0 c</strong></span>
+                            <button onclick="clearExchange()" class="text-rose-500 hover:underline font-bold text-sm">🗑️</button>
                         </div>
                         <div id="ex-tray" class="piggy-box flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5 p-2 sm:p-3 rounded-2xl min-h-[76px] sm:min-h-[96px]">
                         </div>
@@ -386,14 +388,13 @@
                     <div id="feedback" class="h-6 flex items-center justify-center font-black text-xs sm:text-base opacity-0 transition-opacity"></div>
 
                     <div class="wallet-panel p-2 sm:p-3 rounded-2xl flex flex-col items-center gap-1">
-                        <span class="text-[11px] sm:text-xs font-bold text-slate-400">${_col('Smulkūs pinigėliai (spausk ant jų):')}</span>
                         <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
                             ${poolHtml}
                         </div>
                     </div>
 
-                    <button onclick="checkExchangeAnswer()" class="btn-tinted w-full py-2.5 sm:py-3.5 rounded-2xl bg-purple-100 hover:bg-purple-200 text-slate-800 font-black text-lg sm:text-2xl shadow-md border-2 border-b-4 border-purple-400 transition transform active:scale-95">
-                        🔄 ${_col('Iškeisti!')}
+                    <button onclick="checkExchangeAnswer()" class="btn-tinted w-full py-2.5 sm:py-3.5 rounded-2xl bg-purple-100 hover:bg-purple-200 text-slate-800 font-black text-xl sm:text-2xl shadow-md border-2 border-b-4 border-purple-400 transition transform active:scale-95 flex items-center justify-center gap-2">
+                        <span>✅</span>
                     </button>
                 </div>
             `;
@@ -407,7 +408,7 @@
 
             sumEl.textContent = formatMoneyCents(sumCoins(state.collectedItems));
             if (state.collectedItems.length === 0) {
-                tray.innerHTML = `<span class="text-slate-400 font-bold text-xs sm:text-sm text-center">${_col('Spausk smulkesnes monetas apačioje')}</span>`;
+                tray.innerHTML = `<span class="text-slate-400 font-bold text-base sm:text-xl text-center">👆 🪙</span>`;
             } else {
                 tray.innerHTML = state.collectedItems.map((item, idx) => `
                     <button onclick="removeExCoin(${idx})" class="${item.class} pop-in cursor-pointer hover:opacity-80" title="Nuimti">
@@ -464,7 +465,6 @@
                         <div class="flex items-center gap-2.5 sm:gap-3">
                             <span class="text-4xl sm:text-5xl">${task.emoji}</span>
                             <div class="text-left">
-                                <div class="text-xs sm:text-sm font-bold text-slate-500 text-sub-title">${_col('Svajonių pirkinys:')}</div>
                                 <div class="text-lg sm:text-2xl font-black text-slate-800 text-main-title">${_col(task.item)}</div>
                             </div>
                         </div>
@@ -474,24 +474,24 @@
                     </div>
 
                     <div id="piggy-container" class="piggy-box p-3 sm:p-4 rounded-2xl flex flex-col items-center justify-center gap-2 min-h-[115px] sm:min-h-[145px]">
-                        <div class="text-xs sm:text-sm font-black text-pink-600">🐷 ${_col('Tavo taupyklėje yra:')}</div>
+                        <div class="text-sm font-black text-pink-600">🐷</div>
                         <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
                             ${piggyCoinsHtml}
                         </div>
                     </div>
 
-                    <div class="text-center font-black text-base sm:text-xl text-slate-700 text-main-title">
-                        ${_col('Ar užteks pinigų taupyklėje šiam pirkiniui?')}
+                    <div class="text-center font-black text-lg sm:text-2xl text-slate-700 text-main-title">
+                        ${_col('Ar užteks?')}
                     </div>
 
                     <div id="feedback" class="h-6 flex items-center justify-center font-black text-sm sm:text-lg opacity-0 transition-opacity"></div>
 
                     <div class="grid grid-cols-2 gap-3 sm:gap-4">
                         <button id="btn-yes" onclick="checkPiggyAnswer(true, this)" class="btn-tinted py-3.5 sm:py-4 rounded-2xl bg-emerald-100 hover:bg-emerald-200 text-slate-800 font-black text-base sm:text-xl shadow-md border-2 border-b-4 border-emerald-400 transition transform active:scale-95">
-                            ✅ ${_col('Taip, užteks!')}
+                            ✅ ${_col('Užteks')}
                         </button>
                         <button id="btn-no" onclick="checkPiggyAnswer(false, this)" class="btn-tinted py-3.5 sm:py-4 rounded-2xl bg-rose-100 hover:bg-rose-200 text-slate-800 font-black text-base sm:text-xl shadow-md border-2 border-b-4 border-rose-400 transition transform active:scale-95">
-                            ❌ ${_col('Ne, trūksta!')}
+                            ❌ ${_col('Trūksta')}
                         </button>
                     </div>
                 </div>
@@ -550,13 +550,15 @@
 
             app.innerHTML = `
                 <div class="flex-1 flex flex-col items-center justify-center p-6 sm:p-8 text-center fade-in">
-                    <h2 class="text-main-title text-3xl sm:text-4xl font-black text-gray-800 mb-4">${_col('Žaidimas baigtas!')}</h2>
+                    <h2 class="text-main-title text-3xl sm:text-4xl font-black text-gray-800 mb-4">🎉 ${_col('Šaunuolis!')}</h2>
                     <div class="flex justify-center gap-2 mb-4">${starHtml}</div>
                     <p class="text-sub-title text-xl sm:text-2xl font-bold text-gray-700 mb-2">${_col(message)} 🐷</p>
-                    <p class="text-sub-title text-lg sm:text-xl text-gray-600 mb-8">${_col('Taškai:')} <span class="font-black text-green-500">${state.score} / ${state.maxQuestions}</span></p>
-                    <button onclick="renderStartScreen()" class="btn-tinted w-full max-w-xs py-4 rounded-2xl bg-pink-100 hover:bg-pink-200 text-slate-800 font-black text-xl sm:text-2xl shadow-lg transition transform active:scale-95 border-2 border-b-4 border-pink-400">
-                        ${_col('Žaisti dar kartą')} 🔄
-                    </button>
+                    <p class="text-sub-title text-lg sm:text-xl text-gray-600 mb-8">⭐ <span class="font-black text-green-500">${state.score} / ${state.maxQuestions}</span></p>
+                    <div class="flex flex-col sm:flex-row gap-3 w-full max-w-xs">
+                        <button onclick="renderStartScreen()" class="btn-tinted flex-1 py-3.5 sm:py-4 rounded-2xl bg-pink-100 hover:bg-pink-200 text-slate-800 font-black text-lg sm:text-xl shadow-lg transition transform active:scale-95 border-2 border-b-4 border-pink-400">
+                            🔄 ${_col('Dar kartą')}
+                        </button>
+                    </div>
                 </div>
             `;
         }

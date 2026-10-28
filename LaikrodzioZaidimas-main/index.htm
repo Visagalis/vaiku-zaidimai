@@ -193,10 +193,10 @@
                 <div class="top-bar bg-emerald-100 border-b-2 border-emerald-300 text-slate-800 px-3 sm:px-5 py-2 sm:py-2.5 flex justify-between items-center font-bold text-sm sm:text-lg shadow-sm shrink-0">
                     <div class="flex items-center gap-2">
                         <button onclick="renderStartScreen()" class="top-badge bg-white/90 hover:bg-emerald-200 border border-emerald-300 px-2 py-0.5 rounded-lg text-sm sm:text-base transition active:scale-95" title="Pradžia">🏠</button>
-                        <span>⭐ ${_col('Taškai:')} <span class="text-emerald-700 dark:text-amber-300 font-black">${state.score}</span></span>
+                        <span class="flex items-center gap-1">⭐ <span class="text-emerald-700 dark:text-amber-300 font-black">${state.score}</span></span>
                     </div>
-                    <div class="top-badge bg-white/90 border border-emerald-300 px-2.5 py-0.5 rounded-xl">${_col('Klausimas:')} <span class="text-emerald-700 dark:text-amber-300 font-black">${state.question} / ${state.maxQuestions}</span></div>
-                    <div>🔥 ${_col('Serija:')} <span class="text-emerald-700 dark:text-amber-300 font-black">${state.streak}</span></div>
+                    <div class="top-badge bg-white/90 border border-emerald-300 px-2.5 py-0.5 rounded-xl font-black text-emerald-700 dark:text-amber-300">🎯 ${state.question} / ${state.maxQuestions}</div>
+                    <div class="flex items-center gap-1">🔥 <span class="text-emerald-700 dark:text-amber-300 font-black">${state.streak}</span></div>
                 </div>
             `;
         }
@@ -205,21 +205,24 @@
             app.innerHTML = `
                 <div class="flex-1 flex flex-col items-center justify-center p-4 sm:p-7 text-center fade-in">
                     <div class="text-5xl sm:text-6xl mb-1.5 bounce">🕐</div>
-                    <h1 class="text-main-title text-2xl sm:text-4xl font-black text-gray-800 mb-1 tracking-tight">${_col('Laikrodžio Žaidimas')}</h1>
-                    <p class="text-sub-title text-sm sm:text-lg text-gray-600 mb-4 sm:mb-6 font-bold">${_col('Mokykis pažinti ir nustatyti laiką!')}</p>
+                    <h1 class="text-main-title text-2xl sm:text-4xl font-black text-gray-800 mb-4 tracking-tight">${_col('Laikrodžio Žaidimas')}</h1>
                     
                     <div class="flex flex-col gap-2.5 sm:gap-3 w-full max-w-md">
-                        <button onclick="startGame('hours')" class="btn-tinted w-full py-3 sm:py-3.5 px-4 rounded-2xl bg-emerald-100 hover:bg-emerald-200 text-slate-800 font-black text-base sm:text-xl shadow-lg transition transform active:scale-95 border-2 border-b-4 border-emerald-400">
-                            🟢 ${_col('Pilnos valandos (Atpažink laiką)')}
+                        <button onclick="startGame('hours')" class="btn-tinted w-full py-3.5 px-4 rounded-2xl bg-emerald-100 hover:bg-emerald-200 text-slate-800 font-black text-base sm:text-xl shadow-lg transition transform active:scale-95 border-2 border-b-4 border-emerald-400 flex items-center justify-center gap-2.5">
+                            <span class="text-2xl">🟢</span>
+                            <span>${_col('Valandos')}</span>
                         </button>
-                        <button onclick="startGame('minutes')" class="btn-tinted w-full py-3 sm:py-3.5 px-4 rounded-2xl bg-amber-100 hover:bg-amber-200 text-slate-800 font-black text-base sm:text-xl shadow-lg transition transform active:scale-95 border-2 border-b-4 border-amber-400">
-                            🟡 ${_col('Pusvalandžiai ir minutės')}
+                        <button onclick="startGame('minutes')" class="btn-tinted w-full py-3.5 px-4 rounded-2xl bg-amber-100 hover:bg-amber-200 text-slate-800 font-black text-base sm:text-xl shadow-lg transition transform active:scale-95 border-2 border-b-4 border-amber-400 flex items-center justify-center gap-2.5">
+                            <span class="text-2xl">🟡</span>
+                            <span>${_col('Minutės')}</span>
                         </button>
-                        <button onclick="startGame('interactive')" class="btn-tinted w-full py-3 sm:py-3.5 px-4 rounded-2xl bg-indigo-100 hover:bg-indigo-200 text-slate-800 font-black text-base sm:text-xl shadow-lg transition transform active:scale-95 border-2 border-b-4 border-indigo-400">
-                            🖐️ ${_col('Nustatyk laikrodį pats!')}
+                        <button onclick="startGame('interactive')" class="btn-tinted w-full py-3.5 px-4 rounded-2xl bg-indigo-100 hover:bg-indigo-200 text-slate-800 font-black text-base sm:text-xl shadow-lg transition transform active:scale-95 border-2 border-b-4 border-indigo-400 flex items-center justify-center gap-2.5">
+                            <span class="text-2xl">🖐️</span>
+                            <span>${_col('Suk rodykles')}</span>
                         </button>
-                        <button onclick="startGame('routine')" class="btn-tinted w-full py-3 sm:py-3.5 px-4 rounded-2xl bg-rose-100 hover:bg-rose-200 text-slate-800 font-black text-base sm:text-xl shadow-lg transition transform active:scale-95 border-2 border-b-4 border-rose-400">
-                            🌞 ${_col('Dienotvarkė (Kada tai vyksta?)')}
+                        <button onclick="startGame('routine')" class="btn-tinted w-full py-3.5 px-4 rounded-2xl bg-rose-100 hover:bg-rose-200 text-slate-800 font-black text-base sm:text-xl shadow-lg transition transform active:scale-95 border-2 border-b-4 border-rose-400 flex items-center justify-center gap-2.5">
+                            <span class="text-2xl">🌞</span>
+                            <span>${_col('Dienotvarkė')}</span>
                         </button>
                     </div>
                 </div>
@@ -358,11 +361,11 @@
             const routineBanner = isRoutine && state.routineItem ? `
                 <div class="panel-box px-3 py-1.5 sm:py-2 rounded-2xl mb-1 text-center shadow-sm">
                     <div class="text-base sm:text-xl font-black text-main-title">${state.routineItem.icon} ${_col(state.routineItem.title)}</div>
-                    <div class="text-xs sm:text-sm font-bold text-sub-title">${_col('Kokį laiką rodo laikrodis?')}</div>
                 </div>
             ` : `
-                <h2 class="text-center text-lg sm:text-2xl font-black text-slate-700 text-main-title">
-                    ${_col('Kiek valandų rodo laikrodis?')}
+                <h2 class="text-center text-xl sm:text-2xl font-black text-slate-700 text-main-title flex items-center justify-center gap-2">
+                    <span>🕐</span>
+                    <span>${_col('Kiek valandų?')}</span>
                 </h2>
             `;
 
@@ -394,14 +397,12 @@
         function renderInteractiveScreen(isRoutine) {
             const headerHtml = isRoutine && state.routineItem ? `
                 <div class="panel-box px-3 py-1.5 rounded-2xl text-center w-full shadow-sm">
-                    <div class="text-sm sm:text-lg font-black text-main-title">${state.routineItem.icon} ${_col(state.routineItem.title)} – <span class="text-indigo-600 dark:text-indigo-400 font-black">${state.targetStr}</span></div>
-                    <div class="text-xs sm:text-sm font-bold text-sub-title">${_col('Nustatyk šį laiką laikrodyje!')}</div>
+                    <div class="text-base sm:text-xl font-black text-main-title">${state.routineItem.icon} ${_col(state.routineItem.title)} – <span class="text-indigo-600 dark:text-indigo-400 font-black">${state.targetStr}</span></div>
                 </div>
             ` : `
                 <div class="text-center">
-                    <p class="text-xs sm:text-sm font-bold text-sub-title">${_col('Spausk skaičius ant ciferblato arba mygtukus:')}</p>
-                    <div class="inline-block mt-0.5 px-4 py-1 rounded-2xl bg-amber-100 border-2 border-amber-400 text-amber-900 font-black text-lg sm:text-2xl shadow-sm">
-                        🎯 ${_col('Nustatyk laikrodį:')} ${state.targetStr}
+                    <div class="inline-block px-5 py-1 rounded-2xl bg-amber-100 border-2 border-amber-400 text-amber-900 font-black text-2xl sm:text-4xl shadow-sm">
+                        🎯 ${state.targetStr}
                     </div>
                 </div>
             `;
@@ -431,22 +432,22 @@
 
                     <!-- Tactile adjustment buttons -->
                     <div class="grid grid-cols-4 gap-1.5 sm:gap-2.5 w-full">
-                        <button onclick="adjustTime(-1, 0)" class="ctrl-btn py-2 sm:py-2.5 rounded-xl font-black text-xs sm:text-base border-b-4 shadow-sm">
-                            🕐 -1 ${_col('val.')}
+                        <button onclick="adjustTime(-1, 0)" class="ctrl-btn py-2 sm:py-2.5 rounded-xl font-black text-sm sm:text-lg border-b-4 shadow-sm">
+                            🕐 -1
                         </button>
-                        <button onclick="adjustTime(1, 0)" class="ctrl-btn py-2 sm:py-2.5 rounded-xl font-black text-xs sm:text-base border-b-4 shadow-sm">
-                            🕐 +1 ${_col('val.')}
+                        <button onclick="adjustTime(1, 0)" class="ctrl-btn py-2 sm:py-2.5 rounded-xl font-black text-sm sm:text-lg border-b-4 shadow-sm">
+                            🕐 +1
                         </button>
-                        <button onclick="adjustTime(0, 5)" class="ctrl-btn py-2 sm:py-2.5 rounded-xl font-black text-xs sm:text-base border-b-4 shadow-sm">
-                            ⏱️ +5 ${_col('min.')}
+                        <button onclick="adjustTime(0, 5)" class="ctrl-btn py-2 sm:py-2.5 rounded-xl font-black text-sm sm:text-lg border-b-4 shadow-sm">
+                            ⏱️ +5
                         </button>
-                        <button onclick="adjustTime(0, 15)" class="ctrl-btn py-2 sm:py-2.5 rounded-xl font-black text-xs sm:text-base border-b-4 shadow-sm">
-                            ⏱️ +15 ${_col('min.')}
+                        <button onclick="adjustTime(0, 15)" class="ctrl-btn py-2 sm:py-2.5 rounded-xl font-black text-sm sm:text-lg border-b-4 shadow-sm">
+                            ⏱️ +15
                         </button>
                     </div>
 
-                    <button onclick="checkInteractiveAnswer()" class="btn-tinted w-full py-2.5 sm:py-3 rounded-2xl bg-green-100 hover:bg-green-200 text-slate-800 font-black text-base sm:text-xl shadow-md border-2 border-b-4 border-green-400 transition transform active:scale-95">
-                        ${_col('Patikrinti!')} ✅
+                    <button onclick="checkInteractiveAnswer()" class="btn-tinted w-full py-2.5 sm:py-3.5 rounded-2xl bg-green-100 hover:bg-green-200 text-slate-800 font-black text-xl sm:text-2xl shadow-md border-2 border-b-4 border-green-400 transition transform active:scale-95">
+                        ✅
                     </button>
                 </div>
             `;
@@ -607,7 +608,7 @@
                     <p class="text-sub-title text-lg sm:text-xl text-gray-600 mb-8">${_col('Surinkai:')} <span class="font-black text-green-500">${state.score} / ${state.maxQuestions}</span></p>
                     
                     <button onclick="renderStartScreen()" class="btn-tinted w-full max-w-xs py-4 rounded-2xl bg-blue-100 hover:bg-blue-200 text-slate-800 font-black text-xl sm:text-2xl shadow-lg transition transform active:scale-95 border-2 border-b-4 border-blue-400">
-                        ${_col('Žaisti dar kartą')} 🔄
+                        🔄 ${_col('Dar kartą')}
                     </button>
                 </div>
             `;
