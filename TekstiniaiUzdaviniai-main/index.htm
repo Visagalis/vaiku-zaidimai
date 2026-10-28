@@ -54,6 +54,38 @@
                 color: #f8fafc !important;
             }
         }
+
+        .tap-token {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+            user-select: none;
+            touch-action: manipulation;
+        }
+        .tap-token:active {
+            transform: scale(1.25);
+        }
+        .tap-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #ef4444;
+            color: #ffffff;
+            font-size: 0.7rem;
+            font-weight: 900;
+            width: 1.25rem;
+            height: 1.25rem;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            animation: popIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
     </style>
 </head>
 <body class="h-screen max-h-screen flex items-center justify-center p-2 sm:p-4 overflow-hidden transition-colors duration-200">
@@ -276,17 +308,85 @@
             score: 0,
             streak: 0,
             firstTry: true,
-            waiting: false
+            waiting: false,
+            tappedCount: 0
         };
 
         const appEl = document.getElementById('app');
 
+        function speakStory() {
+            if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+            try {
+                window.speechSynthesis.cancel();
+                const q = state.questions[state.currentIndex];
+                if (!q) return;
+                // Išvalome emojis geresniam tarimui
+                const plainText = q.story.replace(/[\u{1F300}-\u{1F9FF}]/gu, '');
+                const utterance = new SpeechSynthesisUtterance(plainText);
+                utterance.lang = 'lt-LT';
+                utterance.rate = 0.9;
+                window.speechSynthesis.speak(utterance);
+            } catch (e) {}
+        }
+
+        function onTokenTap(el) {
+            if (state.waiting) return;
+            const badge = el.querySelector('.tap-badge');
+            if (badge) {
+                // Nuimti žymą
+                badge.remove();
+                el.classList.remove('bounce-anim');
+                playPopSound();
+            } else {
+                state.tappedCount++;
+                playStepSound(state.tappedCount);
+                el.classList.add('bounce-anim');
+                const b = document.createElement('span');
+                b.className = 'tap-badge';
+                b.textContent = state.tappedCount;
+                el.appendChild(b);
+            }
+        }
+
+        function buildInteractiveVisual(visualStr) {
+            if (!visualStr) return '';
+            // Jei tai tekstinė pinigų lygtis, pvz. "5 € − 2 €", paliekame stilingą formatą
+            if (visualStr.includes('€') || visualStr.includes(' c')) {
+                return `<div class="font-black text-2xl sm:text-4xl text-rose-700 dark:text-rose-300">${visualStr}</div>`;
+            }
+
+            // Skaidome emojis į interaktyvius elementus
+            // Pavyzdys: "🍎 🍎 + 🍎 🍎" arba su line-through
+            let counter = 0;
+            const parts = visualStr.split(/(\s+)/);
+            return parts.map(part => {
+                const trimmed = part.trim();
+                if (!trimmed) return part;
+                if (trimmed === '+' || trimmed === '−' || trimmed === '-') {
+                    return `<span class="mx-1.5 text-2xl sm:text-3xl font-black text-slate-400 select-none">${trimmed}</span>`;
+                }
+                // Tikriname ar turi line-through
+                const isCrossed = part.includes('line-through');
+                const emojiMatch = part.match(/[\u{1F300}-\u{1F9FF}]/gu);
+                if (emojiMatch) {
+                    return emojiMatch.map(em => {
+                        counter++;
+                        return `<span onclick="onTokenTap(this)" class="tap-token text-3xl sm:text-4xl mx-1 my-0.5 p-1 rounded-xl bg-white/70 dark:bg-slate-700/60 shadow-sm border border-slate-200 dark:border-slate-600 ${isCrossed ? 'opacity-40 grayscale line-through' : ''}" title="Paspausk suskaičiuoti">${em}</span>`;
+                    }).join('');
+                }
+                return part;
+            }).join('');
+        }
+
         function renderStartScreen() {
+            if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+            }
             appEl.innerHTML = `
                 <div class="p-6 sm:p-8 flex flex-col items-center justify-center text-center">
                     <div class="text-6xl sm:text-7xl mb-2 animate-bounce">🍎</div>
                     <h1 class="text-3xl sm:text-5xl font-black text-rose-700 mb-2">${_col('Tekstiniai Uždavinukai')}</h1>
-                    <p class="text-lg sm:text-xl font-bold text-slate-600 mb-5 sm:mb-7">${_col('Perskaityk trumpą istoriją ir suskaičiuok!')}</p>
+                    <p class="text-lg sm:text-xl font-bold text-slate-600 mb-5 sm:mb-7">${_col('Perskaityk, paspausk daiktus ir suskaičiuok!')}</p>
                     
                     <div class="flex flex-col gap-3 sm:gap-3.5 w-full max-w-sm">
                         <button onclick="startGame('easy')" class="btn-3d py-3.5 px-6 bg-rose-100 hover:bg-rose-200 text-slate-800 border-2 border-rose-400 rounded-2xl text-xl sm:text-2xl font-black shadow-[0_6px_0_#fb7185] active:shadow-[0_0px_0_#fb7185] transition-all">
@@ -309,6 +409,7 @@
             state.score = 0;
             state.streak = 0;
             state.currentIndex = 0;
+            state.tappedCount = 0;
             const pool = mode === 'easy' ? TASKS_EASY : mode === 'hard' ? TASKS_HARD : TASKS_MONEY;
             state.questions = shuffle(pool).slice(0, 8);
             renderQuestion();
@@ -322,31 +423,38 @@
 
             state.firstTry = true;
             state.waiting = false;
+            state.tappedCount = 0;
             const q = state.questions[state.currentIndex];
             const options = shuffle([...q.options]);
 
             const optionsHtml = options.map((opt, idx) => `
                 <button id="btn-${idx}" onclick="handleAnswer('${String(opt)}', this)" 
-                    class="btn-3d py-3 sm:py-4 px-4 bg-rose-50 hover:bg-rose-100 text-rose-950 border-2 border-rose-300 rounded-2xl text-2xl sm:text-3xl font-black shadow-[0_5px_0_#fca5a5] active:shadow-[0_0px_0_#fca5a5] transition-all flex items-center justify-center text-center">
+                    class="btn-3d py-3 sm:py-4 px-4 bg-rose-50 hover:bg-rose-100 text-rose-950 border-2 border-rose-300 rounded-2xl text-2xl sm:text-3xl font-black shadow-[0_5px_0_#fca5a5] active:shadow-[0_0px_0_#fca5a5] transition-all flex items-center justify-center text-center min-h-[58px]">
                     ${opt}
                 </button>
             `).join('');
 
+            const interactiveVisualHtml = buildInteractiveVisual(q.visual);
+
             appEl.innerHTML = `
                 ${renderTopBar({ score: state.score, current: state.currentIndex + 1, total: state.questions.length, streak: state.streak, theme: 'rose' })}
 
-                <div class="p-3 sm:p-5 flex-1 flex flex-col justify-between items-center">
-                    <div class="w-full bg-rose-50/80 rounded-2xl p-3 sm:p-4 border-2 border-rose-200 shadow-sm text-center mb-1">
-                        <p class="text-lg sm:text-2xl font-black text-slate-800 leading-snug">
+                <div class="p-3 sm:p-5 flex-1 flex flex-col justify-between items-center gap-2">
+                    <div class="w-full bg-rose-50/80 rounded-2xl p-3 sm:p-4 border-2 border-rose-200 shadow-sm relative">
+                        <button onclick="speakStory()" title="Išklausyti garsiai" class="absolute top-2 right-2 p-2 rounded-xl bg-white hover:bg-rose-100 text-rose-600 shadow-sm border border-rose-200 text-base sm:text-lg transition active:scale-90" aria-label="Klausyti">
+                            🔊
+                        </button>
+                        <p class="text-base sm:text-xl font-black text-slate-800 leading-snug pr-8 text-center">
                             ${_col(q.story)}
                         </p>
                     </div>
 
-                    <div class="visual-box my-auto py-2 px-4 flex items-center justify-center text-2xl sm:text-3xl tracking-wide bg-white rounded-xl border border-rose-100 min-h-[50px]">
-                        ${q.visual}
+                    <!-- Interaktyvi vizuali erdvė su paspaudžiamais elementais -->
+                    <div class="visual-box my-auto py-2.5 px-4 flex flex-wrap items-center justify-center bg-white/90 rounded-2xl border-2 border-rose-200 min-h-[70px] w-full shadow-inner">
+                        ${interactiveVisualHtml}
                     </div>
 
-                    <div id="feedback" class="h-6 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black my-1 opacity-0 transition-opacity">
+                    <div id="feedback" class="h-6 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black opacity-0 transition-opacity">
                         Pranešimas
                     </div>
 
