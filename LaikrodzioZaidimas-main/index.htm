@@ -56,6 +56,7 @@
             text-anchor: middle;
             dominant-baseline: central;
             pointer-events: none;
+            user-select: none;
         }
 
         .clock-num-hit {
@@ -64,15 +65,35 @@
             transition: fill 0.15s ease;
         }
         .clock-num-hit:hover {
-            fill: rgba(59, 130, 246, 0.15);
+            fill: rgba(59, 130, 246, 0.12);
         }
         .clock-num-hit:active {
-            fill: rgba(59, 130, 246, 0.3);
+            fill: rgba(59, 130, 246, 0.25);
         }
 
-        #hour-hand, #minute-hand {
-            transition: transform 0.25s cubic-bezier(0.34, 1.4, 0.64, 1);
+        #hour-hand-group, #minute-hand-group {
             transform-origin: 150px 150px;
+            transition: transform 0.25s cubic-bezier(0.34, 1.4, 0.64, 1);
+            will-change: transform;
+        }
+
+        #clock-svg.is-dragging #hour-hand-group,
+        #clock-svg.is-dragging #minute-hand-group,
+        #clock-svg.is-dragging #hour-hand,
+        #clock-svg.is-dragging #minute-hand {
+            transition: none !important;
+        }
+
+        .hand-handle {
+            cursor: grab;
+            transition: transform 0.15s ease, filter 0.15s ease;
+        }
+        .hand-handle:hover {
+            filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.35));
+        }
+        .hand-handle:active,
+        #clock-svg.is-dragging .hand-handle {
+            cursor: grabbing;
         }
 
         /* Tamsioji Tema (Dark Mode) */
@@ -130,10 +151,22 @@
                 fill: #f8fafc !important;
             }
             #hour-hand {
-                stroke: #f8fafc !important;
+                stroke: #fbbf24 !important;
             }
             #minute-hand {
                 stroke: #60a5fa !important;
+            }
+            .hour-handle {
+                fill: #f59e0b !important;
+                stroke: #f8fafc !important;
+            }
+            .minute-handle {
+                fill: #3b82f6 !important;
+                stroke: #f8fafc !important;
+            }
+            #clock-inner-ring {
+                stroke: #fbbf24 !important;
+                opacity: 0.35 !important;
             }
         }
     </style>
@@ -231,12 +264,23 @@
 
         function startGame(mode) {
             initAudio();
+            dragData.active = false;
+            dragData.hand = null;
+            dragData.hasMoved = false;
             state.mode = mode;
             state.score = 0;
             state.streak = 0;
             state.question = 1;
             generateQuestion();
         }
+
+        let dragData = {
+            active: false,
+            hand: null,
+            startX: 0,
+            startY: 0,
+            hasMoved: false
+        };
 
         function buildClockSvgHTML(interactive) {
             const cx = 150, cy = 150;
@@ -265,15 +309,53 @@
                 numbersHtml += `<text x="${x}" y="${parseFloat(y) + 1}" class="clock-number">${i}</text>`;
             }
 
+            if (interactive) {
+                return `
+                    <svg id="clock-svg" viewBox="0 0 300 300" class="w-full h-full drop-shadow-md select-none touch-none cursor-grab"
+                         onpointerdown="onClockPointerDown(event)"
+                         onpointermove="onClockPointerMove(event)"
+                         onpointerup="onClockPointerUp(event)"
+                         onpointercancel="onClockPointerUp(event)">
+                        <circle id="clock-face-circle" cx="150" cy="150" r="144" fill="#ffffff" stroke="#334155" stroke-width="8"/>
+                        <circle id="clock-inner-ring" cx="150" cy="150" r="88" fill="rgba(245, 158, 11, 0.05)" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.6" pointer-events="none"/>
+                        <g id="clock-marks" pointer-events="none">${ticksHtml}</g>
+                        <g id="clock-numbers">${numbersHtml}</g>
+                        <!-- Hour Hand Group (Interactive) -->
+                        <g id="hour-hand-group">
+                            <line x1="150" y1="150" x2="150" y2="72" stroke="transparent" stroke-width="44" stroke-linecap="round" data-hand="hour" class="cursor-pointer"/>
+                            <line id="hour-hand" x1="150" y1="150" x2="150" y2="72" stroke="#d97706" stroke-width="10" stroke-linecap="round" pointer-events="none"/>
+                            <circle cx="150" cy="72" r="13" fill="#f59e0b" stroke="#ffffff" stroke-width="2.5" class="hand-handle hour-handle" data-hand="hour"/>
+                            <circle cx="150" cy="72" r="4" fill="#ffffff" pointer-events="none"/>
+                        </g>
+                        <!-- Minute Hand Group (Interactive) -->
+                        <g id="minute-hand-group">
+                            <line x1="150" y1="150" x2="150" y2="38" stroke="transparent" stroke-width="40" stroke-linecap="round" data-hand="minute" class="cursor-pointer"/>
+                            <line id="minute-hand" x1="150" y1="150" x2="150" y2="38" stroke="#2563eb" stroke-width="7" stroke-linecap="round" pointer-events="none"/>
+                            <circle cx="150" cy="38" r="11" fill="#2563eb" stroke="#ffffff" stroke-width="2.5" class="hand-handle minute-handle" data-hand="minute"/>
+                            <circle cx="150" cy="38" r="3.5" fill="#ffffff" pointer-events="none"/>
+                        </g>
+                        <!-- Center Pin -->
+                        <circle cx="150" cy="150" r="10" fill="#ef4444" stroke="#ffffff" stroke-width="2.5" pointer-events="none"/>
+                        <circle cx="150" cy="150" r="3.5" fill="#ffffff" pointer-events="none"/>
+                    </svg>
+                `;
+            }
+
             return `
-                <svg id="clock-svg" viewBox="0 0 300 300" class="w-full h-full drop-shadow-md">
+                <svg id="clock-svg" viewBox="0 0 300 300" class="w-full h-full drop-shadow-md select-none">
                     <circle id="clock-face-circle" cx="150" cy="150" r="144" fill="#ffffff" stroke="#334155" stroke-width="8"/>
                     <g id="clock-marks">${ticksHtml}</g>
                     <g id="clock-numbers">${numbersHtml}</g>
-                    <!-- Hour Hand -->
-                    <line id="hour-hand" x1="150" y1="150" x2="150" y2="74" stroke="#1e293b" stroke-width="10" stroke-linecap="round"/>
-                    <!-- Minute Hand -->
-                    <line id="minute-hand" x1="150" y1="150" x2="150" y2="42" stroke="#2563eb" stroke-width="6" stroke-linecap="round"/>
+                    <!-- Hour Hand Group (Static) -->
+                    <g id="hour-hand-group">
+                        <line id="hour-hand" x1="150" y1="150" x2="150" y2="72" stroke="#d97706" stroke-width="10" stroke-linecap="round"/>
+                        <circle cx="150" cy="72" r="5" fill="#f59e0b"/>
+                    </g>
+                    <!-- Minute Hand Group (Static) -->
+                    <g id="minute-hand-group">
+                        <line id="minute-hand" x1="150" y1="150" x2="150" y2="38" stroke="#2563eb" stroke-width="7" stroke-linecap="round"/>
+                        <circle cx="150" cy="38" r="4" fill="#2563eb"/>
+                    </g>
                     <!-- Center Pin -->
                     <circle cx="150" cy="150" r="9" fill="#ef4444" stroke="#ffffff" stroke-width="2"/>
                 </svg>
@@ -281,13 +363,126 @@
         }
 
         function updateClockHands(hours, minutes) {
+            const hourGroup = document.getElementById('hour-hand-group');
+            const minGroup = document.getElementById('minute-hand-group');
             const hourHand = document.getElementById('hour-hand');
             const minHand = document.getElementById('minute-hand');
-            if (!hourHand || !minHand) return;
+
             const hourDeg = (hours % 12) * 30 + minutes * 0.5;
             const minDeg = minutes * 6;
-            hourHand.style.transform = `rotate(${hourDeg}deg)`;
-            minHand.style.transform = `rotate(${minDeg}deg)`;
+
+            if (hourGroup) {
+                hourGroup.style.transform = `rotate(${hourDeg}deg)`;
+            } else if (hourHand) {
+                hourHand.style.transform = `rotate(${hourDeg}deg)`;
+            }
+
+            if (minGroup) {
+                minGroup.style.transform = `rotate(${minDeg}deg)`;
+            } else if (minHand) {
+                minHand.style.transform = `rotate(${minDeg}deg)`;
+            }
+        }
+
+        function getClockAngleAndDist(e, svg) {
+            const pt = svg.createSVGPoint();
+            pt.x = e.clientX;
+            pt.y = e.clientY;
+            const svgP = pt.matrixTransform(svg.getScreenCTM().inverse());
+            const dx = svgP.x - 150;
+            const dy = svgP.y - 150;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            let deg = Math.atan2(dx, -dy) * (180 / Math.PI);
+            if (deg < 0) deg += 360;
+            return { deg, dist, x: svgP.x, y: svgP.y };
+        }
+
+        function onClockPointerDown(e) {
+            if (state.waiting) return;
+            const svg = document.getElementById('clock-svg');
+            if (!svg) return;
+
+            try {
+                svg.setPointerCapture(e.pointerId);
+            } catch (err) {}
+
+            const info = getClockAngleAndDist(e, svg);
+            if (info.dist > 146) return;
+
+            let hand = null;
+            if (e.target && e.target.getAttribute) {
+                hand = e.target.getAttribute('data-hand');
+            }
+
+            if (!hand) {
+                if (info.dist < 88) {
+                    hand = 'hour';
+                } else {
+                    hand = 'minute';
+                }
+            }
+
+            dragData.active = true;
+            dragData.hand = hand;
+            dragData.startX = info.x;
+            dragData.startY = info.y;
+            dragData.hasMoved = false;
+
+            setActiveHand(hand, false);
+            svg.classList.add('is-dragging');
+
+            updateHandFromAngle(info.deg, hand);
+        }
+
+        function onClockPointerMove(e) {
+            if (!dragData.active || state.waiting) return;
+            const svg = document.getElementById('clock-svg');
+            if (!svg) return;
+
+            const info = getClockAngleAndDist(e, svg);
+            const moveDist = Math.hypot(info.x - dragData.startX, info.y - dragData.startY);
+            if (moveDist > 6) {
+                dragData.hasMoved = true;
+            }
+
+            updateHandFromAngle(info.deg, dragData.hand);
+        }
+
+        function onClockPointerUp(e) {
+            const svg = document.getElementById('clock-svg');
+            if (svg) {
+                svg.classList.remove('is-dragging');
+                try {
+                    svg.releasePointerCapture(e.pointerId);
+                } catch (err) {}
+            }
+
+            if (!dragData.active) return;
+            dragData.active = false;
+            dragData.hand = null;
+            refreshInteractiveClock();
+        }
+
+        function updateHandFromAngle(deg, hand) {
+            if (hand === 'minute') {
+                let snappedM = Math.round(deg / 30) * 5;
+                if (snappedM >= 60) snappedM = 0;
+
+                if (snappedM !== state.userM) {
+                    state.userM = snappedM;
+                    playSound('tick');
+                    refreshInteractiveClock();
+                }
+            } else if (hand === 'hour') {
+                let hour = Math.round(deg / 30);
+                if (hour === 0) hour = 12;
+
+                if (hour !== state.userH) {
+                    state.userH = hour;
+                    playSound('tick');
+                    refreshInteractiveClock();
+                }
+            }
         }
 
         function generateQuestion() {
@@ -424,7 +619,7 @@
                         </span>
                     </div>
 
-                    <div id="clock-wrap" class="w-[175px] h-[175px] sm:w-[220px] sm:h-[220px] my-auto shrink-0 flex items-center justify-center">
+                    <div id="clock-wrap" class="w-[190px] h-[190px] min-[380px]:w-[215px] min-[380px]:h-[215px] sm:w-[250px] sm:h-[250px] my-auto shrink-0 flex items-center justify-center relative touch-none">
                         ${buildClockSvgHTML(true)}
                     </div>
 
@@ -432,32 +627,37 @@
 
                     <!-- Tactile adjustment buttons -->
                     <div class="grid grid-cols-4 gap-1.5 sm:gap-2.5 w-full">
-                        <button onclick="adjustTime(-1, 0)" class="ctrl-btn py-2 sm:py-2.5 rounded-xl font-black text-sm sm:text-lg border-b-4 shadow-sm">
+                        <button onclick="adjustTime(-1, 0)" class="ctrl-btn py-2 sm:py-2.5 rounded-xl font-black text-sm sm:text-base border-b-4 shadow-sm active:translate-y-0.5">
                             🕐 -1
                         </button>
-                        <button onclick="adjustTime(1, 0)" class="ctrl-btn py-2 sm:py-2.5 rounded-xl font-black text-sm sm:text-lg border-b-4 shadow-sm">
+                        <button onclick="adjustTime(1, 0)" class="ctrl-btn py-2 sm:py-2.5 rounded-xl font-black text-sm sm:text-base border-b-4 shadow-sm active:translate-y-0.5">
                             🕐 +1
                         </button>
-                        <button onclick="adjustTime(0, 5)" class="ctrl-btn py-2 sm:py-2.5 rounded-xl font-black text-sm sm:text-lg border-b-4 shadow-sm">
-                            ⏱️ +5
+                        <button onclick="adjustTime(0, -5)" class="ctrl-btn py-2 sm:py-2.5 rounded-xl font-black text-sm sm:text-base border-b-4 shadow-sm active:translate-y-0.5">
+                            ⏱️ -5
                         </button>
-                        <button onclick="adjustTime(0, 15)" class="ctrl-btn py-2 sm:py-2.5 rounded-xl font-black text-sm sm:text-lg border-b-4 shadow-sm">
-                            ⏱️ +15
+                        <button onclick="adjustTime(0, 5)" class="ctrl-btn py-2 sm:py-2.5 rounded-xl font-black text-sm sm:text-base border-b-4 shadow-sm active:translate-y-0.5">
+                            ⏱️ +5
                         </button>
                     </div>
 
-                    <button onclick="checkInteractiveAnswer()" class="btn-tinted w-full py-2.5 sm:py-3.5 rounded-2xl bg-green-100 hover:bg-green-200 text-slate-800 font-black text-xl sm:text-2xl shadow-md border-2 border-b-4 border-green-400 transition transform active:scale-95">
-                        ✅
+                    <button onclick="checkInteractiveAnswer()" class="btn-tinted w-full py-2.5 sm:py-3.5 rounded-2xl bg-green-100 hover:bg-green-200 text-slate-800 font-black text-xl sm:text-2xl shadow-md border-2 border-b-4 border-green-400 transition transform active:scale-95 flex items-center justify-center gap-2">
+                        <span>✅</span>
+                        <span>${_col('Patvirtinti')}</span>
                     </button>
                 </div>
             `;
             updateClockHands(state.userH, state.userM);
         }
 
-        function setActiveHand(hand) {
+        function setActiveHand(hand, withSound) {
             if (state.waiting) return;
+            if (withSound === undefined) withSound = true;
+            const changed = state.activeHand !== hand;
             state.activeHand = hand;
-            playSound('tick');
+            if (withSound && changed) {
+                playSound('tick');
+            }
             const hBtn = document.getElementById('toggle-hour-btn');
             const mBtn = document.getElementById('toggle-min-btn');
             if (hBtn && mBtn) {
@@ -468,6 +668,7 @@
 
         function onClockNumberClick(num) {
             if (state.waiting) return;
+            if (dragData.hasMoved) return;
             playSound('tick');
             if (state.activeHand === 'hour') {
                 state.userH = num;
@@ -482,13 +683,19 @@
             playSound('tick');
             if (deltaH !== 0) {
                 state.userH = ((state.userH - 1 + deltaH + 12) % 12) + 1;
+                setActiveHand('hour', false);
             }
             if (deltaM !== 0) {
                 let totalMins = state.userM + deltaM;
-                if (totalMins >= 60) {
+                if (totalMins < 0) {
+                    totalMins += 60;
+                    state.userH = ((state.userH - 2 + 12) % 12) + 1;
+                } else if (totalMins >= 60) {
+                    totalMins -= 60;
                     state.userH = (state.userH % 12) + 1;
                 }
-                state.userM = (totalMins + 60) % 60;
+                state.userM = totalMins;
+                setActiveHand('minute', false);
             }
             refreshInteractiveClock();
         }
