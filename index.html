@@ -662,7 +662,7 @@
         function openSettings() {
             sylToggle.checked = isSyllableColoringEnabled();
             updateThemeButtonsUI();
-            sylPreview.innerHTML = _col('Katė geria pieną');
+            sylPreview.innerHTML = `<span>${_col('Katė geria pieną')}</span>`;
             settingsModal.classList.remove('hidden');
             settingsModal.classList.add('flex');
         }

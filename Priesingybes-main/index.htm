@@ -362,7 +362,7 @@
             const optionsHtml = options.map((opt, idx) => `
                 <button id="btn-${idx}" onclick="handleAnswer('${opt.replace(/'/g, "\\'")}', this)" 
                     class="btn-3d py-3 sm:py-4 px-3 bg-blue-50 hover:bg-blue-100 text-blue-950 border-2 border-blue-300 rounded-2xl text-base sm:text-xl font-black shadow-[0_5px_0_#93c5fd] active:shadow-[0_0px_0_#93c5fd] transition-all flex items-center justify-center text-center">
-                    ${_col(opt)}
+                    <span>${_col(opt)}</span>
                 </button>
             `).join('');
 

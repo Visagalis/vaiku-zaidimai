@@ -335,7 +335,7 @@
             state.currentSlots[slotIndex] = null;
 
             const messageEl = document.getElementById('message');
-            messageEl.innerHTML = _col('Pataisyk sakinį:');
+            messageEl.innerHTML = `<span>${_col('Pataisyk sakinį:')}</span>`;
             messageEl.className = "text-base sm:text-xl font-black h-7 text-orange-500 flex items-center justify-center";
             renderSlots();
         }
@@ -372,7 +372,7 @@
                     state.score++;
                     state.streak++;
                 }
-                messageEl.innerHTML = `${_col('Teisingai! Šaunuolis!')} 🎉`;
+                messageEl.innerHTML = `<span>${_col('Teisingai! Šaunuolis!')} 🎉</span>`;
                 messageEl.className = "text-xl sm:text-2xl font-black h-7 text-green-500 flex items-center justify-center";
                 for (let i = 0; i < children.length; i++) {
                     children[i].classList.add('slot-correct', 'correct-anim');
@@ -385,7 +385,7 @@
                 state.firstTry = false;
                 state.streak = 0;
                 playWrongSound();
-                messageEl.innerHTML = `${_col('Bandyk dar kartą! Paspausk ant žodžio, kad nuimtum.')} 🤔`;
+                messageEl.innerHTML = `<span>${_col('Bandyk dar kartą! Paspausk ant žodžio, kad nuimtum.')} 🤔</span>`;
                 messageEl.className = "text-sm sm:text-lg font-black h-7 text-red-500 flex items-center justify-center";
                 slotsContainer.classList.remove('shake');
                 void slotsContainer.offsetWidth;
@@ -442,7 +442,7 @@
                 blank.innerHTML = _col(selected);
                 blank.className = "inline-flex items-center justify-center px-4 py-1 bg-green-100 border-2 border-green-500 rounded-xl correct-anim";
                 btn.classList.add('slot-correct', 'correct-anim');
-                messageEl.innerHTML = `${_col('Puiku! Sakinys teisingas!')} 🎉`;
+                messageEl.innerHTML = `<span>${_col('Puiku! Sakinys teisingas!')} 🎉</span>`;
                 messageEl.className = "text-lg sm:text-2xl font-black h-7 text-green-500 flex items-center justify-center";
 
                 setTimeout(() => {
@@ -455,7 +455,7 @@
                 playWrongSound();
                 btn.classList.add('slot-wrong', 'shake', 'opacity-50');
                 btn.disabled = true;
-                messageEl.innerHTML = `${_col('Šis žodis čia netinka, bandyk kitą!')} 🤔`;
+                messageEl.innerHTML = `<span>${_col('Šis žodis čia netinka, bandyk kitą!')} 🤔</span>`;
                 messageEl.className = "text-sm sm:text-lg font-black h-7 text-red-500 flex items-center justify-center";
             }
         }

@@ -702,7 +702,7 @@
                 playCorrectSound();
                 renderPuppyQuestion();
                 const fb = document.getElementById('feedback');
-                fb.innerHTML = _col('Valio! Šuniukas pasiekė tikslą! 🎉');
+                fb.innerHTML = `<span>${_col('Valio! Šuniukas pasiekė tikslą! 🎉')}</span>`;
                 fb.className = 'h-6 flex items-center justify-center text-sm sm:text-base font-black text-green-600 opacity-100';
 
                 setTimeout(() => {
@@ -713,7 +713,7 @@
                 playStepSound();
                 renderPuppyQuestion();
                 const fb = document.getElementById('feedback');
-                fb.innerHTML = _col('Puiku! Eik toliau! 🐾');
+                fb.innerHTML = `<span>${_col('Puiku! Eik toliau! 🐾')}</span>`;
                 fb.className = 'h-6 flex items-center justify-center text-sm sm:text-base font-black text-fuchsia-600 opacity-100';
             }
         }

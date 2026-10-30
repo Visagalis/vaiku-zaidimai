@@ -395,7 +395,7 @@
                 return `
                     <button id="card-${idx}" onclick="handleTrainCard(${idx})" ${isUsed ? 'disabled' : ''}
                         class="btn-3d py-2.5 sm:py-3.5 px-3 bg-cyan-50 hover:bg-cyan-100 border-2 border-cyan-300 rounded-2xl text-sm sm:text-lg font-black shadow-[0_4px_0_#67e8f9] active:shadow-[0_0px_0_#67e8f9] transition-all flex items-center justify-center text-center ${isUsed ? 'opacity-25 scale-95 pointer-events-none' : ''}">
-                        ${_col(word)}
+                        <span>${_col(word)}</span>
                     </button>
                 `;
             }).join('');
@@ -497,7 +497,7 @@
             const optionsHtml = options.map((opt, idx) => `
                 <button id="btn-${idx}" onclick="handleAnswer('${opt.replace(/'/g, "\\'")}', this)" 
                     class="btn-3d py-3 sm:py-4 px-3 bg-cyan-50 hover:bg-cyan-100 text-cyan-950 border-2 border-cyan-300 rounded-2xl text-base sm:text-xl font-black shadow-[0_5px_0_#a5f3fc] active:shadow-[0_0px_0_#a5f3fc] transition-all flex items-center justify-center text-center">
-                    ${_col(opt)}
+                    <span>${_col(opt)}</span>
                 </button>
             `).join('');
 

@@ -274,7 +274,7 @@
                         ${options.map(opt => `
                             <button onclick="handleRecognizeAnswer('${opt.replace(/'/g, "\\'")}', this)"
                                 class="btn-bounce bg-white hover:bg-amber-50 dark-btn text-slate-800 font-black py-3 px-2 rounded-2xl text-base sm:text-lg shadow border-2 border-amber-300 transition-all flex items-center justify-center text-center leading-snug">
-                                ${_col(opt)}
+                                <span>${_col(opt)}</span>
                             </button>
                         `).join('')}
                     </div>
@@ -301,7 +301,7 @@
                 void shapeDisplay.offsetWidth;
                 shapeDisplay.classList.add('animate-bounce-sm');
 
-                feedbackEl.innerHTML = _col('Puiku! Teisingai! 🎉');
+                feedbackEl.innerHTML = `<span>${_col('Puiku! Teisingai! 🎉')}</span>`;
                 feedbackEl.className = 'h-6 text-base sm:text-lg font-black text-center text-green-600 opacity-100';
 
                 gameState.questionIndex++;
@@ -312,11 +312,12 @@
                 playWrongSound();
                 btnEl.disabled = true;
                 btnEl.classList.add('opacity-50', 'line-through', 'border-red-400');
+                shapeDisplay.classList.remove('animate-bounce-sm');
                 shapeDisplay.classList.remove('animate-shake');
                 void shapeDisplay.offsetWidth;
                 shapeDisplay.classList.add('animate-shake');
 
-                feedbackEl.innerHTML = _col('Bandyk dar kartą! 🤔');
+                feedbackEl.innerHTML = `<span>${_col('Bandyk dar kartą! 🤔')}</span>`;
                 feedbackEl.className = 'h-6 text-base sm:text-lg font-black text-center text-red-500 opacity-100';
             }
         }
@@ -433,7 +434,7 @@
                     playCorrectSound();
                     renderNecklaceScreen();
                     const fb = document.getElementById('feedback-msg');
-                    fb.innerHTML = _col('Vėrinys suvertas! Šaunu! 🎉');
+                    fb.innerHTML = `<span>${_col('Vėrinys suvertas! Šaunu! 🎉')}</span>`;
                     fb.className = 'h-6 text-base sm:text-lg font-black text-center text-green-600 opacity-100';
                     gameState.questionIndex++;
                     setTimeout(nextQuestion, 1000);
@@ -441,7 +442,7 @@
                     playPopSound();
                     renderNecklaceScreen();
                     const fb = document.getElementById('feedback-msg');
-                    fb.innerHTML = _col('Puiku! Dabar parink paskutinį karoliuką! ✨');
+                    fb.innerHTML = `<span>${_col('Puiku! Dabar parink paskutinį karoliuką! ✨')}</span>`;
                     fb.className = 'h-6 text-base sm:text-lg font-black text-center text-sky-600 opacity-100';
                 }
             } else {
@@ -454,7 +455,7 @@
                     void slotEl.offsetWidth;
                     slotEl.classList.add('animate-shake');
                 }
-                feedbackEl.innerHTML = _col('Pažiūrėk į seką ir bandyk dar kartą! 🤔');
+                feedbackEl.innerHTML = `<span>${_col('Pažiūrėk į seką ir bandyk dar kartą! 🤔')}</span>`;
                 feedbackEl.className = 'h-6 text-base sm:text-lg font-black text-center text-red-500 opacity-100';
             }
         }
@@ -576,7 +577,7 @@
                     playCorrectSound();
                     renderHuntScreen();
                     const fb = document.getElementById('feedback-msg');
-                    fb.innerHTML = _col('Visos figūros surastos! Šaunuolis! 🎉');
+                    fb.innerHTML = `<span>${_col('Visos figūros surastos! Šaunuolis! 🎉')}</span>`;
                     fb.className = 'h-6 text-base sm:text-lg font-black text-center text-green-600 opacity-100';
                     gameState.questionIndex++;
                     setTimeout(nextQuestion, 1000);
@@ -584,7 +585,7 @@
                     playPopSound();
                     renderHuntScreen();
                     const fb = document.getElementById('feedback-msg');
-                    fb.innerHTML = _col('Teisingai! Ieškok toliau! 🔍');
+                    fb.innerHTML = `<span>${_col('Teisingai! Ieškok toliau! 🔍')}</span>`;
                     fb.className = 'h-6 text-base sm:text-lg font-black text-center text-emerald-600 opacity-100';
                 }
             } else {
@@ -596,7 +597,7 @@
                     void cellBtn.offsetWidth;
                     cellBtn.classList.add('animate-shake');
                 }
-                feedbackEl.innerHTML = _col('Ši figūra netinka! Bandyk dar kartą! 🤔');
+                feedbackEl.innerHTML = `<span>${_col('Ši figūra netinka! Bandyk dar kartą! 🤔')}</span>`;
                 feedbackEl.className = 'h-6 text-base sm:text-lg font-black text-center text-red-500 opacity-100';
             }
         }
