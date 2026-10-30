@@ -747,37 +747,40 @@
             const balloonsHtml = state.balloons.map((b, idx) => {
                 if (b.popped) {
                     return `
-                        <div class="h-24 sm:h-28 rounded-3xl border-2 border-dashed border-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 flex flex-col items-center justify-center pop-in">
+                        <div class="w-full h-full min-h-[85px] sm:min-h-[110px] rounded-3xl border-2 border-dashed border-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 flex flex-col items-center justify-center pop-in p-2">
                             <span class="text-2xl sm:text-3xl">💥</span>
-                            <span class="text-xs sm:text-sm font-black text-emerald-600 dark:text-emerald-400">${b.label} = ${b.value}</span>
+                            <span class="text-xs sm:text-sm font-black text-emerald-600 dark:text-emerald-400 mt-1">${b.label} = ${b.value}</span>
                         </div>
                     `;
                 }
                 return `
-                    <button id="bal-${idx}" onclick="tapBalloon(${idx})" class="float-anim h-24 sm:h-28 rounded-3xl ${b.colorClass} text-white border-b-4 shadow-lg flex flex-col items-center justify-center relative transition transform active:scale-90 ${b.wrongTried ? 'opacity-50' : ''}" style="animation-delay: ${idx * 0.18}s">
-                        <span class="text-xs opacity-90">🎈</span>
-                        <span class="text-xl sm:text-2xl font-black tracking-wide drop-shadow">${b.label}</span>
+                    <button id="bal-${idx}" onclick="tapBalloon(${idx})" class="float-anim w-full h-full min-h-[85px] sm:min-h-[110px] rounded-3xl ${b.colorClass} text-white border-b-4 shadow-lg flex flex-col items-center justify-center relative transition transform active:scale-95 ${b.wrongTried ? 'opacity-50' : ''} p-2" style="animation-delay: ${idx * 0.18}s">
+                        <span class="text-xs sm:text-sm opacity-90 mb-0.5">🎈</span>
+                        <span class="text-xl sm:text-3xl font-black tracking-wide drop-shadow">${b.label}</span>
                     </button>
                 `;
             }).join('');
 
             app.innerHTML = `
                 ${renderTopBar()}
-                <div class="flex-1 flex flex-col p-3 sm:p-5 justify-between overflow-hidden fade-in">
-                    <div class="text-center">
-                        <div class="inline-flex items-center gap-3 px-5 py-2 rounded-2xl bg-rose-100 dark:bg-rose-950 border-2 border-rose-400 text-rose-700 dark:text-rose-200 font-black text-2xl sm:text-4xl shadow-sm">
+                <div class="flex-1 flex flex-col p-3 sm:p-5 justify-between overflow-hidden fade-in min-h-0">
+                    <div class="text-center shrink-0">
+                        <h2 class="text-base sm:text-xl font-black text-slate-800 text-main-title mb-1 sm:mb-2">
+                            🎈 ${_col('Susprogdink 3 balionus su skaičiumi')} <span class="text-rose-500 dark:text-rose-400 font-black text-lg sm:text-2xl">${state.balloonTarget}</span>!
+                        </h2>
+                        <div class="inline-flex items-center gap-2.5 sm:gap-3 px-4 sm:px-5 py-1.5 sm:py-2 rounded-2xl bg-rose-100 dark:bg-rose-950 border-2 border-rose-400 text-rose-700 dark:text-rose-200 font-black text-xl sm:text-3xl shadow-sm">
                             <span>🎈 ${state.balloonTarget}</span>
-                            <span id="pop-progress" class="text-sm sm:text-base px-3 py-1 rounded-xl bg-white text-slate-700 font-extrabold">
+                            <span id="pop-progress" class="text-xs sm:text-base px-2.5 sm:px-3 py-1 rounded-xl bg-white text-slate-700 font-extrabold shadow-inner">
                                 💥 ${state.poppedCount} / 3
                             </span>
                         </div>
                     </div>
 
-                    <div id="balloons-grid" class="flex-1 grid grid-cols-3 gap-2.5 sm:gap-4 my-2 content-center items-center">
+                    <div id="balloons-grid" class="flex-1 grid grid-cols-3 grid-rows-2 gap-2.5 sm:gap-4 my-2 content-stretch items-stretch min-h-0">
                         ${balloonsHtml}
                     </div>
 
-                    <div id="feedback" class="h-7 flex items-center justify-center font-black text-sm sm:text-lg opacity-0 transition-opacity"></div>
+                    <div id="feedback" class="min-h-[2.75rem] sm:min-h-[3.25rem] flex flex-col items-center justify-center font-black text-center opacity-0 transition-opacity shrink-0"></div>
                 </div>
             `;
         }
@@ -804,15 +807,21 @@
                         state.streak++;
                     }
                     if (newFeedback) {
-                        newFeedback.innerHTML = `${_col('Valio! Susprogdinai visus 3 teisingus balionus!')} 🎉`;
-                        newFeedback.className = "h-7 flex items-center justify-center font-black text-sm sm:text-lg text-emerald-500 opacity-100";
+                        newFeedback.innerHTML = `
+                            <span class="text-base sm:text-xl font-black leading-tight">🎉 ${_col('Valio!')}</span>
+                            <span class="text-xs sm:text-sm font-extrabold text-emerald-600 dark:text-emerald-400 leading-tight">${_col('Susprogdinai visus 3 teisingus balionus!')}</span>
+                        `;
+                        newFeedback.className = "min-h-[2.75rem] sm:min-h-[3.25rem] flex flex-col items-center justify-center font-black text-center text-emerald-500 opacity-100 shrink-0";
                     }
                     fireConfetti();
                     setTimeout(advanceQuestion, 1250);
                 } else {
                     if (newFeedback) {
-                        newFeedback.innerHTML = `💥 ${_col('Puiku! Ieškok dar!')} (${state.poppedCount} / 3)`;
-                        newFeedback.className = "h-7 flex items-center justify-center font-black text-sm sm:text-lg text-emerald-500 opacity-100";
+                        newFeedback.innerHTML = `
+                            <span class="text-base sm:text-xl font-black leading-tight">💥 ${_col('Puiku!')}</span>
+                            <span class="text-xs sm:text-sm font-extrabold text-emerald-600 dark:text-emerald-400 leading-tight">${_col('Ieškok dar!')} (${state.poppedCount} / 3)</span>
+                        `;
+                        newFeedback.className = "min-h-[2.75rem] sm:min-h-[3.25rem] flex flex-col items-center justify-center font-black text-center text-emerald-500 opacity-100 shrink-0";
                     }
                 }
             } else {
@@ -827,8 +836,11 @@
                     btn.classList.add('shake', 'opacity-50');
                 }
                 if (feedback) {
-                    feedback.innerHTML = `<span>${_col('Oho!')} ${b.label} = ${b.value}. ${_col('Ieškok skaičiaus')} ${state.balloonTarget}! 🤔</span>`;
-                    feedback.className = "h-7 flex items-center justify-center font-black text-xs sm:text-base text-rose-500 opacity-100";
+                    feedback.innerHTML = `
+                        <span class="text-xs sm:text-base font-black leading-tight">🤔 ${_col('Oho!')} ${b.label} = ${b.value}</span>
+                        <span class="text-[11px] sm:text-xs font-extrabold text-rose-600 dark:text-rose-400 leading-tight">${_col('Ieškok skaičiaus')} ${state.balloonTarget}!</span>
+                    `;
+                    feedback.className = "min-h-[2.75rem] sm:min-h-[3.25rem] flex flex-col items-center justify-center font-black text-center text-rose-500 opacity-100 shrink-0";
                 }
             }
         }
