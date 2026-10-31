@@ -683,6 +683,7 @@
     global.formatMoneyCents = formatMoneyCents;
     global.calculateStars = calculateStars;
     global.renderTopBar = renderTopBar;
+    global.renderTopBarHelper = renderTopBar;
     global.renderEndScreen = renderEndScreen;
     global.renderEndScreenHelper = renderEndScreen;
 })(typeof window !== 'undefined' ? window : this);

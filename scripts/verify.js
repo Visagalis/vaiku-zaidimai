@@ -173,6 +173,15 @@ function checkInlineScripts(relPath, content) {
         } catch (err) {
             logError(`${relPath}: JS sintaksės klaida skripte #${scriptIdx} (ties eil. ~${lineOffset}): ${err.message}`);
         }
+
+        // Patikra dėl globalių funkcijų susidūrimo (pvz. function renderTopBar() { return window.renderTopBar(...); })
+        const selfWindowCallRegex = /function\s+([a-zA-Z0-9_$]+)\s*\([^)]*\)\s*\{[^}]*\bwindow\.\1\s*\(/g;
+        let selfMatch;
+        while ((selfMatch = selfWindowCallRegex.exec(code)) !== null) {
+            const fnName = selfMatch[1];
+            const errLine = lineOffset + code.substring(0, selfMatch.index).split('\n').length - 1;
+            logError(`${relPath}:${errLine} Funkcija "${fnName}" kviečia "window.${fnName}(...)" savo viduje — globaliam skripte tai sukelia begalinę rekursiją (RangeError)! Naudokite "${fnName}Helper(...)" arba pervadinkite vietinę funkciją.`);
+        }
     }
 }
 

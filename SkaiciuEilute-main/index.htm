@@ -258,7 +258,7 @@
         const app = document.getElementById('app');
 
         function renderTopBar() {
-            return window.renderTopBar({
+            return renderTopBarHelper({
                 score: state.score,
                 current: state.question,
                 total: state.maxQuestions,

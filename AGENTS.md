@@ -150,8 +150,8 @@ When you check by hand, open the game **through the portal** (iframe mode) *and*
 | Audio | `playCorrectSound()`, `playWrongSound()`, `playWinSound()`, `playSelectSound()`, `playPickSound()`, `playPopSound()`, `playStepSound(idx?)`, `playTapSound()`, `playReturnSound()`, `playHintSound()` | Preferred high-level feedback sounds. |
 | Arrays | `shuffle(arr)` (alias `shuffleArray`), `pickRandom(arr)` | `shuffle` returns a **new** array (Fisher–Yates). It doesn't mutate the input. |
 | Money | `formatMoneyCents(cents) → string`, `MONEY` | Canonical euro coin/bill data (`centCoins`, `euroCoins`, `bills`) and money formatting (`10 c`, `1 €`, `1,50 €`). |
-| UI Components | `renderTopBar(opts) → htmlString` | Standard game top bar with 🏠 (or 🔙 in portal iframe), ⭐ score, 🎯 progress, and 🔥 streak badges. |
-| UI Components | `calculateStars(score, total) → number`, `renderEndScreen(opts) → htmlString` | Standard star rating (≥80% 3★, ≥50% 2★, else 1★) and end screen template with restart button. |
+| UI Components | `renderTopBar(opts) → htmlString` (alias `renderTopBarHelper`) | Standard game top bar with 🏠 (or 🔙 in portal iframe), ⭐ score, 🎯 progress, and 🔥 streak badges. |
+| UI Components | `calculateStars(score, total) → number`, `renderEndScreen(opts) → htmlString` (alias `renderEndScreenHelper`) | Standard star rating (≥80% 3★, ≥50% 2★, else 1★) and end screen template with restart button. |
 | Input | `preventZoom(doc)` | Blocks pinch, gesture, and ctrl+wheel zoom. Runs automatically on load. |
 
 **Rules for editing `common.js`:**
