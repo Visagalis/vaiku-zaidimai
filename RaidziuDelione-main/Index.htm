@@ -55,19 +55,44 @@
             --overlay-bg: #0f172a;
         }
 
-        body:not(.dark-mode) .letter-tile:not(.slot-locked):not(.pool-btn-disabled):not(.bg-rose-500) {
+        /* Tušti žodžio langeliai (aiškiai matomi tiek šviesioje, tiek tamsioje temoje) */
+        .word-slot-empty {
+            background-color: #f1f5f9 !important;
+            border: 3px dashed #94a3b8 !important;
+        }
+        .dark-mode .word-slot-empty,
+        :root.dark .word-slot-empty,
+        :root.dark-theme .word-slot-empty {
+            background-color: #0f172a !important;
+            border: 3px dashed #475569 !important;
+        }
+
+        /* Raidžių baseino mygtukai (3D kaladėlės) */
+        .pool-tile {
             background-color: #ffffff !important;
-            border-color: #e2e8f0 !important;
+            border: 2px solid #cbd5e1 !important;
+            border-bottom: 5px solid #94a3b8 !important;
+            box-shadow: 0 4px 8px rgba(15, 23, 42, 0.1);
         }
-
-        .dark-mode .letter-tile:not(.slot-locked):not(.pool-btn-disabled):not(.bg-rose-500) {
-            background-color: #1e293b !important;
-            border-color: #334155 !important;
-        }
-
-        .dark-mode #letters-pool .letter-tile:not(.pool-btn-disabled) {
+        .dark-mode .pool-tile,
+        :root.dark .pool-tile,
+        :root.dark-theme .pool-tile {
             background-color: #334155 !important;
-            border-color: #0f172a !important;
+            border: 2px solid #475569 !important;
+            border-bottom: 5px solid #0f172a !important;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.35);
+        }
+
+        /* Užauginame užuominos kortelės foną */
+        .clue-card {
+            background-color: #fffbeb;
+            border: 2px solid #fde68a;
+        }
+        .dark-mode .clue-card,
+        :root.dark .clue-card,
+        :root.dark-theme .clue-card {
+            background-color: rgba(30, 41, 59, 0.85);
+            border: 2px solid #334155;
         }
 
         .dark-mode #end-screen .bg-yellow-100 {
@@ -129,7 +154,7 @@
 
         .slot-locked {
             background-color: #ecfdf5 !important;
-            border-color: #10b981 !important;
+            border: 3px solid #10b981 !important;
             transform: scale(1.04);
             pointer-events: none;
             box-shadow: 0 3px 0 #059669;
@@ -137,22 +162,22 @@
 
         .dark-mode .slot-locked {
             background-color: #064e3b !important;
-            border-color: #10b981 !important;
+            border: 3px solid #10b981 !important;
             box-shadow: 0 3px 0 #047857;
         }
 
         .slot-active {
-            border-color: #f59e0b !important;
-            background-color: rgba(254, 243, 199, 0.7) !important;
-            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.45);
-            transform: scale(1.04);
+            border: 3px solid #f59e0b !important;
+            background-color: #fef3c7 !important;
+            box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.35);
+            transform: scale(1.05);
         }
 
         .dark-mode .slot-active {
-            border-color: #f59e0b !important;
-            background-color: rgba(120, 53, 15, 0.35) !important;
-            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.4);
-            transform: scale(1.04);
+            border: 3px solid #f59e0b !important;
+            background-color: rgba(120, 53, 15, 0.45) !important;
+            box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.4);
+            transform: scale(1.05);
         }
 
         .letter-tile {
@@ -164,46 +189,44 @@
         .pool-btn-disabled {
             background-color: #e2e8f0 !important;
             color: #94a3b8 !important;
-            border-color: #cbd5e1 !important;
+            border: 2px dashed #cbd5e1 !important;
             pointer-events: none;
             box-shadow: none !important;
             transform: scale(0.92) !important;
-            opacity: 0.25;
+            opacity: 0.3;
         }
 
         .dark-mode .pool-btn-disabled {
-            background-color: #334155 !important;
+            background-color: #1e293b !important;
             color: #475569 !important;
-            border-color: #1e293b !important;
+            border: 2px dashed #334155 !important;
         }
         
         .star-gold { color: #fbbf24; text-shadow: 0 0 8px rgba(251, 191, 36, 0.4); }
-        .star-lost { color: #94a3b8; opacity: 0.2; }
+        .star-lost { color: #94a3b8; opacity: 0.25; }
     </style>
 </head>
-<body class="dark-mode">
+<body>
 
     <div id="main-app" class="main-card max-w-4xl relative overflow-hidden border-0 md:border-8" style="border-color: var(--border-color)">
         
         <!-- Header -->
-        <div id="header-ui" class="flex justify-between items-center px-3 sm:px-4 py-2 sm:py-2.5 z-20 hidden w-full flex-shrink-0 border-b border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5">
-            <div class="flex gap-1.5 sm:gap-2">
-                <button onclick="location.reload()" class="bg-white dark:bg-slate-700 border-2 border-slate-300 dark:border-slate-600 px-2.5 py-1.5 rounded-xl font-bold hover:bg-slate-100 dark:hover:bg-slate-600 transition-colors text-sm shadow-sm active:scale-95" title="Pradžia">
-                    🏠
+        <div id="header-ui" class="top-bar flex justify-between items-center px-3 sm:px-4 py-2 sm:py-2.5 z-20 hidden w-full flex-shrink-0 border-b border-amber-200 dark:border-slate-700 bg-amber-50/90 dark:bg-slate-800/90">
+            <div class="flex gap-1.5 sm:gap-2 items-center">
+                <button onclick="showStartScreen()" class="bg-white dark:bg-slate-700 border-2 border-amber-200 dark:border-slate-600 px-2.5 py-1.5 rounded-xl font-bold hover:bg-amber-50 dark:hover:bg-slate-600 transition-colors text-base shadow-sm active:scale-95" title="Atgal į meniu">
+                    🔙
                 </button>
-                <button onclick="toggleDarkMode()" id="dark-toggle" class="bg-indigo-600 text-white border-2 border-indigo-400 px-2.5 sm:px-3 py-1.5 rounded-xl font-bold hover:bg-indigo-500 transition-colors text-xs shadow-sm active:scale-95">
-                    ☀️ Diena
-                </button>
-                <button onclick="toggleStats()" class="bg-white dark:bg-slate-700 border-2 border-yellow-300 px-2.5 sm:px-3 py-1.5 rounded-xl font-bold text-yellow-700 dark:text-yellow-400 hover:bg-yellow-50 dark:hover:bg-slate-600 transition-colors text-xs shadow-sm active:scale-95" title="Pasiekimai">
-                    📊
+                <button onclick="toggleStats()" class="bg-white dark:bg-slate-700 border-2 border-amber-300 dark:border-slate-600 px-2.5 sm:px-3 py-1.5 rounded-xl font-extrabold text-amber-800 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-slate-600 transition-colors text-xs sm:text-sm shadow-sm active:scale-95 flex items-center gap-1" title="Pasiekimai">
+                    <span>📊</span>
+                    <span class="hidden min-[380px]:inline">Žodžiai</span>
                 </button>
             </div>
             <div class="flex gap-2 sm:gap-3 items-center">
-                <div class="flex items-center gap-1">
-                    <span class="text-base sm:text-lg">⭐</span>
-                    <span id="total-stars-display" class="text-base sm:text-lg font-black text-yellow-500">0</span>
+                <div class="top-badge flex items-center gap-1 bg-white dark:bg-slate-700 border border-amber-200 dark:border-slate-600 px-2.5 py-1 rounded-full shadow-sm">
+                    <span class="text-sm sm:text-base">⭐</span>
+                    <span id="total-stars-display" class="text-sm sm:text-base font-black text-amber-600 dark:text-amber-400">0</span>
                 </div>
-                <div class="bg-yellow-400 text-slate-900 px-2.5 py-1 rounded-xl text-xs sm:text-sm font-black shadow-sm">
+                <div class="top-badge bg-amber-400 text-slate-900 px-3 py-1 rounded-full text-xs sm:text-sm font-black shadow-sm">
                     🎯 <span id="current-word-num">1</span> / <span id="max-words-num">10</span>
                 </div>
             </div>
@@ -220,19 +243,19 @@
             </p>
             
             <div class="grid grid-cols-2 gap-2.5 sm:gap-3.5 w-full max-w-sm sm:max-w-md mb-6">
-                <button onclick="startGame(5)" class="py-3 sm:py-3.5 px-3 rounded-2xl bg-sky-500 hover:bg-sky-600 text-white font-black text-base sm:text-xl shadow-md border-b-4 border-sky-700 transition transform active:scale-95 flex flex-col items-center justify-center">
+                <button onclick="startGame(5)" class="py-3 sm:py-3.5 px-3 rounded-2xl bg-sky-500 text-white font-black text-base sm:text-xl shadow-md border-b-4 border-sky-700 transition transform active:scale-95 flex flex-col items-center justify-center">
                     <span>🌱 5 žodžiai</span>
                     <span class="text-xs font-semibold opacity-85">Greitas</span>
                 </button>
-                <button onclick="startGame(10)" class="py-3 sm:py-3.5 px-3 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-black text-base sm:text-xl shadow-md border-b-4 border-amber-700 transition transform active:scale-95 flex flex-col items-center justify-center">
+                <button onclick="startGame(10)" class="py-3 sm:py-3.5 px-3 rounded-2xl bg-amber-500 text-white font-black text-base sm:text-xl shadow-md border-b-4 border-amber-700 transition transform active:scale-95 flex flex-col items-center justify-center">
                     <span>⭐ 10 žodžių</span>
                     <span class="text-xs font-semibold opacity-85">Klasikinis</span>
                 </button>
-                <button onclick="startGame(20)" class="py-3 sm:py-3.5 px-3 rounded-2xl bg-purple-500 hover:bg-purple-600 text-white font-black text-base sm:text-xl shadow-md border-b-4 border-purple-700 transition transform active:scale-95 flex flex-col items-center justify-center">
+                <button onclick="startGame(20)" class="py-3 sm:py-3.5 px-3 rounded-2xl bg-purple-500 text-white font-black text-base sm:text-xl shadow-md border-b-4 border-purple-700 transition transform active:scale-95 flex flex-col items-center justify-center">
                     <span>🏆 20 žodžių</span>
                     <span class="text-xs font-semibold opacity-85">Ilgas</span>
                 </button>
-                <button onclick="startGame(30)" class="py-3 sm:py-3.5 px-3 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-base sm:text-xl shadow-md border-b-4 border-emerald-700 transition transform active:scale-95 flex flex-col items-center justify-center">
+                <button onclick="startGame(30)" class="py-3 sm:py-3.5 px-3 rounded-2xl bg-emerald-500 text-white font-black text-base sm:text-xl shadow-md border-b-4 border-emerald-700 transition transform active:scale-95 flex flex-col items-center justify-center">
                     <span>🌟 Visi (30)</span>
                     <span class="text-xs font-semibold opacity-85">Meistras</span>
                 </button>
@@ -245,30 +268,39 @@
         </div>
 
         <!-- Game View -->
-        <div id="game-view" class="flex-1 flex flex-col items-center justify-evenly p-2 sm:p-4 hidden w-full overflow-hidden gap-2">
+        <div id="game-view" class="flex-1 flex flex-col items-center justify-evenly p-3 sm:p-5 hidden w-full overflow-hidden gap-3">
             
-            <div class="flex flex-col items-center justify-center w-full py-1 gap-1.5">
-                <div id="emoji-box" class="text-6xl sm:text-7xl md:text-8xl select-none drop-shadow-xl transition-all duration-300 cursor-default text-center leading-tight">
-                    🌙
+            <div class="clue-card w-full max-w-lg rounded-3xl p-4 sm:p-5 shadow-sm flex flex-col items-center justify-center gap-2.5">
+                <div class="flex items-center justify-center gap-3">
+                    <div id="emoji-box" class="text-6xl sm:text-7xl md:text-8xl select-none drop-shadow-md transition-all duration-300 cursor-default text-center leading-none">
+                        🌙
+                    </div>
+                    <button id="speak-word-btn" onclick="speakCurrentWord()" class="speak-btn" title="Paklausyk žodžio">
+                        🔊
+                    </button>
                 </div>
 
-                <div class="flex items-center justify-center gap-2 flex-wrap">
-                    <div id="current-word-stars-ui" class="flex flex-wrap justify-center gap-1 sm:gap-1.5 text-xl sm:text-2xl md:text-3xl px-2">
+                <div class="flex items-center justify-center gap-2.5 flex-wrap">
+                    <div id="current-word-stars-ui" class="flex flex-wrap justify-center gap-1 sm:gap-1.5 text-xl sm:text-2xl px-2">
                         <!-- Stars -->
                     </div>
-                    <button id="hint-btn" onclick="showLetterHint()" class="hint-btn">
+                    <button id="hint-btn" onclick="showLetterHint()" class="hint-btn py-1.5 px-3.5 text-xs sm:text-sm min-h-[36px]">
                         <span>💡</span> <span>Užuomina</span>
                     </button>
                 </div>
             </div>
 
-            <div class="w-full flex flex-col items-center justify-center shrink-0 gap-2.5 sm:gap-3.5 pb-1 sm:pb-2 max-w-lg">
-                <div id="word-slots" class="flex flex-wrap justify-center items-center content-center gap-1.5 sm:gap-2.5 w-full px-1 min-h-[52px] sm:min-h-[60px]">
-                    <!-- Slots -->
+            <div class="w-full flex flex-col items-center justify-center shrink-0 gap-3 sm:gap-4 pb-1 sm:pb-2 max-w-lg">
+                <div class="w-full flex flex-col items-center gap-1.5">
+                    <span class="text-xs sm:text-sm font-extrabold text-slate-500 dark:text-slate-400">Sudėliok žodį:</span>
+                    <div id="word-slots" class="flex flex-wrap justify-center items-center content-center gap-2 sm:gap-2.5 w-full px-1 min-h-[60px] sm:min-h-[68px]">
+                        <!-- Slots -->
+                    </div>
                 </div>
 
-                <div class="w-full p-2.5 sm:p-4 rounded-3xl border-2 border-dashed border-amber-300 dark:border-slate-600 bg-amber-50/60 dark:bg-slate-900/60 shadow-inner flex flex-col items-center justify-center">
-                    <div id="letters-pool" class="flex flex-wrap justify-center items-center content-center gap-2 sm:gap-3 w-full min-h-[52px] sm:min-h-[60px]">
+                <div class="w-full p-3 sm:p-4 rounded-3xl border-2 border-dashed border-amber-300 dark:border-slate-600 bg-amber-50/70 dark:bg-slate-900/60 shadow-inner flex flex-col items-center justify-center gap-1.5">
+                    <span class="text-xs sm:text-sm font-extrabold text-amber-800/80 dark:text-slate-400">Pasirink tinkamą raidę:</span>
+                    <div id="letters-pool" class="flex flex-wrap justify-center items-center content-center gap-2.5 sm:gap-3 w-full min-h-[60px] sm:min-h-[68px]">
                         <!-- Letters -->
                     </div>
                 </div>
@@ -392,7 +424,6 @@
         let lockedSlots = [];
         let currentPool = []; 
         let wordMistakes = {};
-        let isDarkMode = true;
         let maxWordsCount = 10;
         let currentWordStarPotential = 0;
         let isRetryMode = false;
@@ -410,7 +441,7 @@
         const retryBtn = document.getElementById('retry-mistakes-btn');
 
         function toggleDarkMode() {
-            const currentlyDark = isDarkMode();
+            const currentlyDark = typeof window.isDarkMode === 'function' ? window.isDarkMode() : false;
             const nextMode = currentlyDark ? 'light' : 'dark';
             setThemeMode(nextMode);
             applyTheme(nextMode);
@@ -418,15 +449,25 @@
         }
 
         function updateThemeUI() {
-            const dark = isDarkMode();
+            const dark = typeof window.isDarkMode === 'function' ? window.isDarkMode() : false;
             document.body.classList.toggle('dark-mode', dark);
             document.body.classList.toggle('light-mode', !dark);
-            const btn = document.getElementById('dark-toggle');
-            if (btn) {
-                btn.innerHTML = dark ? '☀️ Diena' : '🌙 Naktis';
-                btn.className = dark
-                    ? 'bg-indigo-600 text-white border-2 border-indigo-400 px-2.5 sm:px-3 py-1.5 rounded-xl font-bold hover:bg-indigo-500 transition-colors text-xs shadow-sm active:scale-95'
-                    : 'bg-slate-800 text-white border-2 border-slate-600 px-2.5 sm:px-3 py-1.5 rounded-xl font-bold hover:bg-slate-700 text-xs shadow-sm active:scale-95';
+        }
+
+        function showStartScreen() {
+            playSound('click');
+            document.getElementById('game-view').classList.add('hidden');
+            document.getElementById('game-view').classList.remove('flex');
+            document.getElementById('header-ui').classList.add('hidden');
+            document.getElementById('header-ui').classList.remove('flex');
+            document.getElementById('end-screen').classList.add('hidden');
+            document.getElementById('success-overlay').classList.add('hidden');
+            document.getElementById('start-screen').classList.remove('hidden');
+        }
+
+        function speakCurrentWord() {
+            if (currentWordObj && typeof speakLT === 'function') {
+                speakLT(currentWordObj.word);
             }
         }
 
@@ -518,6 +559,10 @@
             if (!wordMistakes[word]) wordMistakes[word] = 0;
 
             emojiEl.textContent = currentWordObj.emoji;
+            const spkBtn = document.getElementById('speak-word-btn');
+            if (spkBtn && typeof hasLithuanianTTS === 'function') {
+                spkBtn.style.display = hasLithuanianTTS() ? 'inline-flex' : 'none';
+            }
             currentWordNumEl.textContent = isRetryMode ? '↺' : (currentIndex + 1);
             overlay.classList.add('hidden');
             const hintBtn = document.getElementById('hint-btn');
@@ -559,25 +604,25 @@
             const nextEmptyIdx = userProgress.indexOf(null);
 
             // Responsive langelių dydžiai pagal žodžio ilgį, kad 7 raidžių žodis tilptų telefone
-            let slotSize = "w-11 h-11 text-xl sm:w-14 sm:h-14 sm:text-2xl md:w-16 md:h-16 md:text-3xl";
+            let slotSize = "w-12 h-12 text-xl sm:w-14 sm:h-14 sm:text-2xl md:w-16 md:h-16 md:text-3xl";
             if (wordLen <= 4) {
                 slotSize = "w-14 h-14 text-2xl sm:w-16 sm:h-16 sm:text-3xl md:w-20 md:h-20 md:text-4xl";
             } else if (wordLen === 5) {
                 slotSize = "w-12 h-12 text-2xl sm:w-14 sm:h-14 sm:text-3xl md:w-16 md:h-16 md:text-4xl";
             } else {
-                slotSize = "w-10 h-10 min-[370px]:w-11 min-[370px]:h-11 text-xl sm:w-13 sm:h-13 sm:text-2xl md:w-16 md:h-16 md:text-3xl";
+                slotSize = "w-11 h-11 text-xl sm:w-14 sm:h-14 sm:text-2xl md:w-16 md:h-16 md:text-3xl";
             }
 
             userProgress.forEach((char, i) => {
                 const slot = document.createElement('div');
                 const isActive = (i === nextEmptyIdx);
 
-                slot.className = `${slotSize} border-3 sm:border-4 rounded-2xl flex items-center justify-center font-black letter-tile flex-shrink-0 transition-all select-none
+                slot.className = `${slotSize} rounded-2xl flex items-center justify-center font-black letter-tile flex-shrink-0 transition-all select-none
                     ${lockedSlots[i] 
                         ? 'slot-locked' 
                         : isActive 
                             ? 'slot-active' 
-                            : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 opacity-90 shadow-sm'}`;
+                            : 'word-slot-empty'}`;
                 
                 slot.textContent = char || '';
                 if (char) {
@@ -587,22 +632,22 @@
             });
 
             poolEl.innerHTML = '';
-            let btnSize = "w-11 h-11 text-xl sm:w-13 sm:h-13 sm:text-2xl md:w-16 md:h-16 md:text-3xl";
+            let btnSize = "w-12 h-12 text-xl sm:w-14 sm:h-14 sm:text-2xl md:w-16 md:h-16 md:text-3xl";
             if (wordLen <= 4) {
-                btnSize = "w-13 h-13 text-2xl sm:w-15 sm:h-15 sm:text-3xl md:w-18 md:h-18 md:text-4xl";
+                btnSize = "w-14 h-14 text-2xl sm:w-16 sm:h-16 sm:text-3xl md:w-20 md:h-20 md:text-4xl";
             } else if (wordLen === 5) {
                 btnSize = "w-12 h-12 text-2xl sm:w-14 sm:h-14 sm:text-3xl md:w-16 md:h-16 md:text-4xl";
             } else {
-                btnSize = "w-10 h-10 min-[370px]:w-11 min-[370px]:h-11 text-xl sm:w-13 sm:h-13 sm:text-2xl md:w-16 md:h-16 md:text-3xl";
+                btnSize = "w-11 h-11 text-xl sm:w-14 sm:h-14 sm:text-2xl md:w-16 md:h-16 md:text-3xl";
             }
 
             currentPool.forEach((item, poolIdx) => {
                 const btn = document.createElement('button');
                 btn.id = `pool-btn-${poolIdx}`;
-                btn.className = `${btnSize} rounded-2xl font-black letter-tile select-none transition-all
+                btn.className = `${btnSize} rounded-2xl font-black letter-tile flex items-center justify-center select-none transition-all
                     ${item.used 
                         ? 'pool-btn-disabled' 
-                        : 'bg-white dark:bg-slate-700 border-b-4 border-slate-300 dark:border-slate-900 shadow-md hover:bg-yellow-50 dark:hover:bg-slate-600 active:border-b-0 active:translate-y-1 active:scale-95'}`;
+                        : 'pool-tile active:translate-y-1 active:scale-95'}`;
                 btn.textContent = item.char;
                 if (!item.used && item.color) {
                     btn.style.color = item.color;
