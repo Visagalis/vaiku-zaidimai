@@ -456,7 +456,7 @@
       const speakText = () => {
         if ('speechSynthesis' in window) {
           window.speechSynthesis.cancel();
-          const currentTarget = phrases[currentIndex];
+          const currentTarget = String(phrases[currentIndex] || '').toLowerCase();
           const utterance = new SpeechSynthesisUtterance(currentTarget);
           utterance.lang = 'lt-LT';
           

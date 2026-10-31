@@ -671,10 +671,35 @@
                 <div id="syl-preview" class="text-2xl sm:text-3xl font-black text-slate-800"></div>
             </div>
 
-            <div class="mt-3 flex justify-center">
-                <button type="button" onclick="resetAllProgress()" class="text-xs font-extrabold text-slate-400 hover:text-rose-500 transition-colors py-1 px-3 rounded-lg">
-                    🗑️ Išvalyti surinktų žvaigždučių progresą
-                </button>
+            <!-- Progreso išvalymas su patvirtinimu -->
+            <div class="settings-row mt-3 bg-rose-50/80 border-2 border-rose-200 rounded-2xl p-3.5">
+                <div id="reset-progress-default" class="flex items-center justify-between gap-3">
+                    <div>
+                        <div class="settings-title font-extrabold text-sm sm:text-base text-slate-800">🗑️ Žaidimų progresas</div>
+                        <div class="settings-desc text-xs font-bold text-slate-500 leading-snug">Išvalyti visas surinktas žvaigždutes</div>
+                    </div>
+                    <button type="button" onclick="askResetAllProgress()" class="shrink-0 bg-rose-100 hover:bg-rose-200 active:scale-95 text-rose-800 border-2 border-rose-300 font-black text-xs sm:text-sm py-2 px-3 rounded-xl transition">
+                        Išvalyti...
+                    </button>
+                </div>
+
+                <div id="reset-progress-confirm" class="hidden flex-col gap-2.5 text-center">
+                    <div class="settings-title text-xs sm:text-sm font-black text-rose-600 dark:text-rose-400">
+                        ⚠️ Ar tikrai norite išvalyti visą surinktą progresą?
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button type="button" onclick="confirmResetAllProgress()" class="bg-rose-600 hover:bg-rose-700 active:scale-95 text-white font-black text-xs sm:text-sm py-2 px-3 rounded-xl border-2 border-rose-700 shadow-sm transition">
+                            ✅ Taip, išvalyti
+                        </button>
+                        <button type="button" onclick="cancelResetAllProgress()" class="theme-opt-btn active:scale-95 font-black text-xs sm:text-sm py-2 px-3 rounded-xl border-2 transition">
+                            ✕ Atšaukti
+                        </button>
+                    </div>
+                </div>
+
+                <div id="reset-progress-done" class="hidden text-center py-1 text-xs sm:text-sm font-black text-emerald-600 dark:text-emerald-400">
+                    ✔️ Visas progresas sėkmingai išvalytas!
+                </div>
             </div>
         </div>
     </div>
@@ -798,12 +823,14 @@
                 soundToggle.checked = isSoundEnabled();
             }
             updateThemeButtonsUI();
+            cancelResetAllProgress();
             sylPreview.innerHTML = `<span>${_col('Katė geria pieną')}</span>`;
             settingsModal.classList.remove('hidden');
             settingsModal.classList.add('flex');
         }
 
         function closeSettings() {
+            cancelResetAllProgress();
             settingsModal.classList.add('hidden');
             settingsModal.classList.remove('flex');
         }
@@ -823,12 +850,59 @@
             }
         }
 
-        function resetAllProgress() {
+        function askResetAllProgress() {
+            if (typeof playSound === 'function') playSound('click');
+            const defEl = document.getElementById('reset-progress-default');
+            const confEl = document.getElementById('reset-progress-confirm');
+            const doneEl = document.getElementById('reset-progress-done');
+            if (defEl) defEl.classList.add('hidden');
+            if (doneEl) doneEl.classList.add('hidden');
+            if (confEl) {
+                confEl.classList.remove('hidden');
+                confEl.classList.add('flex');
+            }
+        }
+
+        function cancelResetAllProgress() {
+            const defEl = document.getElementById('reset-progress-default');
+            const confEl = document.getElementById('reset-progress-confirm');
+            const doneEl = document.getElementById('reset-progress-done');
+            if (confEl) {
+                confEl.classList.add('hidden');
+                confEl.classList.remove('flex');
+            }
+            if (doneEl) doneEl.classList.add('hidden');
+            if (defEl) defEl.classList.remove('hidden');
+        }
+
+        function confirmResetAllProgress() {
             if (typeof clearGameProgress === 'function') {
                 clearGameProgress();
                 renderPortalStars();
+                try {
+                    const fWin = gameFrame && gameFrame.contentWindow;
+                    if (fWin && typeof fWin.decorateModeButtons === 'function') {
+                        fWin.decorateModeButtons();
+                    }
+                } catch (err) {}
                 if (typeof playSound === 'function') playSound('remove');
             }
+            const defEl = document.getElementById('reset-progress-default');
+            const confEl = document.getElementById('reset-progress-confirm');
+            const doneEl = document.getElementById('reset-progress-done');
+            if (defEl) defEl.classList.add('hidden');
+            if (confEl) {
+                confEl.classList.add('hidden');
+                confEl.classList.remove('flex');
+            }
+            if (doneEl) doneEl.classList.remove('hidden');
+            setTimeout(() => {
+                cancelResetAllProgress();
+            }, 2200);
+        }
+
+        function resetAllProgress() {
+            askResetAllProgress();
         }
 
         document.addEventListener('keydown', function(e) {

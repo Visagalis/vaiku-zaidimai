@@ -44,7 +44,26 @@ body {
     -webkit-user-select: none;
 }
 
-/* Kai mygtukas pažymimas žalia spalva (teisingas atsakymas), vidiniai skiemenys tampa ryškiai balti */
+/* Kai mygtukas pažymimas žalia spalva (teisingas atsakymas), užtikriname sodrų žalią foną (net ir su :hover ar tamsioje temoje) ir ryškiai baltą tekstą */
+.bg-green-500,
+.bg-green-500:hover,
+.bg-green-500:focus,
+.bg-green-500:active,
+.btn-3d.bg-green-500,
+.btn-3d.bg-green-500:hover,
+.btn-tinted.bg-green-500,
+.btn-tinted.bg-green-500:hover,
+:root.dark .bg-green-500,
+:root.dark-theme .bg-green-500,
+.dark-mode .bg-green-500,
+:root.dark .btn-3d.bg-green-500,
+:root.dark-theme .btn-3d.bg-green-500,
+.dark-mode .btn-3d.bg-green-500 {
+    background-color: #16a34a !important;
+    border-color: #15803d !important;
+    color: #ffffff !important;
+}
+
 .bg-green-500.text-white span:not(.price-tag),
 .bg-green-500 span:not(.price-tag),
 .matched-card span:not(.price-tag) {

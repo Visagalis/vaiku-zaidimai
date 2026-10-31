@@ -526,12 +526,14 @@
         try {
             if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
             window.speechSynthesis.cancel();
-            // Pašaliname HTML žymes ir perteklinius simbolius
+            // Pašaliname HTML žymes, jaustukus (emoji) ir perteklinius simbolius, bei paverčiame mažosiomis raidėmis
             var clean = String(text)
                 .replace(/<[^>]+>/g, ' ')
-                .replace(/[❓❔➕➖✖️➗➔⬅️➡️⬆️⬇️🔗]/g, ' ')
+                .replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, ' ')
+                .replace(/[\u2600-\u27BF\uFE0F\u20E3❓❔➕➖✖️➗➔⬅️➡️⬆️⬇️🔗]/g, ' ')
                 .replace(/\s+/g, ' ')
-                .trim();
+                .trim()
+                .toLowerCase();
             if (!clean) return;
             var utter = new SpeechSynthesisUtterance(clean);
             utter.lang = 'lt-LT';
