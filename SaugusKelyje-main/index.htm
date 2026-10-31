@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>🚦 Saugus Kelyje</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../shared/common.css?v=2">
+    <script src="../shared/common.js?v=2"></script>
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #ecfdf5;
+            background-image: radial-gradient(#34d399 20%, transparent 20%);
+            background-size: 22px 22px;
+        }
+
+        .traffic-light {
+            background: #1e293b;
+            border: 4px solid #0f172a;
+            border-radius: 1.25rem;
+            padding: 0.45rem 0.6rem;
+            display: inline-flex;
+            gap: 0.45rem;
+            box-shadow: 0 6px 0 #0f172a;
+        }
+        .bulb {
+            width: 1.9rem;
+            height: 1.9rem;
+            border-radius: 9999px;
+            opacity: 0.22;
+            transition: all 0.2s ease;
+        }
+        .bulb.active {
+            opacity: 1;
+            transform: scale(1.08);
+            box-shadow: 0 0 14px currentColor;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #0b1120 !important;
+                background-image: radial-gradient(#1e293b 20%, transparent 20%) !important;
+                color: #f1f5f9 !important;
+            }
+            #app {
+                background-color: #0f172a !important;
+                border-color: #334155 !important;
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6) !important;
+            }
+            h1, h2 {
+                color: #f8fafc !important;
+            }
+            .btn-3d {
+                background-color: #1e293b !important;
+                border-color: #334155 !important;
+                color: #f8fafc !important;
+                box-shadow: 0 5px 0 #0f172a !important;
+            }
+            .btn-3d:hover {
+                background-color: #273549 !important;
+            }
+            .scenario-box {
+                background: rgba(30, 41, 59, 0.8) !important;
+                border-color: #475569 !important;
+            }
+            .age-tag {
+                background-color: #1e293b !important;
+                border-color: #475569 !important;
+                color: #6ee7b7 !important;
+            }
+        }
+    </style>
+</head>
+<body class="h-screen max-h-screen flex items-center justify-center p-2 sm:p-4 overflow-hidden transition-colors duration-200">
+
+    <div id="app" class="w-full max-w-2xl bg-white/95 backdrop-blur-md rounded-3xl shadow-xl flex flex-col relative border-4 border-emerald-400 overflow-hidden max-h-full">
+    </div>
+
+    <script>
+        // 1 REŽIMAS: Šviesoforas ir gatvė
+        const TRAFFIC_QUESTIONS = [
+            {
+                light: "red", emoji: "🚦",
+                question: "Pėsčiųjų šviesofore dega RAUDONA šviesa. Ką darome?",
+                hint: "Raudona spalva visada reiškia STOP!",
+                correct: "🛑 Sustojame ir laukiame ant šaligatvio",
+                wrong: [
+                    "🏃 Greitai bėgame per gatvę",
+                    "🚲 Važiuojame dviračiu",
+                    "🙈 Užsimerkiame ir einame"
+                ]
+            },
+            {
+                light: "green", emoji: "🚶",
+                question: "Užsidegė ŽALIA šviesoforo šviesa. Ką padarome prieš žengdami į gatvę?",
+                hint: "Visada įsitikink, kad automobiliai tikrai sustojo!",
+                correct: "👀 Apsižvalgome į kairę ir į dešinę",
+                wrong: [
+                    "📱 Žiūrime į telefoną",
+                    "⚽ Spiriame kamuolį į gatvę",
+                    "🛑 Stovime ir niekur neiname"
+                ]
+            },
+            {
+                light: "yellow", emoji: "⏳",
+                question: "Šviesofore dega GELTONA šviesa. Ką ji reiškia?",
+                hint: "Geltona spalva perspėja palaukti!",
+                correct: "⏳ Pasiruošti ir palaukti žalios šviesos",
+                wrong: [
+                    "🏃 Bėgti kuo greičiau",
+                    "🛸 Šokinėti ant vienos kojos",
+                    "🛑 Eiti atbulomis"
+                ]
+            },
+            {
+                light: null, emoji: "🚲",
+                question: "Kaip taisyklingai kirsti pėsčiųjų perėją su dviračiu ar paspirtuku?",
+                hint: "Per perėją reikia eiti pėsčiomis!",
+                correct: "🚶 Nulipti ir persivesti rankomis",
+                wrong: [
+                    "💨 Pravažiuoti visu greičiu",
+                    "🙌 Važiuoti paleidus vairą",
+                    "🔔 Tik paskambinti skambučiu"
+                ]
+            },
+            {
+                light: null, emoji: "✨",
+                question: "Kurioje kūno pusėje tamsiu paros metu segimas atšvaitas?",
+                hint: "Atšvaitą turi matyti atvažiuojančių automobilių vairuotojai!",
+                correct: "✨ Dešinėje pusėje (į gatvės pusę)",
+                wrong: [
+                    "🎒 Paslėptas kuprinės viduje",
+                    "🧥 Kišenėje po striuke",
+                    "🧢 Viršugalvyje po kepure"
+                ]
+            },
+            {
+                light: null, emoji: "🪖",
+                question: "Ką būtina užsidėti ant galvos važiuojant dviračiu ar paspirtuku?",
+                hint: "Jis apsaugo galvą nukritus!",
+                correct: "🪖 Apsauginį dviratininko šalmą",
+                wrong: [
+                    "👑 Popierinę karūną",
+                    "🕶️ Saulės akinius",
+                    "🧣 Tik šaliką"
+                ]
+            },
+            {
+                light: null, emoji: "💺",
+                question: "Ką pirmiausia padarome atsisėdę į automobilio kėdutę?",
+                hint: "Tai saugo mus kelionės metu!",
+                correct: "💺 Prisisegame saugos diržą",
+                wrong: [
+                    "🍬 Valgome ledus",
+                    "🪟 Atidarome visus langus",
+                    "🔊 Garsiai dainuojame"
+                ]
+            },
+            {
+                light: null, emoji: "⚽",
+                question: "Kur yra saugiausia žaisti su kamuoliu?",
+                hint: "Toli nuo važiuojančių mašinų!",
+                correct: "🏞️ Žaidimų aikštelėje arba parko pievoje",
+                wrong: [
+                    "🛣️ Gatvės viduryje",
+                    "🅿️ Automobilių stovėjimo aikštelėje",
+                    "🌉 Ant tilto"
+                ]
+            },
+            {
+                light: null, emoji: "🚌",
+                question: "Išlipai iš autobuso stotelėje ir nori pereiti gatvę. Ką daryti?",
+                hint: "Už autobuso gali nesimatyti atvažiuojančių mašinų!",
+                correct: "⏳ Palaukti, kol autobusas nuvažiuos, ir eiti per perėją",
+                wrong: [
+                    "🏃 Bėgti tiesiai priešais autobusą",
+                    "🙈 Lįsti po autobusu",
+                    "🤸 Šokti per tvorą"
+                ]
+            }
+        ];
+
+        // 2 REŽIMAS: Kelio ženklai ir pagalba 112
+        const SIGNS_QUESTIONS = [
+            {
+                badge: "🚸", badgeBg: "bg-blue-600 text-white border-white",
+                title: "Pėsčiųjų perėja",
+                question: "Ką rodo mėlynas ženklas su einančiu žmogeliuku ir baltomis juostomis?",
+                hint: "Dar vadinama „zebru“!",
+                correct: "🚶 Vieta, kur pėstieji saugiai kerta gatvę",
+                wrong: [
+                    "🏃 Bėgimo varžybų trasa",
+                    "🛝 Vaikų žaidimų aikštelė",
+                    "🚫 Čia eiti draudžiama"
+                ]
+            },
+            {
+                badge: "🚲", badgeBg: "bg-blue-600 text-white border-white",
+                title: "Dviračių takas",
+                question: "Ką reiškia mėlynas apskritas ženklas su baltu dviračiu?",
+                hint: "Skirtas dviratininkams ir paspirtukams!",
+                correct: "🚲 Takas, kuriuo leidžiama važiuoti dviračiais",
+                wrong: [
+                    "🛠️ Dviračių remonto dirbtuvės",
+                    "🚫 Dviračiais važiuoti draudžiama",
+                    "🏪 Žaislų parduotuvė"
+                ]
+            },
+            {
+                badge: "⚠️", badgeBg: "bg-red-500 text-white border-white",
+                title: "Atsargiai – vaikai!",
+                question: "Kodėl prie mokyklos ar darželio stovi trikampis ženklas su vaikais?",
+                hint: "Jis įspėja vairuotojus sulėtinti greitį!",
+                correct: "🚗 Įspėja vairuotojus važiuoti lėtai ir atsargiai",
+                wrong: [
+                    "🎉 Kviečia visus į šventę",
+                    "🏃 Liepia vaikams bėgti per gatvę",
+                    "🛑 Uždaro mokyklą"
+                ]
+            },
+            {
+                badge: "112", badgeBg: "bg-red-600 text-white border-amber-300",
+                title: "Skubios pagalbos numeris",
+                question: "Kokiu telefono numeriu Lietuvoje kviečiama policija, gaisrinė ir greitoji pagalba?",
+                hint: "Trys skaičiai: vienas, vienas, du!",
+                correct: "📞 112",
+                wrong: [
+                    "📞 999",
+                    "📞 123",
+                    "📞 000"
+                ]
+            },
+            {
+                badge: "🚒", badgeBg: "bg-red-500 text-white border-white",
+                title: "Ugniagesiai gelbėtojai",
+                question: "Kokia tarnyba atskuba raudonu automobiliu su kopėčiomis, kai kyla gaisras?",
+                hint: "Jie gesina ugnį ir gelbėja žmones bei gyvūnus!",
+                correct: "🚒 Ugniagesiai gelbėtojai",
+                wrong: [
+                    "🚚 Šiukšliavežis",
+                    "🚕 Taksi automobilis",
+                    "🚜 Traktorius"
+                ]
+            },
+            {
+                badge: "🚑", badgeBg: "bg-emerald-600 text-white border-white",
+                title: "Greitoji medicinos pagalba",
+                question: "Kas atvyksta padėti, kai žmogus stipriai suserga arba susižeidžia?",
+                hint: "Automobilis su raudonu kryželiu ir medikais!",
+                correct: "🚑 Greitoji medicinos pagalba",
+                wrong: [
+                    "🚌 Mokyklinis autobusas",
+                    "🍦 Ledų furgonėlis",
+                    "🚓 Kelių policija"
+                ]
+            },
+            {
+                badge: "🚓", badgeBg: "bg-sky-700 text-white border-white",
+                title: "Policija",
+                question: "Į ką galime kreiptis pagalbos, jei pasiklydome mieste?",
+                hint: "Jų šūkis: „Ginti. Saugoti. Padėti.“",
+                correct: "🚓 Į policijos pareigūnus",
+                wrong: [
+                    "🕵️ Į visai nepažįstamą praeivį",
+                    "🐕 Į svetimą šunį",
+                    "🌳 Pasislėpti krūmuose"
+                ]
+            },
+            {
+                badge: "🚏", badgeBg: "bg-blue-500 text-white border-white",
+                title: "Stotelė",
+                question: "Ką žymi mėlynas ženklas su autobuso paveikslėliu?",
+                hint: "Čia sustoja keleiviniai autobusai ir troleibusai!",
+                correct: "🚌 Autobusų ir troleibusų stotelę",
+                wrong: [
+                    "✈️ Oro uostą",
+                    "🚢 Laivų prieplauką",
+                    "⛽ Degalinę"
+                ]
+            }
+        ];
+
+        // 3 REŽIMAS: Saugu ar Pavojinga?
+        const SAFE_OR_NOT_QUESTIONS = [
+            {
+                emoji: "🚦🏃",
+                text: "Bėgti per gatvę degant raudonam šviesoforo signalui.",
+                isSafe: false,
+                explanation: "Degant raudonai šviesai eiti griežtai draudžiama!"
+            },
+            {
+                emoji: "🧥✨",
+                text: "Tamsų vakarą segėti ryškų atšvaitą ant striukės ir kuprinės.",
+                isSafe: true,
+                explanation: "Su atšvaitu vairuotojas tave pastebi daug anksčiau!"
+            },
+            {
+                emoji: "🍬🧔",
+                text: "Eiti kartu su nepažįstamu žmogumi, kuris siūlo saldainių ar pažiūrėti šuniuko.",
+                isSafe: false,
+                explanation: "Niekada neik su nepažįstamais žmonėmis be tėvelių žinios!"
+            },
+            {
+                emoji: "🚲🪖",
+                text: "Važiuoti dviračiu ar paspirtuku užsisegus šalmą.",
+                isSafe: true,
+                explanation: "Šalmas saugo galvą nuo sužeidimų!"
+            },
+            {
+                emoji: "🔥🕯️",
+                text: "Vienam be suaugusiųjų žaisti su degtukais ar žiebtuvėliu.",
+                isSafe: false,
+                explanation: "Ugnis gali sukelti pavojingą gaisrą!"
+            },
+            {
+                emoji: "👀🚸",
+                text: "Prieš žengiant į pėsčiųjų perėją sustoti ir apsižvalgyti į abi puses.",
+                isSafe: true,
+                explanation: "Apsižvalgyti prieš einant per gatvę – svarbiausia taisyklė!"
+            },
+            {
+                emoji: "🔌⚡",
+                text: "Kišti pirštus ar metalinius daiktus į elektros lizdą (rozetę).",
+                isSafe: false,
+                explanation: "Elektra yra labai pavojinga!"
+            },
+            {
+                emoji: "🚗💺",
+                text: "Automobilyje visada sėdėti savo kėdutėje su prisegtu saugos diržu.",
+                isSafe: true,
+                explanation: "Saugos diržas apsaugo staigiai stabdant!"
+            },
+            {
+                emoji: "⚽🛣️",
+                text: "Staiga išbėgti į važiuojamąją gatvę paskui nuriedėjusį kamuolį.",
+                isSafe: false,
+                explanation: "Vairuotojas gali nespėti sustabdyti automobilio! Paprašyk suaugusiojo."
+            },
+            {
+                emoji: "📱👨‍👩‍👧",
+                text: "Mokėti atmintinai savo vardą, pavardę ir tėvelių telefono numerį.",
+                isSafe: true,
+                explanation: "Tai labai padeda, jei netyčia pasimestum parduotuvėje ar mieste!"
+            }
+        ];
+
+        let state = {
+            mode: 'traffic',
+            questions: [],
+            missedQuestions: [],
+            currentIndex: 0,
+            totalPossible: 9,
+            score: 0,
+            streak: 0,
+            firstTry: true,
+            waiting: false,
+            hintUsed: false,
+            currentOptions: []
+        };
+
+        const appEl = document.getElementById('app');
+
+        function renderStartScreen() {
+            clearGameTimers();
+            appEl.innerHTML = `
+                <div class="p-5 sm:p-8 flex flex-col items-center justify-center text-center">
+                    <div class="age-tag inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-900 text-xs sm:text-sm font-black mb-2">
+                        <span>🎒</span>
+                        <span>${_col('5–8 m. • Priešmokyklinė – 2 klasė')}</span>
+                    </div>
+                    <div class="text-5xl sm:text-7xl mb-2 animate-bounce">🚦</div>
+                    <h1 class="text-2xl sm:text-4xl font-black text-emerald-800 mb-2">${_col('Saugus Kelyje')}</h1>
+                    <p class="text-slate-600 dark:text-slate-300 font-bold text-sm sm:text-base mb-5 max-w-md">
+                        ${_col('Išmok šviesoforo signalus, kelio ženklus, atšvaitų taisykles ir pagalbos numerį 112!')}
+                    </p>
+
+                    <div class="flex flex-col gap-3 w-full max-w-sm">
+                        <button onclick="startGame('traffic')" class="btn-3d py-3 sm:py-3.5 px-5 bg-emerald-100 hover:bg-emerald-200 border-2 border-emerald-400 rounded-2xl text-lg sm:text-xl font-black shadow-[0_5px_0_#059669] active:shadow-[0_0px_0_#059669] transition-all flex items-center justify-center gap-2.5 text-emerald-950">
+                            <span class="text-2xl">🚦</span>
+                            <span>${_col('Šviesoforas ir gatvė')}</span>
+                        </button>
+                        <button onclick="startGame('signs')" class="btn-3d py-3 sm:py-3.5 px-5 bg-sky-100 hover:bg-sky-200 border-2 border-sky-400 rounded-2xl text-lg sm:text-xl font-black shadow-[0_5px_0_#0284c7] active:shadow-[0_0px_0_#0284c7] transition-all flex items-center justify-center gap-2.5 text-sky-950">
+                            <span class="text-2xl">🚸</span>
+                            <span>${_col('Ženklai ir pagalba 112')}</span>
+                        </button>
+                        <button onclick="startGame('safe_or_not')" class="btn-3d py-3 sm:py-3.5 px-5 bg-amber-100 hover:bg-amber-200 border-2 border-amber-400 rounded-2xl text-lg sm:text-xl font-black shadow-[0_5px_0_#d97706] active:shadow-[0_0px_0_#d97706] transition-all flex items-center justify-center gap-2.5 text-amber-950">
+                            <span class="text-2xl">🛡️</span>
+                            <span>${_col('Saugu ar Pavojinga?')}</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function startGame(mode) {
+            getAudioCtx();
+            clearGameTimers();
+            state.mode = mode;
+            state.score = 0;
+            state.streak = 0;
+            state.currentIndex = 0;
+            state.missedQuestions = [];
+
+            let pool = TRAFFIC_QUESTIONS;
+            if (mode === 'signs') pool = SIGNS_QUESTIONS;
+            if (mode === 'safe_or_not') pool = SAFE_OR_NOT_QUESTIONS;
+
+            state.questions = shuffle(pool).slice(0, 10);
+            state.totalPossible = state.questions.length;
+            renderQuestion();
+        }
+
+        function retryMistakes() {
+            if (!state.missedQuestions || state.missedQuestions.length === 0) {
+                startGame(state.mode);
+                return;
+            }
+            getAudioCtx();
+            clearGameTimers();
+            state.questions = shuffle(state.missedQuestions);
+            state.missedQuestions = [];
+            state.totalPossible = state.questions.length;
+            state.score = 0;
+            state.streak = 0;
+            state.currentIndex = 0;
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            if (state.currentIndex >= state.questions.length) {
+                renderEndScreen();
+                return;
+            }
+
+            state.firstTry = true;
+            state.waiting = false;
+            state.hintUsed = false;
+
+            if (state.mode === 'safe_or_not') {
+                renderSafeOrNotQuestion();
+            } else {
+                renderQuizQuestion();
+            }
+        }
+
+        function renderTrafficLightWidget(activeLight) {
+            if (!activeLight) return '';
+            return `
+                <div class="traffic-light mb-1">
+                    <div class="bulb bg-red-500 text-red-500 ${activeLight === 'red' ? 'active' : ''}"></div>
+                    <div class="bulb bg-amber-400 text-amber-400 ${activeLight === 'yellow' ? 'active' : ''}"></div>
+                    <div class="bulb bg-emerald-400 text-emerald-400 ${activeLight === 'green' ? 'active' : ''}"></div>
+                </div>
+            `;
+        }
+
+        function renderQuizQuestion() {
+            const q = state.questions[state.currentIndex];
+            const options = shuffle([q.correct, ...q.wrong]);
+            state.currentOptions = options;
+
+            let visualHeader = '';
+            if (state.mode === 'traffic') {
+                visualHeader = q.light
+                    ? renderTrafficLightWidget(q.light)
+                    : `<div class="text-4xl sm:text-6xl">${q.emoji}</div>`;
+            } else {
+                visualHeader = `
+                    <div class="inline-flex items-center justify-center px-4 py-2 rounded-2xl border-4 shadow-md font-black text-2xl sm:text-4xl ${q.badgeBg}">
+                        ${q.badge}
+                    </div>
+                `;
+            }
+
+            const optionsHtml = options.map((opt, idx) => `
+                <button id="btn-${idx}" onclick="handleQuizAnswer(${idx})"
+                    class="btn-3d py-2.5 sm:py-3.5 px-3.5 bg-emerald-50 hover:bg-emerald-100 text-slate-900 border-2 border-emerald-300 rounded-2xl text-sm sm:text-base font-black shadow-[0_4px_0_#10b981] active:shadow-[0_0px_0_#10b981] transition-all flex items-center justify-start text-left min-h-[52px] w-full">
+                    <span>${_col(opt)}</span>
+                </button>
+            `).join('');
+
+            appEl.innerHTML = `
+                ${renderTopBar({ score: state.score, current: state.currentIndex + 1, total: state.questions.length, streak: state.streak, theme: 'emerald' })}
+
+                <div class="p-3 sm:p-5 flex-1 flex flex-col justify-evenly items-center gap-2">
+                    <div class="scenario-box py-3 px-4 sm:px-5 flex flex-col items-center justify-center bg-gradient-to-b from-emerald-100/80 to-emerald-50/80 rounded-3xl border-2 border-emerald-300 w-full shadow-inner gap-1.5">
+                        <div class="flex items-center gap-2">
+                            ${visualHeader}
+                            ${renderSpeakBtn(q.question)}
+                        </div>
+                        <p class="text-sm sm:text-lg font-black text-slate-900 dark:text-white text-center leading-snug">
+                            ${_col(q.question)}
+                        </p>
+                        <div id="hint-box" class="hidden hint-box text-xs sm:text-sm">
+                            💡 ${_col(q.hint)}
+                        </div>
+                        <button id="hint-btn" onclick="showQuizHint()" class="hint-btn mt-0.5">
+                            <span>💡</span> <span>${_col('Užuomina')}</span>
+                        </button>
+                    </div>
+
+                    <div id="feedback" class="h-6 sm:h-7 flex items-center justify-center text-xs sm:text-base font-black opacity-0 transition-opacity">
+                        <span>&nbsp;</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5 w-full">
+                        ${optionsHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        function showQuizHint() {
+            if (state.waiting || state.hintUsed) return;
+            state.hintUsed = true;
+            playHintSound();
+            const hintBox = document.getElementById('hint-box');
+            if (hintBox) hintBox.classList.remove('hidden');
+            const hintBtn = document.getElementById('hint-btn');
+            if (hintBtn) hintBtn.classList.add('hidden');
+
+            const q = state.questions[state.currentIndex];
+            const wrongIdxs = [];
+            (state.currentOptions || []).forEach((opt, idx) => {
+                const btn = document.getElementById(`btn-${idx}`);
+                if (opt !== q.correct && btn && !btn.disabled) wrongIdxs.push(idx);
+            });
+            shuffle(wrongIdxs).slice(0, 1).forEach(idx => {
+                const btn = document.getElementById(`btn-${idx}`);
+                if (btn) {
+                    btn.disabled = true;
+                    btn.classList.add('opacity-35', 'line-through', 'pointer-events-none');
+                }
+            });
+        }
+
+        function handleQuizAnswer(idx) {
+            if (state.waiting) return;
+            const selected = state.currentOptions[idx];
+            const btn = document.getElementById(`btn-${idx}`);
+            const q = state.questions[state.currentIndex];
+            const feedback = document.getElementById('feedback');
+            if (!selected || !btn) return;
+
+            if (selected === q.correct) {
+                state.waiting = true;
+                playCorrectSound();
+                if (state.firstTry) {
+                    state.score++;
+                    state.streak++;
+                }
+
+                btn.classList.remove('bg-emerald-50', 'border-emerald-300');
+                btn.classList.add('bg-green-500', 'text-white', 'border-green-600', 'shadow-[0_4px_0_#15803d]', 'bounce-anim');
+
+                if (feedback) {
+                    feedback.innerHTML = `<span>${_col('Šaunuolis! Tai saugus sprendimas!')} 🎉</span>`;
+                    feedback.className = "h-6 sm:h-7 flex items-center justify-center text-xs sm:text-base font-black text-green-600 opacity-100";
+                }
+
+                setGameTimeout(() => {
+                    state.currentIndex++;
+                    renderQuestion();
+                }, 1250);
+            } else {
+                if (state.firstTry && !state.missedQuestions.includes(q)) {
+                    state.missedQuestions.push(q);
+                }
+                state.firstTry = false;
+                state.streak = 0;
+                playWrongSound();
+
+                btn.classList.add('bg-red-100', 'text-red-400', 'line-through', 'border-red-300', 'opacity-60', 'shake-anim');
+                btn.disabled = true;
+
+                if (feedback) {
+                    feedback.innerHTML = `<span>${_col('Pagalvok, kaip elgtis saugiausia!')} 🤔</span>`;
+                    feedback.className = "h-6 sm:h-7 flex items-center justify-center text-xs sm:text-base font-black text-red-500 opacity-100";
+                }
+
+                const hintBtn = document.getElementById('hint-btn');
+                if (hintBtn && !state.hintUsed) hintBtn.classList.add('hint-btn-pulse');
+            }
+        }
+
+        function renderSafeOrNotQuestion() {
+            const q = state.questions[state.currentIndex];
+
+            appEl.innerHTML = `
+                ${renderTopBar({ score: state.score, current: state.currentIndex + 1, total: state.questions.length, streak: state.streak, theme: 'amber' })}
+
+                <div class="p-3 sm:p-5 flex-1 flex flex-col justify-evenly items-center gap-3">
+                    <h2 class="text-base sm:text-xl font-black text-slate-800 text-center">🛡️ ${_col('Ar taip elgtis SAUGU, ar PAVOJINGA?')}</h2>
+
+                    <div class="scenario-box py-4 px-5 flex flex-col items-center justify-center bg-gradient-to-b from-amber-100/80 to-amber-50/80 rounded-3xl border-2 border-amber-300 w-full shadow-inner gap-2">
+                        <div class="flex items-center gap-2">
+                            <span class="text-4xl sm:text-6xl">${q.emoji}</span>
+                            ${renderSpeakBtn(q.text)}
+                        </div>
+                        <p class="text-base sm:text-xl font-black text-slate-900 dark:text-white text-center leading-snug">
+                            „${_col(q.text)}“
+                        </p>
+                    </div>
+
+                    <div id="feedback" class="min-h-[32px] flex items-center justify-center text-xs sm:text-base font-black text-center px-2 opacity-0 transition-opacity">
+                        <span>&nbsp;</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 sm:gap-4 w-full">
+                        <button id="safe-btn-true" onclick="handleSafeOrNot(true)"
+                            class="btn-3d py-4 sm:py-5 px-4 bg-emerald-100 hover:bg-emerald-200 text-emerald-950 border-2 border-emerald-400 rounded-2xl text-lg sm:text-2xl font-black shadow-[0_5px_0_#059669] active:shadow-[0_0px_0_#059669] transition-all flex flex-col items-center justify-center gap-1">
+                            <span class="text-3xl sm:text-4xl">✅</span>
+                            <span>${_col('SAUGU')}</span>
+                        </button>
+                        <button id="safe-btn-false" onclick="handleSafeOrNot(false)"
+                            class="btn-3d py-4 sm:py-5 px-4 bg-rose-100 hover:bg-rose-200 text-rose-950 border-2 border-rose-400 rounded-2xl text-lg sm:text-2xl font-black shadow-[0_5px_0_#e11d48] active:shadow-[0_0px_0_#e11d48] transition-all flex flex-col items-center justify-center gap-1">
+                            <span class="text-3xl sm:text-4xl">❌</span>
+                            <span>${_col('PAVOJINGA')}</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function handleSafeOrNot(choice) {
+            if (state.waiting) return;
+            const q = state.questions[state.currentIndex];
+            const btn = document.getElementById(`safe-btn-${choice}`);
+            const feedback = document.getElementById('feedback');
+            if (!btn) return;
+
+            if (choice === q.isSafe) {
+                state.waiting = true;
+                playCorrectSound();
+                if (state.firstTry) {
+                    state.score++;
+                    state.streak++;
+                }
+
+                btn.classList.add('bg-green-500', 'text-white', 'border-green-600', 'bounce-anim');
+
+                if (feedback) {
+                    feedback.innerHTML = `<span>✔️ ${_col(q.explanation)}</span>`;
+                    feedback.className = "min-h-[32px] flex items-center justify-center text-xs sm:text-base font-black text-center px-2 text-green-600 opacity-100";
+                }
+
+                setGameTimeout(() => {
+                    state.currentIndex++;
+                    renderQuestion();
+                }, 1500);
+            } else {
+                if (state.firstTry && !state.missedQuestions.includes(q)) {
+                    state.missedQuestions.push(q);
+                }
+                state.firstTry = false;
+                state.streak = 0;
+                playWrongSound();
+
+                btn.classList.add('opacity-50', 'shake-anim');
+                btn.disabled = true;
+
+                if (feedback) {
+                    feedback.innerHTML = `<span>🤔 ${_col(q.explanation)}</span>`;
+                    feedback.className = "min-h-[32px] flex items-center justify-center text-xs sm:text-base font-black text-center px-2 text-red-500 opacity-100";
+                }
+            }
+        }
+
+        function renderEndScreen() {
+            appEl.innerHTML = renderEndScreenHelper({
+                score: state.score,
+                total: state.totalPossible,
+                restartFn: "startGame(state.mode)",
+                retryFn: "retryMistakes()",
+                mistakesCount: state.missedQuestions.length,
+                menuFn: "renderStartScreen()"
+            });
+        }
+
+        renderStartScreen();
+    </script>
+</body>
+</html>

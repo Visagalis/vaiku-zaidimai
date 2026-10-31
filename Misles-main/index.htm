@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>🗝️ Mįslių Skrynelė</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../shared/common.css?v=2">
+    <script src="../shared/common.js?v=2"></script>
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #fffbeb;
+            background-image: radial-gradient(#fbbf24 20%, transparent 20%);
+            background-size: 22px 22px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #0b1120 !important;
+                background-image: radial-gradient(#1e293b 20%, transparent 20%) !important;
+                color: #f1f5f9 !important;
+            }
+            #app {
+                background-color: #0f172a !important;
+                border-color: #334155 !important;
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6) !important;
+            }
+            h1, h2 {
+                color: #f8fafc !important;
+            }
+            .btn-3d {
+                background-color: #1e293b !important;
+                border-color: #334155 !important;
+                color: #f8fafc !important;
+                box-shadow: 0 5px 0 #0f172a !important;
+            }
+            .btn-3d:hover {
+                background-color: #273549 !important;
+            }
+            .riddle-card {
+                background: rgba(30, 41, 59, 0.8) !important;
+                border-color: #475569 !important;
+            }
+            .clue-pill {
+                background-color: #1e293b !important;
+                border-color: #475569 !important;
+                color: #f8fafc !important;
+            }
+            .age-tag {
+                background-color: #1e293b !important;
+                border-color: #475569 !important;
+                color: #fcd34d !important;
+            }
+        }
+    </style>
+</head>
+<body class="h-screen max-h-screen flex items-center justify-center p-2 sm:p-4 overflow-hidden transition-colors duration-200">
+
+    <div id="app" class="w-full max-w-2xl bg-white/95 backdrop-blur-md rounded-3xl shadow-xl flex flex-col relative border-4 border-amber-400 overflow-hidden max-h-full">
+    </div>
+
+    <script>
+        // 1 REŽIMAS: Gamta ir gyvūnai
+        const NATURE_RIDDLES = [
+            {
+                riddle: "Raudonas ponaitis po žeme tupi, o žalia kasa lauke kyšo.",
+                hint: "Triušio mėgstamiausia pailga daržovė!",
+                correct: { word: "MORKA", emoji: "🥕" },
+                wrong: [
+                    { word: "OBUOLYS", emoji: "🍎" },
+                    { word: "GRYBAS", emoji: "🍄" },
+                    { word: "BANANAS", emoji: "🍌" }
+                ]
+            },
+            {
+                riddle: "Šimtas skarų, nė vieno siūlo.",
+                hint: "Apvali žalia daržovė su daugybe lapų!",
+                correct: { word: "KOPŪSTAS", emoji: "🥬" },
+                wrong: [
+                    { word: "POMIDORAS", emoji: "🍅" },
+                    { word: "BRAŠKĖ", emoji: "🍓" },
+                    { word: "CITRINA", emoji: "🍋" }
+                ]
+            },
+            {
+                riddle: "Be rankų, be kojų, o medžius linguoja ir duris atidaro.",
+                hint: "Jis pučia lauke!",
+                correct: { word: "VĖJAS", emoji: "💨" },
+                wrong: [
+                    { word: "AKMUO", emoji: "🪨" },
+                    { word: "GĖLĖ", emoji: "🌸" },
+                    { word: "NAMAS", emoji: "🏠" }
+                ]
+            },
+            {
+                riddle: "Vasarą pilkas, žiemą baltas, ilgomis ausimis.",
+                hint: "Greitai šokinėja per pievą!",
+                correct: { word: "KIŠKIS", emoji: "🐰" },
+                wrong: [
+                    { word: "LOKYS", emoji: "🐻" },
+                    { word: "VARLĖ", emoji: "🐸" },
+                    { word: "GAIDYS", emoji: "🐓" }
+                ]
+            },
+            {
+                riddle: "Mažas vabalėlis, raudonas švarkelis su juodais taškeliais.",
+                hint: "Skraido pievoje ir tupia ant piršto!",
+                correct: { word: "BORUŽĖ", emoji: "🐞" },
+                wrong: [
+                    { word: "SRAIGĖ", emoji: "🐌" },
+                    { word: "VORAS", emoji: "🕷️" },
+                    { word: "SLIEKAS", emoji: "🪱" }
+                ]
+            },
+            {
+                riddle: "Auksinis kamuolėlis danguje rieda ir visus šildo.",
+                hint: "Šviečia danguje dieną!",
+                correct: { word: "SAULĖ", emoji: "☀️" },
+                wrong: [
+                    { word: "LIETUS", emoji: "🌧️" },
+                    { word: "SNIEGAS", emoji: "❄️" },
+                    { word: "MEDIS", emoji: "🌳" }
+                ]
+            },
+            {
+                riddle: "Ant vienos kojos stovi, kepurę nešioja, miške po egle auga.",
+                hint: "Rudenį renkame juos į pintinę!",
+                correct: { word: "GRYBAS", emoji: "🍄" },
+                wrong: [
+                    { word: "KANKORĖŽIS", emoji: "🌲" },
+                    { word: "RIEŠUTAS", emoji: "🌰" },
+                    { word: "UOGA", emoji: "🫐" }
+                ]
+            },
+            {
+                riddle: "Iš dangaus krenta balti pūkeliai ir užkloja žemę balta antklode.",
+                hint: "Iš jo žiemą lipdome senį besmegenį!",
+                correct: { word: "SNIEGAS", emoji: "❄️" },
+                wrong: [
+                    { word: "SMĖLIS", emoji: "🏖️" },
+                    { word: "LAPAI", emoji: "🍂" },
+                    { word: "ŽOLĖ", emoji: "🌿" }
+                ]
+            },
+            {
+                riddle: "Po lietaus ir saulės danguje nutiesia spalvotą tiltą.",
+                hint: "Turi septynias ryškias spalvas!",
+                correct: { word: "VAIVORYKŠTĖ", emoji: "🌈" },
+                wrong: [
+                    { word: "ŽAIBAS", emoji: "⚡" },
+                    { word: "MĖNULIS", emoji: "🌙" },
+                    { word: "VĖJAS", emoji: "💨" }
+                ]
+            },
+            {
+                riddle: "Neša savo namelį ant nugaros ir lėtai šliaužia žole.",
+                hint: "Turi mažus ragelius ir kriauklę!",
+                correct: { word: "SRAIGĖ", emoji: "🐌" },
+                wrong: [
+                    { word: "PELĖ", emoji: "🐭" },
+                    { word: "VOVERĖ", emoji: "🐿️" },
+                    { word: "ŽUVIS", emoji: "🐟" }
+                ]
+            },
+            {
+                riddle: "Spygliuotas kamuoliukas miške po lapais pūškuoja.",
+                hint: "Jo nugara pilna dygliukų!",
+                correct: { word: "EŽYS", emoji: "🦔" },
+                wrong: [
+                    { word: "LAPĖ", emoji: "🦊" },
+                    { word: "ŠUO", emoji: "🐶" },
+                    { word: "AVIS", emoji: "🐑" }
+                ]
+            }
+        ];
+
+        // 2 REŽIMAS: Daiktai ir namai
+        const ITEM_RIDDLES = [
+            {
+                riddle: "Turi daug dantukų, bet nevalgo – tik plaukus glosto.",
+                hint: "Jomis ryte susišukuojame!",
+                correct: { word: "ŠUKOS", emoji: "🪮" },
+                wrong: [
+                    { word: "ŠAUKŠTAS", emoji: "🥄" },
+                    { word: "KEPURĖ", emoji: "🧢" },
+                    { word: "BATAS", emoji: "👟" }
+                ]
+            },
+            {
+                riddle: "Eina, tiksi visą dieną, bet iš vietos nepajuda.",
+                hint: "Rodo valandas ir minutes!",
+                correct: { word: "LAIKRODIS", emoji: "🕐" },
+                wrong: [
+                    { word: "STALAS", emoji: "🪑" },
+                    { word: "LEMPUTĖ", emoji: "💡" },
+                    { word: "KNYGA", emoji: "📖" }
+                ]
+            },
+            {
+                riddle: "Kai lyja lietus – išsiskleidžia, kai saulė šviečia – susiglaudžia.",
+                hint: "Laikome rankoje, kad nesušlaptume!",
+                correct: { word: "SKĖTIS", emoji: "☂️" },
+                wrong: [
+                    { word: "PIRŠTINĖS", emoji: "🧤" },
+                    { word: "AKINIAI", emoji: "👓" },
+                    { word: "KUPRINĖ", emoji: "🎒" }
+                ]
+            },
+            {
+                riddle: "Keturi broliukai po vienu stogu stovi.",
+                hint: "Prie jo sėdime ir valgome arba piešiame!",
+                correct: { word: "STALAS", emoji: "🪑" },
+                wrong: [
+                    { word: "DURYS", emoji: "🚪" },
+                    { word: "LANGAS", emoji: "🪟" },
+                    { word: "VEIDRODIS", emoji: "🪞" }
+                ]
+            },
+            {
+                riddle: "Baltas grūdelis tirpsta šiltoje arbatoje ir ją pasaldina.",
+                hint: "Jis labai saldus!",
+                correct: { word: "CUKRUS", emoji: "🍬" },
+                wrong: [
+                    { word: "DUONA", emoji: "🍞" },
+                    { word: "SŪRIS", emoji: "🧀" },
+                    { word: "AGURKAS", emoji: "🥒" }
+                ]
+            },
+            {
+                riddle: "Nors neturi liežuvio, bet pasakoja įdomias pasakas ir istorijas.",
+                hint: "Verčiame jos puslapius ir skaitome!",
+                correct: { word: "KNYGA", emoji: "📖" },
+                wrong: [
+                    { word: "PIEŠTUKAS", emoji: "✏️" },
+                    { word: "ŽIRKLĖS", emoji: "✂️" },
+                    { word: "KAMUOLYS", emoji: "⚽" }
+                ]
+            },
+            {
+                riddle: "Kas jį lupa ir pjausto – tas ašaras lieja.",
+                hint: "Aštri daržovė su geltona lukšto odele!",
+                correct: { word: "SVOGŪNAS", emoji: "🧅" },
+                wrong: [
+                    { word: "BULVĖ", emoji: "🥔" },
+                    { word: "OBUOLYS", emoji: "🍎" },
+                    { word: "KRIAUŠĖ", emoji: "🍐" }
+                ]
+            },
+            {
+                riddle: "Du žiedeliai, du peiliukai – popierių kerpa mikliai.",
+                hint: "Naudojame per darbelių pamoką!",
+                correct: { word: "ŽIRKLĖS", emoji: "✂️" },
+                wrong: [
+                    { word: "TEPTUKAS", emoji: "🖌️" },
+                    { word: "LINIUOTĖ", emoji: "📏" },
+                    { word: "KLIJAI", emoji: "🧴" }
+                ]
+            },
+            {
+                riddle: "Žiūri į jį: kai nusišypsai – ir jis tau šypsosi.",
+                hint: "Jame matai savo atspindį!",
+                correct: { word: "VEIDRODIS", emoji: "🪞" },
+                wrong: [
+                    { word: "SPINTA", emoji: "🚪" },
+                    { word: "KILIMAS", emoji: "🧶" },
+                    { word: "PAGALVĖ", emoji: "🛌" }
+                ]
+            },
+            {
+                riddle: "Kabina ant durų ir atidaro tiktai su raktu.",
+                hint: "Saugo namus!",
+                correct: { word: "SPYNA", emoji: "🔒" },
+                wrong: [
+                    { word: "SKAMBUTIS", emoji: "🔔" },
+                    { word: "ŠLUOTA", emoji: "🧹" },
+                    { word: "PUODELIS", emoji: "☕" }
+                ]
+            }
+        ];
+
+        // 3 REŽIMAS: 3 užuominų detektyvas (trumpi sakinukai 1 klasei)
+        const DETECTIVE_QUESTIONS = [
+            {
+                clues: ["1. Esu geltonas 💛", "2. Augu šiltuose kraštuose 🌴", "3. Mane mėgsta beždžionės 🐒"],
+                hint: "Ilgas saldus vaisius!",
+                correct: { word: "BANANAS", emoji: "🍌" },
+                wrong: [
+                    { word: "OBUOLYS", emoji: "🍎" },
+                    { word: "AGURKAS", emoji: "🥒" },
+                    { word: "RIEŠUTAS", emoji: "🌰" }
+                ]
+            },
+            {
+                clues: ["1. Turiu du ratus 🛞", "2. Minu pedalus 🦵", "3. Važiuojant dėviu šalmą 🪖"],
+                hint: "Transporto priemonė vaikams!",
+                correct: { word: "DVIRATIS", emoji: "🚲" },
+                wrong: [
+                    { word: "LĖKTUVAS", emoji: "✈️" },
+                    { word: "LAIVAS", emoji: "🚢" },
+                    { word: "ROGUTĖS", emoji: "🛷" }
+                ]
+            },
+            {
+                clues: ["1. Esu žalia 🟢", "2. Šokinėju prie tvenkinio 💦", "3. Sakau KVA KVA 🎵"],
+                hint: "Gyvena prie vandens ir gaudo uodus!",
+                correct: { word: "VARLĖ", emoji: "🐸" },
+                wrong: [
+                    { word: "ŽUVIS", emoji: "🐟" },
+                    { word: "ANTIS", emoji: "🦆" },
+                    { word: "PELĖ", emoji: "🐭" }
+                ]
+            },
+            {
+                clues: ["1. Duodu baltą pieną 🥛", "2. Pievoje rupšnoju žolę 🌿", "3. Sakau MŪŪ 🎵"],
+                hint: "Stambus naminis gyvulys!",
+                correct: { word: "KARVĖ", emoji: "🐄" },
+                wrong: [
+                    { word: "VIŠTA", emoji: "🐔" },
+                    { word: "ŠUO", emoji: "🐶" },
+                    { word: "KATĖ", emoji: "🐱" }
+                ]
+            },
+            {
+                clues: ["1. Esu šaltas ir saldus ❄️", "2. Greitai tirpstu saulėje ☀️", "3. Valgomas vafliniame ragelyje 🧇"],
+                hint: "Mėgstamiausias vasaros skanėstas!",
+                correct: { word: "LEDAI", emoji: "🍦" },
+                wrong: [
+                    { word: "SRIUBA", emoji: "🍲" },
+                    { word: "DUONA", emoji: "🍞" },
+                    { word: "ARBATA", emoji: "🍵" }
+                ]
+            },
+            {
+                clues: ["1. Turiu ilgą straublį 👃", "2. Dideles ausis 👂", "3. Esu didžiausias sausumos gyvūnas 🌍"],
+                hint: "Pilkas milžinas iš Afrikos ar Indijos!",
+                correct: { word: "DRAMBLYS", emoji: "🐘" },
+                wrong: [
+                    { word: "LIŪTAS", emoji: "🦁" },
+                    { word: "ZUIKIS", emoji: "🐰" },
+                    { word: "VILKAS", emoji: "🐺" }
+                ]
+            },
+            {
+                clues: ["1. Skraidau nuo žiedo ant žiedo 🌸", "2. Dūzgiu BZZZ 🎵", "3. Nešu saldų medų 🍯"],
+                hint: "Dryžuotas darbštus vabzdys!",
+                correct: { word: "BITĖ", emoji: "🐝" },
+                wrong: [
+                    { word: "DRUGELIS", emoji: "🦋" },
+                    { word: "SKRUZDĖLĖ", emoji: "🐜" },
+                    { word: "PAUKŠTIS", emoji: "🐦" }
+                ]
+            },
+            {
+                clues: ["1. Esu raudona ir saldi 🔴", "2. Augu darželyje ant žemės 🌱", "3. Iš manęs verda uogienę 🍯"],
+                hint: "Vasaros uoga su mažais taškeliais!",
+                correct: { word: "BRAŠKĖ", emoji: "🍓" },
+                wrong: [
+                    { word: "MORKA", emoji: "🥕" },
+                    { word: "BULVĖ", emoji: "🥔" },
+                    { word: "CITRINA", emoji: "🍋" }
+                ]
+            },
+            {
+                clues: ["1. Turiu patį ilgiausią kaklą 📏", "2. Mano kailis su dėmelėmis 🟡", "3. Skabau aukštų medžių lapus 🌳"],
+                hint: "Aukščiausias gyvūnas pasaulyje!",
+                correct: { word: "ŽIRAFA", emoji: "🦒" },
+                wrong: [
+                    { word: "ZEBRAS", emoji: "🦓" },
+                    { word: "TIGRAS", emoji: "🐯" },
+                    { word: "BEŽDŽIONĖ", emoji: "🐒" }
+                ]
+            },
+            {
+                clues: ["1. Gyvenu po vandeniu 🌊", "2. Turiu pelekus ir žvynus ✨", "3. Plaukioju tyliai be garso 🤫"],
+                hint: "Gyvena upėje, ežere arba jūroje!",
+                correct: { word: "ŽUVIS", emoji: "🐟" },
+                wrong: [
+                    { word: "VOVERĖ", emoji: "🐿️" },
+                    { word: "PELĖDA", emoji: "🦉" },
+                    { word: "ARKLYS", emoji: "🐴" }
+                ]
+            }
+        ];
+
+        let state = {
+            mode: 'nature',
+            questions: [],
+            missedQuestions: [],
+            currentIndex: 0,
+            totalPossible: 10,
+            score: 0,
+            streak: 0,
+            firstTry: true,
+            waiting: false,
+            hintUsed: false,
+            currentOptions: []
+        };
+
+        const appEl = document.getElementById('app');
+
+        function renderStartScreen() {
+            clearGameTimers();
+            appEl.innerHTML = `
+                <div class="p-5 sm:p-8 flex flex-col items-center justify-center text-center">
+                    <div class="age-tag inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 border border-amber-300 text-amber-900 text-xs sm:text-sm font-black mb-2">
+                        <span>🎒</span>
+                        <span>${_col('5–8 m. • Priešmokyklinė – 2 klasė')}</span>
+                    </div>
+                    <div class="text-5xl sm:text-7xl mb-2 animate-bounce">🗝️</div>
+                    <h1 class="text-2xl sm:text-4xl font-black text-amber-800 mb-2">${_col('Mįslių Skrynelė')}</h1>
+                    <p class="text-slate-600 dark:text-slate-300 font-bold text-sm sm:text-base mb-5 max-w-md">
+                        ${_col('Perskaityk arba išklausyk mįslę ir atspėk, kas slepiasi skrynelėje!')}
+                    </p>
+
+                    <div class="flex flex-col gap-3 w-full max-w-sm">
+                        <button onclick="startGame('nature')" class="btn-3d py-3 sm:py-3.5 px-5 bg-emerald-100 hover:bg-emerald-200 border-2 border-emerald-400 rounded-2xl text-lg sm:text-xl font-black shadow-[0_5px_0_#059669] active:shadow-[0_0px_0_#059669] transition-all flex items-center justify-center gap-2.5 text-emerald-950">
+                            <span class="text-2xl">🌿</span>
+                            <span>${_col('Gamta ir gyvūnai')}</span>
+                        </button>
+                        <button onclick="startGame('items')" class="btn-3d py-3 sm:py-3.5 px-5 bg-amber-100 hover:bg-amber-200 border-2 border-amber-400 rounded-2xl text-lg sm:text-xl font-black shadow-[0_5px_0_#d97706] active:shadow-[0_0px_0_#d97706] transition-all flex items-center justify-center gap-2.5 text-amber-950">
+                            <span class="text-2xl">🏠</span>
+                            <span>${_col('Daiktai ir namai')}</span>
+                        </button>
+                        <button onclick="startGame('detective')" class="btn-3d py-3 sm:py-3.5 px-5 bg-sky-100 hover:bg-sky-200 border-2 border-sky-400 rounded-2xl text-lg sm:text-xl font-black shadow-[0_5px_0_#0284c7] active:shadow-[0_0px_0_#0284c7] transition-all flex items-center justify-center gap-2.5 text-sky-950">
+                            <span class="text-2xl">🕵️</span>
+                            <span>${_col('3 užuominų detektyvas')}</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function startGame(mode) {
+            getAudioCtx();
+            clearGameTimers();
+            state.mode = mode;
+            state.score = 0;
+            state.streak = 0;
+            state.currentIndex = 0;
+            state.missedQuestions = [];
+
+            let pool = NATURE_RIDDLES;
+            if (mode === 'items') pool = ITEM_RIDDLES;
+            if (mode === 'detective') pool = DETECTIVE_QUESTIONS;
+
+            state.questions = shuffle(pool).slice(0, 10);
+            state.totalPossible = state.questions.length;
+            renderQuestion();
+        }
+
+        function retryMistakes() {
+            if (!state.missedQuestions || state.missedQuestions.length === 0) {
+                startGame(state.mode);
+                return;
+            }
+            getAudioCtx();
+            clearGameTimers();
+            state.questions = shuffle(state.missedQuestions);
+            state.missedQuestions = [];
+            state.totalPossible = state.questions.length;
+            state.score = 0;
+            state.streak = 0;
+            state.currentIndex = 0;
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            if (state.currentIndex >= state.questions.length) {
+                renderEndScreen();
+                return;
+            }
+
+            state.firstTry = true;
+            state.waiting = false;
+            state.hintUsed = false;
+
+            const q = state.questions[state.currentIndex];
+            const options = shuffle([q.correct, ...q.wrong]);
+            state.currentOptions = options;
+
+            let bodyContent = '';
+            if (state.mode === 'detective') {
+                const speakText = q.clues.join('. ');
+                const cluesHtml = q.clues.map(c => `
+                    <div class="clue-pill px-3.5 py-1.5 rounded-2xl bg-white border-2 border-sky-300 font-extrabold text-sm sm:text-lg text-slate-800 shadow-sm w-full text-left">
+                        ${_col(c)}
+                    </div>
+                `).join('');
+                bodyContent = `
+                    <div class="flex items-center justify-between w-full mb-1">
+                        <span class="text-xs sm:text-sm font-black uppercase tracking-wider text-sky-700 dark:text-sky-300">🕵️ ${_col('Kas aš esu?')}</span>
+                        ${renderSpeakBtn(speakText, 'Išklausyti užuominas')}
+                    </div>
+                    <div class="flex flex-col gap-1.5 w-full">
+                        ${cluesHtml}
+                    </div>
+                `;
+            } else {
+                bodyContent = `
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="text-3xl sm:text-4xl">🗝️</span>
+                        ${renderSpeakBtn(q.riddle, 'Išklausyti mįslę')}
+                    </div>
+                    <p class="text-base sm:text-2xl font-black text-slate-900 dark:text-white leading-snug text-center">
+                        „${_col(q.riddle)}“
+                    </p>
+                `;
+            }
+
+            const optionsHtml = options.map((opt, idx) => `
+                <button id="btn-${idx}" onclick="handleAnswer(${idx})"
+                    class="btn-3d py-3 sm:py-3.5 px-3 bg-amber-50 hover:bg-amber-100 text-slate-900 border-2 border-amber-300 rounded-2xl text-base sm:text-xl font-black shadow-[0_5px_0_#f59e0b] active:shadow-[0_0px_0_#f59e0b] transition-all flex items-center justify-center gap-2 min-h-[60px]">
+                    <span class="text-2xl sm:text-3xl">${opt.emoji}</span>
+                    <span>${_col(opt.word)}</span>
+                </button>
+            `).join('');
+
+            appEl.innerHTML = `
+                ${renderTopBar({ score: state.score, current: state.currentIndex + 1, total: state.questions.length, streak: state.streak, theme: 'amber' })}
+
+                <div class="p-3 sm:p-5 flex-1 flex flex-col justify-evenly items-center gap-2">
+                    <div class="riddle-card py-3.5 px-4 sm:px-6 flex flex-col items-center justify-center bg-gradient-to-b from-amber-100/80 to-amber-50/80 rounded-3xl border-2 border-amber-300 w-full shadow-inner gap-2">
+                        ${bodyContent}
+                        <div id="hint-box" class="hidden hint-box text-xs sm:text-sm mt-1">
+                            💡 ${_col(q.hint)}
+                        </div>
+                        <button id="hint-btn" onclick="showRiddleHint()" class="hint-btn mt-1">
+                            <span>💡</span> <span>${_col('Užuomina')}</span>
+                        </button>
+                    </div>
+
+                    <div id="feedback" class="h-6 sm:h-8 flex items-center justify-center text-sm sm:text-lg font-black opacity-0 transition-opacity">
+                        <span>&nbsp;</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2.5 sm:gap-3.5 w-full">
+                        ${optionsHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        function showRiddleHint() {
+            if (state.waiting || state.hintUsed) return;
+            state.hintUsed = true;
+            playHintSound();
+            const hintBox = document.getElementById('hint-box');
+            if (hintBox) hintBox.classList.remove('hidden');
+            const hintBtn = document.getElementById('hint-btn');
+            if (hintBtn) hintBtn.classList.add('hidden');
+
+            const q = state.questions[state.currentIndex];
+            const wrongIdxs = [];
+            (state.currentOptions || []).forEach((opt, idx) => {
+                const btn = document.getElementById(`btn-${idx}`);
+                if (opt.word !== q.correct.word && btn && !btn.disabled) wrongIdxs.push(idx);
+            });
+            shuffle(wrongIdxs).slice(0, 1).forEach(idx => {
+                const btn = document.getElementById(`btn-${idx}`);
+                if (btn) {
+                    btn.disabled = true;
+                    btn.classList.add('opacity-35', 'line-through', 'pointer-events-none');
+                }
+            });
+        }
+
+        function handleAnswer(idx) {
+            if (state.waiting) return;
+            const selected = state.currentOptions[idx];
+            const btn = document.getElementById(`btn-${idx}`);
+            const q = state.questions[state.currentIndex];
+            const feedback = document.getElementById('feedback');
+            if (!selected || !btn) return;
+
+            if (selected.word === q.correct.word) {
+                state.waiting = true;
+                playCorrectSound();
+                if (state.firstTry) {
+                    state.score++;
+                    state.streak++;
+                }
+
+                btn.classList.remove('bg-amber-50', 'border-amber-300');
+                btn.classList.add('bg-green-500', 'text-white', 'border-green-600', 'shadow-[0_5px_0_#15803d]', 'bounce-anim');
+
+                if (feedback) {
+                    feedback.innerHTML = `<span>${_col('Įminta! Tai')} ${q.correct.emoji} ${_col(q.correct.word)}! 🎉</span>`;
+                    feedback.className = "h-6 sm:h-8 flex items-center justify-center text-sm sm:text-lg font-black text-green-600 opacity-100";
+                }
+
+                setGameTimeout(() => {
+                    state.currentIndex++;
+                    renderQuestion();
+                }, 1250);
+            } else {
+                if (state.firstTry && !state.missedQuestions.includes(q)) {
+                    state.missedQuestions.push(q);
+                }
+                state.firstTry = false;
+                state.streak = 0;
+                playWrongSound();
+
+                btn.classList.add('bg-red-100', 'text-red-400', 'line-through', 'border-red-300', 'opacity-60', 'shake-anim');
+                btn.disabled = true;
+
+                if (feedback) {
+                    feedback.innerHTML = `<span>${_col('Pagalvok dar kartelį!')} 🤔</span>`;
+                    feedback.className = "h-6 sm:h-8 flex items-center justify-center text-sm sm:text-lg font-black text-red-500 opacity-100";
+                }
+
+                const hintBtn = document.getElementById('hint-btn');
+                if (hintBtn && !state.hintUsed) hintBtn.classList.add('hint-btn-pulse');
+            }
+        }
+
+        function renderEndScreen() {
+            appEl.innerHTML = renderEndScreenHelper({
+                score: state.score,
+                total: state.totalPossible,
+                restartFn: "startGame(state.mode)",
+                retryFn: "retryMistakes()",
+                mistakesCount: state.missedQuestions.length,
+                menuFn: "renderStartScreen()"
+            });
+        }
+
+        renderStartScreen();
+    </script>
+</body>
+</html>

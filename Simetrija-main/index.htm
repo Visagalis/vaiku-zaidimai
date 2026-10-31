@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>🪞 Simetrija ir Sekos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../shared/common.css?v=2">
+    <script src="../shared/common.js?v=2"></script>
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #eef2ff;
+            background-image: radial-gradient(#818cf8 20%, transparent 20%);
+            background-size: 22px 22px;
+        }
+
+        .mirror-cell {
+            transition: transform 0.12s ease, background-color 0.15s ease;
+        }
+        .mirror-cell:active {
+            transform: scale(0.9);
+        }
+
+        .house-roof {
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #0b1120 !important;
+                background-image: radial-gradient(#1e293b 20%, transparent 20%) !important;
+                color: #f1f5f9 !important;
+            }
+            #app {
+                background-color: #0f172a !important;
+                border-color: #334155 !important;
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6) !important;
+            }
+            h1, h2 {
+                color: #f8fafc !important;
+            }
+            .btn-3d {
+                background-color: #1e293b !important;
+                border-color: #334155 !important;
+                color: #f8fafc !important;
+                box-shadow: 0 5px 0 #0f172a !important;
+            }
+            .btn-3d:hover {
+                background-color: #273549 !important;
+            }
+            .panel-box {
+                background-color: rgba(30, 41, 59, 0.75) !important;
+                border-color: #475569 !important;
+            }
+            .cell-empty {
+                background-color: #1e293b !important;
+                border-color: #475569 !important;
+            }
+            .age-tag {
+                background-color: #1e293b !important;
+                border-color: #475569 !important;
+                color: #a5b4fc !important;
+            }
+        }
+    </style>
+</head>
+<body class="h-screen max-h-screen flex items-center justify-center p-2 sm:p-4 overflow-hidden transition-colors duration-200">
+
+    <div id="app" class="w-full max-w-2xl bg-white/95 backdrop-blur-md rounded-3xl shadow-xl flex flex-col relative border-4 border-indigo-300 overflow-hidden max-h-full">
+    </div>
+
+    <script>
+        // 1 REŽIMAS: Skaičių nameliai (1 klasės skaičiaus sandara iki 10)
+        const HOUSE_QUESTIONS = [
+            { roof: 5, left: 2, right: 3, wrong: [1, 2, 4] },
+            { roof: 5, left: 4, right: 1, wrong: [2, 3, 5] },
+            { roof: 6, left: 3, right: 3, wrong: [2, 4, 1] },
+            { roof: 6, left: 4, right: 2, wrong: [1, 3, 5] },
+            { roof: 7, left: 3, right: 4, wrong: [2, 3, 5] },
+            { roof: 7, left: 5, right: 2, wrong: [1, 3, 4] },
+            { roof: 8, left: 4, right: 4, wrong: [2, 3, 5] },
+            { roof: 8, left: 5, right: 3, wrong: [2, 4, 1] },
+            { roof: 8, left: 6, right: 2, wrong: [1, 3, 4] },
+            { roof: 9, left: 5, right: 4, wrong: [2, 3, 6] },
+            { roof: 9, left: 6, right: 3, wrong: [2, 4, 5] },
+            { roof: 10, left: 5, right: 5, wrong: [3, 4, 6] },
+            { roof: 10, left: 7, right: 3, wrong: [2, 4, 5] },
+            { roof: 10, left: 6, right: 4, wrong: [2, 3, 5] },
+            { roof: 10, left: 8, right: 2, wrong: [1, 3, 4] }
+        ];
+
+        // 2 REŽIMAS: Pratęsk seką (Dėsningumai)
+        const SEQUENCE_QUESTIONS = [
+            {
+                seq: ["🔴", "🔵", "🔴", "🔵", "🔴"],
+                correct: "🔵",
+                wrong: ["🔴", "🟢", "🟡"],
+                rule: "Raudonas ir mėlynas keičiasi paeiliui"
+            },
+            {
+                seq: ["🍎", "🍎", "🍌", "🍎", "🍎"],
+                correct: "🍌",
+                wrong: ["🍎", "🍐", "🍇"],
+                rule: "Du obuoliai, tada vienas bananas"
+            },
+            {
+                seq: ["⭐", "🌙", "🌙", "⭐", "🌙"],
+                correct: "🌙",
+                wrong: ["⭐", "☀️", "☁️"],
+                rule: "Viena žvaigždutė, tada du mėnuliai"
+            },
+            {
+                seq: ["⬆️", "⬇️", "⬆️", "⬇️", "⬆️"],
+                correct: "⬇️",
+                wrong: ["⬆️", "➡️", "⬅️"],
+                rule: "Rodyklės kyla aukštyn ir leidžiasi žemyn"
+            },
+            {
+                seq: ["🐱", "🐶", "🐭", "🐱", "🐶"],
+                correct: "🐭",
+                wrong: ["🐱", "🐶", "🐰"],
+                rule: "Katė, šuo, pelė – kartojasi trys gyvūnai"
+            },
+            {
+                seq: ["2", "4", "6", "8"],
+                correct: "10",
+                wrong: ["7", "9", "12"],
+                rule: "Kas kartą pridedame po 2"
+            },
+            {
+                seq: ["1", "3", "5", "7"],
+                correct: "9",
+                wrong: ["6", "8", "10"],
+                rule: "Nelyginiai skaičiai (kas 2)"
+            },
+            {
+                seq: ["10", "8", "6", "4"],
+                correct: "2",
+                wrong: ["0", "3", "5"],
+                rule: "Kas kartą atimame po 2"
+            },
+            {
+                seq: ["🔺", "🟢", "🟦", "🔺", "🟢"],
+                correct: "🟦",
+                wrong: ["🔺", "🟢", "⭐"],
+                rule: "Trikampis, apskritimas, kvadratas"
+            },
+            {
+                seq: ["🌱", "🌿", "🌸", "🌱", "🌿"],
+                correct: "🌸",
+                wrong: ["🌱", "🌿", "🌵"],
+                rule: "Daigelis, lapelis, žiedelis"
+            },
+            {
+                seq: ["🚗", "🚌", "🚌", "🚗", "🚌"],
+                correct: "🚌",
+                wrong: ["🚗", "🚲", "🚂"],
+                rule: "Vienas automobilis, du autobusai"
+            },
+            {
+                seq: ["5", "10", "15", "20"],
+                correct: "25",
+                wrong: ["21", "22", "30"],
+                rule: "Skaičiuojame penketais (+5)"
+            }
+        ];
+
+        // 3 REŽIMAS: Simetrijos veidrodis (4 eilutės x 3 stulpeliai kairėje pusėje)
+        // Kairės pusės stulpeliai: 0 (toliausiai nuo ašies), 1 (vidurinis), 2 (prie pat veidrodžio ašies).
+        // Dešinėje pusėje stulpelis 0 yra prie pat ašies, todėl right[r][c] turi būti lygus left[r][2 - c].
+        const MIRROR_PATTERNS = [
+            {
+                name: "ŠIRDELĖ", emoji: "❤️", color: "bg-rose-500 border-rose-600",
+                left: [
+                    [0, 1, 0],
+                    [1, 1, 1],
+                    [0, 1, 1],
+                    [0, 0, 1]
+                ]
+            },
+            {
+                name: "EGLUTĖ", emoji: "🌲", color: "bg-emerald-500 border-emerald-600",
+                left: [
+                    [0, 0, 1],
+                    [0, 1, 1],
+                    [1, 1, 1],
+                    [0, 0, 1]
+                ]
+            },
+            {
+                name: "DRUGELIS", emoji: "🦋", color: "bg-amber-400 border-amber-500",
+                left: [
+                    [1, 1, 0],
+                    [1, 1, 1],
+                    [0, 1, 1],
+                    [1, 0, 0]
+                ]
+            },
+            {
+                name: "KARŪNA", emoji: "👑", color: "bg-yellow-400 border-yellow-500",
+                left: [
+                    [1, 0, 1],
+                    [1, 1, 1],
+                    [1, 1, 1],
+                    [0, 0, 0]
+                ]
+            },
+            {
+                name: "RAKETA", emoji: "🚀", color: "bg-sky-500 border-sky-600",
+                left: [
+                    [0, 0, 1],
+                    [0, 1, 1],
+                    [0, 1, 1],
+                    [1, 0, 1]
+                ]
+            },
+            {
+                name: "NAMELIS", emoji: "🏠", color: "bg-orange-500 border-orange-600",
+                left: [
+                    [0, 0, 1],
+                    [0, 1, 1],
+                    [0, 1, 0],
+                    [0, 1, 1]
+                ]
+            },
+            {
+                name: "ROBOTAS", emoji: "🤖", color: "bg-purple-500 border-purple-600",
+                left: [
+                    [0, 1, 1],
+                    [1, 0, 1],
+                    [0, 1, 1],
+                    [0, 1, 0]
+                ]
+            },
+            {
+                name: "GRYBAS", emoji: "🍄", color: "bg-red-500 border-red-600",
+                left: [
+                    [0, 1, 1],
+                    [1, 1, 1],
+                    [0, 0, 1],
+                    [0, 0, 1]
+                ]
+            },
+            {
+                name: "LAIVELIS", emoji: "⛵", color: "bg-blue-500 border-blue-600",
+                left: [
+                    [0, 0, 1],
+                    [0, 1, 1],
+                    [1, 1, 1],
+                    [0, 1, 1]
+                ]
+            },
+            {
+                name: "TAURĖ", emoji: "🏆", color: "bg-amber-500 border-amber-600",
+                left: [
+                    [1, 1, 1],
+                    [0, 1, 1],
+                    [0, 0, 1],
+                    [0, 1, 1]
+                ]
+            }
+        ];
+
+        let state = {
+            mode: 'houses',
+            questions: [],
+            missedQuestions: [],
+            currentIndex: 0,
+            totalPossible: 10,
+            score: 0,
+            streak: 0,
+            firstTry: true,
+            waiting: false,
+            hintUsed: false,
+            currentOptions: [],
+            userGrid: []
+        };
+
+        const appEl = document.getElementById('app');
+
+        function renderStartScreen() {
+            clearGameTimers();
+            appEl.innerHTML = `
+                <div class="p-5 sm:p-8 flex flex-col items-center justify-center text-center">
+                    <div class="age-tag inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-100 border border-indigo-300 text-indigo-800 text-xs sm:text-sm font-black mb-2">
+                        <span>🎒</span>
+                        <span>${_col('6–8 m. • 1–2 klasė')}</span>
+                    </div>
+                    <div class="text-5xl sm:text-7xl mb-2 animate-bounce">🪞</div>
+                    <h1 class="text-2xl sm:text-4xl font-black text-indigo-800 mb-2">${_col('Simetrija ir Sekos')}</h1>
+                    <p class="text-slate-600 dark:text-slate-300 font-bold text-sm sm:text-base mb-5 max-w-md">
+                        ${_col('Užpildyk skaičių namelius, pratęsk logines sekas ir sukurk veidrodinį atspindį!')}
+                    </p>
+
+                    <div class="flex flex-col gap-3 w-full max-w-sm">
+                        <button onclick="startGame('houses')" class="btn-3d py-3 sm:py-3.5 px-5 bg-indigo-100 hover:bg-indigo-200 border-2 border-indigo-400 rounded-2xl text-lg sm:text-xl font-black shadow-[0_5px_0_#4338ca] active:shadow-[0_0px_0_#4338ca] transition-all flex items-center justify-center gap-2.5 text-indigo-950">
+                            <span class="text-2xl">🏠</span>
+                            <span>${_col('Skaičių nameliai')}</span>
+                        </button>
+                        <button onclick="startGame('sequences')" class="btn-3d py-3 sm:py-3.5 px-5 bg-emerald-100 hover:bg-emerald-200 border-2 border-emerald-400 rounded-2xl text-lg sm:text-xl font-black shadow-[0_5px_0_#059669] active:shadow-[0_0px_0_#059669] transition-all flex items-center justify-center gap-2.5 text-emerald-950">
+                            <span class="text-2xl">🚂</span>
+                            <span>${_col('Pratęsk seką')}</span>
+                        </button>
+                        <button onclick="startGame('mirror')" class="btn-3d py-3 sm:py-3.5 px-5 bg-violet-100 hover:bg-violet-200 border-2 border-violet-400 rounded-2xl text-lg sm:text-xl font-black shadow-[0_5px_0_#6d28d9] active:shadow-[0_0px_0_#6d28d9] transition-all flex items-center justify-center gap-2.5 text-violet-950">
+                            <span class="text-2xl">🪞</span>
+                            <span>${_col('Veidrodėlis')}</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function startGame(mode) {
+            getAudioCtx();
+            clearGameTimers();
+            state.mode = mode;
+            state.score = 0;
+            state.streak = 0;
+            state.currentIndex = 0;
+            state.missedQuestions = [];
+
+            let pool = HOUSE_QUESTIONS;
+            if (mode === 'sequences') pool = SEQUENCE_QUESTIONS;
+            if (mode === 'mirror') pool = MIRROR_PATTERNS;
+
+            state.questions = shuffle(pool).slice(0, 10);
+            state.totalPossible = state.questions.length;
+            renderQuestion();
+        }
+
+        function retryMistakes() {
+            if (!state.missedQuestions || state.missedQuestions.length === 0) {
+                startGame(state.mode);
+                return;
+            }
+            getAudioCtx();
+            clearGameTimers();
+            state.questions = shuffle(state.missedQuestions);
+            state.missedQuestions = [];
+            state.totalPossible = state.questions.length;
+            state.score = 0;
+            state.streak = 0;
+            state.currentIndex = 0;
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            if (state.currentIndex >= state.questions.length) {
+                renderEndScreen();
+                return;
+            }
+
+            state.firstTry = true;
+            state.waiting = false;
+            state.hintUsed = false;
+
+            if (state.mode === 'houses') {
+                renderHouseQuestion();
+            } else if (state.mode === 'sequences') {
+                renderSequenceQuestion();
+            } else {
+                initMirrorBoard();
+            }
+        }
+
+        // --- 1 REŽIMAS: SKAIČIŲ NAMELIAI ---
+        function renderHouseQuestion() {
+            const q = state.questions[state.currentIndex];
+            const options = shuffle([q.right, ...q.wrong]);
+            state.currentOptions = options;
+
+            const leftDots = '🔵'.repeat(q.left);
+
+            const optionsHtml = options.map((opt, idx) => `
+                <button id="btn-${idx}" onclick="handleHouseAnswer(${idx})"
+                    class="btn-3d py-3.5 sm:py-4 px-3 bg-indigo-50 hover:bg-indigo-100 text-indigo-950 border-2 border-indigo-300 rounded-2xl text-2xl sm:text-3xl font-black shadow-[0_5px_0_#818cf8] active:shadow-[0_0px_0_#818cf8] transition-all flex items-center justify-center min-h-[60px]">
+                    <span>${opt}</span>
+                </button>
+            `).join('');
+
+            appEl.innerHTML = `
+                ${renderTopBar({ score: state.score, current: state.currentIndex + 1, total: state.questions.length, streak: state.streak, theme: 'indigo' })}
+
+                <div class="p-3 sm:p-5 flex-1 flex flex-col justify-evenly items-center gap-2">
+                    <h2 class="text-base sm:text-xl font-black text-slate-800 text-center">🏠 ${_col('Koks skaičius gyvena kitame langelyje?')}</h2>
+
+                    <!-- Skaičiaus namelis -->
+                    <div class="flex flex-col items-center w-full max-w-xs">
+                        <div class="house-roof w-56 sm:w-64 h-16 sm:h-20 bg-rose-500 flex items-end justify-center pb-2 shadow-md">
+                            <span class="text-3xl sm:text-4xl font-black text-white drop-shadow">${q.roof}</span>
+                        </div>
+                        <div class="panel-box w-52 sm:w-60 bg-amber-50 border-4 border-amber-400 rounded-b-2xl p-3 sm:p-4 flex flex-col items-center gap-2 shadow-inner">
+                            <div class="grid grid-cols-2 gap-3 w-full">
+                                <div class="bg-white dark:bg-slate-800 border-2 border-amber-300 rounded-xl py-2.5 flex flex-col items-center justify-center">
+                                    <span class="text-2xl sm:text-3xl font-black text-indigo-700 dark:text-indigo-300">${q.left}</span>
+                                </div>
+                                <div id="missing-window" class="bg-indigo-100 dark:bg-indigo-950 border-2 border-dashed border-indigo-500 rounded-xl py-2.5 flex flex-col items-center justify-center">
+                                    <span class="text-2xl sm:text-3xl font-black text-indigo-600 dark:text-indigo-300">?</span>
+                                </div>
+                            </div>
+                            <div class="text-xs sm:text-sm font-extrabold text-slate-600 dark:text-slate-300">
+                                ${q.left} + ? = ${q.roof}
+                            </div>
+                            <div id="dots-helper" class="text-sm sm:text-base tracking-widest min-h-[24px] flex items-center justify-center flex-wrap gap-0.5">
+                                <span>${leftDots}</span>
+                            </div>
+                            <button id="hint-btn" onclick="showHouseHint()" class="hint-btn">
+                                <span>💡</span> <span>${_col('Užuomina')}</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="feedback" class="h-6 sm:h-8 flex items-center justify-center text-sm sm:text-lg font-black opacity-0 transition-opacity">
+                        <span>&nbsp;</span>
+                    </div>
+
+                    <div class="grid grid-cols-4 gap-2.5 sm:gap-3.5 w-full">
+                        ${optionsHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        function showHouseHint() {
+            if (state.waiting || state.hintUsed) return;
+            state.hintUsed = true;
+            playHintSound();
+            const q = state.questions[state.currentIndex];
+            const dotsEl = document.getElementById('dots-helper');
+            if (dotsEl) {
+                dotsEl.innerHTML = `<span>${'🔵'.repeat(q.left)}</span><span class="ml-1 animate-bounce">${'🟢'.repeat(q.right)}</span>`;
+            }
+            const hintBtn = document.getElementById('hint-btn');
+            if (hintBtn) hintBtn.classList.add('hidden');
+        }
+
+        function handleHouseAnswer(idx) {
+            if (state.waiting) return;
+            const selected = state.currentOptions[idx];
+            const btn = document.getElementById(`btn-${idx}`);
+            const q = state.questions[state.currentIndex];
+            const feedback = document.getElementById('feedback');
+            if (selected === undefined || !btn) return;
+
+            if (selected === q.right) {
+                state.waiting = true;
+                playCorrectSound();
+                if (state.firstTry) {
+                    state.score++;
+                    state.streak++;
+                }
+
+                btn.classList.remove('bg-indigo-50', 'border-indigo-300');
+                btn.classList.add('bg-green-500', 'text-white', 'border-green-600', 'shadow-[0_5px_0_#15803d]', 'bounce-anim');
+
+                const winEl = document.getElementById('missing-window');
+                if (winEl) {
+                    winEl.innerHTML = `<span class="text-2xl sm:text-3xl font-black text-green-600">${q.right}</span>`;
+                    winEl.classList.replace('border-dashed', 'border-solid');
+                }
+
+                if (feedback) {
+                    feedback.innerHTML = `<span>${_col('Puiku!')} ${q.left} + ${q.right} = ${q.roof} 🎉</span>`;
+                    feedback.className = "h-6 sm:h-8 flex items-center justify-center text-sm sm:text-lg font-black text-green-600 opacity-100";
+                }
+
+                setGameTimeout(() => {
+                    state.currentIndex++;
+                    renderQuestion();
+                }, 1200);
+            } else {
+                if (state.firstTry && !state.missedQuestions.includes(q)) {
+                    state.missedQuestions.push(q);
+                }
+                state.firstTry = false;
+                state.streak = 0;
+                playWrongSound();
+
+                btn.classList.add('bg-red-100', 'text-red-400', 'line-through', 'border-red-300', 'opacity-60', 'shake-anim');
+                btn.disabled = true;
+
+                if (feedback) {
+                    feedback.innerHTML = `<span>${_col('Suskaičiuok, kiek trūksta iki')} ${q.roof}! 🤔</span>`;
+                    feedback.className = "h-6 sm:h-8 flex items-center justify-center text-sm sm:text-lg font-black text-red-500 opacity-100";
+                }
+
+                const hintBtn = document.getElementById('hint-btn');
+                if (hintBtn && !state.hintUsed) hintBtn.classList.add('hint-btn-pulse');
+            }
+        }
+
+        // --- 2 REŽIMAS: PRATĘSK SEKĄ ---
+        function renderSequenceQuestion() {
+            const q = state.questions[state.currentIndex];
+            const options = shuffle([q.correct, ...q.wrong]);
+            state.currentOptions = options;
+
+            const seqHtml = q.seq.map(item => `
+                <div class="w-11 h-11 sm:w-14 sm:h-14 rounded-2xl bg-white dark:bg-slate-800 border-2 border-emerald-300 shadow-sm flex items-center justify-center text-2xl sm:text-3xl font-black">
+                    ${item}
+                </div>
+            `).join('');
+
+            const optionsHtml = options.map((opt, idx) => `
+                <button id="btn-${idx}" onclick="handleSequenceAnswer(${idx})"
+                    class="btn-3d py-3.5 sm:py-4 px-3 bg-emerald-50 hover:bg-emerald-100 text-slate-900 border-2 border-emerald-300 rounded-2xl text-2xl sm:text-3xl font-black shadow-[0_5px_0_#10b981] active:shadow-[0_0px_0_#10b981] transition-all flex items-center justify-center min-h-[64px]">
+                    <span>${opt}</span>
+                </button>
+            `).join('');
+
+            appEl.innerHTML = `
+                ${renderTopBar({ score: state.score, current: state.currentIndex + 1, total: state.questions.length, streak: state.streak, theme: 'emerald' })}
+
+                <div class="p-3 sm:p-5 flex-1 flex flex-col justify-evenly items-center gap-2">
+                    <h2 class="text-base sm:text-xl font-black text-slate-800 text-center">🚂 ${_col('Kas turi būti toliau šioje eilutėje?')}</h2>
+
+                    <div class="panel-box py-4 px-3 sm:px-5 flex flex-col items-center justify-center bg-emerald-50/80 rounded-3xl border-2 border-emerald-300 w-full shadow-inner gap-3">
+                        <div class="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5">
+                            ${seqHtml}
+                            <div id="seq-target" class="w-11 h-11 sm:w-14 sm:h-14 rounded-2xl bg-amber-100 dark:bg-amber-950 border-2 border-dashed border-amber-500 flex items-center justify-center text-2xl sm:text-3xl font-black text-amber-600 animate-pulse">
+                                ?
+                            </div>
+                        </div>
+                        <div id="rule-box" class="hidden hint-box text-xs sm:text-sm">
+                            💡 ${_col(q.rule)}
+                        </div>
+                        <button id="hint-btn" onclick="showSequenceHint()" class="hint-btn">
+                            <span>💡</span> <span>${_col('Užuomina')}</span>
+                        </button>
+                    </div>
+
+                    <div id="feedback" class="h-6 sm:h-8 flex items-center justify-center text-sm sm:text-lg font-black opacity-0 transition-opacity">
+                        <span>&nbsp;</span>
+                    </div>
+
+                    <div class="grid grid-cols-4 gap-2.5 sm:gap-3.5 w-full">
+                        ${optionsHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        function showSequenceHint() {
+            if (state.waiting || state.hintUsed) return;
+            state.hintUsed = true;
+            playHintSound();
+            const ruleBox = document.getElementById('rule-box');
+            if (ruleBox) ruleBox.classList.remove('hidden');
+            const hintBtn = document.getElementById('hint-btn');
+            if (hintBtn) hintBtn.classList.add('hidden');
+        }
+
+        function handleSequenceAnswer(idx) {
+            if (state.waiting) return;
+            const selected = state.currentOptions[idx];
+            const btn = document.getElementById(`btn-${idx}`);
+            const q = state.questions[state.currentIndex];
+            const feedback = document.getElementById('feedback');
+            if (selected === undefined || !btn) return;
+
+            if (selected === q.correct) {
+                state.waiting = true;
+                playCorrectSound();
+                if (state.firstTry) {
+                    state.score++;
+                    state.streak++;
+                }
+
+                btn.classList.remove('bg-emerald-50', 'border-emerald-300');
+                btn.classList.add('bg-green-500', 'text-white', 'border-green-600', 'shadow-[0_5px_0_#15803d]', 'bounce-anim');
+
+                const targetEl = document.getElementById('seq-target');
+                if (targetEl) {
+                    targetEl.textContent = q.correct;
+                    targetEl.classList.remove('animate-pulse', 'border-dashed');
+                    targetEl.classList.add('bg-green-100', 'border-green-500');
+                }
+
+                if (feedback) {
+                    feedback.innerHTML = `<span>${_col('Puikiai pastebėjai dėsningumą!')} 🎉</span>`;
+                    feedback.className = "h-6 sm:h-8 flex items-center justify-center text-sm sm:text-lg font-black text-green-600 opacity-100";
+                }
+
+                setGameTimeout(() => {
+                    state.currentIndex++;
+                    renderQuestion();
+                }, 1200);
+            } else {
+                if (state.firstTry && !state.missedQuestions.includes(q)) {
+                    state.missedQuestions.push(q);
+                }
+                state.firstTry = false;
+                state.streak = 0;
+                playWrongSound();
+
+                btn.classList.add('bg-red-100', 'text-red-400', 'border-red-300', 'opacity-60', 'shake-anim');
+                btn.disabled = true;
+
+                if (feedback) {
+                    feedback.innerHTML = `<span>${_col('Pažiūrėk, kaip kartojasi eilutė!')} 🤔</span>`;
+                    feedback.className = "h-6 sm:h-8 flex items-center justify-center text-sm sm:text-lg font-black text-red-500 opacity-100";
+                }
+
+                const hintBtn = document.getElementById('hint-btn');
+                if (hintBtn && !state.hintUsed) hintBtn.classList.add('hint-btn-pulse');
+            }
+        }
+
+        // --- 3 REŽIMAS: SIMETRIJOS VEIDRODIS ---
+        function initMirrorBoard() {
+            state.userGrid = [
+                [0, 0, 0],
+                [0, 0, 0],
+                [0, 0, 0],
+                [0, 0, 0]
+            ];
+            renderMirrorBoard();
+        }
+
+        function renderMirrorBoard() {
+            const q = state.questions[state.currentIndex];
+
+            let rowsHtml = '';
+            for (let r = 0; r < 4; r++) {
+                let leftCells = '';
+                for (let c = 0; c < 3; c++) {
+                    const active = q.left[r][c] === 1;
+                    const cls = active
+                        ? `${q.color} shadow-sm`
+                        : 'cell-empty bg-slate-100 border-slate-200';
+                    leftCells += `<div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl border-2 ${cls}"></div>`;
+                }
+
+                let rightCells = '';
+                for (let c = 0; c < 3; c++) {
+                    const active = state.userGrid[r][c] === 1;
+                    const cls = active
+                        ? `${q.color} shadow-sm scale-100`
+                        : 'cell-empty bg-white hover:bg-indigo-50 border-indigo-200';
+                    rightCells += `
+                        <button type="button" onclick="toggleMirrorCell(${r}, ${c})"
+                            class="mirror-cell w-10 h-10 sm:w-12 sm:h-12 rounded-xl border-2 ${cls} cursor-pointer">
+                        </button>
+                    `;
+                }
+
+                rowsHtml += `
+                    <div class="flex items-center justify-center gap-1.5 sm:gap-2">
+                        <div class="flex gap-1 sm:gap-1.5">${leftCells}</div>
+                        <div class="w-1.5 h-10 sm:h-12 rounded-full bg-indigo-500/80 mx-0.5"></div>
+                        <div class="flex gap-1 sm:gap-1.5">${rightCells}</div>
+                    </div>
+                `;
+            }
+
+            appEl.innerHTML = `
+                ${renderTopBar({ score: state.score, current: state.currentIndex + 1, total: state.questions.length, streak: state.streak, theme: 'violet' })}
+
+                <div class="p-3 sm:p-5 flex-1 flex flex-col justify-evenly items-center gap-2">
+                    <div class="flex items-center gap-2">
+                        <span class="text-2xl sm:text-3xl">${q.emoji}</span>
+                        <h2 class="text-base sm:text-xl font-black text-slate-800 text-center">
+                            ${_col('Atspindėk dešinėje:')} ${_col(q.name)}
+                        </h2>
+                    </div>
+
+                    <div class="panel-box p-3 sm:p-4 bg-indigo-50/70 rounded-3xl border-2 border-indigo-200 flex flex-col items-center gap-1.5 shadow-inner">
+                        <div class="flex items-center justify-between w-full px-3 text-[11px] sm:text-xs font-extrabold text-indigo-700 dark:text-indigo-300 uppercase tracking-wider">
+                            <span>${_col('Pavyzdys')}</span>
+                            <span>🪞 ${_col('Ašis')}</span>
+                            <span>${_col('Tavo pusė')}</span>
+                        </div>
+                        <div class="flex flex-col gap-1 sm:gap-1.5 mt-1">
+                            ${rowsHtml}
+                        </div>
+                    </div>
+
+                    <div id="feedback" class="h-6 sm:h-8 flex items-center justify-center text-sm sm:text-lg font-black opacity-0 transition-opacity">
+                        <span>&nbsp;</span>
+                    </div>
+
+                    <div class="flex items-center justify-center gap-3 w-full max-w-sm">
+                        <button id="hint-btn" onclick="showMirrorHint()" class="hint-btn py-2.5 px-4 text-sm">
+                            <span>💡</span> <span>${_col('Užuomina')}</span>
+                        </button>
+                        <button onclick="checkMirrorAnswer()" class="btn-3d flex-1 py-3 px-5 bg-green-500 hover:bg-green-600 text-white border-2 border-green-600 rounded-2xl text-base sm:text-lg font-black shadow-[0_5px_0_#15803d] active:shadow-[0_0px_0_#15803d] transition-all">
+                            ✔️ ${_col('Patikrinti')}
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleMirrorCell(r, c) {
+            if (state.waiting) return;
+            playTapSound();
+            state.userGrid[r][c] = state.userGrid[r][c] === 1 ? 0 : 1;
+            renderMirrorBoard();
+        }
+
+        function showMirrorHint() {
+            if (state.waiting) return;
+            playHintSound();
+            const q = state.questions[state.currentIndex];
+            for (let r = 0; r < 4; r++) {
+                for (let c = 0; c < 3; c++) {
+                    const expected = q.left[r][2 - c];
+                    if (state.userGrid[r][c] !== expected) {
+                        state.userGrid[r][c] = expected;
+                        renderMirrorBoard();
+                        return;
+                    }
+                }
+            }
+        }
+
+        function checkMirrorAnswer() {
+            if (state.waiting) return;
+            const q = state.questions[state.currentIndex];
+            let allMatch = true;
+
+            for (let r = 0; r < 4; r++) {
+                for (let c = 0; c < 3; c++) {
+                    const expected = q.left[r][2 - c];
+                    if (state.userGrid[r][c] !== expected) {
+                        allMatch = false;
+                    }
+                }
+            }
+
+            const feedback = document.getElementById('feedback');
+
+            if (allMatch) {
+                state.waiting = true;
+                playCorrectSound();
+                if (state.firstTry) {
+                    state.score++;
+                    state.streak++;
+                }
+                if (feedback) {
+                    feedback.innerHTML = `<span>${_col('Tobula simetrija!')} ${q.emoji} 🎉</span>`;
+                    feedback.className = "h-6 sm:h-8 flex items-center justify-center text-sm sm:text-lg font-black text-green-600 opacity-100";
+                }
+                setGameTimeout(() => {
+                    state.currentIndex++;
+                    renderQuestion();
+                }, 1200);
+            } else {
+                if (state.firstTry && !state.missedQuestions.includes(q)) {
+                    state.missedQuestions.push(q);
+                }
+                state.firstTry = false;
+                state.streak = 0;
+                playWrongSound();
+                if (feedback) {
+                    feedback.innerHTML = `<span>${_col('Dar ne visai lygiai – patikrink langelius!')} 🤔</span>`;
+                    feedback.className = "h-6 sm:h-8 flex items-center justify-center text-sm sm:text-lg font-black text-red-500 opacity-100";
+                }
+                const hintBtn = document.getElementById('hint-btn');
+                if (hintBtn) hintBtn.classList.add('hint-btn-pulse');
+            }
+        }
+
+        function renderEndScreen() {
+            appEl.innerHTML = renderEndScreenHelper({
+                score: state.score,
+                total: state.totalPossible,
+                restartFn: "startGame(state.mode)",
+                retryFn: "retryMistakes()",
+                mistakesCount: state.missedQuestions.length,
+                menuFn: "renderStartScreen()"
+            });
+        }
+
+        renderStartScreen();
+    </script>
+</body>
+</html>

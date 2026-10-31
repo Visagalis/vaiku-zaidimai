@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>🎵 Rask Rimą ir Skiemenį</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../shared/common.css?v=2">
+    <script src="../shared/common.js?v=2"></script>
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #fdf2f8;
+            background-image: radial-gradient(#f472b6 20%, transparent 20%);
+            background-size: 22px 22px;
+        }
+
+        .syl-pill {
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #0b1120 !important;
+                background-image: radial-gradient(#1e293b 20%, transparent 20%) !important;
+                color: #f1f5f9 !important;
+            }
+            #app {
+                background-color: #0f172a !important;
+                border-color: #334155 !important;
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.6) !important;
+            }
+            h1, h2 {
+                color: #f8fafc !important;
+            }
+            .btn-3d {
+                background-color: #1e293b !important;
+                border-color: #334155 !important;
+                color: #f8fafc !important;
+                box-shadow: 0 5px 0 #0f172a !important;
+            }
+            .btn-3d:hover {
+                background-color: #273549 !important;
+            }
+            .question-box {
+                background: rgba(30, 41, 59, 0.75) !important;
+                border-color: #475569 !important;
+            }
+            .syl-pill {
+                background-color: #1e293b !important;
+                border-color: #475569 !important;
+                color: #f8fafc !important;
+            }
+            .age-tag {
+                background-color: #1e293b !important;
+                border-color: #475569 !important;
+                color: #f9a8d4 !important;
+            }
+        }
+    </style>
+</head>
+<body class="h-screen max-h-screen flex items-center justify-center p-2 sm:p-4 overflow-hidden transition-colors duration-200">
+
+    <div id="app" class="w-full max-w-2xl bg-white/95 backdrop-blur-md rounded-3xl shadow-xl flex flex-col relative border-4 border-pink-300 overflow-hidden max-h-full">
+    </div>
+
+    <script>
+        // 1 REŽIMAS: Tikri lietuviški rimai
+        const RHYME_QUESTIONS = [
+            {
+                word: "RATAS", emoji: "🛞", ending: "-ATAS",
+                correct: { word: "BATAS", emoji: "👟" },
+                wrong: [
+                    { word: "NAMAS", emoji: "🏠" },
+                    { word: "STALAS", emoji: "🪑" },
+                    { word: "MEDIS", emoji: "🌳" }
+                ]
+            },
+            {
+                word: "PELĖ", emoji: "🐭", ending: "-ELĖ / -ĖLĖ",
+                correct: { word: "GĖLĖ", emoji: "🌸" },
+                wrong: [
+                    { word: "SŪRIS", emoji: "🧀" },
+                    { word: "VARLĖ", emoji: "🐸" },
+                    { word: "KNYGA", emoji: "📖" }
+                ]
+            },
+            {
+                word: "SAULĖ", emoji: "☀️", ending: "-AULĖ",
+                correct: { word: "KIAULĖ", emoji: "🐷" },
+                wrong: [
+                    { word: "MĖNULIS", emoji: "🌙" },
+                    { word: "DEBESIS", emoji: "☁️" },
+                    { word: "ŽUVIS", emoji: "🐟" }
+                ]
+            },
+            {
+                word: "LAPAS", emoji: "🍃", ending: "-APAS",
+                correct: { word: "KVAPAS", emoji: "🌺" },
+                wrong: [
+                    { word: "ŠAKA", emoji: "🌿" },
+                    { word: "OBUOLYS", emoji: "🍎" },
+                    { word: "LIETUS", emoji: "🌧️" }
+                ]
+            },
+            {
+                word: "TILTAS", emoji: "🌉", ending: "-ILTAS",
+                correct: { word: "ŠILTAS", emoji: "🧤" },
+                wrong: [
+                    { word: "LAIVAS", emoji: "🚢" },
+                    { word: "ŠALTAS", emoji: "🧊" },
+                    { word: "KELIAS", emoji: "🛣️" }
+                ]
+            },
+            {
+                word: "ŠUO", emoji: "🐶", ending: "-UO",
+                correct: { word: "AKMUO", emoji: "🪨" },
+                wrong: [
+                    { word: "KAULAS", emoji: "🦴" },
+                    { word: "KATĖ", emoji: "🐱" },
+                    { word: "PAUKŠTIS", emoji: "🐦" }
+                ]
+            },
+            {
+                word: "RAGAS", emoji: "🦌", ending: "-AGAS",
+                correct: { word: "NAGAS", emoji: "💅" },
+                wrong: [
+                    { word: "MIŠKAS", emoji: "🌲" },
+                    { word: " VILKAS", emoji: "🐺" },
+                    { word: "AUSIS", emoji: "👂" }
+                ]
+            },
+            {
+                word: "PUODAS", emoji: "🍲", ending: "-UODAS",
+                correct: { word: "JUODAS", emoji: "🐈‍⬛" },
+                wrong: [
+                    { word: "ŠAUKŠTAS", emoji: "🥄" },
+                    { word: "BALTAS", emoji: "🐑" },
+                    { word: "TORTAS", emoji: "🎂" }
+                ]
+            },
+            {
+                word: "MUSĖ", emoji: "🪰", ending: "-USĖ",
+                correct: { word: "PUSĖ", emoji: "🌗" },
+                wrong: [
+                    { word: "BITĖ", emoji: "🐝" },
+                    { word: "VORAS", emoji: "🕷️" },
+                    { word: "MEDUS", emoji: "🍯" }
+                ]
+            },
+            {
+                word: "KASA", emoji: "🎀", ending: "-ASA",
+                correct: { word: "RASA", emoji: "💧" },
+                wrong: [
+                    { word: "ŠUKOS", emoji: "🪮" },
+                    { word: "KEPURĖ", emoji: "🧢" },
+                    { word: "SAULĖ", emoji: "☀️" }
+                ]
+            },
+            {
+                word: "ŠAKĖ", emoji: "🍴", ending: "-AKĖ",
+                correct: { word: "ŽVAKĖ", emoji: "🕯️" },
+                wrong: [
+                    { word: "PEILIS", emoji: "🔪" },
+                    { word: "LEMPUTĖ", emoji: "💡" },
+                    { word: "LĖKŠTĖ", emoji: "🍽️" }
+                ]
+            },
+            {
+                word: "VĖJAS", emoji: "💨", ending: "-ĖJAS",
+                correct: { word: "KEPĖJAS", emoji: "👨‍🍳" },
+                wrong: [
+                    { word: "AUDRA", emoji: "⛈️" },
+                    { word: "DUONA", emoji: "🍞" },
+                    { word: "MALŪNAS", emoji: "🏡" }
+                ]
+            }
+        ];
+
+        // 2 REŽIMAS: Pirmas garsas (raidė)
+        const FIRST_SOUND_QUESTIONS = [
+            {
+                word: "KATĖ", emoji: "🐱", letter: "K",
+                correct: { word: "KARŪNA", emoji: "👑" },
+                wrong: [
+                    { word: "ŠUO", emoji: "🐶" },
+                    { word: "OBUOLYS", emoji: "🍎" },
+                    { word: "SAULĖ", emoji: "☀️" }
+                ]
+            },
+            {
+                word: "SAULĖ", emoji: "☀️", letter: "S",
+                correct: { word: "SŪRIS", emoji: "🧀" },
+                wrong: [
+                    { word: "MĖNULIS", emoji: "🌙" },
+                    { word: "MEDIS", emoji: "🌳" },
+                    { word: "LAPĖ", emoji: "🦊" }
+                ]
+            },
+            {
+                word: "BALIONAS", emoji: "🎈", letter: "B",
+                correct: { word: "BANANAS", emoji: "🍌" },
+                wrong: [
+                    { word: "APELSINAS", emoji: "🍊" },
+                    { word: "TORTAS", emoji: "🎂" },
+                    { word: "ŽVAIGŽDĖ", emoji: "⭐" }
+                ]
+            },
+            {
+                word: "NAMAS", emoji: "🏠", letter: "N",
+                correct: { word: "NOSIS", emoji: "👃" },
+                wrong: [
+                    { word: "LANGAS", emoji: "🪟" },
+                    { word: "DURYS", emoji: "🚪" },
+                    { word: "AKIS", emoji: "👁️" }
+                ]
+            },
+            {
+                word: "PELĖ", emoji: "🐭", letter: "P",
+                correct: { word: "PIENAS", emoji: "🥛" },
+                wrong: [
+                    { word: "KATĖ", emoji: "🐱" },
+                    { word: "DUONA", emoji: "🍞" },
+                    { word: "VANDUO", emoji: "💧" }
+                ]
+            },
+            {
+                word: "VARLĖ", emoji: "🐸", letter: "V",
+                correct: { word: "VYŠNIA", emoji: "🍒" },
+                wrong: [
+                    { word: "BRAŠKĖ", emoji: "🍓" },
+                    { word: "GANDRAS", emoji: "🦩" },
+                    { word: "ŽOLĖ", emoji: "🌿" }
+                ]
+            },
+            {
+                word: "LIŪTAS", emoji: "🦁", letter: "L",
+                correct: { word: "LAPĖ", emoji: "🦊" },
+                wrong: [
+                    { word: "TIGRAS", emoji: "🐯" },
+                    { word: "VILKAS", emoji: "🐺" },
+                    { word: "ZUIKIS", emoji: "🐰" }
+                ]
+            },
+            {
+                word: "MEDIS", emoji: "🌳", letter: "M",
+                correct: { word: "MORKA", emoji: "🥕" },
+                wrong: [
+                    { word: "AGURKAS", emoji: "🥒" },
+                    { word: "LAPAS", emoji: "🍃" },
+                    { word: "GĖLĖ", emoji: "🌸" }
+                ]
+            },
+            {
+                word: "ŽUVIS", emoji: "🐟", letter: "Ž",
+                correct: { word: "ŽVAIGŽDĖ", emoji: "⭐" },
+                wrong: [
+                    { word: "JŪRA", emoji: "🌊" },
+                    { word: "SAULĖ", emoji: "☀️" },
+                    { word: "LAIVAS", emoji: "🚢" }
+                ]
+            },
+            {
+                word: "DRAMBLYS", emoji: "🐘", letter: "D",
+                correct: { word: "DRUGELIS", emoji: "🦋" },
+                wrong: [
+                    { word: "BITĖ", emoji: "🐝" },
+                    { word: "ŽIRAFA", emoji: "🦒" },
+                    { word: "BEždžionė".toUpperCase(), emoji: "🐒" }
+                ]
+            },
+            {
+                word: "TRAUKINYS", emoji: "🚂", letter: "T",
+                correct: { word: "TIGRAS", emoji: "🐯" },
+                wrong: [
+                    { word: "MAŠINA", emoji: "🚗" },
+                    { word: "LIŪTAS", emoji: "🦁" },
+                    { word: "LĖKTUVAS", emoji: "✈️" }
+                ]
+            },
+            {
+                word: "GAIDYS", emoji: "🐓", letter: "G",
+                correct: { word: "GRYBAS", emoji: "🍄" },
+                wrong: [
+                    { word: "VIŠTA", emoji: "🐔" },
+                    { word: "UOGA", emoji: "🍓" },
+                    { word: "MEDIS", emoji: "🌳" }
+                ]
+            }
+        ];
+
+        // 3 REŽIMAS: Skiemenų skaičiavimas (Suplok žodį!)
+        const SYLLABLE_QUESTIONS = [
+            { word: "ŠUO", emoji: "🐶", syllables: ["ŠUO"], count: 1 },
+            { word: "DU", emoji: "2️⃣", syllables: ["DU"], count: 1 },
+            { word: "TRYS", emoji: "3️⃣", syllables: ["TRYS"], count: 1 },
+            { word: "KATĖ", emoji: "🐱", syllables: ["KA", "TĖ"], count: 2 },
+            { word: "NAMAS", emoji: "🏠", syllables: ["NA", "MAS"], count: 2 },
+            { word: "SAULĖ", emoji: "☀️", syllables: ["SAU", "LĖ"], count: 2 },
+            { word: "LAPĖ", emoji: "🦊", syllables: ["LA", "PĖ"], count: 2 },
+            { word: "OBUOLYS", emoji: "🍎", syllables: ["O", "BUO", "LYS"], count: 3 },
+            { word: "DRUGELIS", emoji: "🦋", syllables: ["DRU", "GE", "LIS"], count: 3 },
+            { word: "BANANAS", emoji: "🍌", syllables: ["BA", "NA", "NAS"], count: 3 },
+            { word: "MAŠINA", emoji: "🚗", syllables: ["MA", "ŠI", "NA"], count: 3 },
+            { word: "LĖKTUVAS", emoji: "✈️", syllables: ["LĖK", "TU", "VAS"], count: 3 },
+            { word: "KROKODILAS", emoji: "🐊", syllables: ["KRO", "KO", "DI", "LAS"], count: 4 },
+            { word: "POMIDORAS", emoji: "🍅", syllables: ["PO", "MI", "DO", "RAS"], count: 4 },
+            { word: "TELEFONAS", emoji: "☎️", syllables: ["TE", "LE", "FO", "NAS"], count: 4 }
+        ];
+
+        let state = {
+            mode: 'rhyme',
+            questions: [],
+            missedQuestions: [],
+            currentIndex: 0,
+            totalPossible: 10,
+            score: 0,
+            streak: 0,
+            firstTry: true,
+            waiting: false,
+            hintUsed: false,
+            currentOptions: []
+        };
+
+        const appEl = document.getElementById('app');
+
+        function renderStartScreen() {
+            clearGameTimers();
+            appEl.innerHTML = `
+                <div class="p-5 sm:p-8 flex flex-col items-center justify-center text-center">
+                    <div class="age-tag inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-100 border border-pink-300 text-pink-800 text-xs sm:text-sm font-black mb-2">
+                        <span>🎒</span>
+                        <span>${_col('5–7 m. • Priešmokyklinė – 1 klasė')}</span>
+                    </div>
+                    <div class="text-5xl sm:text-7xl mb-2 animate-bounce">🎵</div>
+                    <h1 class="text-2xl sm:text-4xl font-black text-pink-800 mb-2">${_col('Rask Rimą ir Skiemenį')}</h1>
+                    <p class="text-slate-600 dark:text-slate-300 font-bold text-sm sm:text-base mb-5 max-w-md">
+                        ${_col('Klausykis žodžių skambesio, surask pirmą garsą ir suplok skiemenis!')}
+                    </p>
+
+                    <div class="flex flex-col gap-3 w-full max-w-sm">
+                        <button onclick="startGame('rhyme')" class="btn-3d py-3 sm:py-3.5 px-5 bg-pink-100 hover:bg-pink-200 border-2 border-pink-400 rounded-2xl text-lg sm:text-xl font-black shadow-[0_5px_0_#db2777] active:shadow-[0_0px_0_#db2777] transition-all flex items-center justify-center gap-2.5 text-pink-950">
+                            <span class="text-2xl">🎶</span>
+                            <span>${_col('Rimų poros')}</span>
+                        </button>
+                        <button onclick="startGame('sound')" class="btn-3d py-3 sm:py-3.5 px-5 bg-purple-100 hover:bg-purple-200 border-2 border-purple-400 rounded-2xl text-lg sm:text-xl font-black shadow-[0_5px_0_#9333ea] active:shadow-[0_0px_0_#9333ea] transition-all flex items-center justify-center gap-2.5 text-purple-950">
+                            <span class="text-2xl">🔤</span>
+                            <span>${_col('Pirmas garsas')}</span>
+                        </button>
+                        <button onclick="startGame('syllables')" class="btn-3d py-3 sm:py-3.5 px-5 bg-amber-100 hover:bg-amber-200 border-2 border-amber-400 rounded-2xl text-lg sm:text-xl font-black shadow-[0_5px_0_#d97706] active:shadow-[0_0px_0_#d97706] transition-all flex items-center justify-center gap-2.5 text-amber-950">
+                            <span class="text-2xl">👏</span>
+                            <span>${_col('Suplok skiemenis')}</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function startGame(mode) {
+            getAudioCtx();
+            clearGameTimers();
+            state.mode = mode;
+            state.score = 0;
+            state.streak = 0;
+            state.currentIndex = 0;
+            state.missedQuestions = [];
+
+            let pool = RHYME_QUESTIONS;
+            if (mode === 'sound') pool = FIRST_SOUND_QUESTIONS;
+            if (mode === 'syllables') pool = SYLLABLE_QUESTIONS;
+
+            state.questions = shuffle(pool).slice(0, 10);
+            state.totalPossible = state.questions.length;
+            renderQuestion();
+        }
+
+        function retryMistakes() {
+            if (!state.missedQuestions || state.missedQuestions.length === 0) {
+                startGame(state.mode);
+                return;
+            }
+            getAudioCtx();
+            clearGameTimers();
+            state.questions = shuffle(state.missedQuestions);
+            state.missedQuestions = [];
+            state.totalPossible = state.questions.length;
+            state.score = 0;
+            state.streak = 0;
+            state.currentIndex = 0;
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            if (state.currentIndex >= state.questions.length) {
+                renderEndScreen();
+                return;
+            }
+
+            state.firstTry = true;
+            state.waiting = false;
+            state.hintUsed = false;
+
+            if (state.mode === 'syllables') {
+                renderSyllableQuestion();
+            } else {
+                renderChoiceQuestion();
+            }
+        }
+
+        function renderChoiceQuestion() {
+            const q = state.questions[state.currentIndex];
+            const options = shuffle([q.correct, ...q.wrong]);
+            state.currentOptions = options;
+
+            const isRhyme = state.mode === 'rhyme';
+            const titleText = isRhyme
+                ? 'Kuris žodis skamba panašiai (rimuojasi)?'
+                : `Kuris žodis irgi prasideda raide „${q.letter}“?`;
+
+            const badgeHtml = isRhyme
+                ? `<div class="text-xs sm:text-sm font-extrabold text-pink-700 dark:text-pink-300 bg-pink-200/70 dark:bg-pink-900/50 px-3 py-0.5 rounded-full">${_col('Pabaiga:')} ${q.ending}</div>`
+                : `<div class="text-xs sm:text-sm font-extrabold text-purple-700 dark:text-purple-300 bg-purple-200/70 dark:bg-purple-900/50 px-3 py-0.5 rounded-full">${_col('Pirmas garsas:')} „${q.letter}“</div>`;
+
+            const optionsHtml = options.map((opt, idx) => `
+                <button id="btn-${idx}" onclick="handleChoiceAnswer(${idx})"
+                    class="btn-3d py-3 sm:py-3.5 px-3 bg-pink-50 hover:bg-pink-100 text-slate-900 border-2 border-pink-300 rounded-2xl text-base sm:text-xl font-black shadow-[0_5px_0_#f472b6] active:shadow-[0_0px_0_#f472b6] transition-all flex items-center justify-center gap-2 min-h-[60px]">
+                    <span class="text-2xl sm:text-3xl">${opt.emoji}</span>
+                    <span>${_col(opt.word)}</span>
+                </button>
+            `).join('');
+
+            appEl.innerHTML = `
+                ${renderTopBar({ score: state.score, current: state.currentIndex + 1, total: state.questions.length, streak: state.streak, theme: 'rose' })}
+
+                <div class="p-3 sm:p-5 flex-1 flex flex-col justify-evenly items-center gap-2">
+                    <h2 class="text-base sm:text-xl font-black text-slate-800 text-center">${isRhyme ? '🎶' : '🔤'} ${_col(titleText)}</h2>
+
+                    <div class="question-box py-3 px-6 flex flex-col items-center justify-center bg-gradient-to-b from-pink-100/80 to-pink-50/80 rounded-3xl border-2 border-pink-300 w-full max-w-md shadow-inner gap-1.5">
+                        <div class="text-5xl sm:text-7xl">${q.emoji}</div>
+                        <div class="flex items-center gap-2">
+                            <div class="text-2xl sm:text-4xl font-black tracking-wide text-slate-900 dark:text-white">${_col(q.word)}</div>
+                            ${renderSpeakBtn(q.word)}
+                        </div>
+                        ${badgeHtml}
+                        <button id="hint-btn" onclick="showChoiceHint()" class="hint-btn mt-1">
+                            <span>💡</span> <span>${_col('Užuomina')}</span>
+                        </button>
+                    </div>
+
+                    <div id="feedback" class="h-6 sm:h-8 flex items-center justify-center text-sm sm:text-lg font-black opacity-0 transition-opacity">
+                        <span>&nbsp;</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2.5 sm:gap-3.5 w-full">
+                        ${optionsHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        function showChoiceHint() {
+            if (state.waiting || state.hintUsed) return;
+            state.hintUsed = true;
+            playHintSound();
+            const hintBtn = document.getElementById('hint-btn');
+            if (hintBtn) hintBtn.classList.add('hidden');
+            const q = state.questions[state.currentIndex];
+            const wrongIdxs = [];
+            (state.currentOptions || []).forEach((opt, idx) => {
+                const btn = document.getElementById(`btn-${idx}`);
+                if (opt.word !== q.correct.word && btn && !btn.disabled) wrongIdxs.push(idx);
+            });
+            shuffle(wrongIdxs).slice(0, 2).forEach(idx => {
+                const btn = document.getElementById(`btn-${idx}`);
+                if (btn) {
+                    btn.disabled = true;
+                    btn.classList.add('opacity-35', 'line-through', 'pointer-events-none');
+                }
+            });
+        }
+
+        function handleChoiceAnswer(idx) {
+            if (state.waiting) return;
+            const selected = state.currentOptions[idx];
+            const btn = document.getElementById(`btn-${idx}`);
+            const q = state.questions[state.currentIndex];
+            const feedback = document.getElementById('feedback');
+            if (!selected || !btn) return;
+
+            if (selected.word === q.correct.word) {
+                state.waiting = true;
+                playCorrectSound();
+                if (state.firstTry) {
+                    state.score++;
+                    state.streak++;
+                }
+
+                btn.classList.remove('bg-pink-50', 'border-pink-300');
+                btn.classList.add('bg-green-500', 'text-white', 'border-green-600', 'shadow-[0_5px_0_#15803d]', 'bounce-anim');
+
+                if (feedback) {
+                    feedback.innerHTML = `<span>${_col('Puiku!')} ${_col(q.word)} — ${_col(q.correct.word)}! 🎉</span>`;
+                    feedback.className = "h-6 sm:h-8 flex items-center justify-center text-sm sm:text-lg font-black text-green-600 opacity-100";
+                }
+
+                setGameTimeout(() => {
+                    state.currentIndex++;
+                    renderQuestion();
+                }, 1200);
+            } else {
+                if (state.firstTry && !state.missedQuestions.includes(q)) {
+                    state.missedQuestions.push(q);
+                }
+                state.firstTry = false;
+                state.streak = 0;
+                playWrongSound();
+
+                btn.classList.add('bg-red-100', 'text-red-400', 'line-through', 'border-red-300', 'opacity-60', 'shake-anim');
+                btn.disabled = true;
+
+                if (feedback) {
+                    feedback.innerHTML = `<span>${_col('Paklausyk dar kartą!')} 🤔</span>`;
+                    feedback.className = "h-6 sm:h-8 flex items-center justify-center text-sm sm:text-lg font-black text-red-500 opacity-100";
+                }
+
+                const hintBtn = document.getElementById('hint-btn');
+                if (hintBtn && !state.hintUsed) hintBtn.classList.add('hint-btn-pulse');
+            }
+        }
+
+        function renderSyllableQuestion() {
+            const q = state.questions[state.currentIndex];
+
+            const numberButtons = [1, 2, 3, 4].map(num => `
+                <button id="syl-btn-${num}" onclick="handleSyllableAnswer(${num})"
+                    class="btn-3d py-3 sm:py-4 px-2 bg-amber-50 hover:bg-amber-100 text-slate-900 border-2 border-amber-300 rounded-2xl text-lg sm:text-2xl font-black shadow-[0_5px_0_#f59e0b] active:shadow-[0_0px_0_#f59e0b] transition-all flex flex-col items-center justify-center gap-0.5 min-h-[68px]">
+                    <span class="text-2xl sm:text-3xl font-black">${num}</span>
+                    <span class="text-xs sm:text-sm">${'👏'.repeat(num)}</span>
+                </button>
+            `).join('');
+
+            appEl.innerHTML = `
+                ${renderTopBar({ score: state.score, current: state.currentIndex + 1, total: state.questions.length, streak: state.streak, theme: 'amber' })}
+
+                <div class="p-3 sm:p-5 flex-1 flex flex-col justify-evenly items-center gap-2">
+                    <h2 class="text-base sm:text-xl font-black text-slate-800 text-center">👏 ${_col('Kiek skiemenų turi šis žodis?')}</h2>
+
+                    <div class="question-box py-3.5 px-6 flex flex-col items-center justify-center bg-gradient-to-b from-amber-100/80 to-amber-50/80 rounded-3xl border-2 border-amber-300 w-full max-w-md shadow-inner gap-2">
+                        <div class="text-5xl sm:text-7xl">${q.emoji}</div>
+                        <div class="flex items-center gap-2">
+                            <div id="word-display" class="text-2xl sm:text-4xl font-black tracking-wide text-slate-900 dark:text-white">${_col(q.word)}</div>
+                            ${renderSpeakBtn(q.word)}
+                        </div>
+                        <div id="syllable-boxes" class="flex flex-wrap items-center justify-center gap-2 min-h-[38px]">
+                            <button id="hint-btn" onclick="clapSyllablesHint()" class="hint-btn">
+                                <span>👏</span> <span>${_col('Suplok užuominą')}</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="feedback" class="h-6 sm:h-8 flex items-center justify-center text-sm sm:text-lg font-black opacity-0 transition-opacity">
+                        <span>&nbsp;</span>
+                    </div>
+
+                    <div class="grid grid-cols-4 gap-2.5 sm:gap-3.5 w-full">
+                        ${numberButtons}
+                    </div>
+                </div>
+            `;
+        }
+
+        function clapSyllablesHint() {
+            if (state.waiting) return;
+            state.hintUsed = true;
+            const q = state.questions[state.currentIndex];
+            const container = document.getElementById('syllable-boxes');
+            if (!container) return;
+
+            container.innerHTML = q.syllables.map((syl, i) => `
+                <span id="clap-pill-${i}" class="syl-pill px-3 py-1 rounded-xl bg-white border-2 border-amber-400 font-black text-base sm:text-xl shadow-sm opacity-30 scale-90">
+                    ${_col(syl)}
+                </span>
+            `).join('<span class="font-black text-amber-500">-</span>');
+
+            q.syllables.forEach((_, i) => {
+                setGameTimeout(() => {
+                    playStepSound(i);
+                    const pill = document.getElementById(`clap-pill-${i}`);
+                    if (pill) {
+                        pill.classList.remove('opacity-30', 'scale-90');
+                        pill.classList.add('opacity-100', 'scale-105');
+                    }
+                }, i * 280);
+            });
+        }
+
+        function handleSyllableAnswer(num) {
+            if (state.waiting) return;
+            const q = state.questions[state.currentIndex];
+            const btn = document.getElementById(`syl-btn-${num}`);
+            const feedback = document.getElementById('feedback');
+            if (!btn) return;
+
+            if (num === q.count) {
+                state.waiting = true;
+                playCorrectSound();
+                if (state.firstTry) {
+                    state.score++;
+                    state.streak++;
+                }
+
+                btn.classList.remove('bg-amber-50', 'border-amber-300');
+                btn.classList.add('bg-green-500', 'text-white', 'border-green-600', 'shadow-[0_5px_0_#15803d]', 'bounce-anim');
+
+                const container = document.getElementById('syllable-boxes');
+                if (container) {
+                    container.innerHTML = q.syllables.map(syl => `
+                        <span class="syl-pill px-3 py-1 rounded-xl bg-white border-2 border-green-500 font-black text-base sm:text-xl shadow-sm">
+                            ${_col(syl)}
+                        </span>
+                    `).join('<span class="font-black text-green-600">•</span>');
+                }
+
+                if (feedback) {
+                    const wordForm = q.count === 1 ? 'skiemuo' : 'skiemenys';
+                    feedback.innerHTML = `<span>${_col('Teisingai!')} ${q.count} ${_col(wordForm)}! 👏🎉</span>`;
+                    feedback.className = "h-6 sm:h-8 flex items-center justify-center text-sm sm:text-lg font-black text-green-600 opacity-100";
+                }
+
+                setGameTimeout(() => {
+                    state.currentIndex++;
+                    renderQuestion();
+                }, 1300);
+            } else {
+                if (state.firstTry && !state.missedQuestions.includes(q)) {
+                    state.missedQuestions.push(q);
+                }
+                state.firstTry = false;
+                state.streak = 0;
+                playWrongSound();
+
+                btn.classList.add('bg-red-100', 'text-red-400', 'border-red-300', 'opacity-60', 'shake-anim');
+                btn.disabled = true;
+
+                if (feedback) {
+                    feedback.innerHTML = `<span>${_col('Suplok žodį lėtai ir suskaičiuok!')} 👏</span>`;
+                    feedback.className = "h-6 sm:h-8 flex items-center justify-center text-sm sm:text-lg font-black text-red-500 opacity-100";
+                }
+
+                const hintBtn = document.getElementById('hint-btn');
+                if (hintBtn && !state.hintUsed) hintBtn.classList.add('hint-btn-pulse');
+            }
+        }
+
+        function renderEndScreen() {
+            appEl.innerHTML = renderEndScreenHelper({
+                score: state.score,
+                total: state.totalPossible,
+                restartFn: "startGame(state.mode)",
+                retryFn: "retryMistakes()",
+                mistakesCount: state.missedQuestions.length,
+                menuFn: "renderStartScreen()"
+            });
+        }
+
+        renderStartScreen();
+    </script>
+</body>
+</html>

@@ -654,6 +654,33 @@
     }
 
     // === 3B. ŽAIDIMŲ PROGRESO IR ŽVAIGŽDUČIŲ SAUGOJIMAS (vz-progress) ===
+    // Kelių dalių (režimų) žaidimų sąrašas: visoms 3 žaidimo žvaigždutėms surinkti reikia pereiti visas dalis
+    var GAME_MODES = {
+        'AtmintiesZaidimas-main': ['6', '8', '10'],
+        'DidesnisMazesnis-main': ['croc', 'baskets', 'stairs'],
+        'Graza-main': ['cents', 'euros', 'quiz'],
+        'GyvunaiVaikeliai-main': ['babies', 'homes', 'matching'],
+        'KaireDesine-main': ['left-right', 'spatial', 'puppy'],
+        'LaikrodzioZaidimas-main': ['hours', 'minutes', 'interactive', 'routine'],
+        'LinksmiSkaiciai-main': ['objects', 'scale', 'balloons'],
+        'MetuLaikai-main': ['seasons', 'calendar', 'train'],
+        'Misles-main': ['nature', 'items', 'detective'],
+        'Parduotuve-main': ['single', 'basket', 'afford'],
+        'Pinigai-main': ['cents', 'euros', 'collect'],
+        'Priesingybes-main': ['easy', 'hard', 'pairs'],
+        'RaskRima-main': ['rhyme', 'sound', 'syllables'],
+        'Rusiuotojas-main': ['3bins', '4bins', 'meadow'],
+        'SaugusKelyje-main': ['traffic', 'signs', 'safe_or_not'],
+        'Simetrija-main': ['houses', 'sequences', 'mirror'],
+        'SkaiciuEilute-main': ['train', 'frog', 'neighbors'],
+        'SpalvosFormos-main': ['recognize', 'necklace', 'hunt'],
+        'Taupykle-main': ['compare', 'exchange', 'piggy'],
+        'TekstiniaiUzdaviniai-main': ['easy', 'hard', 'money'],
+        'ZodziuTvarka-main': ['short', 'long', 'fill']
+    };
+
+    var _activeGameMode = null;
+
     function detectGameId() {
         try {
             if (typeof location === 'undefined' || !location.pathname) return null;
@@ -664,40 +691,200 @@
         }
     }
 
+    function detectCurrentMode(explicitMode) {
+        if (explicitMode !== undefined && explicitMode !== null && String(explicitMode) !== '') {
+            return String(explicitMode);
+        }
+        try {
+            if (typeof state !== 'undefined' && state && state.mode !== undefined && state.mode !== null) {
+                return String(state.mode);
+            }
+        } catch (e) {}
+        try {
+            if (typeof gameState !== 'undefined' && gameState && gameState.mode !== undefined && gameState.mode !== null) {
+                return String(gameState.mode);
+            }
+        } catch (e) {}
+        try {
+            if (typeof currentPairs !== 'undefined' && currentPairs !== undefined && currentPairs !== null) {
+                return String(currentPairs);
+            }
+        } catch (e) {}
+        if (_activeGameMode !== null && _activeGameMode !== undefined) {
+            return String(_activeGameMode);
+        }
+        return null;
+    }
+
+    function computeOverallGameStars(gameId, modesObj, legacyStars) {
+        var req = GAME_MODES[gameId];
+        if (!req || !req.length) {
+            return Math.min(3, Math.max(0, legacyStars || 0));
+        }
+        var modes = modesObj || {};
+        var completed = 0;
+        var sumStars = 0;
+        for (var i = 0; i < req.length; i++) {
+            var s = modes[req[i]] || 0;
+            if (s > 0) {
+                completed++;
+                sumStars += s;
+            }
+        }
+        if (completed === 0) {
+            return legacyStars > 0 ? 1 : 0;
+        }
+        if (completed === 1) return 1;
+        if (completed < req.length) return 2;
+        return (sumStars >= req.length * 2) ? 3 : 2;
+    }
+
+    function normalizeGameEntry(id, entry) {
+        var e = entry || { stars: 0, bestScore: 0, plays: 0, modes: {} };
+        var req = GAME_MODES[id];
+        if (req && req.length) {
+            var modes = e.modes || {};
+            var completed = 0;
+            for (var i = 0; i < req.length; i++) {
+                if ((modes[req[i]] || 0) > 0) completed++;
+            }
+            e.modes = modes;
+            e.completedModes = completed;
+            e.totalModes = req.length;
+            e.stars = computeOverallGameStars(id, modes, e.stars);
+        }
+        return e;
+    }
+
     function getGameProgress(gameId) {
         try {
             var raw = localStorage.getItem(PROGRESS_STORAGE_KEY);
             var data = raw ? JSON.parse(raw) : {};
+            var k;
+            for (k in data) {
+                if (Object.prototype.hasOwnProperty.call(data, k)) {
+                    data[k] = normalizeGameEntry(k, data[k]);
+                }
+            }
             if (!gameId) return data;
-            return data[gameId] || { stars: 0, bestScore: 0, plays: 0 };
+            return normalizeGameEntry(gameId, data[gameId]);
         } catch (e) {
-            return gameId ? { stars: 0, bestScore: 0, plays: 0 } : {};
+            return gameId ? normalizeGameEntry(gameId, null) : {};
         }
     }
 
-    function saveGameProgress(gameId, stars, score, total) {
+    function saveGameProgress(gameId, stars, score, total, mode) {
         var id = gameId || detectGameId();
         if (!id) return;
         try {
-            var all = getGameProgress();
-            var prev = all[id] || { stars: 0, bestScore: 0, plays: 0 };
-            var newStars = Math.max(prev.stars || 0, stars || 1);
+            var raw = localStorage.getItem(PROGRESS_STORAGE_KEY);
+            var all = raw ? JSON.parse(raw) : {};
+            var prev = all[id] || { stars: 0, bestScore: 0, plays: 0, modes: {} };
+            var roundStars = Math.min(3, Math.max(1, stars || 1));
+            var modes = prev.modes || {};
+            var curMode = detectCurrentMode(mode);
+            if (curMode !== null && curMode !== undefined && String(curMode) !== '') {
+                var mKey = String(curMode);
+                modes[mKey] = Math.max(modes[mKey] || 0, roundStars);
+            }
+            var overallStars;
+            if (GAME_MODES[id]) {
+                overallStars = computeOverallGameStars(id, modes, roundStars);
+            } else {
+                overallStars = Math.max(prev.stars || 0, roundStars);
+            }
             var newBest = Math.max(prev.bestScore || 0, score || 0);
             all[id] = {
-                stars: Math.min(3, Math.max(1, newStars)),
+                stars: overallStars,
+                modes: modes,
                 bestScore: newBest,
                 total: total || prev.total || 10,
                 plays: (prev.plays || 0) + 1,
                 updatedAt: Date.now()
             };
             localStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify(all));
+            setTimeout(decorateModeButtons, 20);
         } catch (e) {}
     }
 
     function clearGameProgress() {
         try {
             localStorage.removeItem(PROGRESS_STORAGE_KEY);
+            setTimeout(decorateModeButtons, 20);
         } catch (e) {}
+    }
+
+    // Automatinis režimų mygtukų žvaigždučių atvaizdavimas žaidimo pradžios ekrane
+    var _isDecoratingModes = false;
+    function decorateModeButtons() {
+        if (_isDecoratingModes || typeof document === 'undefined') return;
+        var id = detectGameId();
+        if (!id || !GAME_MODES[id]) return;
+        var req = GAME_MODES[id];
+        _isDecoratingModes = true;
+        try {
+            var prog = getGameProgress(id);
+            var modes = (prog && prog.modes) ? prog.modes : {};
+            var btns = document.querySelectorAll('button[onclick*="startGame("]');
+            var matchedBtns = [];
+            for (var i = 0; i < btns.length; i++) {
+                var btn = btns[i];
+                var onclick = btn.getAttribute('onclick') || '';
+                var m = onclick.match(/^startGame\(\s*(?:'([^']+)'|"([^"]+)"|(\d+))\s*\)$/);
+                if (!m) continue;
+                var modeKey = m[1] || m[2] || m[3];
+                if (req.indexOf(modeKey) === -1) continue;
+                matchedBtns.push(btn);
+
+                var mStars = modes[modeKey] || 0;
+                if (btn.getAttribute('data-vz-stars') === String(mStars) && btn.querySelector('.vz-mode-stars')) {
+                    continue;
+                }
+                btn.setAttribute('data-vz-stars', String(mStars));
+                var badge = btn.querySelector('.vz-mode-stars');
+                if (!badge) {
+                    badge = document.createElement('span');
+                    badge.className = 'vz-mode-stars ml-auto pl-2 text-xs sm:text-sm font-black tracking-tight shrink-0 select-none';
+                    btn.appendChild(badge);
+                }
+                var sHtml = '';
+                for (var s = 0; s < 3; s++) {
+                    if (s < mStars) {
+                        sHtml += '<span>⭐</span>';
+                    } else {
+                        sHtml += '<span style="opacity:0.25">⭐</span>';
+                    }
+                }
+                badge.innerHTML = sHtml;
+            }
+
+            if (matchedBtns.length > 0 && matchedBtns[0].parentNode) {
+                var parent = matchedBtns[0].parentNode;
+                var doneCount = prog.completedModes || 0;
+                var totalCount = req.length;
+                var overStars = prog.stars || 0;
+                var sumKey = doneCount + '/' + totalCount + ':' + overStars;
+                var summaryEl = parent.querySelector('.vz-modes-summary');
+                if (!summaryEl || summaryEl.getAttribute('data-vz-sum') !== sumKey) {
+                    if (!summaryEl) {
+                        summaryEl = document.createElement('div');
+                        summaryEl.className = 'vz-modes-summary mt-1.5 px-3 py-1.5 rounded-2xl bg-slate-100/90 dark:bg-slate-800/90 border border-slate-300 dark:border-slate-600 text-xs sm:text-sm font-extrabold text-slate-700 dark:text-slate-200 text-center shadow-sm';
+                        parent.appendChild(summaryEl);
+                    }
+                    summaryEl.setAttribute('data-vz-sum', sumKey);
+                    var starStr = '';
+                    for (var k = 0; k < 3; k++) {
+                        starStr += (k < overStars) ? '⭐' : '<span style="opacity:0.25">⭐</span>';
+                    }
+                    if (doneCount >= totalCount && overStars === 3) {
+                        summaryEl.innerHTML = '🏆 ' + _col('Visos dalys pereitos!') + ' (' + doneCount + '/' + totalCount + ') ' + starStr;
+                    } else {
+                        summaryEl.innerHTML = '🧩 ' + _col('Pereita dalių:') + ' <b>' + doneCount + ' / ' + totalCount + '</b> • ' + starStr;
+                    }
+                }
+            }
+        } catch (e) {}
+        _isDecoratingModes = false;
     }
 
     // === 4. APSAUGA NUO PRIARTINIMO GESTAIS (PINCH TO ZOOM) ===
@@ -821,7 +1008,7 @@
         }
 
         try {
-            saveGameProgress(opts.gameId, stars, score, total);
+            saveGameProgress(opts.gameId, stars, score, total, opts.mode);
             playWinSound();
             if (opts.celebrate !== false) {
                 celebrateWin(stars);
@@ -831,35 +1018,61 @@
         var starHtml = '';
         for (var i = 0; i < 3; i++) {
             if (i < stars) {
-                starHtml += '<span class="text-5xl sm:text-6xl text-yellow-400 bounce drop-shadow-md" style="animation-delay: ' + (i * 0.2) + 's">⭐</span>';
+                starHtml += '<span class="text-4xl sm:text-5xl text-yellow-400 bounce drop-shadow-md" style="animation-delay: ' + (i * 0.2) + 's">⭐</span>';
             } else {
-                starHtml += '<span class="text-5xl sm:text-6xl text-gray-400 opacity-40 drop-shadow-md">⭐</span>';
+                starHtml += '<span class="text-4xl sm:text-5xl text-gray-400 opacity-40 drop-shadow-md">⭐</span>';
+            }
+        }
+
+        var modeProgressHtml = '';
+        var gId = opts.gameId || detectGameId();
+        var reqModes = gId ? GAME_MODES[gId] : null;
+        if (reqModes && reqModes.length > 1) {
+            var prog = getGameProgress(gId);
+            var doneModes = prog.completedModes || 1;
+            var totalModes = reqModes.length;
+            var overallStars = prog.stars || 1;
+            var overallStarsHtml = '';
+            for (var mIdx = 0; mIdx < 3; mIdx++) {
+                overallStarsHtml += (mIdx < overallStars) ? '⭐' : '<span style="opacity:0.25">⭐</span>';
+            }
+            if (doneModes >= totalModes && overallStars === 3) {
+                modeProgressHtml = '<div class="mb-3 px-3.5 py-2 rounded-2xl bg-emerald-50 dark:bg-slate-800 border-2 border-emerald-400 text-xs sm:text-sm font-extrabold text-emerald-900 dark:text-emerald-200 max-w-xs w-full">' +
+                    '<div>🏆 ' + _col('Visos žaidimo dalys pereitos!') + ' (' + doneModes + '/' + totalModes + ')</div>' +
+                    '<div class="mt-0.5">' + _col('Žaidimo žvaigždutės:') + ' ' + overallStarsHtml + '</div>' +
+                '</div>';
+            } else {
+                modeProgressHtml = '<div class="mb-3 px-3.5 py-2 rounded-2xl bg-amber-50 dark:bg-slate-800 border-2 border-amber-300 dark:border-slate-600 text-xs sm:text-sm font-extrabold text-amber-900 dark:text-amber-200 max-w-xs w-full">' +
+                    '<div>🧩 ' + _col('Pereita žaidimo dalių:') + ' <span class="font-black">' + doneModes + ' / ' + totalModes + '</span> • ' + overallStarsHtml + '</div>' +
+                    '<div class="text-[11px] sm:text-xs opacity-85 mt-0.5">' + _col('Pereik visas dalis, kad surinktum visas 3 žvaigždutes!') + '</div>' +
+                '</div>';
             }
         }
 
         var retryBtnHtml = '';
         if (retryFn && mistakesCount > 0) {
-            retryBtnHtml = '<button onclick="' + retryFn + '" class="btn-3d w-full py-3 sm:py-3.5 px-4 rounded-2xl bg-amber-100 hover:bg-amber-200 text-amber-950 font-black text-base sm:text-lg shadow-md transition transform active:scale-95 border-2 border-b-4 border-amber-400">' +
+            retryBtnHtml = '<button onclick="' + retryFn + '" class="btn-3d w-full py-2.5 sm:py-3 px-4 rounded-2xl bg-amber-100 hover:bg-amber-200 text-amber-950 font-black text-sm sm:text-base shadow-md transition transform active:scale-95 border-2 border-b-4 border-amber-400">' +
                 '🛠️ ' + _col('Pataisyti klaidas') + ' (' + mistakesCount + ')' +
             '</button>';
         }
 
         var menuBtnHtml = '';
         if (menuFn && !opts.hideMenuBtn && restartFn !== menuFn) {
-            menuBtnHtml = '<button onclick="' + menuFn + '" class="btn-tinted w-full py-3 sm:py-3.5 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-base sm:text-lg shadow transition transform active:scale-95 border-2 border-b-4 border-slate-300">' +
+            menuBtnHtml = '<button onclick="' + menuFn + '" class="btn-tinted w-full py-2.5 sm:py-3 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-sm sm:text-base shadow transition transform active:scale-95 border-2 border-b-4 border-slate-300">' +
                 '🎛️ ' + _col(menuText) +
             '</button>';
         }
 
-        return '<div class="flex-1 flex flex-col items-center justify-center p-5 sm:p-8 text-center fade-in">' +
-            '<div class="text-5xl sm:text-7xl mb-2">🎉</div>' +
-            '<h2 class="text-3xl sm:text-4xl font-black text-green-600 dark:text-green-400 mb-2">' + _col(title) + '</h2>' +
-            '<div class="flex justify-center gap-2 mb-2">' + starHtml + '</div>' +
-            '<p class="text-lg sm:text-2xl font-bold text-slate-700 dark:text-slate-200 mb-1.5">' + _col(message) + ' 🏆</p>' +
-            '<p class="text-base sm:text-xl text-slate-600 dark:text-slate-300 mb-5">' + _col('Surinkai:') + ' <span class="font-black text-green-500 text-xl sm:text-2xl">' + score + ' / ' + total + '</span></p>' +
-            '<div class="flex flex-col gap-2.5 w-full max-w-xs">' +
+        return '<div class="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 text-center fade-in">' +
+            '<div class="text-4xl sm:text-6xl mb-1">🎉</div>' +
+            '<h2 class="text-2xl sm:text-3xl font-black text-green-600 dark:text-green-400 mb-1">' + _col(title) + '</h2>' +
+            '<div class="flex justify-center gap-2 mb-1">' + starHtml + '</div>' +
+            '<p class="text-base sm:text-xl font-bold text-slate-700 dark:text-slate-200 mb-1">' + _col(message) + ' 🏆</p>' +
+            '<p class="text-sm sm:text-lg text-slate-600 dark:text-slate-300 mb-2.5">' + _col('Šioje dalyje surinkai:') + ' <span class="font-black text-green-500 text-lg sm:text-xl">' + score + ' / ' + total + '</span></p>' +
+            modeProgressHtml +
+            '<div class="flex flex-col gap-2 w-full max-w-xs">' +
                 retryBtnHtml +
-                '<button onclick="' + restartFn + '" class="btn-tinted w-full py-3.5 sm:py-4 px-4 rounded-2xl bg-blue-100 hover:bg-blue-200 text-slate-800 font-black text-lg sm:text-xl shadow-lg transition transform active:scale-95 border-2 border-b-4 border-blue-400">' +
+                '<button onclick="' + restartFn + '" class="btn-tinted w-full py-3 sm:py-3.5 px-4 rounded-2xl bg-blue-100 hover:bg-blue-200 text-slate-800 font-black text-base sm:text-lg shadow-lg transition transform active:scale-95 border-2 border-b-4 border-blue-400">' +
                     '🔄 ' + _col(restartText) +
                 '</button>' +
                 menuBtnHtml +
@@ -869,9 +1082,42 @@
 
     if (typeof document !== 'undefined') {
         preventZoom(document);
+        try {
+            document.addEventListener('click', function (e) {
+                var t = e.target;
+                while (t && t !== document) {
+                    if (t.tagName === 'BUTTON' && t.getAttribute) {
+                        var oc = t.getAttribute('onclick') || '';
+                        var m = oc.match(/^startGame\(\s*(?:'([^']+)'|"([^"]+)"|(\d+))\s*\)$/);
+                        if (m) {
+                            _activeGameMode = m[1] || m[2] || m[3];
+                            break;
+                        }
+                    }
+                    t = t.parentNode;
+                }
+            }, true);
+
+            var initModeObserver = function () {
+                decorateModeButtons();
+                if (typeof MutationObserver !== 'undefined' && document.body) {
+                    var obs = new MutationObserver(function () {
+                        decorateModeButtons();
+                    });
+                    obs.observe(document.body, { childList: true, subtree: true });
+                }
+            };
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initModeObserver);
+            } else {
+                setTimeout(initModeObserver, 0);
+            }
+        } catch (err) {}
     }
 
     // Eksportuojame į globalią erdvę (window)
+    global.GAME_MODES = GAME_MODES;
+    global.decorateModeButtons = decorateModeButtons;
     global._V = _V;
     global._D = _D;
     global._L = _L;
