@@ -408,6 +408,14 @@
                 gain.gain.exponentialRampToValueAtTime(0.01, now + 0.28);
                 osc.start(now);
                 osc.stop(now + 0.28);
+            } else if (type === 'hint') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, now);
+                osc.frequency.setValueAtTime(783.99, now + 0.08);
+                gain.gain.setValueAtTime(0.18, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                osc.start(now);
+                osc.stop(now + 0.25);
             } else if (type === 'win') {
                 osc.type = 'square';
                 osc.frequency.setValueAtTime(440, now);
@@ -468,6 +476,11 @@
 
     function playReturnSound() {
         playTone(320, 'sine', 0.09, 0, 0.08);
+    }
+
+    function playHintSound() {
+        playTone(523.25, 'sine', 0.12, 0, 0.16);
+        playTone(783.99, 'sine', 0.18, 0.08, 0.16);
     }
 
     // === 3. PAGALBINĖS MASYVŲ FUNKCIJOS ===
@@ -550,18 +563,21 @@
     function renderTopBar(opts) {
         opts = opts || {};
         var homeFn = opts.homeFn || 'renderStartScreen()';
-        var homeTitle = opts.homeTitle || 'Pradžia';
+        var homeTitle = opts.homeTitle || 'Lygio pasirinkimas';
         var score = (opts.score !== undefined) ? opts.score : 0;
         var current = opts.current;
         var total = opts.total;
         var streak = (opts.streak !== undefined) ? opts.streak : null;
         var theme = opts.theme || 'sky'; // spalvų paletė: sky, emerald, teal, orange, amber, purple, pink, blue, fuchsia
+        var inIframe = false;
+        try { inIframe = (global.self !== global.top); } catch (e) { inIframe = true; }
+        var homeIcon = opts.homeIcon || (inIframe ? '🔙' : '🏠');
 
         var html = '<div class="top-bar bg-' + theme + '-100 border-b-2 border-' + theme + '-300 text-slate-800 px-3 sm:px-5 py-2 sm:py-2.5 flex justify-between items-center font-black text-sm sm:text-base shadow-sm shrink-0">';
         
         // Kairė: Pradžios mygtukas ir taškai
         html += '<div class="flex items-center gap-2 sm:gap-3">';
-        html += '<button onclick="' + homeFn + '" class="top-badge bg-white/90 hover:bg-' + theme + '-200 border border-' + theme + '-300 px-2.5 py-1 rounded-xl text-base sm:text-xl transition active:scale-95" title="' + homeTitle + '">🏠</button>';
+        html += '<button onclick="' + homeFn + '" class="top-badge bg-white/90 hover:bg-' + theme + '-200 border border-' + theme + '-300 px-2.5 py-1 rounded-xl text-base sm:text-xl transition active:scale-95" title="' + homeTitle + '">' + homeIcon + '</button>';
         html += '<span class="flex items-center gap-1.5 text-base sm:text-lg">⭐ <span class="text-' + theme + '-700 dark:text-amber-300 font-black text-lg sm:text-xl">' + score + '</span></span>';
         html += '</div>';
 
@@ -658,6 +674,7 @@
     global.playStepSound = playStepSound;
     global.playTapSound = playTapSound;
     global.playReturnSound = playReturnSound;
+    global.playHintSound = playHintSound;
     global.shuffle = shuffle;
     global.shuffleArray = shuffle;
     global.pickRandom = pickRandom;

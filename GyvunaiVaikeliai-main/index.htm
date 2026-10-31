@@ -273,10 +273,15 @@
             appEl.innerHTML = `
                 ${renderTopBar({ score: state.score, current: state.currentIndex + 1, total: state.boards.length, streak: state.streak, theme: 'amber' })}
 
-                <div class="p-3 sm:p-5 flex-1 flex flex-col justify-between items-center">
-                    <h2 class="text-xl sm:text-2xl font-black text-slate-800 text-center mb-2">${_col(board.prompt)}</h2>
+                <div class="p-3 sm:p-5 flex-1 flex flex-col justify-evenly items-center gap-2">
+                    <div class="flex flex-col items-center gap-1.5">
+                        <h2 class="text-xl sm:text-2xl font-black text-slate-800 text-center">${_col(board.prompt)}</h2>
+                        <button id="hint-btn" onclick="showMatchHint()" class="hint-btn">
+                            <span>💡</span> <span>${_col('Užuomina')}</span>
+                        </button>
+                    </div>
 
-                    <div class="grid grid-cols-2 gap-3 sm:gap-5 w-full my-auto">
+                    <div class="grid grid-cols-2 gap-3 sm:gap-5 w-full">
                         <div class="flex flex-col gap-2.5 sm:gap-3.5">
                             ${leftHtml}
                         </div>
@@ -285,11 +290,23 @@
                         </div>
                     </div>
 
-                    <div id="feedback" class="h-7 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black mt-2 opacity-0 transition-opacity">
+                    <div id="feedback" class="h-7 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black opacity-0 transition-opacity">
                         Pranešimas
                     </div>
                 </div>
             `;
+        }
+
+        function showMatchHint() {
+            if (state.waiting) return;
+            playHintSound();
+            const board = state.boards[state.currentIndex];
+            const targetId = state.selectedLeft || (board.leftItems.find(it => !state.matchedIds.includes(it.id)) || {}).id;
+            if (!targetId) return;
+            const leftBtn = document.getElementById(`left-${targetId}`);
+            const rightBtn = document.getElementById(`right-${targetId}`);
+            if (leftBtn) leftBtn.classList.add('ring-4', 'ring-amber-400', 'bounce-anim');
+            if (rightBtn) rightBtn.classList.add('ring-4', 'ring-amber-400', 'bounce-anim');
         }
 
         function selectLeft(id) {
@@ -378,12 +395,14 @@
 
             state.firstTry = true;
             state.waiting = false;
+            state.hintUsed = false;
             const q = state.questions[state.currentIndex];
             const options = shuffle([...q.options]);
+            state.currentOptions = options;
 
             const optionsHtml = options.map((opt, idx) => `
                 <button id="btn-${idx}" onclick="handleAnswer('${opt.replace(/'/g, "\\'")}', this)" 
-                    class="btn-3d py-3 sm:py-4 px-3 bg-amber-50 hover:bg-amber-100 text-amber-950 border-2 border-amber-300 rounded-2xl text-base sm:text-xl font-black shadow-[0_5px_0_#fcd34d] active:shadow-[0_0px_0_#fcd34d] transition-all flex items-center justify-center text-center">
+                    class="btn-3d py-3.5 sm:py-4 px-3 bg-amber-50 hover:bg-amber-100 text-amber-950 border-2 border-amber-300 rounded-2xl text-lg sm:text-xl font-black shadow-[0_5px_0_#fcd34d] active:shadow-[0_0px_0_#fcd34d] transition-all flex items-center justify-center text-center min-h-[56px]">
                     <span>${_col(opt)}</span>
                 </button>
             `).join('');
@@ -391,25 +410,49 @@
             appEl.innerHTML = `
                 ${renderTopBar({ score: state.score, current: state.currentIndex + 1, total: 10, streak: state.streak, theme: 'amber' })}
 
-                <div class="p-3 sm:p-5 flex-1 flex flex-col justify-between items-center">
-                    <h2 class="text-xl sm:text-2xl font-black text-slate-800 text-center mb-2 sm:mb-3">
+                <div class="p-3 sm:p-5 flex-1 flex flex-col justify-evenly items-center gap-2">
+                    <h2 class="text-xl sm:text-2xl font-black text-slate-800 text-center">
                         ${state.mode === 'babies' ? '🐾 ' + _col('Kieno mažylis?') : '🏡 ' + _col('Kur gyvena?')}
                     </h2>
 
-                    <div class="my-auto py-3 px-6 flex flex-col items-center justify-center bg-amber-100/60 rounded-3xl border-3 border-amber-200 min-h-[120px] sm:min-h-[140px] shadow-inner">
-                        <div class="text-6xl sm:text-8xl mb-1">${q.parent.split(' ').pop()}</div>
+                    <div class="py-3.5 px-6 flex flex-col items-center justify-center bg-amber-100/60 rounded-3xl border-3 border-amber-200 min-h-[120px] sm:min-h-[140px] shadow-inner gap-1.5">
+                        <div class="text-6xl sm:text-8xl">${q.parent.split(' ').pop()}</div>
                         <div class="text-2xl sm:text-3xl font-black text-amber-900">${_col(q.parent.split(' ')[0])}</div>
+                        <button id="hint-btn" onclick="showQuizHint()" class="hint-btn mt-1">
+                            <span>💡</span> <span>${_col('Užuomina')}</span>
+                        </button>
                     </div>
 
-                    <div id="feedback" class="h-6 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black my-1 opacity-0 transition-opacity">
+                    <div id="feedback" class="h-6 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black opacity-0 transition-opacity">
                         Pranešimas
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2.5 sm:gap-3.5 w-full mt-1">
+                    <div class="grid grid-cols-2 gap-2.5 sm:gap-3.5 w-full">
                         ${optionsHtml}
                     </div>
                 </div>
             `;
+        }
+
+        function showQuizHint() {
+            if (state.waiting || state.hintUsed) return;
+            state.hintUsed = true;
+            playHintSound();
+            const hintBtn = document.getElementById('hint-btn');
+            if (hintBtn) hintBtn.classList.add('hidden');
+            const q = state.questions[state.currentIndex];
+            const wrongIdxs = [];
+            (state.currentOptions || []).forEach((opt, idx) => {
+                const btn = document.getElementById(`btn-${idx}`);
+                if (opt !== q.correct && btn && !btn.disabled) wrongIdxs.push(idx);
+            });
+            shuffle(wrongIdxs).slice(0, 2).forEach(idx => {
+                const btn = document.getElementById(`btn-${idx}`);
+                if (btn) {
+                    btn.disabled = true;
+                    btn.classList.add('opacity-35', 'line-through', 'pointer-events-none');
+                }
+            });
         }
 
         function handleAnswer(selected, btn) {
@@ -447,6 +490,9 @@
 
                 feedback.innerHTML = `<span>${_col("Bandyk dar kartą!")} 🤔</span>`;
                 feedback.className = "h-6 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black my-1 text-red-500 opacity-100";
+
+                const hintBtn = document.getElementById('hint-btn');
+                if (hintBtn && !state.hintUsed) hintBtn.classList.add('hint-btn-pulse');
 
                 setTimeout(() => {
                     btn.classList.remove('shake-anim');

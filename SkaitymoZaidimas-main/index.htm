@@ -176,10 +176,12 @@
       const [feedback, setFeedback] = useState(null);
       const [wrongAnswers, setWrongAnswers] = useState(new Set());
       const [hasExtraChance, setHasExtraChance] = useState(true);
+      const [hintUsed, setHintUsed] = useState(false);
       
       const [wordPool, setWordPool] = useState([]);
 
       const playIncorrectSound = playWrongSound;
+      const isInIframe = typeof window !== 'undefined' && window.self !== window.top;
 
       const getNextWord = useCallback(() => {
         let currentPool = [...wordPool];
@@ -209,6 +211,7 @@
         setFeedback(null);
         setWrongAnswers(new Set());
         setHasExtraChance(true); 
+        setHintUsed(false);
 
       }, [getNextWord]);
 
@@ -230,9 +233,18 @@
         if (feedback?.type === 'success' || wrongAnswers.has(emoji)) return;
         playSelectSound();
         setSelectedEmoji(emoji);
-        
-        // Slinkimas į viršų, kad patvirtinimo mygtukas būtų centre
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+      };
+
+      const handleUseHint = () => {
+        if (hintUsed || !currentWord || feedback?.type === 'success') return;
+        if (typeof playHintSound === 'function') playHintSound();
+        setHintUsed(true);
+        const candidates = options.filter(em => em !== currentWord.emoji && !wrongAnswers.has(em));
+        const toRemove = shuffleArray(candidates).slice(0, 5);
+        setWrongAnswers(prev => new Set([...prev, ...toRemove]));
+        if (toRemove.includes(selectedEmoji)) {
+          setSelectedEmoji(null);
+        }
       };
 
       const handleConfirmGuess = () => {
@@ -297,30 +309,35 @@
       }
 
       return (
-        <div className="min-h-screen bg-yellow-50 flex flex-col items-center p-4 md:p-8 font-sans selection:bg-transparent pb-32 select-none">
+        <div className="h-screen max-h-screen overflow-hidden bg-yellow-50 flex flex-col items-center justify-between p-2.5 sm:p-5 font-sans selection:bg-transparent select-none">
           
           {/* Informacinė juosta */}
-          <div className="w-full max-w-4xl flex justify-between items-center mb-6 bg-white px-4 py-2.5 rounded-3xl shadow-md border-4 border-yellow-200">
+          <div className="w-full max-w-4xl flex justify-between items-center bg-white px-3 sm:px-4 py-2 rounded-2xl sm:rounded-3xl shadow-md border-2 sm:border-4 border-yellow-200 shrink-0">
             <div className="flex items-center gap-2">
-              <button onClick={() => setGameState('start')} className="p-2 bg-slate-100 hover:bg-slate-200 active:scale-95 rounded-2xl text-xl transition-all" title="Pradžia">🏠</button>
-              <span className="text-xl md:text-2xl font-black text-blue-600 flex items-center gap-1">⭐ {score}</span>
+              <button onClick={() => setGameState('start')} className="p-1.5 sm:p-2 bg-slate-100 hover:bg-slate-200 active:scale-95 rounded-xl sm:rounded-2xl text-lg sm:text-xl transition-all" title="Atgal">{isInIframe ? '🔙' : '🏠'}</button>
+              <span className="text-lg sm:text-2xl font-black text-blue-600 flex items-center gap-1">⭐ {score}</span>
             </div>
             
             {/* Papildomas šansas */}
-            <div className="flex items-center justify-center">
-              <span className={`text-3xl transition-all duration-300 ${hasExtraChance ? 'opacity-100 scale-100' : 'opacity-20 scale-75 grayscale'}`} title="Šansas">
+            <div className="flex items-center justify-center gap-2">
+              <span className={`text-2xl sm:text-3xl transition-all duration-300 ${hasExtraChance ? 'opacity-100 scale-100' : 'opacity-20 scale-75 grayscale'}`} title="Šansas">
                 ❤️
               </span>
+              {!hintUsed && (
+                <button onClick={handleUseHint} className="hint-btn">
+                  <span>💡</span> <span>Užuomina</span>
+                </button>
+              )}
             </div>
 
-            <div className="text-xl md:text-2xl font-black text-orange-500 flex items-center gap-1">
+            <div className="text-lg sm:text-2xl font-black text-orange-500 flex items-center gap-1">
               🔥 {streak}
             </div>
           </div>
 
           {/* Žodis (suskirstytas spalvotais skiemenimis) */}
-          <div className="w-full max-w-4xl flex flex-col items-center mb-4">
-            <h2 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-wide text-center uppercase break-all flex flex-wrap justify-center drop-shadow-sm">
+          <div className="w-full max-w-4xl flex flex-col items-center justify-center my-1">
+            <h2 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-wide text-center uppercase break-all flex flex-wrap justify-center drop-shadow-sm leading-tight">
               {currentWord?.syllables.map((syl, index) => (
                 <span key={index} style={{ color: SYLLABLE_COLORS[index % SYLLABLE_COLORS.length] }}>
                   {syl}
@@ -329,24 +346,24 @@
             </h2>
             
             {/* Pasirinktas emoji ir pranešimai */}
-            <div className="mt-4 flex flex-col items-center justify-center w-full min-h-[120px]">
+            <div className="mt-2 flex flex-col items-center justify-center w-full">
               {/* Pasirinkto emoji rodymas */}
-              <div className="h-24 flex items-center justify-center mb-2 w-full">
+              <div className="h-16 sm:h-24 flex items-center justify-center w-full">
                 {selectedEmoji ? (
-                  <div className="text-7xl md:text-8xl drop-shadow-md transition-all scale-110 animate-[bounce_0.3s_ease-out_1]">
+                  <div className="text-5xl sm:text-7xl drop-shadow-md transition-all scale-110 animate-[bounce_0.3s_ease-out_1]">
                     {selectedEmoji}
                   </div>
                 ) : (
-                  <div className="w-20 h-20 border-4 border-dashed border-gray-300 rounded-3xl flex items-center justify-center text-gray-300 text-4xl opacity-50">
+                  <div className="w-14 h-14 sm:w-20 sm:h-20 border-4 border-dashed border-gray-300 rounded-2xl sm:rounded-3xl flex items-center justify-center text-gray-300 text-2xl sm:text-4xl opacity-50">
                     ?
                   </div>
                 )}
               </div>
 
               {/* Klaidos/Sėkmės pranešimas */}
-              <div className="h-10 mt-2 flex items-center justify-center w-full">
+              <div className="h-8 mt-1 flex items-center justify-center w-full">
                 {feedback && (
-                  <div className={`text-xl md:text-2xl font-bold px-6 py-2 rounded-full text-center ${
+                  <div className={`text-sm sm:text-xl font-bold px-4 py-1 rounded-full text-center ${
                     feedback.type === 'success' 
                       ? 'bg-green-100 text-green-600 border-2 border-green-400 animate-bounce' 
                       : 'bg-red-100 text-red-600 border-2 border-red-400'
@@ -359,14 +376,14 @@
           </div>
 
           {/* Patvirtinimo mygtukas */}
-          <div className="h-20 mb-6 flex items-center justify-center w-full">
+          <div className="w-full flex items-center justify-center my-1 shrink-0">
               <button
                 onClick={handleConfirmGuess}
                 disabled={!selectedEmoji || feedback?.type === 'success'}
                 className={`
-                  text-2xl md:text-3xl font-black py-3.5 md:py-4 px-10 rounded-full transition-all w-full max-w-md flex items-center justify-center gap-2
+                  text-lg sm:text-2xl font-black py-2.5 sm:py-3.5 px-8 rounded-full transition-all w-full max-w-sm flex items-center justify-center gap-2
                   ${selectedEmoji && feedback?.type !== 'success'
-                    ? 'bg-blue-500 hover:bg-blue-600 text-white shadow-[0_6px_0_rgb(29,78,216)] active:shadow-[0_0px_0_rgb(29,78,216)] active:translate-y-[6px] animate-pulse cursor-pointer' 
+                    ? 'bg-blue-500 hover:bg-blue-600 text-white shadow-[0_5px_0_rgb(29,78,216)] active:shadow-[0_0px_0_rgb(29,78,216)] active:translate-y-[5px] animate-pulse cursor-pointer' 
                     : 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-70'}
                 `}
               >
@@ -374,8 +391,8 @@
               </button>
           </div>
 
-          {/* Tinklelis */}
-          <div className="w-full max-w-3xl grid grid-cols-2 sm:grid-cols-5 gap-4 md:gap-6 mt-2">
+          {/* Tinklelis: 5 stulpeliai x 2 eilutės mažuose ekranuose, kad nereikėtų slinkti */}
+          <div className="w-full max-w-3xl grid grid-cols-5 gap-2 sm:gap-4 pb-1 shrink-0">
             {options.map((emoji, index) => {
               const isWrong = wrongAnswers.has(emoji);
               const isSelected = selectedEmoji === emoji;
@@ -387,10 +404,10 @@
                   onClick={() => handleEmojiClick(emoji)}
                   disabled={isWrong || feedback?.type === 'success'}
                   className={`
-                    aspect-square flex items-center justify-center text-6xl md:text-7xl bg-white rounded-3xl shadow-md
-                    border-4 transition-all duration-200 cursor-pointer
-                    ${isWrong ? 'opacity-30 grayscale cursor-not-allowed scale-95 border-gray-200' : 'border-gray-100 hover:border-blue-200 hover:scale-[1.02]'}
-                    ${isSelected && !isCorrectAndFound ? 'border-blue-500 bg-blue-50 scale-105 shadow-lg shadow-blue-200 ring-4 ring-blue-300 ring-opacity-50' : ''}
+                    aspect-square flex items-center justify-center text-3xl min-[380px]:text-4xl sm:text-6xl bg-white rounded-2xl sm:rounded-3xl shadow-md
+                    border-2 sm:border-4 transition-all duration-200 cursor-pointer
+                    ${isWrong ? 'opacity-25 grayscale cursor-not-allowed scale-95 border-gray-200' : 'border-gray-100 hover:border-blue-200 hover:scale-[1.02]'}
+                    ${isSelected && !isCorrectAndFound ? 'border-blue-500 bg-blue-50 scale-105 shadow-lg shadow-blue-200 ring-2 sm:ring-4 ring-blue-300 ring-opacity-50' : ''}
                     ${isCorrectAndFound ? 'scale-110 border-green-500 bg-green-50 shadow-green-200 shadow-xl z-10' : ''}
                   `}
                   style={{

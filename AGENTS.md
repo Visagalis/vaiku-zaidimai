@@ -146,11 +146,11 @@ When you check by hand, open the game **through the portal** (iframe mode) *and*
 | Theme | `getThemeMode()`, `setThemeMode('auto'\|'light'\|'dark')`, `isDarkMode(mode?)`, `applyTheme(mode?, doc?)` | See §4.3. |
 | Audio | `getAudioCtx()` / `initAudio()` | Lazily creates and resumes the `AudioContext`. Call it in the first user gesture (e.g. `startGame`). |
 | Audio | `playTone(freq, type, duration, startTime=0, vol=0.15)` | Low-level oscillator beep. |
-| Audio | `playSound(type)` | `'coin' 'remove' 'click' 'tap' 'tick' 'pop' 'hop' 'correct' 'wrong'/'error' 'win'` |
-| Audio | `playCorrectSound()`, `playWrongSound()`, `playWinSound()`, `playSelectSound()`, `playPickSound()`, `playPopSound()`, `playStepSound(idx?)`, `playTapSound()`, `playReturnSound()` | Preferred high-level feedback sounds. |
+| Audio | `playSound(type)` | `'coin' 'remove' 'click' 'tap' 'tick' 'pop' 'hop' 'hint' 'correct' 'wrong'/'error' 'win'` |
+| Audio | `playCorrectSound()`, `playWrongSound()`, `playWinSound()`, `playSelectSound()`, `playPickSound()`, `playPopSound()`, `playStepSound(idx?)`, `playTapSound()`, `playReturnSound()`, `playHintSound()` | Preferred high-level feedback sounds. |
 | Arrays | `shuffle(arr)` (alias `shuffleArray`), `pickRandom(arr)` | `shuffle` returns a **new** array (Fisher–Yates). It doesn't mutate the input. |
 | Money | `formatMoneyCents(cents) → string`, `MONEY` | Canonical euro coin/bill data (`centCoins`, `euroCoins`, `bills`) and money formatting (`10 c`, `1 €`, `1,50 €`). |
-| UI Components | `renderTopBar(opts) → htmlString` | Standard game top bar with 🏠, ⭐ score, 🎯 progress, and 🔥 streak badges. |
+| UI Components | `renderTopBar(opts) → htmlString` | Standard game top bar with 🏠 (or 🔙 in portal iframe), ⭐ score, 🎯 progress, and 🔥 streak badges. |
 | UI Components | `calculateStars(score, total) → number`, `renderEndScreen(opts) → htmlString` | Standard star rating (≥80% 3★, ≥50% 2★, else 1★) and end screen template with restart button. |
 | Input | `preventZoom(doc)` | Blocks pinch, gesture, and ctrl+wheel zoom. Runs automatically on load. |
 
@@ -164,6 +164,7 @@ When you check by hand, open the game **through the portal** (iframe mode) *and*
 ### 4.2 `shared/common.css`
 - `--sc-0 … --sc-5`: syllable colors. They have light and dark variants and become `currentColor` under `.syl-off`.
 - Animations: `.bounce`, `.shake` / `.shake-anim`, `.bounce-anim`, `.fade-in`, `.pop-in`.
+- Hints: `.hint-btn` (amber 3D pill button for `💡 Užuomina`), `.hint-btn-pulse` (gentle pulse after a wrong try), `.hint-box` (revealed hint container, with dark-mode support).
 - Money: `.coin` + `.coin-copper` / `.coin-gold` + `.coin-1c … .coin-50c`, `.coin-1e`, `.coin-2e`; `.bill` + `.bill-5e/10e/20e`. Use these for every euro coin and bill.
 - Structural hooks the mobile rules depend on: **`#app`** (or `#main-app`, `.app-card`, `.glass-panel`) as the root game card, **`.top-bar`** / **`.top-badge`** for the stats bar, **`#feedback`** for the feedback line, and `.counter-tray`, `.money-tray`, `.change-tray`, `.piggy-box` for money trays. Keep these ids and class names when you refactor, or the small-screen layout breaks.
 - `.btn-tinted`, `.top-bar`, `.top-badge` get dark-mode styling automatically.

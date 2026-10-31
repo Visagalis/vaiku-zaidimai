@@ -146,6 +146,7 @@
             maxQuestions: 10,
             waiting: false,
             firstTry: true,
+            hintUsed: false,
 
             // Mode 1: Skaičiuok su daiktais
             num1: 0,
@@ -224,16 +225,13 @@
         }
 
         function renderTopBar() {
-            return `
-                <div class="top-bar bg-sky-100 border-b-2 border-sky-300 text-slate-800 px-3 sm:px-4 py-2 sm:py-2.5 flex justify-between items-center font-bold text-xs sm:text-base shadow-sm shrink-0">
-                    <div class="flex items-center gap-2">
-                        <button onclick="renderStartScreen()" class="top-badge bg-white/90 hover:bg-sky-200 border border-sky-300 px-2.5 py-1 rounded-xl text-sm sm:text-base transition active:scale-95" title="Meniu">🏠</button>
-                        <span class="flex items-center gap-1">⭐ <span class="text-sky-700 dark:text-amber-300 font-black">${state.score}</span></span>
-                    </div>
-                    <div class="top-badge bg-white/90 border border-sky-300 px-2.5 py-0.5 rounded-xl text-sky-700 dark:text-amber-300 font-black">🎯 ${state.question} / ${state.maxQuestions}</div>
-                    <div class="flex items-center gap-1">🔥 <span class="text-sky-700 dark:text-amber-300 font-black">${state.streak}</span></div>
-                </div>
-            `;
+            return window.renderTopBar({
+                score: state.score,
+                current: state.question,
+                total: state.maxQuestions,
+                streak: state.streak,
+                theme: 'sky'
+            });
         }
 
         function renderStartScreen() {
@@ -281,6 +279,7 @@
             clearConfetti();
             state.waiting = false;
             state.firstTry = true;
+            state.hintUsed = false;
 
             if (state.mode === 'objects') {
                 generateObjectsQuestion();
@@ -393,13 +392,30 @@
                 let allHtml = '';
                 const keepCount = state.num1 - state.num2;
                 for (let i = 0; i < state.num1; i++) {
-                    const isCrossed = i >= keepCount;
+                    const isCrossed = state.hintUsed && (i >= keepCount);
                     allHtml += buildTokenButton(i, isCrossed);
                 }
                 return `
-                    <div class="flex flex-wrap items-center justify-center gap-1 sm:gap-1.5">${allHtml}</div>
+                    <div class="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">${allHtml}</div>
                 `;
             }
+        }
+
+        function showObjectsHint() {
+            if (state.waiting || state.hintUsed) return;
+            state.hintUsed = true;
+            playHintSound();
+            if (state.isAddition) {
+                state.countedMap = {};
+                for (let i = 0; i < state.num1; i++) {
+                    state.countedMap[i] = i + 1;
+                }
+            } else {
+                state.countedMap = {};
+            }
+            const hBtn = document.getElementById('hint-btn');
+            if (hBtn) hBtn.classList.add('hidden');
+            updateTokensUI();
         }
 
         function updateTokensUI() {
@@ -415,33 +431,39 @@
         function renderObjectsScreen() {
             const sign = state.isAddition ? '+' : '-';
             const optionsHtml = state.options.map((opt, idx) => `
-                <button id="opt-btn-${idx}" onclick="checkObjectsAnswer(${idx}, ${opt})" class="opt-btn py-2.5 sm:py-3.5 rounded-2xl font-black text-2xl sm:text-3xl shadow-md border-b-4 transition transform active:scale-95">
+                <button id="opt-btn-${idx}" onclick="checkObjectsAnswer(${idx}, ${opt})" class="opt-btn py-3.5 sm:py-4 rounded-2xl font-black text-3xl sm:text-4xl shadow-md border-b-4 transition transform active:scale-95">
                     ${opt}
                 </button>
             `).join('');
 
             app.innerHTML = `
                 ${renderTopBar()}
-                <div class="flex-1 flex flex-col p-3 sm:p-5 justify-between overflow-hidden fade-in">
-                    <div class="text-center">
-                        <div id="problem-box" class="inline-block px-5 py-2 rounded-2xl bg-sky-100 border-2 border-sky-300 font-black text-3xl sm:text-5xl text-slate-800 text-main-title tracking-wider shadow-sm">
+                <div class="flex-1 flex flex-col p-3 sm:p-5 justify-evenly gap-2 overflow-hidden fade-in">
+                    <div class="text-center flex flex-col items-center gap-2">
+                        <div id="problem-box" class="inline-block px-6 py-2.5 rounded-2xl bg-sky-100 border-2 border-sky-300 font-black text-3xl sm:text-5xl text-slate-800 text-main-title tracking-wider shadow-sm">
                             ${state.num1} ${sign} ${state.num2} = <span id="ans-slot" class="text-sky-600 dark:text-sky-400">?</span>
                         </div>
                     </div>
 
-                    <div class="flex-1 flex flex-col min-h-0 my-1 sm:my-2">
-                        <div class="flex justify-between items-center px-1 mb-1 text-sm font-bold shrink-0">
-                            <span id="tap-counter" class="text-sub-title">👆 <strong class="text-amber-500 font-black">0</strong></span>
-                            <button onclick="state.countedMap={}; playSound('click'); updateTokensUI();" class="text-sky-500 hover:underline font-extrabold text-sm" title="Iš naujo">🔄</button>
+                    <div class="flex flex-col min-h-0">
+                        <div class="flex justify-between items-center px-1 mb-1.5 text-sm font-bold shrink-0">
+                            <span id="tap-counter" class="text-sub-title text-base">👆 <strong class="text-amber-500 font-black">0</strong></span>
+                            <div class="flex items-center gap-2">
+                                <button id="hint-btn" onclick="showObjectsHint()" class="hint-btn py-1 px-3 text-xs sm:text-sm min-h-[34px]">
+                                    <span>💡</span>
+                                    <span>${_col('Užuomina')}</span>
+                                </button>
+                                <button onclick="state.countedMap={}; playSound('click'); updateTokensUI();" class="text-sky-500 hover:underline font-extrabold text-base px-1" title="Iš naujo">🔄</button>
+                            </div>
                         </div>
-                        <div id="tokens-container" class="panel-box flex-1 rounded-2xl p-2.5 sm:p-3.5 min-h-[110px] sm:min-h-[140px] flex flex-wrap items-center justify-center content-center gap-1.5 sm:gap-2">
+                        <div id="tokens-container" class="panel-box rounded-2xl p-3 sm:p-4 min-h-[105px] sm:min-h-[135px] flex flex-wrap items-center justify-center content-center gap-1.5 sm:gap-2">
                             ${renderTokensMarkup()}
                         </div>
                     </div>
 
                     <div id="feedback" class="h-6 sm:h-7 flex items-center justify-center font-black text-sm sm:text-lg opacity-0 transition-opacity"></div>
 
-                    <div class="grid grid-cols-2 gap-2.5 sm:gap-3">
+                    <div class="grid grid-cols-2 gap-3 sm:gap-3.5">
                         ${optionsHtml}
                     </div>
                 </div>
@@ -482,6 +504,8 @@
                 }
                 feedback.innerHTML = `<span>${_col('Bandyk dar kartą! Paspausk daiktus ir suskaičiuok.')} 🤔</span>`;
                 feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-xs sm:text-base text-rose-500 opacity-100";
+                const hBtn = document.getElementById('hint-btn');
+                if (hBtn) hBtn.classList.add('hint-btn-pulse');
             }
         }
 
@@ -520,26 +544,39 @@
             setScaleGuess(state.rightGuess + delta);
         }
 
+        function showScaleHint() {
+            if (state.waiting || state.hintUsed) return;
+            state.hintUsed = true;
+            playHintSound();
+            const hBtn = document.getElementById('hint-btn');
+            if (hBtn) hBtn.classList.add('hidden');
+            updateScaleUI();
+        }
+
         function renderScaleScreen() {
             const leftLabel = state.leftHasSum ? `${state.leftA} + ${state.leftB}` : `${state.leftTotal}`;
             const numButtons = [1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => `
-                <button id="num-blk-${n}" onclick="setScaleGuess(${n})" class="opt-btn py-2 sm:py-2.5 px-2.5 sm:px-3.5 rounded-xl font-black text-lg sm:text-xl border-b-4 shadow-sm transition transform active:scale-90">
+                <button id="num-blk-${n}" onclick="setScaleGuess(${n})" class="opt-btn py-2.5 sm:py-3 px-2 sm:px-3.5 rounded-xl font-black text-lg sm:text-xl border-b-4 shadow-sm transition transform active:scale-90">
                     ${n}
                 </button>
             `).join('');
 
             app.innerHTML = `
                 ${renderTopBar()}
-                <div class="flex-1 flex flex-col p-3 sm:p-5 justify-between overflow-hidden fade-in">
-                    <div class="text-center">
+                <div class="flex-1 flex flex-col p-3 sm:p-5 justify-evenly gap-1.5 overflow-hidden fade-in">
+                    <div class="text-center flex flex-col items-center gap-1.5">
                         <h2 class="text-base sm:text-xl font-black text-slate-800 text-main-title">
                             ⚖️ ${_col('Išlygink svarstykles! Surask trūkstamą skaičių:')}
                         </h2>
+                        <button id="hint-btn" onclick="showScaleHint()" class="hint-btn py-1 px-3.5 text-xs sm:text-sm min-h-[34px]">
+                            <span>💡</span>
+                            <span>${_col('Užuomina')}</span>
+                        </button>
                     </div>
 
                     <!-- Svarstyklių vizualizacija -->
-                    <div id="scale-area" class="panel-box flex-1 rounded-2xl p-3 sm:p-4 flex flex-col items-center justify-center min-h-[150px] sm:min-h-[180px] relative overflow-hidden my-1 sm:my-2">
-                        <div id="scale-status" class="text-xs sm:text-sm font-black mb-2 px-3 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300">
+                    <div id="scale-area" class="panel-box rounded-2xl p-3 sm:p-4 flex flex-col items-center justify-center min-h-[145px] sm:min-h-[175px] relative overflow-hidden">
+                        <div id="scale-status" class="text-xs sm:text-sm font-black mb-2 px-3 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300 ${state.hintUsed ? '' : 'hidden'}">
                         </div>
 
                         <!-- Svarstyklių sija -->
@@ -548,7 +585,7 @@
                             <div class="scale-pan rounded-2xl px-3 sm:px-4 py-2 sm:py-3 shadow-md flex flex-col items-center min-w-[110px] sm:min-w-[135px]">
                                 <span class="text-[11px] sm:text-xs font-bold text-slate-400">${_col('Kairė pusė')}</span>
                                 <span class="text-xl sm:text-3xl font-black text-sky-600 dark:text-sky-400">${leftLabel}</span>
-                                <span class="text-xs font-extrabold text-slate-500">(${_col('Svoris:')} ${state.leftTotal})</span>
+                                <span id="left-sum-label" class="text-xs font-extrabold text-slate-500 ${state.hintUsed ? '' : 'hidden'}">(${_col('Svoris:')} ${state.leftTotal})</span>
                             </div>
 
                             <!-- Centrinis ženklas -->
@@ -558,11 +595,12 @@
 
                             <!-- Dešinė lėkštė -->
                             <div class="scale-pan rounded-2xl px-3 sm:px-4 py-2 sm:py-3 shadow-md flex flex-col items-center min-w-[110px] sm:min-w-[135px]">
+                                <span class="text-[11px] sm:text-xs font-bold text-slate-400">${_col('Dešinė pusė')}</span>
                                 <div class="text-xl sm:text-3xl font-black text-amber-600 dark:text-amber-400 flex items-center gap-1">
                                     <span>${state.rightBase} +</span>
                                     <span id="guess-box" class="inline-block px-2 py-0.5 rounded-lg bg-amber-100 border-2 border-amber-400 text-amber-700">${state.rightGuess}</span>
                                 </div>
-                                <span id="right-sum-label" class="text-xs font-extrabold text-slate-500"></span>
+                                <span id="right-sum-label" class="text-xs font-extrabold text-slate-500 ${state.hintUsed ? '' : 'hidden'}"></span>
                             </div>
                         </div>
 
@@ -575,12 +613,12 @@
 
                     <!-- Valdymo mygtukai: -1 / +1 ir skaičių kaladėlės 1..9 -->
                     <div class="sub-panel rounded-2xl p-2 sm:p-3 flex flex-col gap-2">
-                        <div class="flex items-center justify-center gap-2 sm:gap-3">
-                            <button onclick="adjustScaleGuess(-1)" class="px-3.5 py-1.5 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-black text-base sm:text-lg shadow border-b-4 border-rose-700 active:scale-95">
+                        <div class="flex items-center justify-center gap-3">
+                            <button onclick="adjustScaleGuess(-1)" class="px-4 py-1.5 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-black text-base sm:text-lg shadow border-b-4 border-rose-700 active:scale-95">
                                 -1
                             </button>
                             <span class="text-base font-black">❓</span>
-                            <button onclick="adjustScaleGuess(1)" class="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-base sm:text-lg shadow border-b-4 border-emerald-700 active:scale-95">
+                            <button onclick="adjustScaleGuess(1)" class="px-4 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-base sm:text-lg shadow border-b-4 border-emerald-700 active:scale-95">
                                 +1
                             </button>
                         </div>
@@ -589,7 +627,7 @@
                         </div>
                     </div>
 
-                    <button onclick="checkScaleAnswer()" class="btn-tinted w-full py-2.5 sm:py-3.5 rounded-2xl bg-green-100 hover:bg-green-200 text-slate-800 font-black text-xl sm:text-3xl shadow-md border-2 border-b-4 border-green-400 transition transform active:scale-95">
+                    <button onclick="checkScaleAnswer()" class="btn-tinted w-full py-3 sm:py-3.5 rounded-2xl bg-green-100 hover:bg-green-200 text-slate-800 font-black text-xl sm:text-3xl shadow-md border-2 border-b-4 border-green-400 transition transform active:scale-95">
                         ✅
                     </button>
                 </div>
@@ -600,6 +638,7 @@
         function updateScaleUI() {
             const beam = document.getElementById('scale-beam');
             const guessBox = document.getElementById('guess-box');
+            const leftSumLabel = document.getElementById('left-sum-label');
             const rightSumLabel = document.getElementById('right-sum-label');
             const scaleOp = document.getElementById('scale-op');
             const scaleStatus = document.getElementById('scale-status');
@@ -608,8 +647,15 @@
 
             const rightTotal = state.rightBase + state.rightGuess;
             guessBox.textContent = state.rightGuess;
+            if (leftSumLabel) {
+                leftSumLabel.classList.toggle('hidden', !state.hintUsed);
+            }
             if (rightSumLabel) {
-                rightSumLabel.innerHTML = `(${rightTotal})`;
+                rightSumLabel.innerHTML = `(${_col('Svoris:')} ${rightTotal})`;
+                rightSumLabel.classList.toggle('hidden', !state.hintUsed);
+            }
+            if (scaleStatus) {
+                scaleStatus.classList.toggle('hidden', !state.hintUsed);
             }
 
             // Paryškiname pasirinktą kaladėlę
@@ -672,6 +718,8 @@
                     : 'Dešinėje pusėje per daug svorio!';
                 feedback.innerHTML = `<span>${_col(hint)} 🤔</span>`;
                 feedback.className = "h-6 flex items-center justify-center font-black text-xs sm:text-base text-rose-500 opacity-100";
+                const hBtn = document.getElementById('hint-btn');
+                if (hBtn) hBtn.classList.add('hint-btn-pulse');
                 if (scaleArea) {
                     scaleArea.classList.remove('shake');
                     void scaleArea.offsetWidth;

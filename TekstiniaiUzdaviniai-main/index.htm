@@ -309,10 +309,26 @@
             streak: 0,
             firstTry: true,
             waiting: false,
-            tappedCount: 0
+            tappedCount: 0,
+            hintUsed: false
         };
 
         const appEl = document.getElementById('app');
+
+        function showHint() {
+            if (state.waiting || state.hintUsed) return;
+            state.hintUsed = true;
+            playHintSound();
+            const q = state.questions[state.currentIndex];
+            const hintArea = document.getElementById('visual-hint-area');
+            if (hintArea && q) {
+                hintArea.innerHTML = `
+                    <div class="visual-box pop-in py-3 px-4 flex flex-wrap items-center justify-center content-center bg-white/95 rounded-2xl border-2 border-dashed border-amber-400 min-h-[72px] w-full shadow-inner">
+                        ${buildInteractiveVisual(q.visual)}
+                    </div>
+                `;
+            }
+        }
 
         function speakStory() {
             if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
@@ -424,41 +440,43 @@
             state.firstTry = true;
             state.waiting = false;
             state.tappedCount = 0;
+            state.hintUsed = false;
             const q = state.questions[state.currentIndex];
             const options = shuffle([...q.options]);
 
             const optionsHtml = options.map((opt, idx) => `
                 <button id="btn-${idx}" onclick="handleAnswer('${String(opt)}', this)" 
-                    class="btn-3d py-3 sm:py-4 px-4 bg-rose-50 hover:bg-rose-100 text-rose-950 border-2 border-rose-300 rounded-2xl text-2xl sm:text-3xl font-black shadow-[0_5px_0_#fca5a5] active:shadow-[0_0px_0_#fca5a5] transition-all flex items-center justify-center text-center min-h-[58px]">
+                    class="btn-3d py-4 sm:py-5 px-4 bg-rose-50 hover:bg-rose-100 text-rose-950 border-2 border-rose-300 rounded-2xl text-2xl sm:text-3xl font-black shadow-[0_5px_0_#fca5a5] active:shadow-[0_0px_0_#fca5a5] transition-all flex items-center justify-center text-center min-h-[64px]">
                     ${opt}
                 </button>
             `).join('');
 
-            const interactiveVisualHtml = buildInteractiveVisual(q.visual);
-
             appEl.innerHTML = `
                 ${renderTopBar({ score: state.score, current: state.currentIndex + 1, total: state.questions.length, streak: state.streak, theme: 'rose' })}
 
-                <div class="p-3 sm:p-5 flex-1 flex flex-col justify-between items-center gap-2">
-                    <div class="w-full bg-rose-50/80 rounded-2xl p-3 sm:p-4 border-2 border-rose-200 shadow-sm relative">
-                        <button onclick="speakStory()" title="Išklausyti garsiai" class="absolute top-2 right-2 p-2 rounded-xl bg-white hover:bg-rose-100 text-rose-600 shadow-sm border border-rose-200 text-base sm:text-lg transition active:scale-90" aria-label="Klausyti">
+                <div class="p-3 sm:p-5 flex-1 flex flex-col justify-evenly items-center gap-2.5 overflow-hidden">
+                    <div class="w-full bg-rose-50/80 rounded-3xl p-4 sm:p-5 border-2 border-rose-200 shadow-sm relative">
+                        <button onclick="speakStory()" title="Išklausyti garsiai" class="absolute top-2.5 right-2.5 p-2 rounded-xl bg-white hover:bg-rose-100 text-rose-600 shadow-sm border border-rose-200 text-base sm:text-lg transition active:scale-90" aria-label="Klausyti">
                             🔊
                         </button>
-                        <p class="text-base sm:text-xl font-black text-slate-800 leading-snug pr-8 text-center">
+                        <p class="text-lg sm:text-2xl font-black text-slate-800 leading-relaxed pr-9 text-center">
                             ${_col(q.story)}
                         </p>
                     </div>
 
-                    <!-- Interaktyvi vizuali erdvė su paspaudžiamais elementais -->
-                    <div class="visual-box my-auto py-2.5 px-4 flex flex-wrap items-center justify-center bg-white/90 rounded-2xl border-2 border-rose-200 min-h-[70px] w-full shadow-inner">
-                        ${interactiveVisualHtml}
+                    <!-- Užuomina / Interaktyvi vizuali erdvė (atrakinama paspaudus 💡) -->
+                    <div id="visual-hint-area" class="w-full flex items-center justify-center min-h-[56px]">
+                        <button id="hint-btn" onclick="showHint()" class="hint-btn py-2.5 px-5 text-base sm:text-lg">
+                            <span>💡</span>
+                            <span>${_col('Užuomina')}</span>
+                        </button>
                     </div>
 
-                    <div id="feedback" class="h-6 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black opacity-0 transition-opacity">
+                    <div id="feedback" class="h-7 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black opacity-0 transition-opacity">
                         Pranešimas
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2.5 sm:gap-3.5 w-full mt-1">
+                    <div class="grid grid-cols-2 gap-3 sm:gap-4 w-full">
                         ${optionsHtml}
                     </div>
                 </div>
@@ -499,7 +517,9 @@
                 btn.disabled = true;
 
                 feedback.innerHTML = `<span>${_col("Bandyk dar kartą!")} 🤔</span>`;
-                feedback.className = "h-6 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black my-1 text-red-500 opacity-100";
+                feedback.className = "h-7 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black my-1 text-red-500 opacity-100";
+                const hBtn = document.getElementById('hint-btn');
+                if (hBtn) hBtn.classList.add('hint-btn-pulse');
 
                 setTimeout(() => {
                     btn.classList.remove('shake-anim');

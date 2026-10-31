@@ -271,13 +271,38 @@
             collectedItems: [],
             walletPool: [],
             waiting: false,
-            firstTry: true
+            firstTry: true,
+            hintUsed: false
         };
 
         const app = document.getElementById('app');
 
         function getRandomElement(arr) {
             return pickRandom(arr);
+        }
+
+        function showShopHint() {
+            if (state.waiting || state.hintUsed) return;
+            state.hintUsed = true;
+            playHintSound();
+            const slot = document.getElementById('shop-hint-slot');
+            if (slot) {
+                const rem = Math.max(0, state.targetCents - getCollectedSum());
+                const text = state.mode === 'basket'
+                    ? `${_col('Iš viso:')} ${formatMoneyCents(state.targetCents)}`
+                    : `${_col('Dar trūksta:')} ${formatMoneyCents(rem)}`;
+                slot.innerHTML = `<span class="hint-box py-1 px-2.5 text-xs sm:text-sm">💡 ${text}</span>`;
+            }
+        }
+
+        function showAffordHint() {
+            if (state.waiting || state.hintUsed) return;
+            state.hintUsed = true;
+            playHintSound();
+            const slot = document.getElementById('afford-hint-slot');
+            if (slot) {
+                slot.innerHTML = `<div class="hint-box inline-flex items-center gap-1.5 py-1 px-3 text-xs sm:text-sm"><span>💡</span><span>${_col('Piniginėje yra:')} ${formatMoneyCents(state.targetCents)}</span></div>`;
+            }
         }
 
         function renderStartScreen() {
@@ -314,21 +339,19 @@
         }
 
         function renderTopBar() {
-            return `
-                <div class="top-bar bg-orange-100 border-b-2 border-orange-300 text-slate-800 px-3 sm:px-5 py-2 sm:py-2.5 flex justify-between items-center font-black text-base sm:text-lg shadow-sm shrink-0">
-                    <div class="flex items-center gap-2 sm:gap-3">
-                        <button onclick="renderStartScreen()" class="top-badge bg-white/90 hover:bg-orange-200 border border-orange-300 px-2.5 py-1 rounded-xl text-base sm:text-xl transition active:scale-95" title="Pradžia">🏠</button>
-                        <span class="flex items-center gap-1.5 text-base sm:text-lg">⭐ <span class="text-orange-700 dark:text-amber-300 font-black text-lg sm:text-xl">${state.score}</span></span>
-                    </div>
-                    <div class="top-badge bg-white/90 border border-orange-300 px-3 py-1 rounded-xl font-black text-orange-700 dark:text-amber-300 text-base sm:text-lg">🎯 ${state.question} / ${state.maxQuestions}</div>
-                    <div class="flex items-center gap-1.5 text-base sm:text-lg">🔥 <span class="text-orange-700 dark:text-amber-300 font-black text-lg sm:text-xl">${state.streak}</span></div>
-                </div>
-            `;
+            return window.renderTopBar({
+                score: state.score,
+                current: state.question,
+                total: state.maxQuestions,
+                streak: state.streak,
+                theme: 'orange'
+            });
         }
 
         function generateQuestion() {
             state.waiting = false;
             state.firstTry = true;
+            state.hintUsed = false;
             state.collectedItems = [];
 
             if (state.mode === 'single') {
@@ -439,7 +462,15 @@
                     <div class="flex flex-col my-1 sm:my-2 shrink-0">
                         <div class="flex justify-between items-center px-1 mb-1.5 text-base sm:text-lg font-black shrink-0">
                             <span class="text-sub-title flex items-center gap-2">💰 Prekystalis: <strong id="counter-sum" class="text-emerald-500 font-black text-xl sm:text-3xl">0 c</strong></span>
-                            <button onclick="clearCounter()" class="text-rose-500 hover:scale-110 active:scale-95 text-2xl p-2 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/30 transition" title="Išvalyti">🗑️</button>
+                            <div class="flex items-center gap-2">
+                                <span id="shop-hint-slot">
+                                    <button id="hint-btn" onclick="showShopHint()" class="hint-btn py-1 px-3 text-xs sm:text-sm min-h-[34px]">
+                                        <span>💡</span>
+                                        <span>${_col('Užuomina')}</span>
+                                    </button>
+                                </span>
+                                <button onclick="clearCounter()" class="text-rose-500 hover:scale-110 active:scale-95 text-2xl p-1.5 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/30 transition" title="Išvalyti">🗑️</button>
+                            </div>
                         </div>
                         <div id="counter-tray" class="counter-tray flex flex-wrap items-center justify-center content-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-2xl h-28 sm:h-36">
                         </div>
@@ -523,6 +554,8 @@
                     : 'Padėjai per daug! Paspausk ant monetos, kad nuimtum.';
                 feedback.innerHTML = `<span>${_col(msg)} 🤔</span>`;
                 feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-sm sm:text-lg text-red-500 opacity-100";
+                const hBtn = document.getElementById('hint-btn');
+                if (hBtn) hBtn.classList.add('hint-btn-pulse');
                 tray.classList.remove('shake');
                 void tray.offsetWidth;
                 tray.classList.add('shake');
@@ -546,18 +579,26 @@
 
             app.innerHTML = `
                 ${renderTopBar()}
-                <div class="flex-1 flex flex-col p-3 sm:p-5 fade-in justify-between overflow-hidden">
-                    <div class="text-center flex-1 flex flex-col min-h-0">
-                        <h2 class="text-xl sm:text-2xl font-black text-slate-700 text-main-title mb-1.5 flex items-center justify-center gap-2 shrink-0">
-                            <span>🛍️</span>
-                            <span>${_col('Ką gali nupirkti?')}</span>
-                        </h2>
-                        <div id="afford-wallet" class="counter-tray flex-1 flex flex-wrap items-center justify-center content-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-2xl min-h-[110px] sm:min-h-[140px] w-full">
+                <div class="flex-1 flex flex-col p-3 sm:p-5 fade-in justify-evenly gap-2 overflow-hidden">
+                    <div class="text-center flex flex-col items-center gap-1.5 min-h-0">
+                        <div class="flex items-center justify-center gap-2.5 flex-wrap">
+                            <h2 class="text-xl sm:text-2xl font-black text-slate-700 text-main-title flex items-center justify-center gap-2 shrink-0">
+                                <span>🛍️</span>
+                                <span>${_col('Ką gali nupirkti?')}</span>
+                            </h2>
+                            <span id="afford-hint-slot">
+                                <button id="hint-btn" onclick="showAffordHint()" class="hint-btn py-1 px-3 text-xs sm:text-sm min-h-[34px]">
+                                    <span>💡</span>
+                                    <span>${_col('Užuomina')}</span>
+                                </button>
+                            </span>
+                        </div>
+                        <div id="afford-wallet" class="counter-tray flex flex-wrap items-center justify-center content-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-2xl min-h-[100px] sm:min-h-[130px] w-full">
                             ${walletCoinsHtml}
                         </div>
                     </div>
 
-                    <div id="feedback" class="h-6 sm:h-7 flex items-center justify-center font-black text-sm sm:text-lg opacity-0 transition-opacity shrink-0 my-1"></div>
+                    <div id="feedback" class="h-6 sm:h-7 flex items-center justify-center font-black text-sm sm:text-lg opacity-0 transition-opacity shrink-0"></div>
 
                     <div class="grid grid-cols-2 gap-3 sm:gap-4 shrink-0">
                         ${optionsHtml}
@@ -599,6 +640,8 @@
                 btn.classList.add('opacity-40', 'cursor-not-allowed', 'shake');
                 feedback.innerHTML = `<span>${_col('Suskaičiuok pinigus dar kartą!')} 🤔</span>`;
                 feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-sm sm:text-lg text-red-500 opacity-100";
+                const hBtn = document.getElementById('hint-btn');
+                if (hBtn) hBtn.classList.add('hint-btn-pulse');
                 walletEl.classList.remove('shake');
                 void walletEl.offsetWidth;
                 walletEl.classList.add('shake');

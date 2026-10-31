@@ -245,25 +245,30 @@
         </div>
 
         <!-- Game View -->
-        <div id="game-view" class="flex-1 flex flex-col items-center justify-between p-2 sm:p-4 hidden w-full overflow-hidden">
+        <div id="game-view" class="flex-1 flex flex-col items-center justify-evenly p-2 sm:p-4 hidden w-full overflow-hidden gap-2">
             
-            <div class="flex-1 flex flex-col items-center justify-center w-full min-h-0 py-1">
-                <div id="emoji-box" class="text-6xl sm:text-7xl md:text-8xl select-none drop-shadow-xl transition-all duration-300 cursor-default text-center leading-tight mb-1">
+            <div class="flex flex-col items-center justify-center w-full py-1 gap-1.5">
+                <div id="emoji-box" class="text-6xl sm:text-7xl md:text-8xl select-none drop-shadow-xl transition-all duration-300 cursor-default text-center leading-tight">
                     🌙
                 </div>
 
-                <div id="current-word-stars-ui" class="flex flex-wrap justify-center gap-1 sm:gap-1.5 text-xl sm:text-2xl md:text-3xl px-2">
-                    <!-- Stars -->
+                <div class="flex items-center justify-center gap-2 flex-wrap">
+                    <div id="current-word-stars-ui" class="flex flex-wrap justify-center gap-1 sm:gap-1.5 text-xl sm:text-2xl md:text-3xl px-2">
+                        <!-- Stars -->
+                    </div>
+                    <button id="hint-btn" onclick="showLetterHint()" class="hint-btn">
+                        <span>💡</span> <span>Užuomina</span>
+                    </button>
                 </div>
             </div>
 
-            <div class="w-full flex flex-col items-center justify-end shrink-0 gap-2 sm:gap-3.5 pb-1 sm:pb-3 max-w-lg">
-                <div id="word-slots" class="flex flex-wrap justify-center items-center gap-1.5 sm:gap-2.5 w-full px-1 min-h-[48px] sm:min-h-[58px]">
+            <div class="w-full flex flex-col items-center justify-center shrink-0 gap-2.5 sm:gap-3.5 pb-1 sm:pb-2 max-w-lg">
+                <div id="word-slots" class="flex flex-wrap justify-center items-center content-center gap-1.5 sm:gap-2.5 w-full px-1 min-h-[52px] sm:min-h-[60px]">
                     <!-- Slots -->
                 </div>
 
                 <div class="w-full p-2.5 sm:p-4 rounded-3xl border-2 border-dashed border-amber-300 dark:border-slate-600 bg-amber-50/60 dark:bg-slate-900/60 shadow-inner flex flex-col items-center justify-center">
-                    <div id="letters-pool" class="flex flex-wrap justify-center items-center gap-2 sm:gap-3 w-full min-h-[48px] sm:min-h-[58px]">
+                    <div id="letters-pool" class="flex flex-wrap justify-center items-center content-center gap-2 sm:gap-3 w-full min-h-[52px] sm:min-h-[60px]">
                         <!-- Letters -->
                     </div>
                 </div>
@@ -515,9 +520,25 @@
             emojiEl.textContent = currentWordObj.emoji;
             currentWordNumEl.textContent = isRetryMode ? '↺' : (currentIndex + 1);
             overlay.classList.add('hidden');
+            const hintBtn = document.getElementById('hint-btn');
+            if (hintBtn) hintBtn.classList.remove('hint-btn-pulse');
             
             updateStarPotentialUI();
             render();
+        }
+
+        function showLetterHint() {
+            const emptyIdx = userProgress.indexOf(null);
+            if (emptyIdx === -1 || !currentWordObj) return;
+            if (typeof playHintSound === 'function') playHintSound();
+            const expectedChar = currentWordObj.word[emptyIdx];
+            const poolIdx = currentPool.findIndex(p => !p.used && p.char === expectedChar);
+            if (poolIdx !== -1) {
+                const btn = document.getElementById(`pool-btn-${poolIdx}`);
+                if (btn) {
+                    btn.classList.add('ring-4', 'ring-amber-400', 'bounce-anim');
+                }
+            }
         }
 
         function updateStarPotentialUI() {
@@ -636,6 +657,8 @@
                         void tappedBtn.offsetWidth;
                         tappedBtn.classList.add('shake-anim', 'bg-rose-100', 'border-rose-400');
                     }
+                    const hintBtn = document.getElementById('hint-btn');
+                    if (hintBtn) hintBtn.classList.add('hint-btn-pulse');
                     
                     setTimeout(() => {
                         if (tempErrorSlot && !lockedSlots[emptyIdx]) {

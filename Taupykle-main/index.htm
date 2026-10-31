@@ -155,7 +155,8 @@
             currentTask: null,
             collectedItems: [],
             waiting: false,
-            firstTry: true
+            firstTry: true,
+            hintUsed: false
         };
 
         const app = document.getElementById('app');
@@ -166,6 +167,40 @@
 
         function getRandomElement(arr) {
             return pickRandom(arr);
+        }
+
+        function showCompareHint() {
+            if (state.waiting || state.hintUsed) return;
+            state.hintUsed = true;
+            playHintSound();
+            const leftSum = sumCoins(state.currentTask.left);
+            const rightSum = sumCoins(state.currentTask.right);
+            const slot = document.getElementById('compare-hint-slot');
+            if (slot) {
+                slot.innerHTML = `<div class="hint-box inline-flex items-center gap-2 py-1 px-3 text-xs sm:text-sm"><span>💡</span><span>👈 ${formatMoneyCents(leftSum)} | 👉 ${formatMoneyCents(rightSum)}</span></div>`;
+            }
+        }
+
+        function showExchangeHint() {
+            if (state.waiting || state.hintUsed) return;
+            state.hintUsed = true;
+            playHintSound();
+            const rem = Math.max(0, state.currentTask.target.cents - sumCoins(state.collectedItems));
+            const slot = document.getElementById('exchange-hint-slot');
+            if (slot) {
+                slot.innerHTML = `<span class="hint-box py-1 px-2.5 text-xs sm:text-sm">💡 ${_col('Trūksta:')} ${formatMoneyCents(rem)}</span>`;
+            }
+        }
+
+        function showPiggyHint() {
+            if (state.waiting || state.hintUsed) return;
+            state.hintUsed = true;
+            playHintSound();
+            const piggySum = sumCoins(state.currentTask.piggy);
+            const slot = document.getElementById('piggy-hint-slot');
+            if (slot) {
+                slot.innerHTML = `<div class="hint-box inline-flex items-center gap-1.5 py-1 px-3 text-xs sm:text-sm"><span>💡</span><span>${_col('Taupyklėje yra:')} ${formatMoneyCents(piggySum)}</span></div>`;
+            }
         }
 
         function renderStartScreen() {
@@ -202,21 +237,19 @@
         }
 
         function renderTopBar() {
-            return `
-                <div class="top-bar bg-pink-100 border-b-2 border-pink-300 text-slate-800 px-3 sm:px-5 py-2 sm:py-2.5 flex justify-between items-center font-black text-base sm:text-lg shadow-sm shrink-0">
-                    <div class="flex items-center gap-2 sm:gap-3">
-                        <button onclick="renderStartScreen()" class="top-badge bg-white/90 hover:bg-pink-200 border border-pink-300 px-2.5 py-1 rounded-xl text-base sm:text-xl transition active:scale-95" title="Pradžia">🏠</button>
-                        <span class="flex items-center gap-1.5 text-base sm:text-lg">⭐ <span class="text-pink-700 dark:text-amber-300 font-black text-lg sm:text-xl">${state.score}</span></span>
-                    </div>
-                    <div class="top-badge bg-white/90 border border-pink-300 px-3 py-1 rounded-xl font-black text-pink-700 dark:text-amber-300 text-base sm:text-lg">🎯 ${state.question} / ${state.maxQuestions}</div>
-                    <div class="flex items-center gap-1.5 text-base sm:text-lg">🔥 <span class="text-pink-700 dark:text-amber-300 font-black text-lg sm:text-xl">${state.streak}</span></div>
-                </div>
-            `;
+            return window.renderTopBar({
+                score: state.score,
+                current: state.question,
+                total: state.maxQuestions,
+                streak: state.streak,
+                theme: 'pink'
+            });
         }
 
         function generateQuestion() {
             state.waiting = false;
             state.firstTry = true;
+            state.hintUsed = false;
             state.collectedItems = [];
 
             if (state.mode === 'compare') {
@@ -251,22 +284,30 @@
 
             app.innerHTML = `
                 ${renderTopBar()}
-                <div class="flex-1 flex flex-col p-3 sm:p-5 fade-in justify-between overflow-hidden">
-                    <h2 class="text-center text-lg sm:text-2xl font-black text-slate-700 text-main-title flex items-center justify-center gap-2">
-                        <span>👛</span> <span>Kur daugiau?</span> <span>👛</span>
-                    </h2>
+                <div class="flex-1 flex flex-col p-3 sm:p-5 fade-in justify-evenly gap-2 overflow-hidden">
+                    <div class="flex flex-col items-center gap-1.5">
+                        <h2 class="text-center text-lg sm:text-2xl font-black text-slate-700 text-main-title flex items-center justify-center gap-2">
+                            <span>👛</span> <span>${_col('Kur daugiau?')}</span> <span>👛</span>
+                        </h2>
+                        <div id="compare-hint-slot">
+                            <button id="hint-btn" onclick="showCompareHint()" class="hint-btn py-1 px-3.5 text-xs sm:text-sm min-h-[34px]">
+                                <span>💡</span>
+                                <span>${_col('Užuomina')}</span>
+                            </button>
+                        </div>
+                    </div>
 
-                    <div id="compare-area" class="flex-1 grid grid-cols-2 gap-2.5 sm:gap-4 my-2 min-h-0">
-                        <div onclick="checkCompare('left', document.getElementById('btn-left'))" class="piggy-box flex-1 p-2.5 sm:p-4 rounded-2xl flex flex-col items-center justify-between min-h-[140px] sm:min-h-[180px] cursor-pointer hover:scale-[1.01] transition">
+                    <div id="compare-area" class="grid grid-cols-2 gap-2.5 sm:gap-4 min-h-0">
+                        <div onclick="checkCompare('left', document.getElementById('btn-left'))" class="piggy-box p-3 sm:p-4 rounded-2xl flex flex-col items-center justify-between min-h-[135px] sm:min-h-[175px] cursor-pointer hover:scale-[1.01] transition">
                             <span class="text-sm font-black uppercase tracking-wider text-pink-600">👛 👈</span>
-                            <div class="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 my-auto py-1">
+                            <div class="flex flex-wrap items-center justify-center content-center gap-1.5 sm:gap-2 my-auto py-1">
                                 ${leftHtml}
                             </div>
                         </div>
 
-                        <div onclick="checkCompare('right', document.getElementById('btn-right'))" class="piggy-box flex-1 p-2.5 sm:p-4 rounded-2xl flex flex-col items-center justify-between min-h-[140px] sm:min-h-[180px] cursor-pointer hover:scale-[1.01] transition">
+                        <div onclick="checkCompare('right', document.getElementById('btn-right'))" class="piggy-box p-3 sm:p-4 rounded-2xl flex flex-col items-center justify-between min-h-[135px] sm:min-h-[175px] cursor-pointer hover:scale-[1.01] transition">
                             <span class="text-sm font-black uppercase tracking-wider text-indigo-600">👛 👉</span>
-                            <div class="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 my-auto py-1">
+                            <div class="flex flex-wrap items-center justify-center content-center gap-1.5 sm:gap-2 my-auto py-1">
                                 ${rightHtml}
                             </div>
                         </div>
@@ -274,14 +315,14 @@
 
                     <div id="feedback" class="h-7 flex items-center justify-center font-black text-sm sm:text-lg opacity-0 transition-opacity"></div>
 
-                    <div class="grid grid-cols-3 gap-2 sm:gap-3">
-                        <button id="btn-left" onclick="checkCompare('left', this)" class="choice-btn py-3 sm:py-4 px-2 rounded-2xl font-black text-2xl sm:text-3xl shadow-md border-b-4 transition transform active:scale-95 flex items-center justify-center">
+                    <div class="grid grid-cols-3 gap-2.5 sm:gap-3.5">
+                        <button id="btn-left" onclick="checkCompare('left', this)" class="choice-btn py-3.5 sm:py-4 px-2 rounded-2xl font-black text-2xl sm:text-3xl shadow-md border-b-4 transition transform active:scale-95 flex items-center justify-center">
                             👈
                         </button>
-                        <button id="btn-eq" onclick="checkCompare('equal', this)" class="choice-btn py-3 sm:py-4 px-2 rounded-2xl font-black text-2xl sm:text-3xl shadow-md border-b-4 transition transform active:scale-95 flex items-center justify-center">
+                        <button id="btn-eq" onclick="checkCompare('equal', this)" class="choice-btn py-3.5 sm:py-4 px-2 rounded-2xl font-black text-2xl sm:text-3xl shadow-md border-b-4 transition transform active:scale-95 flex items-center justify-center">
                             🟰
                         </button>
-                        <button id="btn-right" onclick="checkCompare('right', this)" class="choice-btn py-3 sm:py-4 px-2 rounded-2xl font-black text-2xl sm:text-3xl shadow-md border-b-4 transition transform active:scale-95 flex items-center justify-center">
+                        <button id="btn-right" onclick="checkCompare('right', this)" class="choice-btn py-3.5 sm:py-4 px-2 rounded-2xl font-black text-2xl sm:text-3xl shadow-md border-b-4 transition transform active:scale-95 flex items-center justify-center">
                             👉
                         </button>
                     </div>
@@ -325,6 +366,8 @@
                 }
                 feedback.innerHTML = `<span>${_col('Suskaičiuok abi pinigines dar kartą!')} 🤔</span>`;
                 feedback.className = "h-7 flex items-center justify-center font-black text-sm sm:text-lg text-red-500 opacity-100";
+                const hBtn = document.getElementById('hint-btn');
+                if (hBtn) hBtn.classList.add('hint-btn-pulse');
                 area.classList.remove('shake');
                 void area.offsetWidth;
                 area.classList.add('shake');
@@ -373,7 +416,15 @@
                     <div class="flex flex-col my-1 sm:my-2 shrink-0">
                         <div class="flex justify-between items-center px-1 mb-1.5 text-base sm:text-lg font-black shrink-0">
                             <span class="text-sub-title flex items-center gap-2">💰 Iškeista: <strong id="ex-sum" class="text-pink-500 font-black text-xl sm:text-3xl">0 c</strong></span>
-                            <button onclick="clearExchange()" class="text-rose-500 hover:scale-110 active:scale-95 text-2xl p-2 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/30 transition" title="Išvalyti">🗑️</button>
+                            <div class="flex items-center gap-2">
+                                <span id="exchange-hint-slot">
+                                    <button id="hint-btn" onclick="showExchangeHint()" class="hint-btn py-1 px-3 text-xs sm:text-sm min-h-[34px]">
+                                        <span>💡</span>
+                                        <span>${_col('Užuomina')}</span>
+                                    </button>
+                                </span>
+                                <button onclick="clearExchange()" class="text-rose-500 hover:scale-110 active:scale-95 text-2xl p-1.5 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/30 transition" title="Išvalyti">🗑️</button>
+                            </div>
                         </div>
                         <div id="ex-tray" class="piggy-box flex flex-wrap items-center justify-center content-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-2xl h-28 sm:h-36">
                         </div>
@@ -450,6 +501,8 @@
                 const msg = currentSum < targetSum ? 'Dar trūksta smulkių pinigėlių!' : 'Per daug! Paspausk ant monetos, kad nuimtum.';
                 feedback.innerHTML = `<span>${_col(msg)} 🤔</span>`;
                 feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-sm sm:text-lg text-red-500 opacity-100";
+                const hBtn = document.getElementById('hint-btn');
+                if (hBtn) hBtn.classList.add('hint-btn-pulse');
                 tray.classList.remove('shake');
                 void tray.offsetWidth;
                 tray.classList.add('shake');
@@ -463,7 +516,7 @@
 
             app.innerHTML = `
                 ${renderTopBar()}
-                <div class="flex-1 flex flex-col p-3 sm:p-5 fade-in justify-between overflow-hidden">
+                <div class="flex-1 flex flex-col p-3 sm:p-5 fade-in justify-evenly gap-2 overflow-hidden">
                     <div class="wallet-panel p-2.5 sm:p-3.5 rounded-2xl flex items-center justify-between gap-3">
                         <div class="flex items-center gap-2.5 sm:gap-3">
                             <span class="text-4xl sm:text-5xl">${task.emoji}</span>
@@ -476,9 +529,17 @@
                         </div>
                     </div>
 
-                    <div id="piggy-container" class="piggy-box flex-1 p-3 sm:p-4 rounded-2xl flex flex-col items-center justify-center gap-2 min-h-[130px] sm:min-h-[170px] my-2">
-                        <div class="text-3xl sm:text-4xl font-black">🐷</div>
-                        <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+                    <div id="piggy-container" class="piggy-box p-4 sm:p-5 rounded-3xl flex flex-col items-center justify-center gap-2.5 min-h-[125px] sm:min-h-[160px]">
+                        <div class="flex items-center gap-2">
+                            <span class="text-3xl sm:text-4xl font-black">🐷</span>
+                            <span id="piggy-hint-slot">
+                                <button id="hint-btn" onclick="showPiggyHint()" class="hint-btn py-1 px-3 text-xs sm:text-sm min-h-[34px]">
+                                    <span>💡</span>
+                                    <span>${_col('Užuomina')}</span>
+                                </button>
+                            </span>
+                        </div>
+                        <div class="flex flex-wrap items-center justify-center content-center gap-2 sm:gap-3">
                             ${piggyCoinsHtml}
                         </div>
                     </div>
@@ -490,10 +551,10 @@
                     <div id="feedback" class="h-6 flex items-center justify-center font-black text-sm sm:text-lg opacity-0 transition-opacity"></div>
 
                     <div class="grid grid-cols-2 gap-3 sm:gap-4">
-                        <button id="btn-yes" onclick="checkPiggyAnswer(true, this)" class="btn-tinted py-3.5 sm:py-4 rounded-2xl bg-emerald-100 hover:bg-emerald-200 text-slate-800 font-black text-base sm:text-xl shadow-md border-2 border-b-4 border-emerald-400 transition transform active:scale-95">
+                        <button id="btn-yes" onclick="checkPiggyAnswer(true, this)" class="btn-tinted py-4 sm:py-4.5 rounded-2xl bg-emerald-100 hover:bg-emerald-200 text-slate-800 font-black text-lg sm:text-2xl shadow-md border-2 border-b-4 border-emerald-400 transition transform active:scale-95">
                             ✅ ${_col('Užteks')}
                         </button>
-                        <button id="btn-no" onclick="checkPiggyAnswer(false, this)" class="btn-tinted py-3.5 sm:py-4 rounded-2xl bg-rose-100 hover:bg-rose-200 text-slate-800 font-black text-base sm:text-xl shadow-md border-2 border-b-4 border-rose-400 transition transform active:scale-95">
+                        <button id="btn-no" onclick="checkPiggyAnswer(false, this)" class="btn-tinted py-4 sm:py-4.5 rounded-2xl bg-rose-100 hover:bg-rose-200 text-slate-800 font-black text-lg sm:text-2xl shadow-md border-2 border-b-4 border-rose-400 transition transform active:scale-95">
                             ❌ ${_col('Trūksta')}
                         </button>
                     </div>

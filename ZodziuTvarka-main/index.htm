@@ -32,24 +32,27 @@
         }
 
         .word-btn {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             background-color: white;
             color: #1e293b;
             font-weight: 800;
-            padding: 8px 15px;
+            padding: 10px 18px;
             border-radius: 9999px;
-            font-size: 1.15rem;
+            font-size: 1.25rem;
+            min-height: 48px;
             box-shadow: 0 4px 0 #cbd5e1;
             border: 2px solid #e2e8f0;
             cursor: pointer;
             transition: all 0.12s;
-            margin: 4px;
+            margin: 2px;
         }
         @media (min-width: 640px) {
             .word-btn {
-                padding: 10px 20px;
-                font-size: 1.4rem;
-                margin: 5px;
+                padding: 12px 22px;
+                font-size: 1.45rem;
+                margin: 4px;
             }
         }
         .word-btn:active {
@@ -61,19 +64,19 @@
             display: inline-flex;
             justify-content: center;
             align-items: center;
-            min-width: 85px;
-            height: 46px;
+            min-width: 92px;
+            height: 48px;
             border: 3px dashed #f59e0b;
             border-radius: 9999px;
-            margin: 3px;
-            background: rgba(255, 255, 255, 0.65);
+            margin: 2px;
+            background: rgba(255, 255, 255, 0.75);
             transition: all 0.25s;
         }
         @media (min-width: 640px) {
             .slot {
-                min-width: 110px;
+                min-width: 112px;
                 height: 54px;
-                margin: 5px;
+                margin: 4px;
             }
         }
         
@@ -206,6 +209,8 @@
             firstTry: true,
             currentWords: [],
             currentSlots: [],
+            poolButtons: [],
+            hintUsed: false,
             lockGame: false
         };
 
@@ -213,7 +218,7 @@
 
         function renderStartScreen() {
             app.innerHTML = `
-                <div class="p-6 sm:p-8 flex flex-col items-center justify-center text-center">
+                <div class="flex-1 p-6 sm:p-8 flex flex-col items-center justify-center text-center">
                     <div class="text-5xl sm:text-6xl mb-2">📐</div>
                     <h1 class="text-main-title text-3xl sm:text-5xl font-black text-orange-600 mb-4">${_col('Žodžių Tvarka')}</h1>
                     
@@ -247,16 +252,13 @@
         }
 
         function renderTopBar() {
-            return `
-                <div class="top-bar bg-orange-100 border-b-2 border-orange-300 text-slate-800 px-3 sm:px-5 py-2 sm:py-2.5 flex justify-between items-center font-bold text-sm sm:text-base shadow-sm shrink-0">
-                    <div class="flex items-center gap-2">
-                        <button onclick="renderStartScreen()" class="top-badge bg-white/90 hover:bg-orange-200 border border-orange-300 px-2 py-0.5 rounded-lg text-sm sm:text-base transition active:scale-95" title="Pradžia">🏠</button>
-                        <span class="flex items-center gap-1">⭐ <span class="text-orange-700 dark:text-amber-300 font-black">${state.score}</span></span>
-                    </div>
-                    <div class="top-badge bg-white/90 border border-orange-300 px-2.5 py-0.5 rounded-xl font-black text-orange-700 dark:text-amber-300">🎯 ${state.round + 1} / ${state.deck.length}</div>
-                    <div class="flex items-center gap-1">🔥 <span class="text-orange-700 dark:text-amber-300 font-black">${state.streak}</span></div>
-                </div>
-            `;
+            return window.renderTopBar({
+                score: state.score,
+                current: state.round + 1,
+                total: state.deck.length,
+                streak: state.streak,
+                theme: 'orange'
+            });
         }
 
         function loadQuestion() {
@@ -266,6 +268,7 @@
             }
             state.lockGame = false;
             state.firstTry = true;
+            state.hintUsed = false;
 
             if (state.mode === 'fill') {
                 renderFillQuestion();
@@ -278,19 +281,28 @@
             const item = state.deck[state.round];
             state.currentWords = item.text.split(' ').map(w => w.trim()).filter(w => w.length > 0);
             state.currentSlots = new Array(state.currentWords.length).fill(null);
+            state.poolButtons = [];
 
             const scrambled = shuffle(state.currentWords.map((word, originalIndex) => ({ word, originalIndex })));
 
             app.innerHTML = `
                 ${renderTopBar()}
-                <div class="p-3 sm:p-5 flex-1 flex flex-col justify-between overflow-hidden">
-                    <div class="text-5xl sm:text-6xl drop-shadow-md">${item.emoji}</div>
+                <div class="p-3 sm:p-5 flex-1 flex flex-col justify-evenly gap-2 overflow-hidden">
+                    <div class="flex flex-col items-center gap-1.5">
+                        <div class="text-5xl sm:text-6xl drop-shadow-md">${item.emoji}</div>
+                        <div id="hint-area">
+                            <button id="hint-btn" onclick="showOrderHint()" class="hint-btn">
+                                <span>💡</span>
+                                <span>${_col('Užuomina')}</span>
+                            </button>
+                        </div>
+                    </div>
 
-                    <div id="message" class="text-base sm:text-xl font-black h-7 text-slate-500 text-sub-title flex items-center justify-center"></div>
+                    <div id="slots-container" class="sentence-card bg-amber-50/90 border-2 border-amber-300 rounded-3xl p-3.5 sm:p-5 flex flex-wrap justify-center content-center items-center gap-1.5 sm:gap-2.5 min-h-[82px] sm:min-h-[100px] shadow-inner"></div>
 
-                    <div id="slots-container" class="flex-1 flex flex-wrap justify-center items-center min-h-[70px] sm:min-h-[90px] py-1"></div>
+                    <div id="message" class="text-base sm:text-xl font-black min-h-[1.75rem] text-slate-500 text-sub-title flex items-center justify-center"></div>
 
-                    <div id="pool-container" class="flex-1 flex flex-wrap justify-center items-center min-h-[90px] sm:min-h-[120px] py-1"></div>
+                    <div id="pool-container" class="flex flex-wrap justify-center content-center items-center gap-1.5 sm:gap-2.5 py-2 min-h-[70px]"></div>
                 </div>
             `;
 
@@ -310,7 +322,56 @@
                 btn.innerHTML = _col(obj.word);
                 btn.onclick = () => pickWord(btn, obj.word, obj.originalIndex);
                 poolContainer.appendChild(btn);
+                state.poolButtons.push({ btn, word: obj.word, originalIndex: obj.originalIndex });
             });
+        }
+
+        function showOrderHint() {
+            if (state.lockGame || state.hintUsed) return;
+            state.hintUsed = true;
+            playHintSound();
+
+            // Pirmiausia grąžiname neteisingose vietose esančius žodžius
+            for (let i = 0; i < state.currentSlots.length; i++) {
+                const placed = state.currentSlots[i];
+                if (placed && placed.word !== state.currentWords[i]) {
+                    placed.el.classList.remove('hidden-word');
+                    state.currentSlots[i] = null;
+                }
+            }
+
+            // Randame pirmą tuščią vietą ir įdedame teisingą žodį (jei liko bent 2 tuščios vietos)
+            const emptyIndices = [];
+            for (let i = 0; i < state.currentSlots.length; i++) {
+                if (state.currentSlots[i] === null) emptyIndices.push(i);
+            }
+
+            if (emptyIndices.length >= 2) {
+                const targetIdx = emptyIndices[0];
+                const expectedWord = state.currentWords[targetIdx];
+                const candidate = state.poolButtons.find(
+                    p => !p.btn.classList.contains('hidden-word') && p.word === expectedWord
+                );
+                if (candidate) {
+                    state.currentSlots[targetIdx] = {
+                        word: candidate.word,
+                        originalIndex: candidate.originalIndex,
+                        el: candidate.btn
+                    };
+                    candidate.btn.classList.add('hidden-word');
+                }
+            }
+
+            renderSlots();
+            const hintArea = document.getElementById('hint-area');
+            if (hintArea) {
+                hintArea.innerHTML = `
+                    <div class="hint-box inline-flex items-center gap-1.5 text-xs sm:text-sm">
+                        <span>💡</span>
+                        <span>${_col('Didžioji raidė — pradžioje, taškas (.) — gale!')}</span>
+                    </div>
+                `;
+            }
         }
 
         function pickWord(btnElement, word, originalIndex) {
@@ -386,7 +447,9 @@
                 state.streak = 0;
                 playWrongSound();
                 messageEl.innerHTML = `<span>${_col('Bandyk dar kartą! Paspausk ant žodžio, kad nuimtum.')} 🤔</span>`;
-                messageEl.className = "text-sm sm:text-lg font-black h-7 text-red-500 flex items-center justify-center";
+                messageEl.className = "text-sm sm:text-lg font-black min-h-[1.75rem] text-red-500 flex items-center justify-center";
+                const hBtn = document.getElementById('hint-btn');
+                if (hBtn) hBtn.classList.add('hint-btn-pulse');
                 slotsContainer.classList.remove('shake');
                 void slotsContainer.offsetWidth;
                 slotsContainer.classList.add('shake');
@@ -396,30 +459,54 @@
             }
         }
 
+        function showFillHint() {
+            if (state.lockGame || state.hintUsed) return;
+            state.hintUsed = true;
+            playHintSound();
+            const item = state.deck[state.round];
+            const buttons = Array.from(document.querySelectorAll('[id^="fill-btn-"]'));
+            const wrongBtns = buttons.filter(b => b.dataset.word !== item.correct && !b.disabled);
+            shuffle(wrongBtns).slice(0, 2).forEach(b => {
+                b.disabled = true;
+                b.classList.add('opacity-30', 'pointer-events-none', 'scale-95');
+            });
+            const hBtn = document.getElementById('hint-btn');
+            if (hBtn) hBtn.classList.add('hidden');
+        }
+
         function renderFillQuestion() {
             const item = state.deck[state.round];
             const options = shuffle([...item.options]);
 
             const optsHtml = options.map((opt, idx) => `
-                <button id="fill-btn-${idx}" onclick="checkFillAnswer('${opt}', this)" class="word-btn py-2.5 sm:py-3.5 px-5 text-lg sm:text-2xl">
+                <button id="fill-btn-${idx}" data-word="${opt}" onclick="checkFillAnswer('${opt}', this)" class="word-btn w-full py-3.5 sm:py-4 px-4 text-xl sm:text-2xl">
                     ${_col(opt)}
                 </button>
             `).join('');
 
             app.innerHTML = `
                 ${renderTopBar()}
-                <div class="p-3 sm:p-5 flex-1 flex flex-col justify-between overflow-hidden">
-                    <div class="text-5xl sm:text-6xl drop-shadow-md">${item.emoji}</div>
-
-                    <div class="sentence-card my-auto bg-amber-50 border-2 border-amber-300 rounded-2xl p-4 sm:p-6 shadow-sm flex flex-wrap items-center justify-center gap-2 text-xl sm:text-3xl font-black">
-                        <span>${_col(item.before)}</span>
-                        <span id="fill-blank" class="inline-flex items-center justify-center min-w-[110px] px-4 py-1 border-b-4 border-dashed border-orange-500 bg-white/80 rounded-xl text-orange-500">?</span>
-                        <span>${item.after}</span>
+                <div class="p-3 sm:p-5 flex-1 flex flex-col justify-evenly gap-2 overflow-hidden">
+                    <div class="flex flex-col items-center gap-1.5">
+                        <div class="text-6xl sm:text-7xl drop-shadow-md">${item.emoji}</div>
+                        <div>
+                            <button id="hint-btn" onclick="showFillHint()" class="hint-btn">
+                                <span>💡</span>
+                                <span>${_col('Užuomina')}</span>
+                            </button>
+                        </div>
                     </div>
 
-                    <div id="message" class="text-base sm:text-xl font-black h-7 text-slate-500 text-sub-title flex items-center justify-center"></div>
+                    <div class="sentence-card bg-amber-50 border-2 border-amber-300 rounded-3xl p-4 sm:p-6 shadow-sm flex flex-wrap items-baseline justify-center content-center gap-x-2 gap-y-2 text-2xl sm:text-3xl font-black leading-relaxed">
+                        <span>${_col(item.before)}</span>
+                        <span class="inline-flex items-baseline whitespace-nowrap">
+                            <span id="fill-blank" class="inline-flex items-center justify-center min-w-[110px] px-4 py-1 border-b-4 border-dashed border-orange-500 bg-white/80 rounded-xl text-orange-500">?</span><span>${item.after}</span>
+                        </span>
+                    </div>
 
-                    <div class="flex flex-wrap justify-center gap-2 sm:gap-3">
+                    <div id="message" class="text-base sm:text-xl font-black min-h-[1.75rem] text-slate-500 text-sub-title flex items-center justify-center"></div>
+
+                    <div class="grid grid-cols-2 gap-2.5 sm:gap-3.5 w-full max-w-md mx-auto">
                         ${optsHtml}
                     </div>
                 </div>
@@ -443,7 +530,7 @@
                 blank.className = "inline-flex items-center justify-center px-4 py-1 bg-green-100 border-2 border-green-500 rounded-xl correct-anim";
                 btn.classList.add('slot-correct', 'correct-anim');
                 messageEl.innerHTML = `<span>${_col('Puiku! Sakinys teisingas!')} 🎉</span>`;
-                messageEl.className = "text-lg sm:text-2xl font-black h-7 text-green-500 flex items-center justify-center";
+                messageEl.className = "text-lg sm:text-2xl font-black min-h-[1.75rem] text-green-500 flex items-center justify-center";
 
                 setTimeout(() => {
                     state.round++;
@@ -455,8 +542,10 @@
                 playWrongSound();
                 btn.classList.add('slot-wrong', 'shake', 'opacity-50');
                 btn.disabled = true;
+                const hBtn = document.getElementById('hint-btn');
+                if (hBtn) hBtn.classList.add('hint-btn-pulse');
                 messageEl.innerHTML = `<span>${_col('Šis žodis čia netinka, bandyk kitą!')} 🤔</span>`;
-                messageEl.className = "text-sm sm:text-lg font-black h-7 text-red-500 flex items-center justify-center";
+                messageEl.className = "text-sm sm:text-lg font-black min-h-[1.75rem] text-red-500 flex items-center justify-center";
             }
         }
 

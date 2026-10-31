@@ -285,6 +285,7 @@
             streak: 0,
             firstTry: true,
             waiting: false,
+            hintUsed: false,
             // Mode 3 train state
             trainStep: 0,
             shuffledCards: [],
@@ -347,6 +348,7 @@
             state.usedCardIndices = [];
             state.firstTry = true;
             state.waiting = false;
+            state.hintUsed = false;
 
             let cards = shuffle([...q.items]);
             if (cards.every((w, idx) => w === q.items[idx])) {
@@ -405,18 +407,24 @@
             appEl.innerHTML = `
                 ${renderTopBar({ score: state.score, current: state.currentIndex + 1, total: state.questions.length, streak: state.streak, theme: 'cyan' })}
 
-                <div class="p-3 sm:p-5 flex-1 flex flex-col justify-between items-center">
-                    <div class="text-center">
-                        <h2 class="text-xl sm:text-2xl font-black text-slate-800">🚂 ${_col('Kas toliau?')}</h2>
+                <div class="p-3 sm:p-5 flex-1 flex flex-col justify-evenly items-center gap-2">
+                    <div class="text-center flex flex-col items-center gap-1.5">
+                        <h2 class="text-xl sm:text-2xl font-black text-slate-800">🚂 ${_col(q.prompt || 'Kas toliau?')}</h2>
+                        <button id="hint-btn" onclick="showTrainHint()" class="hint-btn ${state.hintUsed ? 'hidden' : ''}">
+                            <span>💡</span> <span>${_col('Užuomina')}</span>
+                        </button>
+                        <div id="hint-box" class="${state.hintUsed ? '' : 'hidden'} hint-box text-center text-sm sm:text-base font-extrabold text-amber-800 max-w-md">
+                            💡 ${_col(q.subtitle || '')} — ${_col('toliau:')} <span class="underline">${_col(q.items[state.trainStep] || '')}</span>
+                        </div>
                     </div>
 
                     <!-- Traukinuko vagonėliai -->
-                    <div id="train-container" class="train-box w-full my-auto py-3 px-2 sm:px-3 bg-cyan-50/80 rounded-3xl border-2 border-cyan-200 shadow-inner flex flex-wrap items-center justify-center gap-1 sm:gap-1.5 ${isComplete ? 'train-go' : ''}">
+                    <div id="train-container" class="train-box w-full py-3 px-2 sm:px-3 bg-cyan-50/80 rounded-3xl border-2 border-cyan-200 shadow-inner flex flex-wrap items-center justify-center content-center gap-1 sm:gap-1.5 ${isComplete ? 'train-go' : ''}">
                         <div class="text-3xl sm:text-5xl mr-1">🚂</div>
                         ${wagonsHtml}
                     </div>
 
-                    <div id="feedback" class="h-6 sm:h-8 flex items-center justify-center text-sm sm:text-lg font-black my-1 opacity-0 transition-opacity">
+                    <div id="feedback" class="h-6 sm:h-8 flex items-center justify-center text-sm sm:text-lg font-black opacity-0 transition-opacity">
                         Pranešimas
                     </div>
 
@@ -425,6 +433,26 @@
                     </div>
                 </div>
             `;
+        }
+
+        function showTrainHint() {
+            if (state.waiting) return;
+            state.hintUsed = true;
+            playHintSound();
+            const q = state.questions[state.currentIndex];
+            const expectedWord = q.items[state.trainStep];
+            const hintBtn = document.getElementById('hint-btn');
+            const hintBox = document.getElementById('hint-box');
+            if (hintBtn) hintBtn.classList.add('hidden');
+            if (hintBox) {
+                hintBox.innerHTML = `💡 ${_col(q.subtitle || '')} — ${_col('toliau:')} <span class="underline">${_col(expectedWord || '')}</span>`;
+                hintBox.classList.remove('hidden');
+            }
+            const cardIdx = state.shuffledCards.findIndex((w, i) => w === expectedWord && !state.usedCardIndices.includes(i));
+            if (cardIdx !== -1) {
+                const btn = document.getElementById(`card-${cardIdx}`);
+                if (btn) btn.classList.add('ring-4', 'ring-amber-400', 'bounce-anim');
+            }
         }
 
         function handleTrainCard(cardIdx) {
@@ -480,6 +508,8 @@
                     feedback.innerHTML = `<span>${_col("Šis vagonėlis eina vėliau! Bandyk kitą!")} 🤔</span>`;
                     feedback.className = "h-6 sm:h-8 flex items-center justify-center text-sm sm:text-lg font-black my-1 text-red-500 opacity-100";
                 }
+                const hintBtn = document.getElementById('hint-btn');
+                if (hintBtn && !state.hintUsed) hintBtn.classList.add('hint-btn-pulse');
             }
         }
 
@@ -491,12 +521,13 @@
 
             state.firstTry = true;
             state.waiting = false;
+            state.hintUsed = false;
             const q = state.questions[state.currentIndex];
             const options = shuffle([...q.options]);
 
             const optionsHtml = options.map((opt, idx) => `
                 <button id="btn-${idx}" onclick="handleAnswer('${opt.replace(/'/g, "\\'")}', this)" 
-                    class="btn-3d py-3 sm:py-4 px-3 bg-cyan-50 hover:bg-cyan-100 text-cyan-950 border-2 border-cyan-300 rounded-2xl text-base sm:text-xl font-black shadow-[0_5px_0_#a5f3fc] active:shadow-[0_0px_0_#a5f3fc] transition-all flex items-center justify-center text-center">
+                    class="btn-3d py-3.5 sm:py-4 px-3 bg-cyan-50 hover:bg-cyan-100 text-cyan-950 border-2 border-cyan-300 rounded-2xl text-lg sm:text-xl font-black shadow-[0_5px_0_#a5f3fc] active:shadow-[0_0px_0_#a5f3fc] transition-all flex items-center justify-center text-center min-h-[56px]">
                     <span>${_col(opt)}</span>
                 </button>
             `).join('');
@@ -504,22 +535,38 @@
             appEl.innerHTML = `
                 ${renderTopBar({ score: state.score, current: state.currentIndex + 1, total: 10, streak: state.streak, theme: 'cyan' })}
 
-                <div class="p-3 sm:p-5 flex-1 flex flex-col justify-between items-center">
-                    <h2 class="text-xl sm:text-2xl font-black text-slate-800 text-center mb-1">${_col(q.prompt)}</h2>
+                <div class="p-3 sm:p-5 flex-1 flex flex-col justify-evenly items-center gap-2">
+                    <h2 class="text-xl sm:text-2xl font-black text-slate-800 text-center">${_col(q.prompt)}</h2>
 
-                    <div class="my-auto py-3 px-6 flex flex-col items-center justify-center bg-cyan-50/80 rounded-3xl border-2 border-cyan-200 min-h-[110px] sm:min-h-[130px] shadow-inner text-center">
-                        <div class="text-6xl sm:text-7xl mb-1">${q.emoji}</div>
+                    <div class="py-3.5 px-6 flex flex-col items-center justify-center bg-cyan-50/80 rounded-3xl border-2 border-cyan-200 min-h-[110px] sm:min-h-[130px] shadow-inner text-center gap-2 w-full max-w-md">
+                        <div class="text-6xl sm:text-7xl">${q.emoji}</div>
+                        <button id="hint-btn" onclick="showHint()" class="hint-btn">
+                            <span>💡</span> <span>${_col('Užuomina')}</span>
+                        </button>
+                        <div id="hint-box" class="hidden hint-box text-sm sm:text-base font-extrabold text-amber-800">
+                            💡 ${_col(q.desc || '')}
+                        </div>
                     </div>
 
-                    <div id="feedback" class="h-6 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black my-1 opacity-0 transition-opacity">
+                    <div id="feedback" class="h-6 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black opacity-0 transition-opacity">
                         Pranešimas
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2.5 sm:gap-3.5 w-full mt-1">
+                    <div class="grid grid-cols-2 gap-2.5 sm:gap-3.5 w-full">
                         ${optionsHtml}
                     </div>
                 </div>
             `;
+        }
+
+        function showHint() {
+            if (state.waiting || state.hintUsed) return;
+            state.hintUsed = true;
+            playHintSound();
+            const hintBtn = document.getElementById('hint-btn');
+            const hintBox = document.getElementById('hint-box');
+            if (hintBtn) hintBtn.classList.add('hidden');
+            if (hintBox) hintBox.classList.remove('hidden');
         }
 
         function handleAnswer(selected, btn) {
@@ -557,6 +604,9 @@
 
                 feedback.innerHTML = `<span>${_col("Bandyk dar kartą!")} 🤔</span>`;
                 feedback.className = "h-6 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black my-1 text-red-500 opacity-100";
+
+                const hintBtn = document.getElementById('hint-btn');
+                if (hintBtn && !state.hintUsed) hintBtn.classList.add('hint-btn-pulse');
 
                 setTimeout(() => {
                     btn.classList.remove('shake-anim');

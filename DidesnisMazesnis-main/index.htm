@@ -147,6 +147,7 @@
             maxQuestions: 10,
             waiting: false,
             firstTry: true,
+            hintUsed: false,
 
             // Mode 1: Alkanas Krokodilas
             num1: 0,
@@ -180,16 +181,13 @@
         }
 
         function renderTopBar() {
-            return `
-                <div class="top-bar bg-sky-100 border-b-2 border-sky-300 text-slate-800 px-3 sm:px-4 py-2 sm:py-2.5 flex justify-between items-center font-bold text-xs sm:text-base shadow-sm shrink-0">
-                    <div class="flex items-center gap-2">
-                        <button onclick="renderStartScreen()" class="top-badge bg-white/90 hover:bg-sky-200 border border-sky-300 px-2.5 py-1 rounded-xl text-sm sm:text-base transition active:scale-95" title="Meniu">🏠</button>
-                        <span class="flex items-center gap-1">⭐ <span class="text-sky-700 dark:text-amber-300 font-black">${state.score}</span></span>
-                    </div>
-                    <div class="top-badge bg-white/90 border border-sky-300 px-2.5 py-0.5 rounded-xl text-sky-700 dark:text-amber-300 font-black">🎯 ${state.question} / ${state.maxQuestions}</div>
-                    <div class="flex items-center gap-1">🔥 <span class="text-sky-700 dark:text-amber-300 font-black">${state.streak}</span></div>
-                </div>
-            `;
+            return window.renderTopBar({
+                score: state.score,
+                current: state.question,
+                total: state.maxQuestions,
+                streak: state.streak,
+                theme: 'sky'
+            });
         }
 
         function renderStartScreen() {
@@ -259,6 +257,7 @@
         function generateQuestion() {
             state.waiting = false;
             state.firstTry = true;
+            state.hintUsed = false;
 
             if (state.mode === 'croc') {
                 generateCrocQuestion();
@@ -266,6 +265,40 @@
                 generateBasketsQuestion();
             } else {
                 generateStairsQuestion();
+            }
+        }
+
+        function showHint() {
+            if (state.waiting || state.hintUsed) return;
+            state.hintUsed = true;
+            playHintSound();
+            if (state.mode === 'croc') {
+                renderCrocScreen();
+            } else if (state.mode === 'baskets') {
+                renderBasketsScreen();
+            } else {
+                // Laipteliuose įstatome sekantį mažiausią skaičių
+                for (let i = 0; i < 4; i++) {
+                    const pid = state.stairs[i];
+                    if (pid !== null) {
+                        const expectedSorted = [...state.poolNumbers].sort((a, b) => a.val - b.val);
+                        const actualItem = state.poolNumbers.find(x => x.id === pid);
+                        if (actualItem && actualItem.val !== expectedSorted[i].val) {
+                            actualItem.placed = false;
+                            state.stairs[i] = null;
+                        }
+                    }
+                }
+                const emptyIdx = state.stairs.findIndex(s => s === null);
+                if (emptyIdx !== -1 && state.stairs.filter(s => s === null).length >= 2) {
+                    const expectedSorted = [...state.poolNumbers].sort((a, b) => a.val - b.val);
+                    const targetItem = expectedSorted[emptyIdx];
+                    if (targetItem && !targetItem.placed) {
+                        targetItem.placed = true;
+                        state.stairs[emptyIdx] = targetItem.id;
+                    }
+                }
+                renderStairsScreen();
             }
         }
 
@@ -362,21 +395,32 @@
         }
 
         function renderCrocScreen() {
+            const hintBtnHtml = state.hintUsed
+                ? `<div class="hint-box inline-flex items-center gap-1.5 text-xs sm:text-sm">
+                       <span>💡</span>
+                       <span>${_col('Palygink dešimtis ir vienetus!')}</span>
+                   </div>`
+                : `<button id="hint-btn" onclick="showHint()" class="hint-btn py-1.5 px-4 text-sm">
+                       <span>💡</span>
+                       <span>${_col('Užuomina')}</span>
+                   </button>`;
+
             app.innerHTML = `
                 ${renderTopBar()}
-                <div class="flex-1 flex flex-col p-3 sm:p-5 justify-between overflow-hidden fade-in">
-                    <div class="text-center">
-                        <h2 class="text-xl sm:text-3xl font-black text-slate-800 text-main-title flex items-center justify-center gap-2">
+                <div class="flex-1 flex flex-col p-3 sm:p-5 justify-evenly gap-2 overflow-hidden fade-in">
+                    <div class="text-center flex flex-col items-center gap-2">
+                        <h2 class="text-2xl sm:text-3xl font-black text-slate-800 text-main-title flex items-center justify-center gap-2">
                             <span>🐊</span>
                             <span>${state.num1} ❓ ${state.num2}</span>
                         </h2>
+                        <div>${hintBtnHtml}</div>
                     </div>
 
-                    <div id="croc-arena" class="panel-box flex-1 rounded-2xl p-3 sm:p-5 flex items-center justify-between gap-2 sm:gap-4 my-2">
+                    <div id="croc-arena" class="panel-box rounded-3xl p-4 sm:p-6 flex items-center justify-between gap-2 sm:gap-4">
                         <!-- Kairys skaičius -->
-                        <div id="card-left" class="num-card flex-1 rounded-2xl p-2.5 sm:p-4 flex flex-col items-center justify-center shadow-md min-h-[125px] sm:min-h-[155px]">
-                            <div class="text-4xl sm:text-6xl font-black text-sky-600 dark:text-sky-400">${state.num1}</div>
-                            ${buildVisualBars(state.num1)}
+                        <div id="card-left" class="num-card flex-1 rounded-2xl p-3 sm:p-5 flex flex-col items-center justify-center shadow-md min-h-[120px] sm:min-h-[155px]">
+                            <div class="text-5xl sm:text-6xl font-black text-sky-600 dark:text-sky-400">${state.num1}</div>
+                            ${state.hintUsed ? buildVisualBars(state.num1) : ''}
                         </div>
 
                         <!-- Krokodilo nasrai -->
@@ -385,22 +429,22 @@
                         </div>
 
                         <!-- Dešinys skaičius -->
-                        <div id="card-right" class="num-card flex-1 rounded-2xl p-2.5 sm:p-4 flex flex-col items-center justify-center shadow-md min-h-[125px] sm:min-h-[155px]">
-                            <div class="text-4xl sm:text-6xl font-black text-sky-600 dark:text-sky-400">${state.num2}</div>
-                            ${buildVisualBars(state.num2)}
+                        <div id="card-right" class="num-card flex-1 rounded-2xl p-3 sm:p-5 flex flex-col items-center justify-center shadow-md min-h-[120px] sm:min-h-[155px]">
+                            <div class="text-5xl sm:text-6xl font-black text-sky-600 dark:text-sky-400">${state.num2}</div>
+                            ${state.hintUsed ? buildVisualBars(state.num2) : ''}
                         </div>
                     </div>
 
                     <div id="feedback" class="h-6 sm:h-7 flex items-center justify-center font-black text-sm sm:text-lg opacity-0 transition-opacity"></div>
 
-                    <div class="grid grid-cols-3 gap-2.5 sm:gap-4">
-                        <button id="btn-lt" onclick="checkCrocAnswer('<', this)" class="py-3 sm:py-4 rounded-2xl bg-purple-500 hover:bg-purple-600 text-white font-black text-3xl sm:text-5xl shadow-lg border-b-4 border-purple-700 transition transform active:scale-95">
+                    <div class="grid grid-cols-3 gap-3 sm:gap-4">
+                        <button id="btn-lt" onclick="checkCrocAnswer('<', this)" class="py-4 sm:py-5 rounded-2xl bg-purple-500 hover:bg-purple-600 text-white font-black text-4xl sm:text-5xl shadow-lg border-b-4 border-purple-700 transition transform active:scale-95">
                             &lt;
                         </button>
-                        <button id="btn-eq" onclick="checkCrocAnswer('=', this)" class="py-3 sm:py-4 rounded-2xl bg-amber-400 hover:bg-amber-500 text-slate-900 font-black text-3xl sm:text-5xl shadow-lg border-b-4 border-amber-600 transition transform active:scale-95">
+                        <button id="btn-eq" onclick="checkCrocAnswer('=', this)" class="py-4 sm:py-5 rounded-2xl bg-amber-400 hover:bg-amber-500 text-slate-900 font-black text-4xl sm:text-5xl shadow-lg border-b-4 border-amber-600 transition transform active:scale-95">
                             =
                         </button>
-                        <button id="btn-gt" onclick="checkCrocAnswer('>', this)" class="py-3 sm:py-4 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white font-black text-3xl sm:text-5xl shadow-lg border-b-4 border-rose-700 transition transform active:scale-95">
+                        <button id="btn-gt" onclick="checkCrocAnswer('>', this)" class="py-4 sm:py-5 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white font-black text-4xl sm:text-5xl shadow-lg border-b-4 border-rose-700 transition transform active:scale-95">
                             &gt;
                         </button>
                     </div>
@@ -438,6 +482,8 @@
                 }
                 feedback.innerHTML = `<span>${_col('Bandyk dar kartą! Kuris skaičius didesnis?')} 🤔</span>`;
                 feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-xs sm:text-base text-rose-500 opacity-100";
+                const hBtn = document.getElementById('hint-btn');
+                if (hBtn) hBtn.classList.add('hint-btn-pulse');
                 if (arena) {
                     arena.classList.remove('shake');
                     void arena.offsetWidth;
@@ -499,26 +545,35 @@
         }
 
         function renderBasketsScreen() {
+            const hintBtnHtml = state.hintUsed
+                ? `<div class="hint-box inline-flex items-center gap-1.5 text-xs sm:text-sm">
+                       <span>💡</span>
+                       <span>${state.leftBasket.label} = ${state.leftBasket.total} | ${state.rightBasket.label} = ${state.rightBasket.total}</span>
+                   </div>`
+                : `<button id="hint-btn" onclick="showHint()" class="hint-btn py-1.5 px-4 text-sm">
+                       <span>💡</span>
+                       <span>${_col('Užuomina')}</span>
+                   </button>`;
+
             app.innerHTML = `
                 ${renderTopBar()}
-                <div class="flex-1 flex flex-col p-3 sm:p-5 justify-between overflow-hidden fade-in">
-                    <div class="text-center">
+                <div class="flex-1 flex flex-col p-3 sm:p-5 justify-evenly gap-2 overflow-hidden fade-in">
+                    <div class="text-center flex flex-col items-center gap-2">
                         <h2 class="text-xl sm:text-2xl font-black text-slate-800 text-main-title flex items-center justify-center gap-2">
                             <span>🧺</span>
                             <span>${_col('Kur daugiau?')}</span>
                         </h2>
+                        <div>${hintBtnHtml}</div>
                     </div>
 
-                    <div id="baskets-arena" class="panel-box flex-1 rounded-2xl p-3 sm:p-4 flex items-center justify-between gap-2 sm:gap-4 my-2">
+                    <div id="baskets-arena" class="panel-box rounded-3xl p-3.5 sm:p-5 flex items-center justify-between gap-2 sm:gap-4">
                         <!-- Kairys krepšelis -->
-                        <button onclick="checkBasketAnswer('>')" id="basket-left" class="basket-card flex-1 rounded-2xl p-2.5 sm:p-3.5 flex flex-col items-center justify-between shadow-md min-h-[135px] sm:min-h-[160px] active:scale-95">
+                        <button onclick="checkBasketAnswer('>')" id="basket-left" class="basket-card flex-1 rounded-2xl p-3 sm:p-4 flex flex-col items-center justify-between shadow-md min-h-[135px] sm:min-h-[160px] active:scale-95">
                             <span class="text-base sm:text-lg font-black text-amber-800 dark:text-amber-300">🧺</span>
-                            <div class="flex flex-wrap items-center justify-center gap-1 my-1.5">
+                            <div class="flex flex-wrap items-center justify-center gap-1 my-2">
                                 ${renderBasketEmojis(state.leftBasket)}
                             </div>
-                            <span class="basket-badge text-sm sm:text-base font-black px-3 py-1 rounded-full shadow-sm">
-                                ${state.leftBasket.label}
-                            </span>
+                            ${state.hintUsed ? `<span class="basket-badge text-sm sm:text-base font-black px-3 py-1 rounded-full shadow-sm pop-in">${state.leftBasket.label}</span>` : '<span class="h-6"></span>'}
                         </button>
 
                         <!-- Vidurio ženklas -->
@@ -527,27 +582,25 @@
                         </div>
 
                         <!-- Dešinys krepšelis -->
-                        <button onclick="checkBasketAnswer('<')" id="basket-right" class="basket-card flex-1 rounded-2xl p-2.5 sm:p-3.5 flex flex-col items-center justify-between shadow-md min-h-[135px] sm:min-h-[160px] active:scale-95">
+                        <button onclick="checkBasketAnswer('<')" id="basket-right" class="basket-card flex-1 rounded-2xl p-3 sm:p-4 flex flex-col items-center justify-between shadow-md min-h-[135px] sm:min-h-[160px] active:scale-95">
                             <span class="text-base sm:text-lg font-black text-amber-800 dark:text-amber-300">🧺</span>
-                            <div class="flex flex-wrap items-center justify-center gap-1 my-1.5">
+                            <div class="flex flex-wrap items-center justify-center gap-1 my-2">
                                 ${renderBasketEmojis(state.rightBasket)}
                             </div>
-                            <span class="basket-badge text-sm sm:text-base font-black px-3 py-1 rounded-full shadow-sm">
-                                ${state.rightBasket.label}
-                            </span>
+                            ${state.hintUsed ? `<span class="basket-badge text-sm sm:text-base font-black px-3 py-1 rounded-full shadow-sm pop-in">${state.rightBasket.label}</span>` : '<span class="h-6"></span>'}
                         </button>
                     </div>
 
                     <div id="feedback" class="h-6 sm:h-7 flex items-center justify-center font-black text-sm sm:text-lg opacity-0 transition-opacity"></div>
 
-                    <div class="grid grid-cols-3 gap-2.5 sm:gap-4">
-                        <button id="bsk-lt" onclick="checkBasketAnswer('<', this)" class="py-3 sm:py-4 rounded-2xl bg-purple-500 hover:bg-purple-600 text-white font-black text-3xl sm:text-5xl shadow-lg border-b-4 border-purple-700 transition transform active:scale-95">
+                    <div class="grid grid-cols-3 gap-3 sm:gap-4">
+                        <button id="bsk-lt" onclick="checkBasketAnswer('<', this)" class="py-4 sm:py-5 rounded-2xl bg-purple-500 hover:bg-purple-600 text-white font-black text-4xl sm:text-5xl shadow-lg border-b-4 border-purple-700 transition transform active:scale-95">
                             &lt;
                         </button>
-                        <button id="bsk-eq" onclick="checkBasketAnswer('=', this)" class="py-3 sm:py-4 rounded-2xl bg-amber-400 hover:bg-amber-500 text-slate-900 font-black text-3xl sm:text-5xl shadow-lg border-b-4 border-amber-600 transition transform active:scale-95">
+                        <button id="bsk-eq" onclick="checkBasketAnswer('=', this)" class="py-4 sm:py-5 rounded-2xl bg-amber-400 hover:bg-amber-500 text-slate-900 font-black text-4xl sm:text-5xl shadow-lg border-b-4 border-amber-600 transition transform active:scale-95">
                             =
                         </button>
-                        <button id="bsk-gt" onclick="checkBasketAnswer('>', this)" class="py-3 sm:py-4 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white font-black text-3xl sm:text-5xl shadow-lg border-b-4 border-rose-700 transition transform active:scale-95">
+                        <button id="bsk-gt" onclick="checkBasketAnswer('>', this)" class="py-4 sm:py-5 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white font-black text-4xl sm:text-5xl shadow-lg border-b-4 border-rose-700 transition transform active:scale-95">
                             &gt;
                         </button>
                     </div>
@@ -595,6 +648,8 @@
                 }
                 feedback.innerHTML = `<span>${_col('Suskaičiuok dar kartelį!')} 🤔</span>`;
                 feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-xs sm:text-base text-rose-500 opacity-100";
+                const hBtn = document.getElementById('hint-btn');
+                if (hBtn) hBtn.classList.add('hint-btn-pulse');
                 if (arena) {
                     arena.classList.remove('shake');
                     void arena.offsetWidth;
@@ -743,20 +798,23 @@
 
             app.innerHTML = `
                 ${renderTopBar()}
-                <div class="flex-1 flex flex-col p-3 sm:p-5 justify-between overflow-hidden fade-in">
+                <div class="flex-1 flex flex-col p-3 sm:p-5 justify-evenly gap-2 overflow-hidden fade-in">
                     <div class="flex justify-between items-center">
                         <div>
                             <h2 class="text-base sm:text-xl font-black text-slate-800 text-main-title">
                                 🪜 ${_col('Mažiausias')} ➔ ${_col('Didžiausias')}
                             </h2>
                         </div>
-                        <button onclick="clearAllStairs()" class="text-lg sm:text-xl font-extrabold text-rose-500 hover:scale-110 shrink-0 ml-2" title="Išvalyti">
-                            🔄
-                        </button>
+                        <div class="flex items-center gap-2">
+                            ${!state.hintUsed ? `<button id="hint-btn" onclick="showHint()" class="hint-btn py-1 px-3 text-xs min-h-[34px]"><span>💡</span><span>${_col('Užuomina')}</span></button>` : ''}
+                            <button onclick="clearAllStairs()" class="text-lg sm:text-xl font-extrabold text-rose-500 hover:scale-110 shrink-0 px-1" title="Išvalyti">
+                                🔄
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Laiptelių laukas -->
-                    <div id="stairs-arena" class="panel-box flex-1 rounded-2xl px-3 sm:px-5 pt-2 pb-0 flex items-end justify-between gap-2 sm:gap-3 min-h-[185px] sm:min-h-[210px] relative overflow-hidden my-2">
+                    <div id="stairs-arena" class="panel-box rounded-2xl px-3 sm:px-5 pt-2 pb-0 flex items-end justify-between gap-2 sm:gap-3 min-h-[185px] sm:min-h-[210px] relative overflow-hidden">
                         <!-- Pradinė varlytė, jei dar niekas nepadėta -->
                         <div class="flex flex-col items-center justify-end pb-2 w-8 sm:w-10">
                             <span class="text-2xl sm:text-3xl ${frogStep === -1 && !state.frogAtFlag ? 'bounce' : 'opacity-20'}">🐸</span>

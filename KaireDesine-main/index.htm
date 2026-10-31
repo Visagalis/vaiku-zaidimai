@@ -419,17 +419,14 @@
 
         const appEl = document.getElementById('app');
 
-        function renderTopBar() {
-            return `
-                <div class="top-bar bg-fuchsia-100 border-b-2 border-fuchsia-300 text-slate-800 px-3 sm:px-5 py-2 sm:py-2.5 flex justify-between items-center font-bold text-sm sm:text-base shadow-sm shrink-0">
-                    <div class="flex items-center gap-2">
-                        <button onclick="renderStartScreen()" class="top-badge bg-white hover:bg-fuchsia-200 border border-fuchsia-300 px-2 py-0.5 rounded-lg text-sm sm:text-base transition active:scale-95" title="Pradžia">🏠</button>
-                        <span class="flex items-center gap-1">⭐ <span class="text-amber-600 font-black">${state.score}</span></span>
-                    </div>
-                    <div class="top-badge bg-white border border-fuchsia-300 px-2.5 py-0.5 rounded-xl font-black text-fuchsia-700">🎯 ${state.currentIndex + 1} / 10</div>
-                    <div class="flex items-center gap-1">🔥 <span class="text-orange-600 font-black">${state.streak}</span></div>
-                </div>
-            `;
+        function renderGameTopBar() {
+            return window.renderTopBar({
+                score: state.score,
+                current: state.currentIndex + 1,
+                total: 10,
+                streak: state.streak,
+                theme: 'fuchsia'
+            });
         }
 
         function renderStartScreen() {
@@ -498,7 +495,9 @@
         // ==========================================
         function renderQuizQuestion() {
             const q = state.questions[state.currentIndex];
+            state.hintUsed = false;
             const options = state.mode === 'left-right' ? [...q.options] : shuffle([...q.options]);
+            state.currentOptions = options;
 
             const optionsHtml = options.map((opt, idx) => {
                 let icon = '';
@@ -506,30 +505,64 @@
                 else if (opt.includes('dešin') || opt.includes('Dešin')) icon = '👉 ';
                 return `
                     <button id="btn-${idx}" onclick="handleQuizAnswer('${opt.replace(/'/g, "\\'")}', this)"
-                        class="btn-3d py-3 sm:py-4 px-4 bg-fuchsia-50 hover:bg-fuchsia-100 text-fuchsia-900 border-2 border-fuchsia-300 rounded-2xl text-lg sm:text-2xl font-black shadow-[0_5px_0_#d8b4fe] active:shadow-[0_0px_0_#d8b4fe] transition-all flex items-center justify-center text-center gap-1.5">
+                        class="btn-3d py-3.5 sm:py-4 px-4 bg-fuchsia-50 hover:bg-fuchsia-100 text-fuchsia-900 border-2 border-fuchsia-300 rounded-2xl text-lg sm:text-2xl font-black shadow-[0_5px_0_#d8b4fe] active:shadow-[0_0px_0_#d8b4fe] transition-all flex items-center justify-center text-center gap-1.5 min-h-[58px]">
                         <span>${icon}</span><span>${_col(opt)}</span>
                     </button>
                 `;
             }).join('');
 
             appEl.innerHTML = `
-                ${renderTopBar()}
-                <div class="p-3 sm:p-5 flex-1 flex flex-col justify-between items-center">
-                    <h2 class="text-xl sm:text-2xl font-black text-slate-800 text-center mb-1">${_col(q.prompt)}</h2>
+                ${renderGameTopBar()}
+                <div class="p-3 sm:p-5 flex-1 flex flex-col justify-evenly items-center gap-2">
+                    <div class="flex flex-col items-center gap-1.5">
+                        <h2 class="text-xl sm:text-2xl font-black text-slate-800 text-center">${_col(q.prompt)}</h2>
+                        <button id="hint-btn" onclick="showQuizHint()" class="hint-btn">
+                            <span>💡</span> <span>${_col('Užuomina')}</span>
+                        </button>
+                        <div id="hint-box" class="hidden hint-box text-sm sm:text-base font-extrabold text-amber-800">
+                            ✋ ${_col('Kairė pusė')} 👈 &nbsp;|&nbsp; 👉 ${_col('Dešinė pusė')} 🤚
+                        </div>
+                    </div>
 
-                    <div class="my-auto py-2 w-full flex items-center justify-center bg-white/60 dark-panel rounded-2xl border-2 border-fuchsia-100 min-h-[120px] sm:min-h-[140px]">
+                    <div class="py-3 w-full flex items-center justify-center bg-white/60 dark-panel rounded-2xl border-2 border-fuchsia-100 min-h-[120px] sm:min-h-[140px]">
                         ${q.visual}
                     </div>
 
-                    <div id="feedback" class="h-6 sm:h-7 flex items-center justify-center text-base sm:text-lg font-black my-1 opacity-0 transition-opacity">
+                    <div id="feedback" class="h-6 sm:h-7 flex items-center justify-center text-base sm:text-lg font-black opacity-0 transition-opacity">
                         ${_col('Puiku!')}
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2.5 sm:gap-3.5 w-full mt-1">
+                    <div class="grid grid-cols-2 gap-2.5 sm:gap-3.5 w-full">
                         ${optionsHtml}
                     </div>
                 </div>
             `;
+        }
+
+        function showQuizHint() {
+            if (state.waiting || state.hintUsed) return;
+            state.hintUsed = true;
+            playHintSound();
+            const hintBtn = document.getElementById('hint-btn');
+            if (hintBtn) hintBtn.classList.add('hidden');
+            const q = state.questions[state.currentIndex];
+            if (state.mode === 'left-right') {
+                const hintBox = document.getElementById('hint-box');
+                if (hintBox) hintBox.classList.remove('hidden');
+            } else {
+                const wrongIdxs = [];
+                (state.currentOptions || []).forEach((opt, idx) => {
+                    const btn = document.getElementById(`btn-${idx}`);
+                    if (opt !== q.correct && btn && !btn.disabled) wrongIdxs.push(idx);
+                });
+                shuffle(wrongIdxs).slice(0, 2).forEach(idx => {
+                    const btn = document.getElementById(`btn-${idx}`);
+                    if (btn) {
+                        btn.disabled = true;
+                        btn.classList.add('opacity-35', 'line-through', 'pointer-events-none');
+                    }
+                });
+            }
         }
 
         function handleQuizAnswer(selected, btn) {
@@ -567,6 +600,9 @@
 
                 feedback.innerHTML = `<span>${_col("Bandyk dar kartą! 🤔")}</span>`;
                 feedback.className = "h-6 sm:h-7 flex items-center justify-center text-base sm:text-lg font-black my-1 text-red-500 opacity-100";
+
+                const hintBtn = document.getElementById('hint-btn');
+                if (hintBtn && !state.hintUsed) hintBtn.classList.add('hint-btn-pulse');
 
                 setTimeout(() => {
                     btn.classList.remove('shake-anim');
@@ -634,13 +670,13 @@
             `).join('');
 
             appEl.innerHTML = `
-                ${renderTopBar()}
-                <div class="p-3 sm:p-4 flex-1 flex flex-col justify-between items-center">
+                ${renderGameTopBar()}
+                <div class="p-3 sm:p-4 flex-1 flex flex-col justify-evenly items-center gap-2">
                     <h2 class="text-xl sm:text-2xl font-black text-slate-800 text-center flex items-center justify-center gap-2">
                         <span>🐶</span> ➔ <span class="text-3xl">${lvl.goalEmoji}</span>
                     </h2>
 
-                    <div id="puppy-grid" class="grid grid-cols-3 gap-2 sm:gap-2.5 w-full max-w-xs my-1.5 p-2.5 bg-white/80 dark-panel rounded-3xl border-2 border-fuchsia-200 shadow-inner">
+                    <div id="puppy-grid" class="grid grid-cols-3 gap-2 sm:gap-2.5 w-full max-w-xs p-2.5 bg-white/80 dark-panel rounded-3xl border-2 border-fuchsia-200 shadow-inner">
                         ${cellsHtml}
                     </div>
 

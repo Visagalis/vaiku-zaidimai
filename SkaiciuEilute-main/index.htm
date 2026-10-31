@@ -55,14 +55,15 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            min-width: 3.1rem;
-            height: 3.5rem;
+            min-width: 3.25rem;
+            height: 3.85rem;
             border-radius: 0.85rem;
             font-weight: 900;
-            font-size: 1.45rem;
+            font-size: 1.55rem;
             border: 3px solid;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.15);
             margin-bottom: 0.5rem;
+            padding: 0 0.35rem;
         }
         .carriage::before, .carriage::after {
             content: '';
@@ -90,33 +91,39 @@
             }
         }
 
-        /* Lily pad styling */
+        /* Lily pad styling — dideli, patogūs paspausti lapeliai (≥52px) */
         .lily-pad {
             position: relative;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            width: 2.35rem;
-            height: 2.35rem;
+            width: 3.35rem;
+            height: 3.35rem;
             border-radius: 9999px;
             background: radial-gradient(circle at 35% 35%, #4ade80, #16a34a);
             border: 3px solid #15803d;
             color: #052e16;
             font-weight: 900;
-            font-size: 0.95rem;
+            font-size: 1.2rem;
             box-shadow: 0 4px 6px rgba(0,0,0,0.2);
             transition: transform 0.15s ease, background 0.2s ease;
             cursor: pointer;
+            flex-shrink: 0;
         }
         .lily-pad:active {
             transform: scale(0.9);
         }
+        .lily-pad-step {
+            background: radial-gradient(circle at 35% 35%, #fde047, #eab308) !important;
+            border-color: #ca8a04 !important;
+            color: #422006 !important;
+        }
         @media (min-width: 640px) {
             .lily-pad {
-                width: 3.1rem;
-                height: 3.1rem;
-                font-size: 1.25rem;
+                width: 3.65rem;
+                height: 3.65rem;
+                font-size: 1.35rem;
             }
         }
 
@@ -125,25 +132,25 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 5.5rem;
+            width: 5.9rem;
         }
         .house-roof {
             width: 0;
             height: 0;
-            border-left: 3.1rem solid transparent;
-            border-right: 3.1rem solid transparent;
-            border-bottom: 2.1rem solid #ef4444;
+            border-left: 3.3rem solid transparent;
+            border-right: 3.3rem solid transparent;
+            border-bottom: 2.25rem solid #ef4444;
         }
         .house-body {
-            width: 5.2rem;
-            height: 4.5rem;
+            width: 5.6rem;
+            height: 4.9rem;
             border-radius: 0 0 0.85rem 0.85rem;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             font-weight: 900;
-            font-size: 1.75rem;
+            font-size: 1.95rem;
             border: 3px solid;
             box-shadow: 0 6px 10px -2px rgba(0,0,0,0.15);
         }
@@ -244,22 +251,33 @@
             rightVal: null,
             activeSide: 'left', // 'left' | 'right'
             waiting: false,
-            firstTry: true
+            firstTry: true,
+            hintUsed: false
         };
 
         const app = document.getElementById('app');
 
         function renderTopBar() {
-            return `
-                <div class="top-bar bg-purple-100 border-b-2 border-purple-300 text-slate-800 px-3 sm:px-5 py-2 sm:py-2.5 flex justify-between items-center font-bold text-sm sm:text-lg shadow-sm shrink-0">
-                    <div class="flex items-center gap-2">
-                        <button onclick="renderStartScreen()" class="top-badge bg-white/90 hover:bg-purple-200 border border-purple-300 px-2 py-0.5 rounded-lg text-sm sm:text-base transition active:scale-95" title="Pradžia">🏠</button>
-                        <span class="flex items-center gap-1">⭐ <span class="text-purple-700 dark:text-amber-300 font-black">${state.score}</span></span>
-                    </div>
-                    <div class="top-badge bg-white/90 border border-purple-300 px-2.5 py-0.5 rounded-xl font-black text-purple-700 dark:text-amber-300">🎯 ${state.question} / ${state.maxQuestions}</div>
-                    <div class="flex items-center gap-1">🔥 <span class="text-purple-700 dark:text-amber-300 font-black">${state.streak}</span></div>
-                </div>
-            `;
+            return window.renderTopBar({
+                score: state.score,
+                current: state.question,
+                total: state.maxQuestions,
+                streak: state.streak,
+                theme: 'purple'
+            });
+        }
+
+        function showHint() {
+            if (state.waiting || state.hintUsed) return;
+            state.hintUsed = true;
+            playHintSound();
+            if (state.mode === 'train') {
+                renderTrainScreen();
+            } else if (state.mode === 'frog') {
+                renderFrogScreen();
+            } else {
+                renderNeighborsScreen();
+            }
         }
 
         function renderStartScreen() {
@@ -298,6 +316,7 @@
         function generateQuestion() {
             state.waiting = false;
             state.firstTry = true;
+            state.hintUsed = false;
 
             if (state.mode === 'train') {
                 generateTrainQuestion();
@@ -388,31 +407,41 @@
                 ? `📈 ${_col('Skaičiuojame po')} +${state.step} ${_col('į priekį')}`
                 : `📉 ${_col('Skaičiuojame po')} -${state.step} ${_col('atgal')}`;
 
+            const hintSection = state.hintUsed
+                ? `<div class="hint-box inline-flex items-center gap-2 text-sm sm:text-base">
+                       <span>💡</span>
+                       <span>${ruleHint}</span>
+                   </div>`
+                : `<button id="hint-btn" onclick="showHint()" class="hint-btn">
+                       <span>💡</span>
+                       <span>${_col('Užuomina')}</span>
+                   </button>`;
+
             const optionsHtml = state.options.map((opt, idx) => `
-                <button id="btn-${idx}" onclick="checkTrainAnswer(${idx}, ${opt})" class="opt-btn py-3 sm:py-4 rounded-2xl font-black text-2xl sm:text-4xl shadow-md border-b-4 transition transform active:scale-95">
+                <button id="btn-${idx}" onclick="checkTrainAnswer(${idx}, ${opt})" class="opt-btn py-4 sm:py-5 rounded-2xl font-black text-3xl sm:text-4xl shadow-md border-b-4 transition transform active:scale-95">
                     ${opt}
                 </button>
             `).join('');
 
             app.innerHTML = `
                 ${renderTopBar()}
-                <div class="flex-1 flex flex-col justify-between p-3 sm:p-5 fade-in overflow-hidden">
-                    <div class="text-center flex items-center justify-center gap-2">
-                        <span class="text-3xl">🚂</span>
-                        <span class="text-2xl sm:text-3xl font-black">❓</span>
-                        <span class="inline-block px-3 py-1 rounded-full bg-purple-100 text-purple-900 font-extrabold text-sm sm:text-base border border-purple-300">
-                            ${state.isIncreasing ? '+' : '-'}${state.step}
-                        </span>
+                <div class="flex-1 flex flex-col justify-evenly gap-2 p-3 sm:p-5 fade-in overflow-hidden">
+                    <div class="text-center flex flex-col items-center justify-center gap-2">
+                        <div class="flex items-center justify-center gap-2">
+                            <span class="text-3xl sm:text-4xl">🚂</span>
+                            <span class="text-xl sm:text-2xl font-black text-main-title">${_col('Koks skaičius vagonėlyje?')}</span>
+                        </div>
+                        <div>${hintSection}</div>
                     </div>
 
-                    <div id="train-container" class="panel-box flex-1 p-3 sm:p-5 rounded-2xl flex items-center justify-center overflow-x-auto my-2 min-h-[120px]">
+                    <div id="train-container" class="panel-box py-6 px-2.5 sm:p-6 rounded-3xl flex items-center justify-center overflow-x-auto shadow-inner">
                         <div class="text-3xl sm:text-5xl mr-0.5 mb-2 shrink-0">🚂</div>
                         ${trainHtml}
                     </div>
 
-                    <div id="feedback" class="h-6 sm:h-8 flex items-center justify-center font-black text-base sm:text-xl opacity-0 transition-opacity"></div>
+                    <div id="feedback" class="h-7 sm:h-8 flex items-center justify-center font-black text-base sm:text-xl opacity-0 transition-opacity"></div>
 
-                    <div class="grid grid-cols-2 gap-2.5 sm:gap-3.5">
+                    <div class="grid grid-cols-2 gap-3 sm:gap-4">
                         ${optionsHtml}
                     </div>
                 </div>
@@ -456,7 +485,9 @@
                 btn.disabled = true;
                 btn.className = "py-3 sm:py-4 bg-red-100 text-red-400 border-red-200 border-2 rounded-2xl font-bold text-2xl sm:text-4xl line-through opacity-60 cursor-not-allowed shake";
                 feedback.innerHTML = `<span>${_col('Bandyk dar kartą!')} 🤔</span>`;
-                feedback.className = "h-6 sm:h-8 flex items-center justify-center font-black text-base sm:text-xl text-red-500 opacity-100";
+                feedback.className = "h-7 sm:h-8 flex items-center justify-center font-black text-base sm:text-xl text-red-500 opacity-100";
+                const hBtn = document.getElementById('hint-btn');
+                if (hBtn) hBtn.classList.add('hint-btn-pulse');
                 trainContainer.classList.remove('shake');
                 void trainContainer.offsetWidth;
                 trainContainer.classList.add('shake');
@@ -481,37 +512,61 @@
             renderFrogScreen();
         }
 
-        function renderFrogScreen() {
-            const dirText = state.frogDelta > 0
-                ? `+${state.frogDelta} ${_col('į priekį')} ➡️`
-                : `${state.frogDelta} ${_col('atgal')} ⬅️`;
+        function buildLilyPadButton(i) {
+            const isFrogHere = (i === state.frogPos);
+            const isStart = (i === state.frogStart);
+            const minStep = Math.min(state.frogStart, state.frogTarget);
+            const maxStep = Math.max(state.frogStart, state.frogTarget);
+            const isStepPad = state.hintUsed && i !== state.frogStart && i > minStep && i < maxStep;
+            const stepArrow = isStepPad ? (state.frogDelta > 0 ? '➡️' : '⬅️') : '';
 
-            let lilyPadsHtml = '';
-            for (let i = 0; i <= 10; i++) {
-                const isFrogHere = (i === state.frogPos);
-                const isStart = (i === state.frogStart);
-                lilyPadsHtml += `
-                    <button id="lily-${i}" onclick="onLilyPadClick(${i})" class="lily-pad ${isStart ? 'ring-4 ring-yellow-400' : ''}">
-                        <span id="frog-icon-${i}" class="text-lg sm:text-2xl leading-none ${isFrogHere ? 'block frog-hop' : 'hidden'}">🐸</span>
-                        <span class="${isFrogHere ? 'text-xs sm:text-sm' : ''}">${i}</span>
-                    </button>
-                `;
-            }
+            return `
+                <button id="lily-${i}" onclick="onLilyPadClick(${i})" class="lily-pad ${isStart ? 'ring-4 ring-yellow-400' : ''} ${isStepPad ? 'lily-pad-step' : ''}">
+                    <span id="frog-icon-${i}" class="text-xl sm:text-2xl leading-none ${isFrogHere ? 'block frog-hop' : 'hidden'}">🐸</span>
+                    ${stepArrow && !isFrogHere ? `<span class="text-[10px] leading-none">${stepArrow}</span>` : ''}
+                    <span class="${isFrogHere ? 'text-xs sm:text-sm font-black' : ''}">${i}</span>
+                </button>
+            `;
+        }
+
+        function renderFrogScreen() {
+            const dirHint = state.frogDelta > 0
+                ? `${_col('Šok')} ${state.frogDelta} ${_col('į dešinę')} ➡️`
+                : `${_col('Šok')} ${Math.abs(state.frogDelta)} ${_col('atgal į kairę')} ⬅️`;
+
+            const hintSection = state.hintUsed
+                ? `<div class="hint-box inline-flex items-center gap-2 text-sm sm:text-base">
+                       <span>💡</span>
+                       <span>${dirHint}</span>
+                   </div>`
+                : `<button id="hint-btn" onclick="showHint()" class="hint-btn">
+                       <span>💡</span>
+                       <span>${_col('Užuomina')}</span>
+                   </button>`;
+
+            let row1Html = '';
+            for (let i = 0; i <= 5; i++) row1Html += buildLilyPadButton(i);
+            let row2Html = '';
+            for (let i = 6; i <= 10; i++) row2Html += buildLilyPadButton(i);
 
             app.innerHTML = `
                 ${renderTopBar()}
-                <div class="flex-1 flex flex-col justify-between p-3 sm:p-5 fade-in overflow-hidden">
-                    <div class="panel-box p-3 rounded-2xl text-center shadow-sm">
-                        <div class="text-xl sm:text-3xl font-black text-main-title flex items-center justify-center gap-2">
+                <div class="flex-1 flex flex-col justify-evenly gap-2 p-3 sm:p-5 fade-in overflow-hidden">
+                    <div class="panel-box py-3.5 px-4 rounded-2xl text-center shadow-sm flex flex-col items-center gap-2">
+                        <div class="text-2xl sm:text-4xl font-black text-main-title flex items-center justify-center gap-2.5">
                             <span>🐸</span>
-                            <span>${state.frogStart} ${state.frogDelta > 0 ? '+' : ''}${state.frogDelta} = <span class="text-emerald-600">❓</span></span>
+                            <span>${state.frogStart} ${state.frogDelta > 0 ? '+ ' + state.frogDelta : '− ' + Math.abs(state.frogDelta)} = <span class="text-emerald-600">❓</span></span>
                         </div>
+                        <div>${hintSection}</div>
                     </div>
 
-                    <!-- Pond with Number Line of Lily Pads -->
-                    <div id="pond-container" class="pond-box flex-1 bg-sky-100 border-4 border-sky-300 rounded-3xl p-3 sm:p-5 flex flex-col items-center justify-center shadow-inner my-2 min-h-[140px]">
-                        <div class="flex flex-wrap sm:flex-nowrap items-center justify-center gap-1 sm:gap-1.5 w-full">
-                            ${lilyPadsHtml}
+                    <!-- Pond with 2 balanced rows of large Lily Pads (0..5 and 6..10) -->
+                    <div id="pond-container" class="pond-box bg-sky-100 border-4 border-sky-300 rounded-3xl py-6 px-3 sm:p-7 flex flex-col items-center justify-center gap-3.5 sm:gap-4 shadow-inner">
+                        <div class="flex items-center justify-center gap-2 sm:gap-3 w-full">
+                            ${row1Html}
+                        </div>
+                        <div class="flex items-center justify-center gap-2.5 sm:gap-3.5 w-full">
+                            ${row2Html}
                         </div>
                     </div>
 
@@ -575,6 +630,8 @@
                     : `Skaičiuok nuo ${state.frogStart} į kairę atgal!`;
                 feedback.innerHTML = `<span>${_col(hint)} 🤔</span>`;
                 feedback.className = "h-7 sm:h-8 flex items-center justify-center font-black text-sm sm:text-lg text-red-500 opacity-100";
+                const hBtn = document.getElementById('hint-btn');
+                if (hBtn) hBtn.classList.add('hint-btn-pulse');
                 pond.classList.remove('shake');
                 void pond.offsetWidth;
                 pond.classList.add('shake');
@@ -610,23 +667,36 @@
 
         function renderNeighborsScreen() {
             const tilesHtml = state.options.map((num, idx) => `
-                <button id="tile-${idx}" onclick="onNeighborTileClick(${num}, ${idx})" class="opt-btn py-3 sm:py-3.5 rounded-2xl font-black text-2xl sm:text-3xl shadow-md border-b-4 transition transform active:scale-95">
+                <button id="tile-${idx}" onclick="onNeighborTileClick(${num}, ${idx})" class="opt-btn py-3.5 sm:py-4 rounded-2xl font-black text-2xl sm:text-3xl shadow-md border-b-4 transition transform active:scale-95">
                     ${num}
                 </button>
             `).join('');
 
+            const hintSection = state.hintUsed
+                ? `<div class="hint-box inline-flex items-center gap-3 text-sm sm:text-base">
+                       <span>💡</span>
+                       <span>⬅️ ${state.centerNum} − 1</span>
+                       <span>|</span>
+                       <span>${state.centerNum} + 1 ➡️</span>
+                   </div>`
+                : `<button id="hint-btn" onclick="showHint()" class="hint-btn">
+                       <span>💡</span>
+                       <span>${_col('Užuomina')}</span>
+                   </button>`;
+
             app.innerHTML = `
                 ${renderTopBar()}
-                <div class="flex-1 flex flex-col justify-between p-3 sm:p-5 fade-in overflow-hidden">
-                    <div class="text-center">
+                <div class="flex-1 flex flex-col justify-evenly gap-2 p-3 sm:p-5 fade-in overflow-hidden">
+                    <div class="text-center flex flex-col items-center gap-2">
                         <div class="text-xl sm:text-2xl font-black text-main-title flex items-center justify-center gap-2">
                             <span>🏡</span>
                             <span>⬅️ ❓ ${state.centerNum} ❓ ➡️</span>
                         </div>
+                        <div>${hintSection}</div>
                     </div>
 
                     <!-- 3 Little Houses -->
-                    <div id="houses-container" class="flex-1 flex items-end justify-center gap-3 sm:gap-6 my-2 min-h-0">
+                    <div id="houses-container" class="flex items-center justify-center gap-3 sm:gap-6 py-2">
                         <!-- Left Neighbor House -->
                         <div onclick="selectNeighborHouse('left')" class="house-card cursor-pointer">
                             <span class="text-base sm:text-lg font-black mb-0.5">⬅️</span>
@@ -654,7 +724,7 @@
                     <div id="feedback" class="h-6 sm:h-7 flex items-center justify-center font-black text-sm sm:text-lg opacity-0 transition-opacity"></div>
 
                     <!-- 6 Number Tiles -->
-                    <div class="grid grid-cols-3 gap-2 sm:gap-3">
+                    <div class="grid grid-cols-3 gap-2.5 sm:gap-3">
                         ${tilesHtml}
                     </div>
                 </div>
@@ -721,6 +791,8 @@
                 }
                 feedback.innerHTML = `<span>${_col('Pagalvok: kas eina prieš ir po')} ${state.centerNum}? 🤔</span>`;
                 feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-sm sm:text-lg text-red-500 opacity-100";
+                const hBtn = document.getElementById('hint-btn');
+                if (hBtn) hBtn.classList.add('hint-btn-pulse');
                 housesContainer.classList.remove('shake');
                 void housesContainer.offsetWidth;
                 housesContainer.classList.add('shake');

@@ -132,13 +132,34 @@
             collectedItems: [],
             walletPool: [],
             waiting: false,
-            firstTry: true
+            firstTry: true,
+            hintUsed: false
         };
 
         const app = document.getElementById('app');
 
         function getRandomElement(arr) {
             return pickRandom(arr);
+        }
+
+        function showMoneyHint() {
+            if (state.waiting || state.hintUsed) return;
+            state.hintUsed = true;
+            playHintSound();
+            // Surūšiuojame monetas nuo didžiausios iki mažiausios, kad būtų lengviau skaičiuoti
+            state.currentItems = [...state.currentItems].sort((a, b) => b.cents - a.cents);
+            renderGameScreen();
+        }
+
+        function showCollectHint() {
+            if (state.waiting || state.hintUsed) return;
+            state.hintUsed = true;
+            playHintSound();
+            const rem = Math.max(0, state.targetCents - getCollectedSum());
+            const slot = document.getElementById('collect-hint-slot');
+            if (slot) {
+                slot.innerHTML = `<span class="hint-box py-1 px-2.5 text-xs sm:text-sm">💡 ${_col('Trūksta:')} ${formatMoneyCents(rem)}</span>`;
+            }
         }
 
         function renderStartScreen() {
@@ -199,6 +220,7 @@
         function generateQuestion() {
             state.waiting = false;
             state.firstTry = true;
+            state.hintUsed = false;
             state.collectedItems = [];
 
             if (state.mode === 'collect') {
@@ -257,16 +279,13 @@
         }
 
         function renderTopBar() {
-            return `
-                <div class="top-bar bg-emerald-100 border-b-2 border-emerald-300 text-slate-800 px-3 sm:px-5 py-2 sm:py-2.5 flex justify-between items-center font-black text-base sm:text-lg shadow-sm shrink-0">
-                    <div class="flex items-center gap-2 sm:gap-3">
-                        <button onclick="renderStartScreen()" class="top-badge bg-white/90 hover:bg-emerald-200 border border-emerald-300 px-2.5 py-1 rounded-xl text-base sm:text-xl transition active:scale-95" title="Pradžia">🏠</button>
-                        <span class="flex items-center gap-1.5 text-base sm:text-lg">⭐ <span class="text-emerald-700 dark:text-amber-300 font-black text-lg sm:text-xl">${state.score}</span></span>
-                    </div>
-                    <div class="top-badge bg-white/90 border border-emerald-300 px-3 py-1 rounded-xl font-black text-emerald-700 dark:text-amber-300 text-base sm:text-lg">🎯 ${state.question} / ${state.maxQuestions}</div>
-                    <div class="flex items-center gap-1.5 text-base sm:text-lg">🔥 <span class="text-emerald-700 dark:text-amber-300 font-black text-lg sm:text-xl">${state.streak}</span></div>
-                </div>
-            `;
+            return window.renderTopBar({
+                score: state.score,
+                current: state.question,
+                total: state.maxQuestions,
+                streak: state.streak,
+                theme: 'emerald'
+            });
         }
 
         function renderGameScreen() {
@@ -275,30 +294,42 @@
                     ${item.label}
                 </div>
             `).join('');
+
+            const exprStr = state.currentItems.map(item => formatMoneyCents(item.cents)).join(' + ');
+            const hintSection = state.hintUsed
+                ? `<div class="hint-box inline-flex items-center gap-2 text-sm sm:text-base py-1 px-3">
+                       <span>💡</span>
+                       <span>${exprStr} = ❓</span>
+                   </div>`
+                : `<button id="hint-btn" onclick="showMoneyHint()" class="hint-btn py-1.5 px-4 text-sm">
+                       <span>💡</span>
+                       <span>${_col('Užuomina')}</span>
+                   </button>`;
             
             const optionsHtml = state.options.map((opt, index) => `
-                <button id="btn-${index}" onclick="checkAnswer(${index}, ${opt})" class="opt-btn py-3 sm:py-4 rounded-xl font-black text-xl sm:text-2xl shadow-md border-b-4 transition transform active:scale-95">
+                <button id="btn-${index}" onclick="checkAnswer(${index}, ${opt})" class="opt-btn py-4 sm:py-5 rounded-2xl font-black text-2xl sm:text-3xl shadow-md border-b-4 transition transform active:scale-95">
                     ${formatMoneyCents(opt)}
                 </button>
             `).join('');
 
             app.innerHTML = `
                 ${renderTopBar()}
-                <div class="flex-1 flex flex-col p-3 sm:p-5 fade-in justify-between overflow-hidden">
-                    <div class="text-center">
-                        <h2 class="text-xl sm:text-3xl font-black text-slate-700 text-main-title flex items-center justify-center gap-2">
+                <div class="flex-1 flex flex-col p-3 sm:p-5 fade-in justify-evenly gap-2 overflow-hidden">
+                    <div class="text-center flex flex-col items-center gap-2">
+                        <h2 class="text-2xl sm:text-3xl font-black text-slate-700 text-main-title flex items-center justify-center gap-2">
                             <span>💰 = ❓</span>
                         </h2>
+                        <div>${hintSection}</div>
                     </div>
 
-                    <div id="money-container" class="money-tray flex flex-wrap items-center justify-center gap-2 sm:gap-3.5 p-3 sm:p-5 rounded-2xl min-h-[105px] sm:min-h-[145px]">
+                    <div id="money-container" class="money-tray flex flex-wrap items-center justify-center content-center gap-2.5 sm:gap-3.5 p-4 sm:p-6 rounded-3xl min-h-[115px] sm:min-h-[150px]">
                         ${itemsHtml}
                     </div>
                     
-                    <div id="feedback" class="h-7 sm:h-8 flex items-center justify-center font-black text-base sm:text-xl my-1 opacity-0 transition-opacity">
+                    <div id="feedback" class="h-7 sm:h-8 flex items-center justify-center font-black text-base sm:text-xl opacity-0 transition-opacity">
                     </div>
                     
-                    <div class="grid grid-cols-2 gap-2.5 sm:gap-3.5">
+                    <div class="grid grid-cols-2 gap-3 sm:gap-4">
                         ${optionsHtml}
                     </div>
                 </div>
@@ -352,7 +383,15 @@
                     <div class="flex flex-col my-1 sm:my-2 shrink-0">
                         <div class="flex justify-between items-center px-1 mb-1.5 text-base sm:text-lg font-black shrink-0">
                             <span class="text-sub-title flex items-center gap-2">💰 Padėklas: <strong id="current-sum-label" class="text-emerald-500 font-black text-xl sm:text-3xl">0 c</strong></span>
-                            <button onclick="clearTray()" class="text-rose-500 hover:scale-110 active:scale-95 text-2xl p-2 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/30 transition" title="Išvalyti">🗑️</button>
+                            <div class="flex items-center gap-2">
+                                <span id="collect-hint-slot">
+                                    <button id="hint-btn" onclick="showCollectHint()" class="hint-btn py-1 px-3 text-xs sm:text-sm min-h-[34px]">
+                                        <span>💡</span>
+                                        <span>${_col('Užuomina')}</span>
+                                    </button>
+                                </span>
+                                <button onclick="clearTray()" class="text-rose-500 hover:scale-110 active:scale-95 text-2xl p-1.5 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/30 transition" title="Išvalyti">🗑️</button>
+                            </div>
                         </div>
                         <div id="money-container" class="money-tray flex flex-wrap items-center justify-center content-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-2xl h-28 sm:h-36">
                         </div>
@@ -476,6 +515,8 @@
                 btn.className = "py-3 sm:py-4 bg-red-100 text-red-400 border-red-200 border-2 rounded-xl font-bold text-xl sm:text-2xl shadow-sm line-through cursor-not-allowed opacity-60 shake";
                 feedback.innerHTML = `<span>${_col('Bandyk dar kartą!')} 🤔</span>`;
                 feedback.className = "h-7 sm:h-8 flex items-center justify-center font-black text-base sm:text-xl my-1 text-red-500 opacity-100 whitespace-nowrap";
+                const hBtn = document.getElementById('hint-btn');
+                if (hBtn) hBtn.classList.add('hint-btn-pulse');
                 container.classList.remove('shake');
                 void container.offsetWidth;
                 container.classList.add('shake');

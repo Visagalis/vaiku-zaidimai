@@ -208,7 +208,8 @@
             routineSubMode: 'match', // 'match' | 'set'
             options: [],
             waiting: false,
-            firstTry: true
+            firstTry: true,
+            hintUsed: false
         };
 
         const app = document.getElementById('app');
@@ -222,16 +223,13 @@
         }
 
         function renderTopBar() {
-            return `
-                <div class="top-bar bg-emerald-100 border-b-2 border-emerald-300 text-slate-800 px-3 sm:px-5 py-2 sm:py-2.5 flex justify-between items-center font-bold text-sm sm:text-lg shadow-sm shrink-0">
-                    <div class="flex items-center gap-2">
-                        <button onclick="renderStartScreen()" class="top-badge bg-white/90 hover:bg-emerald-200 border border-emerald-300 px-2 py-0.5 rounded-lg text-sm sm:text-base transition active:scale-95" title="Pradžia">🏠</button>
-                        <span class="flex items-center gap-1">⭐ <span class="text-emerald-700 dark:text-amber-300 font-black">${state.score}</span></span>
-                    </div>
-                    <div class="top-badge bg-white/90 border border-emerald-300 px-2.5 py-0.5 rounded-xl font-black text-emerald-700 dark:text-amber-300">🎯 ${state.question} / ${state.maxQuestions}</div>
-                    <div class="flex items-center gap-1">🔥 <span class="text-emerald-700 dark:text-amber-300 font-black">${state.streak}</span></div>
-                </div>
-            `;
+            return window.renderTopBar({
+                score: state.score,
+                current: state.question,
+                total: state.maxQuestions,
+                streak: state.streak,
+                theme: 'emerald'
+            });
         }
 
         function renderStartScreen() {
@@ -300,13 +298,21 @@
             let numbersHtml = '';
             for (let i = 1; i <= 12; i++) {
                 const angle = (i * 30) * Math.PI / 180;
-                const r = 102;
+                const r = 100;
                 const x = (cx + r * Math.sin(angle)).toFixed(2);
                 const y = (cy - r * Math.cos(angle)).toFixed(2);
                 if (interactive) {
                     numbersHtml += `<circle cx="${x}" cy="${y}" r="22" class="clock-num-hit" onclick="onClockNumberClick(${i})"/>`;
                 }
                 numbersHtml += `<text x="${x}" y="${parseFloat(y) + 1}" class="clock-number">${i}</text>`;
+
+                if (state.hintUsed) {
+                    const rm = 129;
+                    const xm = (cx + rm * Math.sin(angle)).toFixed(2);
+                    const ym = (cy - rm * Math.cos(angle)).toFixed(2);
+                    const minVal = (i % 12) * 5;
+                    numbersHtml += `<text x="${xm}" y="${parseFloat(ym) + 1}" fill="#2563eb" font-size="11" font-weight="900" text-anchor="middle" dominant-baseline="central" pointer-events="none">${padZero(minVal)}</text>`;
+                }
             }
 
             if (interactive) {
@@ -488,6 +494,7 @@
         function generateQuestion() {
             state.waiting = false;
             state.firstTry = true;
+            state.hintUsed = false;
 
             if (state.mode === 'routine') {
                 const item = DAILY_ROUTINES[(state.question - 1 + Math.floor(Math.random() * 3)) % DAILY_ROUTINES.length];
@@ -552,9 +559,22 @@
             }
         }
 
+        function showClockHint() {
+            if (state.waiting || state.hintUsed) return;
+            state.hintUsed = true;
+            playHintSound();
+            const isRoutine = (state.mode === 'routine');
+            const isInteractive = (state.mode === 'interactive') || (isRoutine && state.routineSubMode === 'set');
+            if (isInteractive) {
+                renderInteractiveScreen(isRoutine);
+            } else {
+                renderMatchScreen(isRoutine);
+            }
+        }
+
         function renderMatchScreen(isRoutine) {
             const routineBanner = isRoutine && state.routineItem ? `
-                <div class="panel-box px-3 py-1.5 sm:py-2 rounded-2xl mb-1 text-center shadow-sm">
+                <div class="panel-box px-3 py-1.5 sm:py-2 rounded-2xl text-center shadow-sm">
                     <div class="text-base sm:text-xl font-black text-main-title">${state.routineItem.icon} ${_col(state.routineItem.title)}</div>
                 </div>
             ` : `
@@ -564,24 +584,37 @@
                 </h2>
             `;
 
+            const hintSection = state.hintUsed
+                ? `<div class="hint-box inline-flex items-center gap-2 text-xs sm:text-sm py-1 px-3">
+                       <span>💡</span>
+                       <span>🟠 ${_col('Trumpa — valandos')} (${state.targetH}) | 🔵 ${_col('Ilga — minutės')}</span>
+                   </div>`
+                : `<button id="hint-btn" onclick="showClockHint()" class="hint-btn py-1 px-3.5 text-xs sm:text-sm min-h-[34px]">
+                       <span>💡</span>
+                       <span>${_col('Užuomina')}</span>
+                   </button>`;
+
             const optionsHtml = state.options.map((opt, idx) => `
-                <button id="btn-${idx}" onclick="checkMatchAnswer(${idx}, '${opt}')" class="opt-btn py-2.5 sm:py-3.5 rounded-2xl font-black text-xl sm:text-3xl shadow-md border-b-4 transition transform active:scale-95">
+                <button id="btn-${idx}" onclick="checkMatchAnswer(${idx}, '${opt}')" class="opt-btn py-3.5 sm:py-4 rounded-2xl font-black text-2xl sm:text-3xl shadow-md border-b-4 transition transform active:scale-95">
                     ${opt}
                 </button>
             `).join('');
 
             app.innerHTML = `
                 ${renderTopBar()}
-                <div class="flex-1 flex flex-col items-center justify-between p-2.5 sm:p-5 fade-in overflow-hidden">
-                    ${routineBanner}
+                <div class="flex-1 flex flex-col items-center justify-evenly gap-1.5 p-2.5 sm:p-5 fade-in overflow-hidden">
+                    <div class="flex flex-col items-center gap-1.5 w-full">
+                        ${routineBanner}
+                        <div>${hintSection}</div>
+                    </div>
 
-                    <div id="clock-wrap" class="w-[190px] h-[190px] sm:w-[240px] sm:h-[240px] my-auto shrink-0 flex items-center justify-center">
+                    <div id="clock-wrap" class="w-[215px] h-[215px] min-[380px]:w-[240px] min-[380px]:h-[240px] sm:w-[260px] sm:h-[260px] shrink-0 flex items-center justify-center">
                         ${buildClockSvgHTML(false)}
                     </div>
 
                     <div id="feedback" class="h-6 sm:h-7 flex items-center justify-center font-black text-base sm:text-xl opacity-0 transition-opacity"></div>
 
-                    <div class="grid grid-cols-2 gap-2.5 sm:gap-3.5 w-full">
+                    <div class="grid grid-cols-2 gap-3 sm:gap-3.5 w-full">
                         ${optionsHtml}
                     </div>
                 </div>
@@ -602,24 +635,31 @@
                 </div>
             `;
 
+            const hintOrBadgeHtml = state.hintUsed
+                ? `<span id="user-time-badge" class="px-3 py-1.5 rounded-xl bg-emerald-100 text-emerald-900 font-black text-sm sm:text-base border border-emerald-300 pop-in">
+                       ${formatTime(state.userH, state.userM)}
+                   </span>`
+                : `<button id="hint-btn" onclick="showClockHint()" class="hint-btn py-1 px-3 text-xs sm:text-sm min-h-[34px]">
+                       <span>💡</span>
+                       <span>${_col('Užuomina')}</span>
+                   </button>`;
+
             app.innerHTML = `
                 ${renderTopBar()}
-                <div class="flex-1 flex flex-col items-center justify-between p-2 sm:p-4 fade-in overflow-hidden">
+                <div class="flex-1 flex flex-col items-center justify-evenly gap-1.5 p-2 sm:p-4 fade-in overflow-hidden">
                     ${headerHtml}
 
-                    <div class="flex items-center gap-2 my-0.5">
+                    <div class="flex items-center gap-2">
                         <button id="toggle-hour-btn" onclick="setActiveHand('hour')" class="px-3 py-1.5 rounded-xl text-sm sm:text-base font-black border-2 transition ${state.activeHand === 'hour' ? 'btn-tinted bg-amber-100 border-amber-500 shadow-sm' : 'ctrl-btn opacity-70'}">
                             🕐 ${_col('Valandos')}
                         </button>
                         <button id="toggle-min-btn" onclick="setActiveHand('minute')" class="px-3 py-1.5 rounded-xl text-sm sm:text-base font-black border-2 transition ${state.activeHand === 'minute' ? 'btn-tinted bg-sky-100 border-sky-500 shadow-sm' : 'ctrl-btn opacity-70'}">
                             ⏱️ ${_col('Minutės')}
                         </button>
-                        <span id="user-time-badge" class="px-3 py-1.5 rounded-xl bg-emerald-100 text-emerald-900 font-black text-sm sm:text-base border border-emerald-300">
-                            ${formatTime(state.userH, state.userM)}
-                        </span>
+                        ${hintOrBadgeHtml}
                     </div>
 
-                    <div id="clock-wrap" class="w-[190px] h-[190px] min-[380px]:w-[215px] min-[380px]:h-[215px] sm:w-[250px] sm:h-[250px] my-auto shrink-0 flex items-center justify-center relative touch-none">
+                    <div id="clock-wrap" class="w-[210px] h-[210px] min-[380px]:w-[235px] min-[380px]:h-[235px] sm:w-[255px] sm:h-[255px] shrink-0 flex items-center justify-center relative touch-none">
                         ${buildClockSvgHTML(true)}
                     </div>
 
@@ -627,21 +667,21 @@
 
                     <!-- Tactile adjustment buttons -->
                     <div class="grid grid-cols-4 gap-1.5 sm:gap-2.5 w-full">
-                        <button onclick="adjustTime(-1, 0)" class="ctrl-btn py-2 sm:py-2.5 rounded-xl font-black text-sm sm:text-base border-b-4 shadow-sm active:translate-y-0.5">
+                        <button onclick="adjustTime(-1, 0)" class="ctrl-btn py-2.5 rounded-xl font-black text-sm sm:text-base border-b-4 shadow-sm active:translate-y-0.5">
                             🕐 -1
                         </button>
-                        <button onclick="adjustTime(1, 0)" class="ctrl-btn py-2 sm:py-2.5 rounded-xl font-black text-sm sm:text-base border-b-4 shadow-sm active:translate-y-0.5">
+                        <button onclick="adjustTime(1, 0)" class="ctrl-btn py-2.5 rounded-xl font-black text-sm sm:text-base border-b-4 shadow-sm active:translate-y-0.5">
                             🕐 +1
                         </button>
-                        <button onclick="adjustTime(0, -5)" class="ctrl-btn py-2 sm:py-2.5 rounded-xl font-black text-sm sm:text-base border-b-4 shadow-sm active:translate-y-0.5">
+                        <button onclick="adjustTime(0, -5)" class="ctrl-btn py-2.5 rounded-xl font-black text-sm sm:text-base border-b-4 shadow-sm active:translate-y-0.5">
                             ⏱️ -5
                         </button>
-                        <button onclick="adjustTime(0, 5)" class="ctrl-btn py-2 sm:py-2.5 rounded-xl font-black text-sm sm:text-base border-b-4 shadow-sm active:translate-y-0.5">
+                        <button onclick="adjustTime(0, 5)" class="ctrl-btn py-2.5 rounded-xl font-black text-sm sm:text-base border-b-4 shadow-sm active:translate-y-0.5">
                             ⏱️ +5
                         </button>
                     </div>
 
-                    <button onclick="checkInteractiveAnswer()" class="btn-tinted w-full py-2.5 sm:py-3.5 rounded-2xl bg-green-100 hover:bg-green-200 text-slate-800 font-black text-xl sm:text-2xl shadow-md border-2 border-b-4 border-green-400 transition transform active:scale-95 flex items-center justify-center gap-2">
+                    <button onclick="checkInteractiveAnswer()" class="btn-tinted w-full py-3 sm:py-3.5 rounded-2xl bg-green-100 hover:bg-green-200 text-slate-800 font-black text-xl sm:text-2xl shadow-md border-2 border-b-4 border-green-400 transition transform active:scale-95 flex items-center justify-center gap-2">
                         <span>✅</span>
                         <span>${_col('Patvirtinti')}</span>
                     </button>
@@ -743,6 +783,8 @@
                 else if (isHourMatch && !isMinMatch) hint = 'Valandos teisingos, bet patikrink minučių rodyklę!';
                 feedback.innerHTML = `<span>${_col(hint)} 🤔</span>`;
                 feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-sm sm:text-lg text-red-500 opacity-100";
+                const hBtn = document.getElementById('hint-btn');
+                if (hBtn) hBtn.classList.add('hint-btn-pulse');
                 clockWrap.classList.remove('shake');
                 void clockWrap.offsetWidth;
                 clockWrap.classList.add('shake');
@@ -782,6 +824,8 @@
                 btn.className = "py-2.5 sm:py-3.5 bg-red-100 text-red-400 border-red-200 border-2 rounded-2xl font-bold text-xl sm:text-3xl shadow-sm line-through cursor-not-allowed opacity-60 shake";
                 feedback.innerHTML = `<span>${_col('Bandyk dar kartą!')} 🤔</span>`;
                 feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-base sm:text-xl text-red-500 opacity-100";
+                const hBtn = document.getElementById('hint-btn');
+                if (hBtn) hBtn.classList.add('hint-btn-pulse');
                 clockWrap.classList.remove('shake');
                 void clockWrap.offsetWidth;
                 clockWrap.classList.add('shake');

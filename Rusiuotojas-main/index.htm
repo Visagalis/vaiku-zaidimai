@@ -348,7 +348,9 @@
 
             state.firstTry = true;
             state.waiting = false;
+            state.hintUsed = false;
             const item = state.questions[state.currentIndex];
+            const targetBin = BINS[item.category];
 
             const activeBinKeys = state.mode === '3bins' 
                 ? ['paper', 'plastic', 'glass'] 
@@ -370,25 +372,41 @@
             appEl.innerHTML = `
                 ${renderTopBar({ score: state.score, current: state.currentIndex + 1, total: 10, streak: state.streak, theme: 'emerald' })}
 
-                <div class="p-3 sm:p-5 flex-1 flex flex-col justify-between items-center">
-                    <h2 class="text-xl sm:text-2xl font-black text-slate-800 text-center mb-1">♻️ ❓</h2>
+                <div class="p-3 sm:p-5 flex-1 flex flex-col justify-evenly items-center gap-2">
+                    <h2 class="text-xl sm:text-2xl font-black text-slate-800 text-center">♻️ ${_col('Kur mesti?')}</h2>
 
                     <!-- Daikto kortelė -->
-                    <div id="item-card" class="item-card-box my-auto py-3 px-8 flex flex-col items-center justify-center bg-white rounded-3xl border-3 border-emerald-200 shadow-md drop-anim min-h-[120px] sm:min-h-[140px]">
-                        <div class="text-6xl sm:text-8xl mb-1">${item.emoji}</div>
+                    <div id="item-card" class="item-card-box py-3.5 px-8 flex flex-col items-center justify-center bg-white rounded-3xl border-3 border-emerald-200 shadow-md drop-anim min-h-[120px] sm:min-h-[140px] gap-1.5">
+                        <div class="text-6xl sm:text-8xl">${item.emoji}</div>
                         <div class="text-xl sm:text-2xl font-black text-emerald-950">${_col(item.name)}</div>
+                        <button id="hint-btn" onclick="showSortHint()" class="hint-btn mt-1">
+                            <span>💡</span> <span>${_col('Užuomina')}</span>
+                        </button>
+                        <div id="hint-box" class="hidden hint-box text-sm sm:text-base font-extrabold text-amber-800">
+                            💡 ${_col('Medžiaga:')} ${targetBin.icon} ${_col(targetBin.name)}
+                        </div>
                     </div>
 
-                    <div id="feedback" class="h-6 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black my-1 opacity-0 transition-opacity">
+                    <div id="feedback" class="h-6 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black opacity-0 transition-opacity">
                         Pranešimas
                     </div>
 
                     <!-- Konteineriai -->
-                    <div class="grid ${gridClass} gap-2 sm:gap-3 w-full mt-1">
+                    <div class="grid ${gridClass} gap-2 sm:gap-3 w-full">
                         ${binsHtml}
                     </div>
                 </div>
             `;
+        }
+
+        function showSortHint() {
+            if (state.waiting || state.hintUsed) return;
+            state.hintUsed = true;
+            playHintSound();
+            const hintBtn = document.getElementById('hint-btn');
+            const hintBox = document.getElementById('hint-box');
+            if (hintBtn) hintBtn.classList.add('hidden');
+            if (hintBox) hintBox.classList.remove('hidden');
         }
 
         function handleChoice(chosenKey) {
@@ -427,6 +445,9 @@
 
                 feedback.innerHTML = `<span>${_col("Bandyk kitą konteinerį!")} 🤔</span>`;
                 feedback.className = "h-6 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black my-1 text-red-500 opacity-100";
+
+                const hintBtn = document.getElementById('hint-btn');
+                if (hintBtn && !state.hintUsed) hintBtn.classList.add('hint-btn-pulse');
 
                 setTimeout(() => {
                     binBtn.classList.remove('shake-anim');
