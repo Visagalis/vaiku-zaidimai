@@ -166,25 +166,25 @@
                 correct: "Dešinėje"
             },
             {
-                prompt: "Kur rodo rodyklė? ➡️",
+                prompt: "Kur rodo rodyklė?",
                 visual: `<div class="text-7xl sm:text-8xl py-1 text-purple-600 font-black animate-pulse">➡️</div>`,
                 options: ["Į kairę", "Į dešinę"],
                 correct: "Į dešinę"
             },
             {
-                prompt: "Kur rodo rodyklė? ⬅️",
+                prompt: "Kur rodo rodyklė?",
                 visual: `<div class="text-7xl sm:text-8xl py-1 text-purple-600 font-black animate-pulse">⬅️</div>`,
                 options: ["Į kairę", "Į dešinę"],
                 correct: "Į kairę"
             },
             {
-                prompt: "Kur rodo pirštukas? 👉",
+                prompt: "Kur rodo pirštukas?",
                 visual: `<div class="text-7xl sm:text-8xl py-1 animate-pulse">👉</div>`,
                 options: ["Į kairę", "Į dešinę"],
                 correct: "Į dešinę"
             },
             {
-                prompt: "Kur rodo pirštukas? 👈",
+                prompt: "Kur rodo pirštukas?",
                 visual: `<div class="text-7xl sm:text-8xl py-1 animate-pulse">👈</div>`,
                 options: ["Į kairę", "Į dešinę"],
                 correct: "Į kairę"
@@ -495,6 +495,7 @@
             }
             state.firstTry = true;
             state.waiting = false;
+            state.hintUsed = false;
 
             if (state.mode === 'puppy') {
                 const lvl = state.questions[state.currentIndex];
@@ -512,7 +513,7 @@
         function renderQuizQuestion() {
             const q = state.questions[state.currentIndex];
             state.hintUsed = false;
-            const options = state.mode === 'left-right' ? [...q.options] : shuffle([...q.options]);
+            const options = shuffle([...q.options]);
             state.currentOptions = options;
 
             const optionsHtml = options.map((opt, idx) => {
@@ -521,8 +522,8 @@
                 else if (opt.includes('dešin') || opt.includes('Dešin')) icon = '👉 ';
                 return `
                     <button id="btn-${idx}" onclick="handleQuizAnswer('${opt.replace(/'/g, "\\'")}', this)"
-                        class="btn-3d py-3.5 sm:py-4 px-4 bg-fuchsia-50 hover:bg-fuchsia-100 text-fuchsia-900 border-2 border-fuchsia-300 rounded-2xl text-lg sm:text-2xl font-black shadow-[0_5px_0_#d8b4fe] active:shadow-[0_0px_0_#d8b4fe] transition-all flex items-center justify-center text-center gap-1.5 min-h-[58px]">
-                        <span>${icon}</span><span>${_col(opt)}</span>
+                        class="btn-3d py-3.5 sm:py-4 px-4 bg-fuchsia-50 text-fuchsia-900 border-2 border-fuchsia-300 rounded-2xl text-lg sm:text-2xl font-black shadow-[0_5px_0_#d8b4fe] active:shadow-[0_0px_0_#d8b4fe] transition-all flex items-center justify-center text-center gap-1.5 min-h-[58px]">
+                        <span class="opt-hint-icon hidden">${icon}</span><span>${_col(opt)}</span>
                     </button>
                 `;
             }).join('');
@@ -568,6 +569,7 @@
             if (state.mode === 'left-right') {
                 const hintBox = document.getElementById('hint-box');
                 if (hintBox) hintBox.classList.remove('hidden');
+                document.querySelectorAll('.opt-hint-icon').forEach(el => el.classList.remove('hidden'));
             } else {
                 const wrongIdxs = [];
                 (state.currentOptions || []).forEach((opt, idx) => {
@@ -635,6 +637,13 @@
         // ==========================================
         // 3 REŽIMAS: 🐾 Nuvesk šuniuką! (3x3 tinklelis)
         // ==========================================
+        function showPuppyHint() {
+            if (state.waiting || state.hintUsed) return;
+            state.hintUsed = true;
+            playHintSound();
+            renderPuppyQuestion();
+        }
+
         function renderPuppyQuestion() {
             const lvl = state.questions[state.currentIndex];
             const [dr, dc] = state.dogPos;
@@ -675,7 +684,7 @@
                 }
             }
 
-            // 4 krypčių mygtukai
+            // 4 krypčių mygtukai (rodyklių emoji rodomi tik paprašius užuominos)
             const controls = [
                 { dir: 'up', label: 'Viršus', icon: '⬆️' },
                 { dir: 'left', label: 'Kairė', icon: '⬅️' },
@@ -685,8 +694,8 @@
 
             const controlsHtml = controls.map(ctrl => `
                 <button onclick="movePuppy('${ctrl.dir}')"
-                    class="btn-3d py-2.5 sm:py-3.5 px-3 bg-fuchsia-50 hover:bg-fuchsia-100 border-2 border-fuchsia-300 rounded-2xl text-lg sm:text-xl font-black shadow-[0_4px_0_#d8b4fe] active:shadow-[0_0px_0_#d8b4fe] transition-all flex items-center justify-center text-center gap-2">
-                    <span class="text-xl sm:text-2xl">${ctrl.icon}</span>
+                    class="btn-3d py-2.5 sm:py-3.5 px-3 bg-fuchsia-50 border-2 border-fuchsia-300 rounded-2xl text-lg sm:text-xl font-black shadow-[0_4px_0_#d8b4fe] active:shadow-[0_0px_0_#d8b4fe] transition-all flex items-center justify-center text-center gap-2">
+                    ${state.hintUsed ? `<span class="text-xl sm:text-2xl">${ctrl.icon}</span>` : ''}
                     <span>${_col(ctrl.label)}</span>
                 </button>
             `).join('');
@@ -694,9 +703,14 @@
             appEl.innerHTML = `
                 ${renderGameTopBar()}
                 <div class="p-3 sm:p-4 flex-1 flex flex-col justify-evenly items-center gap-2">
-                    <h2 class="text-xl sm:text-2xl font-black text-slate-800 text-center flex items-center justify-center gap-2">
-                        <span>🐶</span> ➔ <span class="text-3xl">${lvl.goalEmoji}</span>
-                    </h2>
+                    <div class="flex flex-col items-center gap-1">
+                        <h2 class="text-xl sm:text-2xl font-black text-slate-800 text-center flex items-center justify-center gap-2">
+                            <span>🐶</span> ➔ <span class="text-3xl">${lvl.goalEmoji}</span>
+                        </h2>
+                        <button id="hint-btn" onclick="showPuppyHint()" class="hint-btn py-1 px-3 text-xs sm:text-sm min-h-[34px] ${state.hintUsed ? 'hidden' : ''}">
+                            <span>💡</span> <span>${_col('Užuomina')}</span>
+                        </button>
+                    </div>
 
                     <div id="puppy-grid" class="grid grid-cols-3 gap-2 sm:gap-2.5 w-full max-w-xs p-2.5 bg-white/80 dark-panel rounded-3xl border-2 border-fuchsia-200 shadow-inner">
                         ${cellsHtml}
@@ -740,6 +754,8 @@
                     void gridEl.offsetWidth;
                     gridEl.classList.add('shake-anim');
                 }
+                const hintBtn = document.getElementById('hint-btn');
+                if (hintBtn && !state.hintUsed) hintBtn.classList.add('hint-btn-pulse');
                 feedback.innerHTML = `<span>${_col(hitObstacle ? 'Ten kliūtis! Pasirink kitą kryptį! 🌳' : 'Ten eiti negalima! Pasirink kitą kryptį! 🚧')}</span>`;
                 feedback.className = 'h-6 flex items-center justify-center text-sm sm:text-base font-black text-red-500 opacity-100';
                 return;

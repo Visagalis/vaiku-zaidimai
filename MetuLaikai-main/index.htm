@@ -116,43 +116,43 @@
             },
             {
                 prompt: "Kada švenčiamos Kalėdos ir puošiama eglutė? 🎄",
-                desc: "Eglutė, šaltukas, dovanėlės ir fejerverkai 🎁",
-                emoji: "🎄 🎁 ❄️",
+                desc: "Eglutė, šaltukas, dovanėlės ir sniegas ❄️🎁",
+                emoji: "🎄 🎁",
                 correct: "Žiemą",
                 options: ["Žiemą", "Vasarą", "Rudenį", "Pavasarį"]
             },
             {
                 prompt: "Kada prinoksta saldžios braškės? 🍓",
-                desc: "Šilta saulytė, atostogos ir saldžios uogos 🍓",
-                emoji: "🍓 🍉 ☀️",
+                desc: "Šilta saulytė ☀️, atostogos ir saldžios uogos 🍓",
+                emoji: "🍓 🧺",
                 correct: "Vasarą",
                 options: ["Vasarą", "Žiemą", "Rudenį", "Pavasarį"]
             },
             {
                 prompt: "Kada vaikai eina į mokyklą Rugsėjo 1-ąją? 🎒",
-                desc: "Nauji mokslo metai, kardeliai ir gelstantys medžiai 📚",
-                emoji: "🎒 📚 🍁",
+                desc: "Nauji mokslo metai, kardeliai ir krentantys lapai 🍁",
+                emoji: "🎒 📚",
                 correct: "Rudenį",
                 options: ["Rudenį", "Vasarą", "Pavasarį", "Žiemą"]
             },
             {
                 prompt: "Kada dažomi margučiai ir švenčiamos Velykos? 🐣",
-                desc: "Pabunda gamta, švenčiamas pavasario atgimimas 🥚",
-                emoji: "🐣 🥚 🌸",
+                desc: "Pabunda gamta 🌸, švenčiamas pavasario atgimimas 🥚",
+                emoji: "🐣 🥚",
                 correct: "Pavasarį",
                 options: ["Pavasarį", "Rudenį", "Žiemą", "Vasarą"]
             },
             {
                 prompt: "Kada reikia šiltos kepurės, pirštinių ir šaliko? 🧤",
                 desc: "Spaudžia šaltukas, krenta snaigės ❄️",
-                emoji: "🧤 🧣 ❄️",
+                emoji: "🧤 🧣",
                 correct: "Žiemą",
                 options: ["Žiemą", "Vasarą", "Pavasarį", "Rudenį"]
             },
             {
-                prompt: "Kada noksta didelės saulėgrąžos ir šviečia karščiausia saulė? 🌻",
-                desc: "Ilgiausios dienos ir trumpiausios naktys 🌞",
-                emoji: "🌻 🌞 🍉",
+                prompt: "Kada noksta didelės saulėgrąžos? 🌻",
+                desc: "Karšta saulė 🌞, ilgiausios dienos ir trumpiausios naktys",
+                emoji: "🌻 🐝",
                 correct: "Vasarą",
                 options: ["Vasarą", "Žiemą", "Rudenį", "Pavasarį"]
             }
@@ -184,7 +184,7 @@
             {
                 prompt: "Kokia diena pradeda savaitę? 🗓️",
                 desc: "Pirmoji savaitės diena yra...",
-                emoji: "1️⃣ 🗓️",
+                emoji: "🗓️ ❓",
                 correct: "Pirmadienis",
                 options: ["Pirmadienis", "Sekmadienis", "Antradienis", "Šeštadienis"]
             },
@@ -197,8 +197,8 @@
             },
             {
                 prompt: "Kuris mėnuo pradeda naujus metus? 🎆",
-                desc: "Pirmasis metų mėnuo:",
-                emoji: "🎆 ❄️",
+                desc: "Pirmasis metų mėnuo (žiemą ❄️):",
+                emoji: "🎆 🗓️",
                 correct: "Sausis",
                 options: ["Sausis", "Gruodis", "Kovas", "Rugsėjis"]
             },
@@ -211,22 +211,22 @@
             },
             {
                 prompt: "Kurį mėnesį prasideda mokslo metai? 🔔",
-                desc: "Rugsėjo 1-osios mėnuo:",
+                desc: "Mokslo metų pradžios šventė (1-oji diena):",
                 emoji: "🔔 🎒",
                 correct: "Rugsėjis",
                 options: ["Rugsėjis", "Spalis", "Rugpjūtis", "Birželis"]
             },
             {
                 prompt: "Kiek dienų turi viena savaitė? 🗓️",
-                desc: "Suskaičiuok: Pirm, Antr, Treč, Ketv, Penkt, Šešt, Sekm",
-                emoji: "7️⃣ 🗓️",
+                desc: "Suskaičiuok: Pirm, Antr, Treč, Ketv, Penkt, Šešt, Sekm (7️⃣)",
+                emoji: "🗓️ ❓",
                 correct: "7 dienas",
                 options: ["7 dienas", "5 dienas", "10 dienų", "12 dienų"]
             },
             {
                 prompt: "Kiek metų laikų yra gamtoje? 🌍",
-                desc: "Pavasaris, Vasara, Ruduo, Žiema",
-                emoji: "🌍 🌸☀️🍁❄️",
+                desc: "Pavasaris 🌸, Vasara ☀️, Ruduo 🍁, Žiema ❄️",
+                emoji: "🌍 ❓",
                 correct: "4 metų laikai",
                 options: ["4 metų laikai", "3 metų laikai", "5 metų laikai", "12 metų laikų"]
             }
@@ -235,12 +235,12 @@
         // Duomenų bazė: 3 režimas (Savaitės ir metų traukinukas)
         const TRAIN_SEQUENCES = [
             {
-                prompt: "Sudėliok savaitės dienas iš eilės (nuo Pirmadienio iki Penktadienio)!",
-                subtitle: "Darbo dienų traukinukas 📅",
+                prompt: "Sudėliok darbo dienas iš eilės!",
+                subtitle: "Nuo Pirmadienio iki Penktadienio 📅",
                 items: ["Pirmadienis", "Antradienis", "Trečiadienis", "Ketvirtadienis", "Penktadienis"]
             },
             {
-                prompt: "Sudėliok savaitgalio ir kitas dienas iš eilės!",
+                prompt: "Sudėliok savaitės pabaigos dienas iš eilės!",
                 subtitle: "Nuo Ketvirtadienio iki Sekmadienio 🎈",
                 items: ["Ketvirtadienis", "Penktadienis", "Šeštadienis", "Sekmadienis"]
             },
@@ -250,23 +250,23 @@
                 items: ["Žiema", "Pavasaris", "Vasara", "Ruduo"]
             },
             {
-                prompt: "Sudėliok pavasario mėnesius iš eilės (Kovas, Balandis, Gegužė)!",
-                subtitle: "Pavasario traukinukas 🌸",
+                prompt: "Sudėliok pavasario mėnesius iš eilės!",
+                subtitle: "Pavasario traukinukas (Kovas, Balandis, Gegužė) 🌸",
                 items: ["Kovas", "Balandis", "Gegužė"]
             },
             {
-                prompt: "Sudėliok vasaros mėnesius iš eilės (Birželis, Liepa, Rugpjūtis)!",
-                subtitle: "Vasaros traukinukas ☀️",
+                prompt: "Sudėliok vasaros mėnesius iš eilės!",
+                subtitle: "Vasaros traukinukas (Birželis, Liepa, Rugpjūtis) ☀️",
                 items: ["Birželis", "Liepa", "Rugpjūtis"]
             },
             {
-                prompt: "Sudėliok rudens mėnesius iš eilės (Rugsėjis, Spalis, Lapkritis)!",
-                subtitle: "Rudens traukinukas 🍁",
+                prompt: "Sudėliok rudens mėnesius iš eilės!",
+                subtitle: "Rudens traukinukas (Rugsėjis, Spalis, Lapkritis) 🍁",
                 items: ["Rugsėjis", "Spalis", "Lapkritis"]
             },
             {
-                prompt: "Sudėliok žiemos mėnesius iš eilės (Gruodis, Sausis, Vasaris)!",
-                subtitle: "Žiemos traukinukas ⛄",
+                prompt: "Sudėliok žiemos mėnesius iš eilės!",
+                subtitle: "Žiemos traukinukas (Gruodis, Sausis, Vasaris) ⛄",
                 items: ["Gruodis", "Sausis", "Vasaris"]
             },
             {

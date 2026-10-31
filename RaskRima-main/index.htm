@@ -422,13 +422,13 @@
                 : `Kuris žodis irgi prasideda raide „${q.letter}“?`;
 
             const badgeHtml = isRhyme
-                ? `<div class="text-xs sm:text-sm font-extrabold text-pink-700 dark:text-pink-300 bg-pink-200/70 dark:bg-pink-900/50 px-3 py-0.5 rounded-full">${_col('Pabaiga:')} ${q.ending}</div>`
-                : `<div class="text-xs sm:text-sm font-extrabold text-purple-700 dark:text-purple-300 bg-purple-200/70 dark:bg-purple-900/50 px-3 py-0.5 rounded-full">${_col('Pirmas garsas:')} „${q.letter}“</div>`;
+                ? `<div id="hint-badge" class="hidden text-xs sm:text-sm font-extrabold text-pink-700 dark:text-pink-300 bg-pink-200/70 dark:bg-pink-900/50 px-3 py-0.5 rounded-full">${_col('Pabaiga:')} ${q.ending}</div>`
+                : `<div id="hint-badge" class="hidden text-xs sm:text-sm font-extrabold text-purple-700 dark:text-purple-300 bg-purple-200/70 dark:bg-purple-900/50 px-3 py-0.5 rounded-full">${_col('Pirmas garsas:')} „${q.letter}“</div>`;
 
             const optionsHtml = options.map((opt, idx) => `
                 <button id="btn-${idx}" onclick="handleChoiceAnswer(${idx})"
-                    class="btn-3d py-3 sm:py-3.5 px-3 bg-pink-50 hover:bg-pink-100 text-slate-900 border-2 border-pink-300 rounded-2xl text-base sm:text-xl font-black shadow-[0_5px_0_#f472b6] active:shadow-[0_0px_0_#f472b6] transition-all flex items-center justify-center gap-2 min-h-[60px]">
-                    <span class="text-2xl sm:text-3xl">${opt.emoji}</span>
+                    class="btn-3d py-3 sm:py-3.5 px-3 bg-pink-50 text-slate-900 border-2 border-pink-300 rounded-2xl text-base sm:text-xl font-black shadow-[0_5px_0_#f472b6] active:shadow-[0_0px_0_#f472b6] transition-all flex items-center justify-center gap-2 min-h-[60px]">
+                    <span class="opt-hint-emoji hidden text-2xl sm:text-3xl">${opt.emoji}</span>
                     <span>${_col(opt.word)}</span>
                 </button>
             `).join('');
@@ -468,13 +468,16 @@
             playHintSound();
             const hintBtn = document.getElementById('hint-btn');
             if (hintBtn) hintBtn.classList.add('hidden');
+            const hintBadge = document.getElementById('hint-badge');
+            if (hintBadge) hintBadge.classList.remove('hidden');
+            document.querySelectorAll('.opt-hint-emoji').forEach(el => el.classList.remove('hidden'));
             const q = state.questions[state.currentIndex];
             const wrongIdxs = [];
             (state.currentOptions || []).forEach((opt, idx) => {
                 const btn = document.getElementById(`btn-${idx}`);
                 if (opt.word !== q.correct.word && btn && !btn.disabled) wrongIdxs.push(idx);
             });
-            shuffle(wrongIdxs).slice(0, 2).forEach(idx => {
+            shuffle(wrongIdxs).slice(0, 1).forEach(idx => {
                 const btn = document.getElementById(`btn-${idx}`);
                 if (btn) {
                     btn.disabled = true;
@@ -499,6 +502,8 @@
                     state.streak++;
                 }
 
+                const emojiSpan = btn.querySelector('.opt-hint-emoji');
+                if (emojiSpan) emojiSpan.classList.remove('hidden');
                 btn.classList.remove('bg-pink-50', 'hover:bg-pink-100', 'text-slate-900', 'border-pink-300');
                 btn.classList.add('bg-green-500', 'text-white', 'border-green-600', 'shadow-[0_5px_0_#15803d]', 'bounce-anim');
 
@@ -537,9 +542,9 @@
 
             const numberButtons = [1, 2, 3, 4].map(num => `
                 <button id="syl-btn-${num}" onclick="handleSyllableAnswer(${num})"
-                    class="btn-3d py-3 sm:py-4 px-2 bg-amber-50 hover:bg-amber-100 text-slate-900 border-2 border-amber-300 rounded-2xl text-lg sm:text-2xl font-black shadow-[0_5px_0_#f59e0b] active:shadow-[0_0px_0_#f59e0b] transition-all flex flex-col items-center justify-center gap-0.5 min-h-[68px]">
+                    class="btn-3d py-3 sm:py-4 px-2 bg-amber-50 text-slate-900 border-2 border-amber-300 rounded-2xl text-lg sm:text-2xl font-black shadow-[0_5px_0_#f59e0b] active:shadow-[0_0px_0_#f59e0b] transition-all flex flex-col items-center justify-center gap-0.5 min-h-[68px]">
                     <span class="text-2xl sm:text-3xl font-black">${num}</span>
-                    <span class="text-xs sm:text-sm">${'👏'.repeat(num)}</span>
+                    <span class="syl-hint-claps hidden text-xs sm:text-sm">${'👏'.repeat(num)}</span>
                 </button>
             `).join('');
 
@@ -552,7 +557,7 @@
                     <div class="question-box py-3.5 px-6 flex flex-col items-center justify-center bg-gradient-to-b from-amber-100/80 to-amber-50/80 rounded-3xl border-2 border-amber-300 w-full max-w-md shadow-inner gap-2">
                         <div class="text-5xl sm:text-7xl">${q.emoji}</div>
                         <div class="flex items-center gap-2">
-                            <div id="word-display" class="text-2xl sm:text-4xl font-black tracking-wide text-slate-900 dark:text-white">${_col(q.word)}</div>
+                            <div id="word-display" class="text-2xl sm:text-4xl font-black tracking-wide text-slate-900 dark:text-white">${q.word}</div>
                             ${renderSpeakBtn(q.word)}
                         </div>
                         <div id="syllable-boxes" class="flex flex-wrap items-center justify-center gap-2 min-h-[38px]">
@@ -577,6 +582,9 @@
             if (state.waiting) return;
             state.hintUsed = true;
             const q = state.questions[state.currentIndex];
+            const wordDisp = document.getElementById('word-display');
+            if (wordDisp) wordDisp.innerHTML = _col(q.word);
+            document.querySelectorAll('.syl-hint-claps').forEach(el => el.classList.remove('hidden'));
             const container = document.getElementById('syllable-boxes');
             if (!container) return;
 

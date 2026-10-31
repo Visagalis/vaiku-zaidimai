@@ -477,12 +477,18 @@
                 `;
             }
 
-            const optionsHtml = options.map((opt, idx) => `
-                <button id="btn-${idx}" onclick="handleQuizAnswer(${idx})"
-                    class="btn-3d py-2.5 sm:py-3.5 px-3.5 bg-emerald-50 hover:bg-emerald-100 text-slate-900 border-2 border-emerald-300 rounded-2xl text-sm sm:text-base font-black shadow-[0_4px_0_#10b981] active:shadow-[0_0px_0_#10b981] transition-all flex items-center justify-start text-left min-h-[52px] w-full">
-                    <span>${_col(opt)}</span>
-                </button>
-            `).join('');
+            const optionsHtml = options.map((opt, idx) => {
+                const spaceIdx = opt.indexOf(' ');
+                const icon = spaceIdx > 0 ? opt.slice(0, spaceIdx) : '';
+                const label = spaceIdx > 0 ? opt.slice(spaceIdx + 1) : opt;
+                return `
+                    <button id="btn-${idx}" onclick="handleQuizAnswer(${idx})"
+                        class="btn-3d py-2.5 sm:py-3.5 px-3.5 bg-emerald-50 text-slate-900 border-2 border-emerald-300 rounded-2xl text-sm sm:text-base font-black shadow-[0_4px_0_#10b981] active:shadow-[0_0px_0_#10b981] transition-all flex items-center justify-start text-left min-h-[52px] w-full">
+                        <span class="opt-hint-emoji hidden mr-1.5">${icon}</span>
+                        <span>${_col(label)}</span>
+                    </button>
+                `;
+            }).join('');
 
             appEl.innerHTML = `
                 ${renderTopBar({ score: state.score, current: state.currentIndex + 1, total: state.questions.length, streak: state.streak, theme: 'emerald' })}
@@ -524,6 +530,8 @@
             const hintBtn = document.getElementById('hint-btn');
             if (hintBtn) hintBtn.classList.add('hidden');
 
+            document.querySelectorAll('.opt-hint-emoji').forEach(el => el.classList.remove('hidden'));
+
             const q = state.questions[state.currentIndex];
             const wrongIdxs = [];
             (state.currentOptions || []).forEach((opt, idx) => {
@@ -555,6 +563,8 @@
                     state.streak++;
                 }
 
+                const emojiSpan = btn.querySelector('.opt-hint-emoji');
+                if (emojiSpan) emojiSpan.classList.remove('hidden');
                 btn.classList.remove('bg-emerald-50', 'hover:bg-emerald-100', 'text-slate-900', 'border-emerald-300');
                 btn.classList.add('bg-green-500', 'text-white', 'border-green-600', 'shadow-[0_4px_0_#15803d]', 'bounce-anim');
 

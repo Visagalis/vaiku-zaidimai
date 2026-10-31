@@ -514,8 +514,8 @@
 
             const optionsHtml = options.map((opt, idx) => `
                 <button id="btn-${idx}" onclick="handleAnswer(${idx})"
-                    class="btn-3d py-3 sm:py-3.5 px-3 bg-amber-50 hover:bg-amber-100 text-slate-900 border-2 border-amber-300 rounded-2xl text-base sm:text-xl font-black shadow-[0_5px_0_#f59e0b] active:shadow-[0_0px_0_#f59e0b] transition-all flex items-center justify-center gap-2 min-h-[60px]">
-                    <span class="text-2xl sm:text-3xl">${opt.emoji}</span>
+                    class="btn-3d py-3 sm:py-3.5 px-3 bg-amber-50 text-slate-900 border-2 border-amber-300 rounded-2xl text-base sm:text-xl font-black shadow-[0_5px_0_#f59e0b] active:shadow-[0_0px_0_#f59e0b] transition-all flex items-center justify-center gap-2 min-h-[60px]">
+                    <span class="opt-hint-emoji hidden text-2xl sm:text-3xl">${opt.emoji}</span>
                     <span>${_col(opt.word)}</span>
                 </button>
             `).join('');
@@ -554,6 +554,8 @@
             const hintBtn = document.getElementById('hint-btn');
             if (hintBtn) hintBtn.classList.add('hidden');
 
+            document.querySelectorAll('.opt-hint-emoji').forEach(el => el.classList.remove('hidden'));
+
             const q = state.questions[state.currentIndex];
             const wrongIdxs = [];
             (state.currentOptions || []).forEach((opt, idx) => {
@@ -585,6 +587,8 @@
                     state.streak++;
                 }
 
+                const emojiSpan = btn.querySelector('.opt-hint-emoji');
+                if (emojiSpan) emojiSpan.classList.remove('hidden');
                 btn.classList.remove('bg-amber-50', 'hover:bg-amber-100', 'text-slate-900', 'border-amber-300');
                 btn.classList.add('bg-green-500', 'text-white', 'border-green-600', 'shadow-[0_5px_0_#15803d]', 'bounce-anim');
 
