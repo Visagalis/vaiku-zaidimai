@@ -9,8 +9,8 @@
     <title>🍎 Tekstiniai Uždavinukai</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../shared/common.css">
-    <script src="../shared/common.js"></script>
+    <link rel="stylesheet" href="../shared/common.css?v=2">
+    <script src="../shared/common.js?v=2"></script>
     <style>
         body {
             font-family: 'Nunito', sans-serif;
@@ -304,6 +304,7 @@
         let state = {
             mode: 'easy',
             questions: [],
+            missedQuestions: [],
             currentIndex: 0,
             score: 0,
             streak: 0,
@@ -331,18 +332,8 @@
         }
 
         function speakStory() {
-            if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
-            try {
-                window.speechSynthesis.cancel();
-                const q = state.questions[state.currentIndex];
-                if (!q) return;
-                // Išvalome emojis geresniam tarimui
-                const plainText = q.story.replace(/[\u{1F300}-\u{1F9FF}]/gu, '');
-                const utterance = new SpeechSynthesisUtterance(plainText);
-                utterance.lang = 'lt-LT';
-                utterance.rate = 0.9;
-                window.speechSynthesis.speak(utterance);
-            } catch (e) {}
+            const q = state.questions[state.currentIndex];
+            if (q) speakLT(q.story);
         }
 
         function onTokenTap(el) {
@@ -426,8 +417,24 @@
             state.streak = 0;
             state.currentIndex = 0;
             state.tappedCount = 0;
+            state.missedQuestions = [];
             const pool = mode === 'easy' ? TASKS_EASY : mode === 'hard' ? TASKS_HARD : TASKS_MONEY;
             state.questions = shuffle(pool).slice(0, 8);
+            renderQuestion();
+        }
+
+        function retryMistakes() {
+            if (!state.missedQuestions || state.missedQuestions.length === 0) {
+                startGame(state.mode);
+                return;
+            }
+            getAudioCtx();
+            state.questions = shuffle(state.missedQuestions);
+            state.missedQuestions = [];
+            state.score = 0;
+            state.streak = 0;
+            state.currentIndex = 0;
+            state.tappedCount = 0;
             renderQuestion();
         }
 
@@ -508,6 +515,9 @@
                     renderQuestion();
                 }, 1300);
             } else {
+                if (state.firstTry && !state.missedQuestions.includes(q)) {
+                    state.missedQuestions.push(q);
+                }
                 state.firstTry = false;
                 state.streak = 0;
                 playWrongSound();
@@ -531,7 +541,10 @@
             appEl.innerHTML = renderEndScreenHelper({
                 score: state.score,
                 total: state.questions.length,
-                restartFn: "startGame(state.mode)"
+                restartFn: "startGame(state.mode)",
+                retryFn: "retryMistakes()",
+                mistakesCount: state.missedQuestions.length,
+                menuFn: "renderStartScreen()"
             });
         }
 

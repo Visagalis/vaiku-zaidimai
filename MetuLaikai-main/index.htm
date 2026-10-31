@@ -9,8 +9,8 @@
     <title>🗓️ Metų Laikai ir Kalendorius</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../shared/common.css">
-    <script src="../shared/common.js"></script>
+    <link rel="stylesheet" href="../shared/common.css?v=2">
+    <script src="../shared/common.js?v=2"></script>
     <style>
         body {
             font-family: 'Nunito', sans-serif;
@@ -279,6 +279,7 @@
         let state = {
             mode: 'seasons',
             questions: [],
+            missedQuestions: [],
             currentIndex: 0,
             totalPossible: 10,
             score: 0,
@@ -325,6 +326,7 @@
             state.score = 0;
             state.streak = 0;
             state.currentIndex = 0;
+            state.missedQuestions = [];
 
             if (mode === 'train') {
                 state.questions = shuffle(TRAIN_SEQUENCES);
@@ -334,6 +336,25 @@
                 const pool = mode === 'seasons' ? SEASONS_DATA : CALENDAR_DATA;
                 state.questions = shuffle(pool).slice(0, 10);
                 state.totalPossible = 10;
+                renderQuestion();
+            }
+        }
+
+        function retryMistakes() {
+            if (!state.missedQuestions || state.missedQuestions.length === 0) {
+                startGame(state.mode);
+                return;
+            }
+            getAudioCtx();
+            state.questions = shuffle(state.missedQuestions);
+            state.missedQuestions = [];
+            state.totalPossible = state.questions.length;
+            state.score = 0;
+            state.streak = 0;
+            state.currentIndex = 0;
+            if (state.mode === 'train') {
+                prepareTrainQuestion();
+            } else {
                 renderQuestion();
             }
         }
@@ -493,6 +514,9 @@
                     }
                 }
             } else {
+                if (state.firstTry && !state.missedQuestions.includes(q)) {
+                    state.missedQuestions.push(q);
+                }
                 state.firstTry = false;
                 state.streak = 0;
                 playWrongSound();
@@ -533,10 +557,13 @@
             `).join('');
 
             appEl.innerHTML = `
-                ${renderTopBar({ score: state.score, current: state.currentIndex + 1, total: 10, streak: state.streak, theme: 'cyan' })}
+                ${renderTopBar({ score: state.score, current: state.currentIndex + 1, total: state.questions.length, streak: state.streak, theme: 'cyan' })}
 
                 <div class="p-3 sm:p-5 flex-1 flex flex-col justify-evenly items-center gap-2">
-                    <h2 class="text-xl sm:text-2xl font-black text-slate-800 text-center">${_col(q.prompt)}</h2>
+                    <div class="flex items-center justify-center gap-2">
+                        <h2 class="text-xl sm:text-2xl font-black text-slate-800 text-center">${_col(q.prompt)}</h2>
+                        ${renderSpeakBtn(q.prompt)}
+                    </div>
 
                     <div class="py-3.5 px-6 flex flex-col items-center justify-center bg-cyan-50/80 rounded-3xl border-2 border-cyan-200 min-h-[110px] sm:min-h-[130px] shadow-inner text-center gap-2 w-full max-w-md">
                         <div class="text-6xl sm:text-7xl">${q.emoji}</div>
@@ -594,6 +621,9 @@
                     renderQuestion();
                 }, 1200);
             } else {
+                if (state.firstTry && !state.missedQuestions.includes(q)) {
+                    state.missedQuestions.push(q);
+                }
                 state.firstTry = false;
                 state.streak = 0;
                 playWrongSound();
@@ -618,7 +648,10 @@
             appEl.innerHTML = renderEndScreenHelper({
                 score: state.score,
                 total: state.totalPossible,
-                restartFn: "startGame(state.mode)"
+                restartFn: "startGame(state.mode)",
+                retryFn: "retryMistakes()",
+                mistakesCount: state.missedQuestions.length,
+                menuFn: "renderStartScreen()"
             });
         }
 

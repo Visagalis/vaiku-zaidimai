@@ -296,8 +296,29 @@
         return colors;
     }
 
-    // === 2. GARSO SISTEMA (Web Audio API) ===
+    // === 2. GARSO SISTEMA (Web Audio API + Lietuviškas TTS) ===
     var _audioCtx = null;
+    var SOUND_STORAGE_KEY = 'vz-sound-enabled';
+    var PROGRESS_STORAGE_KEY = 'vz-progress';
+    var _gameTimers = [];
+
+    function isSoundEnabled() {
+        try {
+            var v = localStorage.getItem(SOUND_STORAGE_KEY);
+            return v === null ? true : v !== '0';
+        } catch (e) {
+            return true;
+        }
+    }
+
+    function setSoundEnabled(enabled) {
+        try {
+            localStorage.setItem(SOUND_STORAGE_KEY, enabled ? '1' : '0');
+            if (!enabled && typeof window !== 'undefined' && 'speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+            }
+        } catch (e) {}
+    }
 
     function getAudioCtx() {
         if (!_audioCtx) {
@@ -315,6 +336,7 @@
     }
 
     function playTone(freq, type, duration, startTime, vol) {
+        if (!isSoundEnabled()) return;
         if (startTime === undefined) startTime = 0;
         if (vol === undefined) vol = 0.15;
         try {
@@ -334,6 +356,7 @@
     }
 
     function playSound(type) {
+        if (!isSoundEnabled()) return;
         try {
             var ctx = getAudioCtx();
             if (!ctx) return;
@@ -483,7 +506,72 @@
         playTone(783.99, 'sine', 0.18, 0.08, 0.16);
     }
 
-    // === 3. PAGALBINĖS MASYVŲ FUNKCIJOS ===
+    // Lietuviškas įgarsinimas (Text-to-Speech)
+    function hasLithuanianTTS() {
+        try {
+            if (typeof window === 'undefined' || !('speechSynthesis' in window)) return false;
+            var voices = window.speechSynthesis.getVoices() || [];
+            if (voices.length === 0) return true; // dar kraunasi balsai
+            for (var i = 0; i < voices.length; i++) {
+                if (voices[i].lang && voices[i].lang.toLowerCase().indexOf('lt') === 0) return true;
+            }
+            return false;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    function speakLT(text, rate) {
+        if (!isSoundEnabled() || !text) return;
+        try {
+            if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+            window.speechSynthesis.cancel();
+            // Pašaliname HTML žymes ir perteklinius simbolius
+            var clean = String(text)
+                .replace(/<[^>]+>/g, ' ')
+                .replace(/[❓❔➕➖✖️➗➔⬅️➡️⬆️⬇️🔗]/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+            if (!clean) return;
+            var utter = new SpeechSynthesisUtterance(clean);
+            utter.lang = 'lt-LT';
+            utter.rate = rate || 0.9;
+            var voices = window.speechSynthesis.getVoices() || [];
+            for (var i = 0; i < voices.length; i++) {
+                if (voices[i].lang && voices[i].lang.toLowerCase().indexOf('lt') === 0) {
+                    utter.voice = voices[i];
+                    break;
+                }
+            }
+            window.speechSynthesis.speak(utter);
+        } catch (e) {}
+    }
+
+    function renderSpeakBtn(text, extraClass) {
+        if (!text) return '';
+        var safe = String(text).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        var cls = 'speak-btn' + (extraClass ? ' ' + extraClass : '');
+        return '<button type="button" onclick="speakLT(\'' + safe + '\')" class="' + cls + '" title="Klausyti">🔊</button>';
+    }
+
+    // Saugūs žaidimo laikmačiai (automatiškai išvalomi grįžtant į meniu)
+    function setGameTimeout(fn, delay) {
+        var id = setTimeout(function () {
+            var idx = _gameTimers.indexOf(id);
+            if (idx !== -1) _gameTimers.splice(idx, 1);
+            fn();
+        }, delay);
+        _gameTimers.push(id);
+        return id;
+    }
+
+    function clearGameTimers() {
+        while (_gameTimers.length > 0) {
+            clearTimeout(_gameTimers.pop());
+        }
+    }
+
+    // === 3. PAGALBINĖS MASYVŲ IR UI FUNKCIJOS ===
     function shuffle(arr) {
         var a = arr.slice();
         for (var i = a.length - 1; i > 0; i--) {
@@ -497,6 +585,119 @@
 
     function pickRandom(arr) {
         return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    // Bendra atsiliepimo (#feedback) eilutės atvaizdavimo funkcija
+    function showFeedback(text, type, elId) {
+        if (typeof document === 'undefined') return;
+        var el = document.getElementById(elId || 'feedback');
+        if (!el) return;
+        var colorClass = 'text-slate-700';
+        if (type === 'success' || type === 'correct') colorClass = 'text-green-600';
+        else if (type === 'error' || type === 'wrong') colorClass = 'text-red-500';
+        else if (type === 'info' || type === 'hint') colorClass = 'text-amber-600';
+
+        el.innerHTML = '<span>' + _col(text) + '</span>';
+        el.classList.remove('opacity-0', 'text-green-600', 'text-red-500', 'text-amber-600', 'text-slate-700');
+        el.classList.add('opacity-100', colorClass);
+    }
+
+    // Bendra 50/50 neteisingų atsakymų atmetimo funkcija viktorinoms
+    function eliminateWrongOptions(selector, isCorrectFn, count) {
+        if (typeof document === 'undefined') return;
+        var nodes = document.querySelectorAll(selector);
+        var candidates = [];
+        for (var i = 0; i < nodes.length; i++) {
+            var btn = nodes[i];
+            if (!btn.disabled && !isCorrectFn(btn, i)) {
+                candidates.push(btn);
+            }
+        }
+        var toDisable = shuffle(candidates).slice(0, count || 2);
+        for (var j = 0; j < toDisable.length; j++) {
+            toDisable[j].disabled = true;
+            toDisable[j].classList.add('opacity-35', 'line-through', 'pointer-events-none');
+        }
+    }
+
+    // Lengvas šventinis konfeti fejerverkas (be išorinių bibliotekų)
+    function celebrateWin(stars) {
+        if (stars !== undefined && stars < 2) return;
+        try {
+            if (typeof global.confetti === 'function') {
+                global.confetti({ particleCount: stars >= 3 ? 65 : 35, spread: 80, origin: { y: 0.55 } });
+                return;
+            }
+            if (typeof document === 'undefined' || !document.body) return;
+            var colors = ['#f59e0b', '#10b981', '#3b82f6', '#ec4899', '#8b5cf6', '#ef4444', '#eab308'];
+            var count = (stars === 2) ? 20 : 38;
+            var pieces = [];
+            for (var i = 0; i < count; i++) {
+                var p = document.createElement('div');
+                p.className = 'vz-confetti-piece';
+                p.style.left = (8 + Math.random() * 84) + 'vw';
+                p.style.backgroundColor = colors[i % colors.length];
+                p.style.animationDelay = (Math.random() * 0.35) + 's';
+                p.style.setProperty('--vz-dx', Math.round((Math.random() - 0.5) * 140) + 'px');
+                p.style.setProperty('--vz-rot', Math.round(360 + Math.random() * 540) + 'deg');
+                document.body.appendChild(p);
+                pieces.push(p);
+            }
+            setTimeout(function () {
+                for (var k = 0; k < pieces.length; k++) {
+                    if (pieces[k] && pieces[k].parentNode) {
+                        pieces[k].parentNode.removeChild(pieces[k]);
+                    }
+                }
+            }, 2200);
+        } catch (e) {}
+    }
+
+    // === 3B. ŽAIDIMŲ PROGRESO IR ŽVAIGŽDUČIŲ SAUGOJIMAS (vz-progress) ===
+    function detectGameId() {
+        try {
+            if (typeof location === 'undefined' || !location.pathname) return null;
+            var m = location.pathname.match(/([A-Za-z0-9_-]+-main)/);
+            return m ? m[1] : null;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function getGameProgress(gameId) {
+        try {
+            var raw = localStorage.getItem(PROGRESS_STORAGE_KEY);
+            var data = raw ? JSON.parse(raw) : {};
+            if (!gameId) return data;
+            return data[gameId] || { stars: 0, bestScore: 0, plays: 0 };
+        } catch (e) {
+            return gameId ? { stars: 0, bestScore: 0, plays: 0 } : {};
+        }
+    }
+
+    function saveGameProgress(gameId, stars, score, total) {
+        var id = gameId || detectGameId();
+        if (!id) return;
+        try {
+            var all = getGameProgress();
+            var prev = all[id] || { stars: 0, bestScore: 0, plays: 0 };
+            var newStars = Math.max(prev.stars || 0, stars || 1);
+            var newBest = Math.max(prev.bestScore || 0, score || 0);
+            all[id] = {
+                stars: Math.min(3, Math.max(1, newStars)),
+                bestScore: newBest,
+                total: total || prev.total || 10,
+                plays: (prev.plays || 0) + 1,
+                updatedAt: Date.now()
+            };
+            localStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify(all));
+        } catch (e) {}
+    }
+
+    function clearGameProgress() {
+        try {
+            localStorage.removeItem(PROGRESS_STORAGE_KEY);
+        } catch (e) {}
     }
 
     // === 4. APSAUGA NUO PRIARTINIMO GESTAIS (PINCH TO ZOOM) ===
@@ -563,6 +764,7 @@
     function renderTopBar(opts) {
         opts = opts || {};
         var homeFn = opts.homeFn || 'renderStartScreen()';
+        var safeHomeFn = 'clearGameTimers(); ' + homeFn;
         var homeTitle = opts.homeTitle || 'Lygio pasirinkimas';
         var score = (opts.score !== undefined) ? opts.score : 0;
         var current = opts.current;
@@ -577,7 +779,7 @@
         
         // Kairė: Pradžios mygtukas ir taškai
         html += '<div class="flex items-center gap-2 sm:gap-3">';
-        html += '<button onclick="' + homeFn + '" class="top-badge bg-white/90 hover:bg-' + theme + '-200 border border-' + theme + '-300 px-2.5 py-1 rounded-xl text-base sm:text-xl transition active:scale-95" title="' + homeTitle + '">' + homeIcon + '</button>';
+        html += '<button onclick="' + safeHomeFn + '" class="top-badge bg-white/90 hover:bg-' + theme + '-200 border border-' + theme + '-300 px-2.5 py-1 rounded-xl text-base sm:text-xl transition active:scale-95" title="' + homeTitle + '">' + homeIcon + '</button>';
         html += '<span class="flex items-center gap-1.5 text-base sm:text-lg">⭐ <span class="text-' + theme + '-700 dark:text-amber-300 font-black text-lg sm:text-xl">' + score + '</span></span>';
         html += '</div>';
 
@@ -599,11 +801,16 @@
 
     function renderEndScreen(opts) {
         opts = opts || {};
+        clearGameTimers();
         var score = (opts.score !== undefined) ? opts.score : 0;
         var total = (opts.total !== undefined) ? opts.total : 10;
         var stars = opts.stars || calculateStars(score, total);
         var restartFn = opts.restartFn || 'renderStartScreen()';
         var restartText = opts.restartText || 'Dar kartą';
+        var menuFn = opts.menuFn !== undefined ? opts.menuFn : 'renderStartScreen()';
+        var menuText = opts.menuText || 'Kitas lygis';
+        var retryFn = opts.retryFn || null;
+        var mistakesCount = opts.mistakesCount || 0;
         var title = opts.title || 'Šaunuolis!';
         
         var message = opts.message;
@@ -614,7 +821,11 @@
         }
 
         try {
+            saveGameProgress(opts.gameId, stars, score, total);
             playWinSound();
+            if (opts.celebrate !== false) {
+                celebrateWin(stars);
+            }
         } catch (e) {}
 
         var starHtml = '';
@@ -626,16 +837,32 @@
             }
         }
 
-        return '<div class="flex-1 flex flex-col items-center justify-center p-6 sm:p-8 text-center fade-in">' +
-            '<div class="text-6xl sm:text-7xl mb-2">🎉</div>' +
-            '<h2 class="text-3xl sm:text-4xl font-black text-green-600 dark:text-green-400 mb-3">' + _col(title) + '</h2>' +
-            '<div class="flex justify-center gap-2 mb-3">' + starHtml + '</div>' +
-            '<p class="text-xl sm:text-2xl font-bold text-slate-700 dark:text-slate-200 mb-2">' + _col(message) + ' 🏆</p>' +
-            '<p class="text-lg sm:text-xl text-slate-600 dark:text-slate-300 mb-6">' + _col('Surinkai:') + ' <span class="font-black text-green-500 text-xl sm:text-2xl">' + score + ' / ' + total + '</span></p>' +
-            '<div class="flex flex-col sm:flex-row gap-3 w-full max-w-xs">' +
+        var retryBtnHtml = '';
+        if (retryFn && mistakesCount > 0) {
+            retryBtnHtml = '<button onclick="' + retryFn + '" class="btn-3d w-full py-3 sm:py-3.5 px-4 rounded-2xl bg-amber-100 hover:bg-amber-200 text-amber-950 font-black text-base sm:text-lg shadow-md transition transform active:scale-95 border-2 border-b-4 border-amber-400">' +
+                '🛠️ ' + _col('Pataisyti klaidas') + ' (' + mistakesCount + ')' +
+            '</button>';
+        }
+
+        var menuBtnHtml = '';
+        if (menuFn && !opts.hideMenuBtn && restartFn !== menuFn) {
+            menuBtnHtml = '<button onclick="' + menuFn + '" class="btn-tinted w-full py-3 sm:py-3.5 px-4 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-black text-base sm:text-lg shadow transition transform active:scale-95 border-2 border-b-4 border-slate-300">' +
+                '🎛️ ' + _col(menuText) +
+            '</button>';
+        }
+
+        return '<div class="flex-1 flex flex-col items-center justify-center p-5 sm:p-8 text-center fade-in">' +
+            '<div class="text-5xl sm:text-7xl mb-2">🎉</div>' +
+            '<h2 class="text-3xl sm:text-4xl font-black text-green-600 dark:text-green-400 mb-2">' + _col(title) + '</h2>' +
+            '<div class="flex justify-center gap-2 mb-2">' + starHtml + '</div>' +
+            '<p class="text-lg sm:text-2xl font-bold text-slate-700 dark:text-slate-200 mb-1.5">' + _col(message) + ' 🏆</p>' +
+            '<p class="text-base sm:text-xl text-slate-600 dark:text-slate-300 mb-5">' + _col('Surinkai:') + ' <span class="font-black text-green-500 text-xl sm:text-2xl">' + score + ' / ' + total + '</span></p>' +
+            '<div class="flex flex-col gap-2.5 w-full max-w-xs">' +
+                retryBtnHtml +
                 '<button onclick="' + restartFn + '" class="btn-tinted w-full py-3.5 sm:py-4 px-4 rounded-2xl bg-blue-100 hover:bg-blue-200 text-slate-800 font-black text-lg sm:text-xl shadow-lg transition transform active:scale-95 border-2 border-b-4 border-blue-400">' +
                     '🔄 ' + _col(restartText) +
                 '</button>' +
+                menuBtnHtml +
             '</div>' +
         '</div>';
     }
@@ -675,6 +902,20 @@
     global.playTapSound = playTapSound;
     global.playReturnSound = playReturnSound;
     global.playHintSound = playHintSound;
+    global.isSoundEnabled = isSoundEnabled;
+    global.setSoundEnabled = setSoundEnabled;
+    global.hasLithuanianTTS = hasLithuanianTTS;
+    global.speakLT = speakLT;
+    global.renderSpeakBtn = renderSpeakBtn;
+    global.setGameTimeout = setGameTimeout;
+    global.clearGameTimers = clearGameTimers;
+    global.showFeedback = showFeedback;
+    global.eliminateWrongOptions = eliminateWrongOptions;
+    global.celebrateWin = celebrateWin;
+    global.detectGameId = detectGameId;
+    global.getGameProgress = getGameProgress;
+    global.saveGameProgress = saveGameProgress;
+    global.clearGameProgress = clearGameProgress;
     global.shuffle = shuffle;
     global.shuffleArray = shuffle;
     global.pickRandom = pickRandom;

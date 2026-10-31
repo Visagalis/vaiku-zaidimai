@@ -26,8 +26,8 @@
   
   <!-- Babel -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <link rel="stylesheet" href="../shared/common.css">
-  <script src="../shared/common.js"></script>
+  <link rel="stylesheet" href="../shared/common.css?v=2">
+  <script src="../shared/common.js?v=2"></script>
   
   <style>
     ::-webkit-scrollbar { width: 8px; }
@@ -503,6 +503,15 @@
           setIsReviewingErrors(false);
           setGameState('play');
         } else {
+          const firstTryCount = stats.filter(s => s.attempts === 1).length;
+          const totalCount = phrases.length || 1;
+          const starsCount = typeof calculateStars === 'function' ? calculateStars(firstTryCount, totalCount) : 3;
+          if (typeof saveGameProgress === 'function') {
+            saveGameProgress('MokomesRasyti-main', starsCount, firstTryCount, totalCount);
+          }
+          if (typeof celebrateWin === 'function') {
+            celebrateWin(starsCount);
+          }
           setGameState('summary');
         }
       };

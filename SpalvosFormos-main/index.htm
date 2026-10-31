@@ -9,8 +9,8 @@
     <title>🟡 Spalvos ir Formos</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../shared/common.css">
-    <script src="../shared/common.js"></script>
+    <link rel="stylesheet" href="../shared/common.css?v=2">
+    <script src="../shared/common.js?v=2"></script>
     <style>
         body {
             font-family: 'Nunito', sans-serif;
@@ -630,28 +630,12 @@
 
         // === PABAIGOS EKRANAS ===
         function renderEndScreen() {
-            playWinSound();
-            let stars = '⭐';
-            if (gameState.score >= 9) stars = '⭐⭐⭐';
-            else if (gameState.score >= 6) stars = '⭐⭐';
-
-            appEl.innerHTML = `
-                <div class="p-6 sm:p-8 flex flex-col items-center justify-center text-center animate-pop-in">
-                    <div class="text-6xl sm:text-7xl mb-2">🏆</div>
-                    <h2 class="text-3xl sm:text-4xl font-black text-slate-800 dark-text mb-2">🎉 ${_col('Šaunuolis!')}</h2>
-                    <div class="text-5xl mb-4 tracking-widest">${stars}</div>
-
-                    <div class="text-xl sm:text-2xl text-slate-700 dark-subtext font-extrabold mb-6">
-                        ⭐ <span class="text-amber-600 text-3xl sm:text-4xl font-black">${gameState.score}</span> / ${TOTAL_QUESTIONS}
-                    </div>
-
-                    <div class="flex flex-col sm:flex-row gap-3 w-full max-w-sm">
-                        <button onclick="startGame(gameState.mode)" class="btn-bounce flex-1 py-3.5 px-5 bg-amber-100 hover:bg-amber-200 dark-btn text-slate-800 rounded-2xl text-lg sm:text-xl font-black shadow-md border-2 border-amber-400 border-b-4 border-b-amber-500">
-                            🔄 ${_col('Dar kartą')}
-                        </button>
-                    </div>
-                </div>
-            `;
+            appEl.innerHTML = renderEndScreenHelper({
+                score: gameState.score,
+                total: TOTAL_QUESTIONS,
+                restartFn: "startGame(gameState.mode)",
+                menuFn: "renderStartScreen()"
+            });
         }
 
         renderStartScreen();

@@ -9,8 +9,8 @@
     <title>🧭 Kairė ar Dešinė?</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../shared/common.css">
-    <script src="../shared/common.js"></script>
+    <link rel="stylesheet" href="../shared/common.css?v=2">
+    <script src="../shared/common.js?v=2"></script>
     <style>
         body {
             font-family: 'Nunito', sans-serif;
@@ -408,6 +408,7 @@
         let state = {
             mode: 'left-right',
             questions: [],
+            missedQuestions: [],
             currentIndex: 0,
             score: 0,
             streak: 0,
@@ -423,7 +424,7 @@
             return window.renderTopBar({
                 score: state.score,
                 current: state.currentIndex + 1,
-                total: 10,
+                total: state.questions.length || 10,
                 streak: state.streak,
                 theme: 'fuchsia'
             });
@@ -460,6 +461,7 @@
             state.score = 0;
             state.streak = 0;
             state.currentIndex = 0;
+            state.missedQuestions = [];
 
             if (mode === 'left-right') {
                 state.questions = shuffle(LEFT_RIGHT_TASKS).slice(0, 10);
@@ -469,6 +471,20 @@
                 state.questions = shuffle(PUPPY_LEVELS).slice(0, 10);
             }
 
+            loadQuestion();
+        }
+
+        function retryMistakes() {
+            if (!state.missedQuestions || state.missedQuestions.length === 0) {
+                startGame(state.mode);
+                return;
+            }
+            getAudioCtx();
+            state.questions = shuffle(state.missedQuestions);
+            state.missedQuestions = [];
+            state.score = 0;
+            state.streak = 0;
+            state.currentIndex = 0;
             loadQuestion();
         }
 
@@ -515,7 +531,10 @@
                 ${renderGameTopBar()}
                 <div class="p-3 sm:p-5 flex-1 flex flex-col justify-evenly items-center gap-2">
                     <div class="flex flex-col items-center gap-1.5">
-                        <h2 class="text-xl sm:text-2xl font-black text-slate-800 text-center">${_col(q.prompt)}</h2>
+                        <div class="flex items-center justify-center gap-2">
+                            <h2 class="text-xl sm:text-2xl font-black text-slate-800 text-center">${_col(q.prompt)}</h2>
+                            ${renderSpeakBtn(q.prompt)}
+                        </div>
                         <button id="hint-btn" onclick="showQuizHint()" class="hint-btn">
                             <span>💡</span> <span>${_col('Užuomina')}</span>
                         </button>
@@ -590,6 +609,9 @@
                     loadQuestion();
                 }, 1050);
             } else {
+                if (state.firstTry && !state.missedQuestions.includes(q)) {
+                    state.missedQuestions.push(q);
+                }
                 state.firstTry = false;
                 state.streak = 0;
                 playWrongSound();
@@ -707,6 +729,9 @@
             const hitObstacle = !outOfBounds && lvl.obstacles.some(o => o.pos[0] === r && o.pos[1] === c);
 
             if (outOfBounds || hitObstacle) {
+                if (state.firstTry && !state.missedQuestions.includes(lvl)) {
+                    state.missedQuestions.push(lvl);
+                }
                 state.firstTry = false;
                 state.streak = 0;
                 playWrongSound();
@@ -756,25 +781,14 @@
 
         // === PABAIGOS EKRANAS ===
         function renderEndScreen() {
-            playWinSound();
-            let stars = "⭐";
-            if (state.score >= 8) stars = "⭐⭐⭐";
-            else if (state.score >= 5) stars = "⭐⭐";
-
-            appEl.innerHTML = `
-                <div class="p-6 sm:p-8 flex flex-col items-center justify-center text-center">
-                    <div class="text-6xl sm:text-7xl mb-2">🎉</div>
-                    <h2 class="text-3xl sm:text-4xl font-black text-green-600 mb-2">${_col('Šaunuolis!')}</h2>
-                    <div class="text-5xl mb-4 tracking-wider">${stars}</div>
-                    <p class="text-2xl font-black text-fuchsia-600 mb-6">⭐ ${state.score} / 10</p>
-
-                    <div class="flex flex-col sm:flex-row gap-3 w-full max-w-sm">
-                        <button onclick="startGame(state.mode)" class="btn-3d flex-1 py-3.5 bg-fuchsia-200 hover:bg-fuchsia-300 border-2 border-fuchsia-400 rounded-2xl text-lg font-black shadow-[0_5px_0_#a21caf] active:shadow-[0_0px_0_#a21caf] transition-all">
-                            🔄 ${_col('Dar kartą')}
-                        </button>
-                    </div>
-                </div>
-            `;
+            appEl.innerHTML = renderEndScreenHelper({
+                score: state.score,
+                total: state.questions.length || 10,
+                restartFn: "startGame(state.mode)",
+                retryFn: "retryMistakes()",
+                mistakesCount: state.missedQuestions.length,
+                menuFn: "renderStartScreen()"
+            });
         }
 
         renderStartScreen();

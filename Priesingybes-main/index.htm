@@ -9,8 +9,8 @@
     <title>⚖️ Priešingybės</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../shared/common.css">
-    <script src="../shared/common.js"></script>
+    <link rel="stylesheet" href="../shared/common.css?v=2">
+    <script src="../shared/common.js?v=2"></script>
     <style>
         body {
             font-family: 'Nunito', sans-serif;
@@ -126,6 +126,7 @@
         let state = {
             mode: 'easy',
             questions: [],
+            missedQuestions: [],
             currentIndex: 0,
             totalPossible: 10,
             score: 0,
@@ -171,6 +172,7 @@
             state.score = 0;
             state.streak = 0;
             state.currentIndex = 0;
+            state.missedQuestions = [];
 
             if (mode === 'pairs') {
                 const shuffledPool = shuffle(PAIR_ANTONYMS);
@@ -188,6 +190,21 @@
                 state.totalPossible = 10;
                 renderQuestion();
             }
+        }
+
+        function retryMistakes() {
+            if (!state.missedQuestions || state.missedQuestions.length === 0) {
+                startGame(state.mode);
+                return;
+            }
+            getAudioCtx();
+            state.questions = shuffle(state.missedQuestions);
+            state.missedQuestions = [];
+            state.totalPossible = state.questions.length;
+            state.score = 0;
+            state.streak = 0;
+            state.currentIndex = 0;
+            renderQuestion();
         }
 
         function preparePairsBoard() {
@@ -386,14 +403,17 @@
             `).join('');
 
             appEl.innerHTML = `
-                ${renderTopBar({ score: state.score, current: state.currentIndex + 1, total: 10, streak: state.streak, theme: 'blue' })}
+                ${renderTopBar({ score: state.score, current: state.currentIndex + 1, total: state.questions.length, streak: state.streak, theme: 'blue' })}
 
                 <div class="p-3 sm:p-5 flex-1 flex flex-col justify-evenly items-center gap-2">
                     <h2 class="text-xl sm:text-2xl font-black text-slate-800 text-center">⚖️ ${_col('Priešingybė?')}</h2>
 
                     <div class="py-3.5 px-8 flex flex-col items-center justify-center bg-gradient-to-b from-blue-100/70 to-blue-50/70 rounded-3xl border-3 border-blue-200 min-h-[120px] sm:min-h-[140px] shadow-inner gap-1.5">
                         <div class="text-6xl sm:text-8xl">${q.emoji}</div>
-                        <div class="text-2xl sm:text-4xl font-black tracking-wide text-blue-900">${_col(q.word)}</div>
+                        <div class="flex items-center gap-2">
+                            <div class="text-2xl sm:text-4xl font-black tracking-wide text-blue-900">${_col(q.word)}</div>
+                            ${renderSpeakBtn(q.word)}
+                        </div>
                         <button id="hint-btn" onclick="showQuizHint()" class="hint-btn mt-1">
                             <span>💡</span> <span>${_col('Užuomina')}</span>
                         </button>
@@ -456,6 +476,9 @@
                     renderQuestion();
                 }, 1200);
             } else {
+                if (state.firstTry && !state.missedQuestions.includes(q)) {
+                    state.missedQuestions.push(q);
+                }
                 state.firstTry = false;
                 state.streak = 0;
                 playWrongSound();
@@ -480,7 +503,10 @@
             appEl.innerHTML = renderEndScreenHelper({
                 score: state.score,
                 total: state.totalPossible,
-                restartFn: "startGame(state.mode)"
+                restartFn: "startGame(state.mode)",
+                retryFn: state.mode !== 'pairs' ? "retryMistakes()" : "",
+                mistakesCount: state.mode !== 'pairs' ? state.missedQuestions.length : 0,
+                menuFn: "renderStartScreen()"
             });
         }
 

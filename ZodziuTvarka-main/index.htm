@@ -9,8 +9,8 @@
     <title>📐 Žodžių Tvarka</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../shared/common.css">
-    <script src="../shared/common.js"></script>
+    <link rel="stylesheet" href="../shared/common.css?v=2">
+    <script src="../shared/common.js?v=2"></script>
     <style>
         body {
             font-family: 'Nunito', sans-serif;
@@ -202,6 +202,7 @@
         const state = {
             mode: 'short', // 'short' | 'long' | 'fill'
             deck: [],
+            missedQuestions: [],
             round: 0,
             totalRounds: 10,
             score: 0,
@@ -246,13 +247,28 @@
             state.round = 0;
             state.score = 0;
             state.streak = 0;
+            state.missedQuestions = [];
             const pool = mode === 'short' ? SHORT_SENTENCES : mode === 'long' ? LONG_SENTENCES : FILL_WORD_TASKS;
             state.deck = shuffle(pool).slice(0, state.totalRounds);
             loadQuestion();
         }
 
-        function renderTopBar() {
-            return renderTopBarHelper({
+        function retryMistakes() {
+            if (!state.missedQuestions || state.missedQuestions.length === 0) {
+                startGame(state.mode);
+                return;
+            }
+            playTapSound();
+            state.deck = shuffle(state.missedQuestions);
+            state.missedQuestions = [];
+            state.round = 0;
+            state.score = 0;
+            state.streak = 0;
+            loadQuestion();
+        }
+
+        function renderGameTopBar() {
+            return window.renderTopBar({
                 score: state.score,
                 current: state.round + 1,
                 total: state.deck.length,
@@ -286,10 +302,13 @@
             const scrambled = shuffle(state.currentWords.map((word, originalIndex) => ({ word, originalIndex })));
 
             app.innerHTML = `
-                ${renderTopBar()}
+                ${renderGameTopBar()}
                 <div class="p-3 sm:p-5 flex-1 flex flex-col justify-evenly gap-2 overflow-hidden">
                     <div class="flex flex-col items-center gap-1.5">
-                        <div class="text-5xl sm:text-6xl drop-shadow-md">${item.emoji}</div>
+                        <div class="flex items-center gap-2">
+                            <div class="text-5xl sm:text-6xl drop-shadow-md">${item.emoji}</div>
+                            ${renderSpeakBtn(item.text)}
+                        </div>
                         <div id="hint-area">
                             <button id="hint-btn" onclick="showOrderHint()" class="hint-btn">
                                 <span>💡</span>
@@ -443,6 +462,10 @@
                     loadQuestion();
                 }, 1300);
             } else {
+                const item = state.deck[state.round];
+                if (state.firstTry && item && !state.missedQuestions.includes(item)) {
+                    state.missedQuestions.push(item);
+                }
                 state.firstTry = false;
                 state.streak = 0;
                 playWrongSound();
@@ -485,7 +508,7 @@
             `).join('');
 
             app.innerHTML = `
-                ${renderTopBar()}
+                ${renderGameTopBar()}
                 <div class="p-3 sm:p-5 flex-1 flex flex-col justify-evenly gap-2 overflow-hidden">
                     <div class="flex flex-col items-center gap-1.5">
                         <div class="text-6xl sm:text-7xl drop-shadow-md">${item.emoji}</div>
@@ -537,6 +560,10 @@
                     loadQuestion();
                 }, 1300);
             } else {
+                const item = state.deck[state.round];
+                if (state.firstTry && item && !state.missedQuestions.includes(item)) {
+                    state.missedQuestions.push(item);
+                }
                 state.firstTry = false;
                 state.streak = 0;
                 playWrongSound();
@@ -550,23 +577,14 @@
         }
 
         function renderEndScreen() {
-            playWinSound();
-            let stars = "⭐";
-            if (state.score >= 8) stars = "⭐⭐⭐";
-            else if (state.score >= 5) stars = "⭐⭐";
-
-            app.innerHTML = `
-                <div class="p-6 sm:p-8 flex flex-col items-center justify-center text-center">
-                    <h2 class="text-main-title text-3xl sm:text-4xl font-black text-purple-600 mb-4">🎉 ${_col('Šaunuolis!')}</h2>
-                    <div class="text-5xl sm:text-6xl mb-4 drop-shadow-md">${stars}</div>
-                    <p class="text-sub-title text-xl sm:text-2xl text-slate-700 mb-6 font-bold">
-                        ⭐ <span class="text-3xl sm:text-4xl text-orange-500 font-black">${state.score} / ${state.deck.length}</span>
-                    </p>
-                    <button onclick="renderStartScreen()" class="btn-3d bg-green-100 hover:bg-green-200 text-slate-800 border-2 border-green-400 text-xl sm:text-2xl font-black py-3.5 px-8 rounded-2xl w-full max-w-xs">
-                        🔄 ${_col('Dar kartą')}
-                    </button>
-                </div>
-            `;
+            app.innerHTML = renderEndScreenHelper({
+                score: state.score,
+                total: state.deck.length,
+                restartFn: "startGame(state.mode)",
+                retryFn: "retryMistakes()",
+                mistakesCount: state.missedQuestions.length,
+                menuFn: "renderStartScreen()"
+            });
         }
 
         renderStartScreen();

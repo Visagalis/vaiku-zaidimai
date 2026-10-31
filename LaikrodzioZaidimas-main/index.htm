@@ -9,8 +9,8 @@
     <title>🕐 Laikrodžio Žaidimas</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../shared/common.css">
-    <script src="../shared/common.js"></script>
+    <link rel="stylesheet" href="../shared/common.css?v=2">
+    <script src="../shared/common.js?v=2"></script>
     <style>
         body {
             font-family: 'Nunito', sans-serif;
@@ -222,8 +222,8 @@
             return `${padZero(h)}:${padZero(m)}`;
         }
 
-        function renderTopBar() {
-            return renderTopBarHelper({
+        function renderGameTopBar() {
+            return window.renderTopBar({
                 score: state.score,
                 current: state.question,
                 total: state.maxQuestions,
@@ -601,7 +601,7 @@
             `).join('');
 
             app.innerHTML = `
-                ${renderTopBar()}
+                ${renderGameTopBar()}
                 <div class="flex-1 flex flex-col items-center justify-evenly gap-1.5 p-2.5 sm:p-5 fade-in overflow-hidden">
                     <div class="flex flex-col items-center gap-1.5 w-full">
                         ${routineBanner}
@@ -645,7 +645,7 @@
                    </button>`;
 
             app.innerHTML = `
-                ${renderTopBar()}
+                ${renderGameTopBar()}
                 <div class="flex-1 flex flex-col items-center justify-evenly gap-1.5 p-2 sm:p-4 fade-in overflow-hidden">
                     ${headerHtml}
 
@@ -833,36 +833,12 @@
         }
 
         function renderEndScreen() {
-            playSound('win');
-
-            let stars = 1;
-            if (state.score >= 8) stars = 3;
-            else if (state.score >= 5) stars = 2;
-
-            const starHtml = Array(3).fill(0).map((_, i) =>
-                `<span class="text-5xl sm:text-6xl ${i < stars ? 'text-yellow-400 bounce' : 'text-gray-400 opacity-40'} drop-shadow-md" style="animation-delay: ${i * 0.2}s">⭐</span>`
-            ).join('');
-
-            let message = "Neblogai! Pasitreniruok dar!";
-            if (stars === 3) message = "Puikiai! Tu tikras laiko meistras!";
-            else if (stars === 2) message = "Geras rezultatas!";
-
-            app.innerHTML = `
-                <div class="flex-1 flex flex-col items-center justify-center p-6 sm:p-8 text-center fade-in">
-                    <h2 class="text-main-title text-3xl sm:text-4xl font-black text-gray-800 mb-4">${_col('Žaidimas baigtas!')}</h2>
-                    
-                    <div class="flex justify-center gap-2 mb-4">
-                        ${starHtml}
-                    </div>
-                    
-                    <p class="text-sub-title text-xl sm:text-2xl font-bold text-gray-700 mb-2">${_col(message)} 🏆</p>
-                    <p class="text-sub-title text-lg sm:text-xl text-gray-600 mb-8">${_col('Surinkai:')} <span class="font-black text-green-500">${state.score} / ${state.maxQuestions}</span></p>
-                    
-                    <button onclick="renderStartScreen()" class="btn-tinted w-full max-w-xs py-4 rounded-2xl bg-blue-100 hover:bg-blue-200 text-slate-800 font-black text-xl sm:text-2xl shadow-lg transition transform active:scale-95 border-2 border-b-4 border-blue-400">
-                        🔄 ${_col('Dar kartą')}
-                    </button>
-                </div>
-            `;
+            app.innerHTML = renderEndScreenHelper({
+                score: state.score,
+                total: state.maxQuestions,
+                restartFn: "startGame(state.mode)",
+                menuFn: "renderStartScreen()"
+            });
         }
 
         // Initialize

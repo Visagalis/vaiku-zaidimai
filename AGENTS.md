@@ -144,14 +144,19 @@ When you check by hand, open the game **through the portal** (iframe mode) *and*
 | Coloring | `SYLLABLE_COLORS` / `_SC` | Array of 6 `var(--sc-N, fallback)` colors. Use it when syllables are hand-authored (SkaitymoZaidimas). |
 | Syllable setting | `isSyllableColoringEnabled()`, `setSyllableColoringEnabled(bool)`, `applySyllableColoring(enabled?, doc?)` | Toggles the `syl-off` class on `<html>`. Game code needs no changes. |
 | Theme | `getThemeMode()`, `setThemeMode('auto'\|'light'\|'dark')`, `isDarkMode(mode?)`, `applyTheme(mode?, doc?)` | See §4.3. |
+| Audio | `isSoundEnabled()`, `setSoundEnabled(bool)` | Global sound mute setting (`vz-sound-enabled`). |
 | Audio | `getAudioCtx()` / `initAudio()` | Lazily creates and resumes the `AudioContext`. Call it in the first user gesture (e.g. `startGame`). |
-| Audio | `playTone(freq, type, duration, startTime=0, vol=0.15)` | Low-level oscillator beep. |
+| Audio | `playTone(freq, type, duration, startTime=0, vol=0.15)` | Low-level oscillator beep (respects `isSoundEnabled()`). |
 | Audio | `playSound(type)` | `'coin' 'remove' 'click' 'tap' 'tick' 'pop' 'hop' 'hint' 'correct' 'wrong'/'error' 'win'` |
 | Audio | `playCorrectSound()`, `playWrongSound()`, `playWinSound()`, `playSelectSound()`, `playPickSound()`, `playPopSound()`, `playStepSound(idx?)`, `playTapSound()`, `playReturnSound()`, `playHintSound()` | Preferred high-level feedback sounds. |
+| Speech (TTS) | `hasLithuanianTTS() → bool`, `speakLT(text, rate?)`, `renderSpeakBtn(text, label?) → htmlString` | Lithuanian speech synthesis (`lt-LT` voice detection, emoji stripping, and `.speak-btn` button renderer). |
 | Arrays | `shuffle(arr)` (alias `shuffleArray`), `pickRandom(arr)` | `shuffle` returns a **new** array (Fisher–Yates). It doesn't mutate the input. |
 | Money | `formatMoneyCents(cents) → string`, `MONEY` | Canonical euro coin/bill data (`centCoins`, `euroCoins`, `bills`) and money formatting (`10 c`, `1 €`, `1,50 €`). |
+| Timers | `setGameTimeout(fn, ms) → id`, `clearGameTimers()` | Tracked timeouts automatically cleared when returning to menu (`renderTopBar` home button). |
+| Progress | `detectGameId() → string`, `getGameProgress(gameId?)`, `saveGameProgress(gameId, stars, score?, total?)`, `clearGameProgress()` | Persists best star rating (`1..3`) and play count per game folder in `vz-progress`. |
 | UI Components | `renderTopBar(opts) → htmlString` (alias `renderTopBarHelper`) | Standard game top bar with 🏠 (or 🔙 in portal iframe), ⭐ score, 🎯 progress, and 🔥 streak badges. |
-| UI Components | `calculateStars(score, total) → number`, `renderEndScreen(opts) → htmlString` (alias `renderEndScreenHelper`) | Standard star rating (≥80% 3★, ≥50% 2★, else 1★) and end screen template with restart button. |
+| UI Components | `calculateStars(score, total) → number`, `renderEndScreen(opts) → htmlString` (alias `renderEndScreenHelper`) | Standard star rating (≥80% 3★, ≥50% 2★, else 1★), auto-saves progress, triggers confetti, and supports `retryFn`/`mistakesCount` (`🛠️ Pataisyti klaidas (N)`) + `menuFn` (`🎛️ Kitas lygis`). |
+| UI Helpers | `showFeedback(idOrEl, htmlText, isSuccess?)`, `eliminateWrongOptions(buttons, count?)`, `celebrateWin(stars?)` | Feedback line updater, 50/50 wrong option eliminator, and zero-dependency confetti burst. |
 | Input | `preventZoom(doc)` | Blocks pinch, gesture, and ctrl+wheel zoom. Runs automatically on load. |
 
 **Rules for editing `common.js`:**
@@ -163,12 +168,12 @@ When you check by hand, open the game **through the portal** (iframe mode) *and*
 
 ### 4.2 `shared/common.css`
 - `--sc-0 … --sc-5`: syllable colors. They have light and dark variants and become `currentColor` under `.syl-off`.
-- Animations: `.bounce`, `.shake` / `.shake-anim`, `.bounce-anim`, `.fade-in`, `.pop-in`.
-- Hints: `.hint-btn` (amber 3D pill button for `💡 Užuomina`), `.hint-btn-pulse` (gentle pulse after a wrong try), `.hint-box` (revealed hint container, with dark-mode support).
+- Animations: `.bounce`, `.shake` / `.shake-anim` / `.animate-shake`, `.bounce-anim` / `.animate-bounce-sm`, `.fade-in`, `.pop-in` / `.animate-pop-in`, `.vz-confetti-piece`.
+- Hints & TTS: `.hint-btn` (amber 3D pill button for `💡 Užuomina`), `.hint-btn-pulse` (gentle pulse after a wrong try), `.hint-box` (revealed hint container, with dark-mode support), `.speak-btn` (compact `🔊` button for Lithuanian TTS).
 - Money: `.coin` + `.coin-copper` / `.coin-gold` + `.coin-1c … .coin-50c`, `.coin-1e`, `.coin-2e`; `.bill` + `.bill-5e/10e/20e`. Use these for every euro coin and bill.
 - Structural hooks the mobile rules depend on: **`#app`** (or `#main-app`, `.app-card`, `.glass-panel`) as the root game card, **`.top-bar`** / **`.top-badge`** for the stats bar, **`#feedback`** for the feedback line, and `.counter-tray`, `.money-tray`, `.change-tray`, `.piggy-box` for money trays. Keep these ids and class names when you refactor, or the small-screen layout breaks.
-- `.btn-tinted`, `.top-bar`, `.top-badge` get dark-mode styling automatically.
-- `body` has `touch-action: manipulation` and `user-select: none` globally.
+- `.btn-tinted`, `.top-bar`, `.top-badge`, `#app`, `.app-card`, `.selected-card`, `.matched-card` get dark-mode styling automatically.
+- `body` has `font-family: 'Nunito'`, `touch-action: manipulation`, and `user-select: none` globally.
 
 ### 4.3 Settings, theme, and `localStorage` keys
 
@@ -176,6 +181,8 @@ When you check by hand, open the game **through the portal** (iframe mode) *and*
 | --- | --- | --- |
 | `vz-syllable-colors` | `'1'` (default) / `'0'` | `setSyllableColoringEnabled` |
 | `vz-theme-mode` | `'auto'` (default) / `'light'` / `'dark'` | `setThemeMode` |
+| `vz-sound-enabled` | `'1'` (default) / `'0'` | `setSoundEnabled` |
+| `vz-progress` | JSON object `{ "<Folder>": { stars, bestScore, total, plays, updatedAt } }` | `saveGameProgress` / `clearGameProgress` |
 
 New keys must use the **`vz-` prefix**. The `storage` event listener in `common.js` keeps open iframes in sync.
 

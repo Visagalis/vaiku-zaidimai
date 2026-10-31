@@ -15,8 +15,8 @@
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <link rel="stylesheet" href="../shared/common.css">
-  <script src="../shared/common.js"></script>
+  <link rel="stylesheet" href="../shared/common.css?v=2">
+  <script src="../shared/common.js?v=2"></script>
 
   <style>
     body {
@@ -255,9 +255,14 @@
           
           const newStreak = streak + 1;
           const pointsEarned = 10 + (Math.floor(newStreak / 5) * 5);
+          const nextScore = score + pointsEarned;
           
-          setScore(prev => prev + pointsEarned);
+          setScore(nextScore);
           setStreak(newStreak);
+          if (typeof saveGameProgress === 'function') {
+            const starsEarned = nextScore >= 80 ? 3 : nextScore >= 40 ? 2 : 1;
+            saveGameProgress('SkaitymoZaidimas-main', starsEarned, nextScore, 100);
+          }
           
           const praise = PRAISE_WORDS[Math.floor(Math.random() * PRAISE_WORDS.length)];
           setFeedback({ text: `${praise} +${pointsEarned}`, type: 'success' });
@@ -337,13 +342,26 @@
 
           {/* Žodis (suskirstytas spalvotais skiemenimis) */}
           <div className="w-full max-w-4xl flex flex-col items-center justify-center my-1">
-            <h2 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-wide text-center uppercase break-all flex flex-wrap justify-center drop-shadow-sm leading-tight">
-              {currentWord?.syllables.map((syl, index) => (
-                <span key={index} style={{ color: SYLLABLE_COLORS[index % SYLLABLE_COLORS.length] }}>
-                  {syl}
-                </span>
-              ))}
-            </h2>
+            <div className="flex items-center justify-center gap-3">
+              <h2 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-wide text-center uppercase break-all flex flex-wrap justify-center drop-shadow-sm leading-tight">
+                {currentWord?.syllables.map((syl, index) => (
+                  <span key={index} style={{ color: SYLLABLE_COLORS[index % SYLLABLE_COLORS.length] }}>
+                    {syl}
+                  </span>
+                ))}
+              </h2>
+              {typeof hasLithuanianTTS === 'function' && hasLithuanianTTS() && currentWord && (
+                <button
+                  type="button"
+                  onClick={() => speakLT(currentWord.word)}
+                  className="speak-btn"
+                  title="Išklausyti žodį"
+                  aria-label="Išklausyti žodį"
+                >
+                  🔊
+                </button>
+              )}
+            </div>
             
             {/* Pasirinktas emoji ir pranešimai */}
             <div className="mt-2 flex flex-col items-center justify-center w-full">

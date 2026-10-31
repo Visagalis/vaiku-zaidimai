@@ -23,8 +23,8 @@
     <title>Žodžių Dėlionė</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../shared/common.css">
-    <script src="../shared/common.js"></script>
+    <link rel="stylesheet" href="../shared/common.css?v=2">
+    <script src="../shared/common.js?v=2"></script>
     <style>
         :root {
             --bg-color: #fdfcf0;
@@ -710,6 +710,10 @@
         function showFinalResults() {
             document.getElementById('final-stars-earned').textContent = totalStarsEarned;
             document.getElementById('final-stars-possible').textContent = totalPossibleStars;
+            
+            const starsRating = calculateStars(totalStarsEarned, totalPossibleStars);
+            saveGameProgress('RaidziuDelione-main', starsRating, totalStarsEarned, totalPossibleStars);
+            celebrateWin(starsRating);
             
             const imperfects = gameWords.filter(w => (wordMistakes[w.word] || 0) > 0);
             

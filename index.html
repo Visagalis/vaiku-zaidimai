@@ -9,8 +9,8 @@
     <title>Žaidimai Vaikams</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="shared/common.css">
-    <script src="shared/common.js"></script>
+    <link rel="stylesheet" href="shared/common.css?v=2">
+    <script src="shared/common.js?v=2"></script>
     <style>
         body {
             font-family: 'Nunito', sans-serif;
@@ -272,13 +272,16 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
             transition: transform 0.2s ease;
         }
-        #syl-toggle:checked + .toggle-track {
+        #syl-toggle:checked + .toggle-track,
+        #sound-toggle:checked + .toggle-track {
             background-color: #22c55e;
         }
-        #syl-toggle:checked + .toggle-track::after {
+        #syl-toggle:checked + .toggle-track::after,
+        #sound-toggle:checked + .toggle-track::after {
             transform: translateX(1.5rem);
         }
-        #syl-toggle:focus-visible + .toggle-track {
+        #syl-toggle:focus-visible + .toggle-track,
+        #sound-toggle:focus-visible + .toggle-track {
             outline: 3px solid #86efac;
             outline-offset: 2px;
         }
@@ -288,7 +291,11 @@
 
     <!-- Menu Screen -->
     <div id="menu" class="w-full max-w-6xl px-2.5 sm:px-4 py-4 sm:py-8 flex flex-col items-center">
-        <div class="w-full flex justify-end -mb-1 sm:-mb-3">
+        <div class="w-full flex justify-between items-center -mb-1 sm:-mb-3">
+            <div id="total-stars-pill" class="settings-btn bg-white border-2 border-b-4 border-amber-300 text-amber-900 font-extrabold text-xs sm:text-base px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-2xl shadow-sm flex items-center gap-1.5">
+                <span class="text-base sm:text-lg leading-none">🏆</span>
+                <span id="total-stars-text">⭐ 0 / 63</span>
+            </div>
             <button onclick="openSettings()" title="Nustatymai" class="settings-btn bg-white border-2 border-b-4 border-emerald-300 text-emerald-900 font-extrabold text-xs sm:text-base px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-2xl shadow-sm flex items-center gap-1.5 transition-transform active:scale-95">
                 <span class="text-base sm:text-lg leading-none">⚙️</span>
                 <span>Nustatymai</span>
@@ -569,7 +576,7 @@
                 </div>
             </div>
 
-            <label for="syl-toggle" class="settings-row flex items-center justify-between gap-4 bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4 cursor-pointer">
+            <label for="syl-toggle" class="settings-row flex items-center justify-between gap-4 bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4 mb-3 cursor-pointer">
                 <div>
                     <div class="settings-title font-extrabold text-base sm:text-lg text-slate-800">🌈 Skiemenų spalvinimas</div>
                     <div class="settings-desc text-xs sm:text-sm font-bold text-slate-500 leading-snug">Žodžiai žaidimuose nuspalvinami pagal skiemenis</div>
@@ -578,9 +585,24 @@
                 <span class="toggle-track" aria-hidden="true"></span>
             </label>
 
-            <div class="settings-preview mt-4 rounded-2xl border-2 border-dashed border-slate-200 p-4 text-center">
+            <label for="sound-toggle" class="settings-row flex items-center justify-between gap-4 bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4 cursor-pointer">
+                <div>
+                    <div class="settings-title font-extrabold text-base sm:text-lg text-slate-800">🔊 Žaidimų garsai</div>
+                    <div class="settings-desc text-xs sm:text-sm font-bold text-slate-500 leading-snug">Garso efektai ir lietuviškas įgarsinimas</div>
+                </div>
+                <input id="sound-toggle" type="checkbox" class="sr-only" onchange="onSoundToggle(this.checked)">
+                <span class="toggle-track" aria-hidden="true"></span>
+            </label>
+
+            <div class="settings-preview mt-3 rounded-2xl border-2 border-dashed border-slate-200 p-3.5 text-center">
                 <div class="settings-desc text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Pavyzdys</div>
                 <div id="syl-preview" class="text-2xl sm:text-3xl font-black text-slate-800"></div>
+            </div>
+
+            <div class="mt-3 flex justify-center">
+                <button type="button" onclick="resetAllProgress()" class="text-xs font-extrabold text-slate-400 hover:text-rose-500 transition-colors py-1 px-3 rounded-lg">
+                    🗑️ Išvalyti surinktų žvaigždučių progresą
+                </button>
             </div>
         </div>
     </div>
@@ -616,10 +638,49 @@
             } catch (err) {}
         });
 
-        // === NUSTATYMAI ===
+        // === NUSTATYMAI IR PROGRESAS ===
         const settingsModal = document.getElementById('settings-modal');
         const sylToggle = document.getElementById('syl-toggle');
+        const soundToggle = document.getElementById('sound-toggle');
         const sylPreview = document.getElementById('syl-preview');
+
+        function renderPortalStars() {
+            if (typeof getGameProgress !== 'function') return;
+            const allProgress = getGameProgress() || {};
+            const cards = document.querySelectorAll('#games-grid .card-3d');
+            let earnedStars = 0;
+            const maxStars = cards.length * 3;
+
+            cards.forEach(card => {
+                const onclickAttr = card.getAttribute('onclick') || '';
+                const match = onclickAttr.match(/([A-Za-z0-9_-]+-main)/);
+                if (!match) return;
+                const gameId = match[1];
+                const info = allProgress[gameId] || { stars: 0 };
+                const stars = Math.min(3, Math.max(0, info.stars || 0));
+                earnedStars += stars;
+
+                card.classList.add('relative');
+                let badge = card.querySelector('.game-stars-badge');
+                if (!badge) {
+                    badge = document.createElement('div');
+                    badge.className = 'game-stars-badge absolute top-2.5 right-3 px-2 py-0.5 rounded-full text-xs sm:text-sm font-black tracking-tight bg-white/85 dark:bg-slate-800/90 border border-black/10 dark:border-white/10 shadow-sm select-none';
+                    card.appendChild(badge);
+                }
+                if (stars > 0) {
+                    badge.innerHTML = '⭐'.repeat(stars) + '<span class="opacity-25">' + '⭐'.repeat(3 - stars) + '</span>';
+                    badge.classList.remove('opacity-50');
+                } else {
+                    badge.innerHTML = '<span class="opacity-30">⭐⭐⭐</span>';
+                    badge.classList.add('opacity-50');
+                }
+            });
+
+            const totalText = document.getElementById('total-stars-text');
+            if (totalText) {
+                totalText.textContent = `⭐ ${earnedStars} / ${maxStars}`;
+            }
+        }
 
         // Pritaiko temą atidarytam žaidimo iframe
         function syncFrameTheme() {
@@ -661,6 +722,9 @@
 
         function openSettings() {
             sylToggle.checked = isSyllableColoringEnabled();
+            if (soundToggle && typeof isSoundEnabled === 'function') {
+                soundToggle.checked = isSoundEnabled();
+            }
             updateThemeButtonsUI();
             sylPreview.innerHTML = `<span>${_col('Katė geria pieną')}</span>`;
             settingsModal.classList.remove('hidden');
@@ -676,6 +740,23 @@
             setSyllableColoringEnabled(enabled);
             syncFrameSyllableColoring();
             if (typeof playSound === 'function') playSound('click');
+        }
+
+        function onSoundToggle(enabled) {
+            if (typeof setSoundEnabled === 'function') {
+                setSoundEnabled(enabled);
+            }
+            if (enabled && typeof playSound === 'function') {
+                playSound('click');
+            }
+        }
+
+        function resetAllProgress() {
+            if (typeof clearGameProgress === 'function') {
+                clearGameProgress();
+                renderPortalStars();
+                if (typeof playSound === 'function') playSound('remove');
+            }
         }
 
         document.addEventListener('keydown', function(e) {
@@ -732,12 +813,16 @@
                 menu.classList.remove('hidden');
                 menu.style.display = '';
                 menu.classList.add('fade-in');
+                renderPortalStars();
                 
                 setTimeout(() => {
                     menu.classList.remove('fade-in');
                 }, 300);
             }, 200);
         }
+
+        window.addEventListener('storage', renderPortalStars);
+        renderPortalStars();
     </script>
 </body>
 </html>

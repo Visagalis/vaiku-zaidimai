@@ -9,8 +9,8 @@
     <title>Atminties Žaidimas</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../shared/common.css">
-    <script src="../shared/common.js"></script>
+    <link rel="stylesheet" href="../shared/common.css?v=2">
+    <script src="../shared/common.js?v=2"></script>
     <style>
         body {
             font-family: 'Nunito', sans-serif;
@@ -217,9 +217,12 @@
     <div id="game-screen" class="hidden flex-col h-full w-full max-w-5xl mx-auto p-2 sm:p-3 absolute inset-0 overflow-hidden">
         <div class="flex justify-between items-center bg-white px-3 py-2 sm:px-4 sm:py-2.5 rounded-2xl shadow-sm mb-2 shrink-0 font-bold text-sm sm:text-base md:text-lg border border-slate-100">
             <div class="flex items-center gap-2">
-                <button onclick="showStartScreen()" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-600 rounded-xl text-sm font-bold transition-colors" title="Pradžia">🏠</button>
+                <button id="home-btn" onclick="showStartScreen()" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-600 rounded-xl text-sm font-bold transition-colors" title="Pradžia">🏠</button>
                 <div id="score-pairs" class="text-indigo-600 font-black">🏆 0/6</div>
             </div>
+            <button id="hint-btn" onclick="showMemoryHint()" class="hint-btn text-xs sm:text-sm py-1 px-2.5">
+                <span>💡</span> <span>Užuomina</span>
+            </button>
             <div id="score-attempts" class="text-orange-500 font-black">🔄 0</div>
             <div id="score-time" class="text-emerald-600 font-black">⏱️ 00:00</div>
         </div>
@@ -242,6 +245,7 @@
 
         <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full max-w-xs">
             <button onclick="replayGame()" class="flex-1 py-3 sm:py-4 px-6 bg-indigo-500 hover:bg-indigo-600 text-white rounded-2xl text-lg sm:text-xl font-black shadow-[0_6px_0_#3730a3] active:translate-y-2 active:shadow-[0_0px_0_#3730a3] transition-all">🔄 Dar kartą</button>
+            <button onclick="showStartScreen()" class="py-3 sm:py-4 px-5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-2xl text-base sm:text-lg font-extrabold border-2 border-slate-300 transition-all">🎛️ Kitas lygis</button>
         </div>
     </div>
 
@@ -374,6 +378,8 @@
 
         function startGame(pairsCount) {
             initAudio();
+            const homeBtn = document.getElementById('home-btn');
+            if (homeBtn && window.self !== window.top) homeBtn.textContent = '🔙';
             
             currentPairs = pairsCount;
             pairsFound = 0;
@@ -479,6 +485,23 @@
             }
         }
 
+        function showMemoryHint() {
+            if (!canFlip || flippedCards.length > 0) return;
+            const unmatched = Array.from(grid.querySelectorAll('.card-container:not(.matched)'));
+            if (unmatched.length < 2) return;
+            playHintSound();
+            canFlip = false;
+            const targetId = unmatched[0].dataset.id;
+            const pairCards = unmatched.filter(c => c.dataset.id === targetId);
+            pairCards.forEach(c => c.classList.add('flipped'));
+            setTimeout(() => {
+                pairCards.forEach(c => {
+                    if (!c.classList.contains('matched')) c.classList.remove('flipped');
+                });
+                canFlip = true;
+            }, 900);
+        }
+
         function endGame() {
             stopTimer();
             playWin();
@@ -486,11 +509,19 @@
             document.getElementById('final-attempts').textContent = attempts;
             document.getElementById('final-time').textContent = formatTime(timeElapsed);
             
+            let starsCount = 1;
             let starsStr = "⭐";
-            if (attempts <= currentPairs + 2) starsStr = "⭐⭐⭐";
-            else if (attempts <= currentPairs * 2) starsStr = "⭐⭐";
+            if (attempts <= currentPairs + 2) {
+                starsCount = 3;
+                starsStr = "⭐⭐⭐";
+            } else if (attempts <= currentPairs * 2) {
+                starsCount = 2;
+                starsStr = "⭐⭐";
+            }
             
             document.getElementById('stars').textContent = starsStr;
+            saveGameProgress('AtmintiesZaidimas-main', starsCount, pairsFound, currentPairs);
+            celebrateWin(starsCount);
             
             showScreen('end');
         }

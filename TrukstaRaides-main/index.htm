@@ -9,8 +9,8 @@
     <title>Žodžių Žaidimas</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="../shared/common.css">
-    <script src="../shared/common.js"></script>
+    <link rel="stylesheet" href="../shared/common.css?v=2">
+    <script src="../shared/common.js?v=2"></script>
     <style>
         @media (prefers-color-scheme: dark) {
             body {
@@ -105,12 +105,18 @@
         
         <!-- Viršutinė juosta (Rezultatai) -->
         <div class="w-full max-w-md flex justify-between items-center bg-white p-2 sm:p-3 rounded-2xl shadow-sm shrink-0">
-            <button id="home-btn" onclick="location.reload()" class="bg-slate-100 hover:bg-slate-200 p-2 rounded-xl text-base transition-all active:scale-95" title="Pradžia">🏠</button>
+            <button id="home-btn" onclick="showStartScreen()" class="bg-slate-100 hover:bg-slate-200 p-2 rounded-xl text-base transition-all active:scale-95" title="Pradžia">🏠</button>
             
             <!-- Taškai -->
             <div class="flex items-center gap-1 sm:gap-1.5 bg-yellow-100 px-2.5 sm:px-3 py-1 rounded-full text-yellow-700 font-bold shadow-sm" title="Taškai">
                 <span>⭐</span>
                 <span id="score-display" class="text-base sm:text-lg">0</span>
+            </div>
+
+            <!-- Progresas -->
+            <div class="top-badge flex items-center gap-1 bg-blue-50 px-2.5 py-1 rounded-full text-blue-700 font-extrabold shadow-sm border border-blue-200 text-sm sm:text-base" title="Progresas">
+                <span>🎯</span>
+                <span id="progress-display">1 / 10</span>
             </div>
 
             <!-- Užuomina -->
@@ -124,19 +130,16 @@
                 <span id="streak-display" class="text-base sm:text-lg">0</span> 
             </div>
 
-            <!-- Klaidos -->
-            <div class="flex items-center gap-1 sm:gap-1.5 bg-red-100 px-2.5 sm:px-3 py-1 rounded-full text-red-700 font-bold shadow-sm" title="Klaidos">
-                <span>❌</span>
-                <span id="mistakes-display" class="text-base sm:text-lg">0</span>
-            </div>
-
         </div>
 
         <!-- Pagrindinė žaidimo lenta -->
         <div class="flex-1 flex flex-col items-center justify-evenly w-full max-w-lg py-1 min-h-0">
-            <!-- Emoji paveikslėlis -->
-            <div id="emoji-display" class="text-6xl sm:text-8xl drop-shadow-xl animate-pulse" style="animation-duration: 3s;">
-                <!-- Emoji -->
+            <!-- Emoji paveikslėlis + 🔊 -->
+            <div class="flex items-center justify-center gap-3">
+                <div id="emoji-display" class="text-6xl sm:text-8xl drop-shadow-xl animate-pulse" style="animation-duration: 3s;">
+                    <!-- Emoji -->
+                </div>
+                <button id="speak-word-btn" onclick="if (currentWord) speakLT(currentWord.word)" class="speak-btn hidden" title="Išklausyti žodį" aria-label="Išklausyti žodį">🔊</button>
             </div>
 
             <!-- Žodžio atvaizdavimas -->
@@ -156,6 +159,11 @@
                 <!-- Mygtukai -->
             </div>
         </div>
+    </div>
+
+    <!-- PABAIGOS EKRANAS -->
+    <div id="end-screen" class="hidden min-h-screen bg-sky-100 flex-col items-center justify-center p-4">
+        <div id="end-card" class="bg-white rounded-3xl shadow-xl max-w-md w-full text-center"></div>
     </div>
 
     <!-- ŽAIDIMO LOGIKA -->
@@ -205,6 +213,10 @@
         ];
 
         let currentWord = null;
+        let roundDeck = [];
+        let roundIndex = 0;
+        let missedWords = [];
+        let firstTry = true;
         let missingIndex = 0;
         let letterColors = [];
         let score = 0;
@@ -218,6 +230,10 @@
             kbContainer.innerHTML = '';
             const homeBtn = document.getElementById('home-btn');
             if (homeBtn && window.self !== window.top) homeBtn.textContent = '🔙';
+            const speakBtn = document.getElementById('speak-word-btn');
+            if (speakBtn && typeof hasLithuanianTTS === 'function' && hasLithuanianTTS()) {
+                speakBtn.classList.remove('hidden');
+            }
             LIETUVISKA_ABECELE.forEach(letter => {
                 const btn = document.createElement('button');
                 btn.textContent = letter;
@@ -228,13 +244,28 @@
             });
         }
 
+        function showStartScreen() {
+            clearGameTimers();
+            isAnimating = false;
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('flex');
+            document.getElementById('end-screen').classList.add('hidden');
+            document.getElementById('end-screen').classList.remove('flex');
+            document.getElementById('start-screen').classList.remove('hidden');
+        }
+
         function startGame() {
+            getAudioCtx();
             score = 0;
             streak = 0;
-            mistakes = 0; // Nunuliname klaidas pradedant naują žaidimą
-            updateScoreUI();
+            mistakes = 0;
+            roundIndex = 0;
+            missedWords = [];
+            roundDeck = shuffle(ZODZIU_SARASAS).slice(0, 10);
             
             document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('end-screen').classList.add('hidden');
+            document.getElementById('end-screen').classList.remove('flex');
             const gameScreen = document.getElementById('game-screen');
             gameScreen.classList.remove('hidden');
             gameScreen.classList.add('flex');
@@ -243,22 +274,62 @@
             pickNextWord();
         }
 
+        function retryMistakes() {
+            if (!missedWords || missedWords.length === 0) {
+                startGame();
+                return;
+            }
+            getAudioCtx();
+            score = 0;
+            streak = 0;
+            mistakes = 0;
+            roundIndex = 0;
+            roundDeck = shuffle(missedWords);
+            missedWords = [];
+
+            document.getElementById('end-screen').classList.add('hidden');
+            document.getElementById('end-screen').classList.remove('flex');
+            const gameScreen = document.getElementById('game-screen');
+            gameScreen.classList.remove('hidden');
+            gameScreen.classList.add('flex');
+
+            initKeyboard();
+            pickNextWord();
+        }
+
+        function showEndScreen() {
+            const gameScreen = document.getElementById('game-screen');
+            gameScreen.classList.add('hidden');
+            gameScreen.classList.remove('flex');
+            const endScreen = document.getElementById('end-screen');
+            const endCard = document.getElementById('end-card');
+            endCard.innerHTML = renderEndScreenHelper({
+                score: score,
+                total: roundDeck.length || 10,
+                restartFn: "startGame()",
+                retryFn: "retryMistakes()",
+                mistakesCount: missedWords.length
+            });
+            endScreen.classList.remove('hidden');
+            endScreen.classList.add('flex');
+        }
+
         function pickNextWord() {
+            if (roundIndex >= roundDeck.length) {
+                showEndScreen();
+                return;
+            }
             isAnimating = false;
             hintUsed = false;
+            firstTry = true;
             const hintBtn = document.getElementById('hint-btn');
             if (hintBtn) {
                 hintBtn.classList.remove('hidden', 'hint-btn-pulse');
             }
-            let nextWordObj;
-            
-            do {
-                const randomIndex = Math.floor(Math.random() * ZODZIU_SARASAS.length);
-                nextWordObj = ZODZIU_SARASAS[randomIndex];
-            } while (currentWord && nextWordObj.word === currentWord.word);
 
-            currentWord = nextWordObj;
+            currentWord = roundDeck[roundIndex];
             missingIndex = Math.floor(Math.random() * currentWord.word.length);
+            updateScoreUI();
             
             renderGame();
             resetKeyboard();
@@ -336,7 +407,10 @@
 
         function updateScoreUI() {
             document.getElementById('score-display').textContent = score;
-            document.getElementById('mistakes-display').textContent = mistakes; // Atnaujiname klaidų tekstą
+            const progEl = document.getElementById('progress-display');
+            if (progEl) {
+                progEl.textContent = `${Math.min(roundIndex + 1, roundDeck.length || 10)} / ${roundDeck.length || 10}`;
+            }
             
             const streakContainer = document.getElementById('streak-container');
             const streakDisplay = document.getElementById('streak-display');
@@ -362,8 +436,11 @@
 
             if (letter === correctLetter) {
                 isAnimating = true;
-                score++;
-                streak++;
+                playCorrectSound();
+                if (firstTry) {
+                    score++;
+                    streak++;
+                }
                 updateScoreUI();
                 disableKeyboard();
 
@@ -373,11 +450,19 @@
                 
                 feedbackMsg.innerHTML = '<div class="text-green-500 text-2xl sm:text-3xl animate-bounce flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg> Puiku! <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg></div>';
 
-                setTimeout(pickNextWord, 1500);
+                setGameTimeout(() => {
+                    roundIndex++;
+                    pickNextWord();
+                }, 1300);
             } else {
                 isAnimating = true;
+                playWrongSound();
+                if (firstTry && !missedWords.includes(currentWord)) {
+                    missedWords.push(currentWord);
+                }
+                firstTry = false;
                 streak = 0;
-                mistakes++; // Padidiname klaidų skaičių
+                mistakes++;
                 updateScoreUI();
 
                 missingBox.style.color = '';
