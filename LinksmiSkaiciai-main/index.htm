@@ -22,10 +22,87 @@
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        .float-anim { animation: floatSlow 2.6s ease-in-out infinite; }
+        .float-anim { animation: floatSlow 2.8s ease-in-out infinite; }
         @keyframes floatSlow {
             0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-5px); }
+            50% { transform: translateY(-6px); }
+        }
+
+        /* Tikroviška baliono forma 3-iam režimui */
+        .balloon-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .balloon-body {
+            width: 122px;
+            height: 136px;
+            border-radius: 50% 50% 46% 46% / 54% 54% 46% 46%;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset -8px -10px 18px rgba(0, 0, 0, 0.18), 0 8px 16px -4px rgba(15, 23, 42, 0.25);
+            transition: transform 0.15s ease, opacity 0.2s ease, box-shadow 0.15s ease;
+        }
+        .balloon-body::before {
+            content: '';
+            position: absolute;
+            top: 14%;
+            left: 18%;
+            width: 22px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.35);
+            transform: rotate(28deg);
+            pointer-events: none;
+        }
+        .balloon-knot {
+            width: 0;
+            height: 0;
+            border-left: 7px solid transparent;
+            border-right: 7px solid transparent;
+            border-bottom: 9px solid currentColor;
+            margin-top: -2px;
+        }
+        .balloon-string {
+            width: 2px;
+            height: 16px;
+            background: rgba(100, 116, 139, 0.55);
+            border-radius: 999px;
+        }
+        .balloon-popped {
+            width: 122px;
+            height: 136px;
+            border-radius: 50% 50% 46% 46% / 54% 54% 46% 46%;
+        }
+        @media (min-width: 640px) {
+            .balloon-body,
+            .balloon-popped {
+                width: 146px;
+                height: 162px;
+            }
+            .balloon-body::before {
+                width: 26px;
+                height: 44px;
+            }
+            .balloon-string {
+                height: 20px;
+            }
+        }
+        @media (max-height: 680px) and (max-width: 639px) {
+            .balloon-body,
+            .balloon-popped {
+                width: 108px;
+                height: 118px;
+            }
+            .balloon-string {
+                height: 10px;
+            }
         }
 
         /* Šviesios temos kortelės ir panelės */
@@ -424,7 +501,7 @@
             if (box) box.innerHTML = renderTokensMarkup();
             if (counterEl) {
                 const c = Object.keys(state.countedMap).length;
-                counterEl.innerHTML = `👆 <strong class="text-amber-500 font-black">${c}</strong>`;
+                counterEl.innerHTML = `👆 ${_col('Suskaičiuota:')} <strong class="text-amber-500 font-black">${c}</strong>`;
             }
         }
 
@@ -447,13 +524,13 @@
 
                     <div class="flex flex-col min-h-0">
                         <div class="flex justify-between items-center px-1 mb-1.5 text-sm font-bold shrink-0">
-                            <span id="tap-counter" class="text-sub-title text-base">👆 <strong class="text-amber-500 font-black">0</strong></span>
+                            <span id="tap-counter" class="text-sub-title text-xs sm:text-sm font-extrabold">👆 ${_col('Suskaičiuota:')} <strong class="text-amber-500 font-black">0</strong></span>
                             <div class="flex items-center gap-2">
                                 <button id="hint-btn" onclick="showObjectsHint()" class="hint-btn py-1 px-3 text-xs sm:text-sm min-h-[34px]">
                                     <span>💡</span>
                                     <span>${_col('Užuomina')}</span>
                                 </button>
-                                <button onclick="state.countedMap={}; playSound('click'); updateTokensUI();" class="text-sky-500 hover:underline font-extrabold text-base px-1" title="Iš naujo">🔄</button>
+                                <button onclick="state.countedMap={}; playSound('click'); updateTokensUI();" class="px-2.5 py-1 rounded-xl bg-sky-100 dark:bg-slate-800 text-sky-700 dark:text-sky-300 border border-sky-300 dark:border-slate-600 font-extrabold text-xs sm:text-sm active:scale-95" title="Iš naujo">🔄 ${_col('Nulis')}</button>
                             </div>
                         </div>
                         <div id="tokens-container" class="panel-box rounded-2xl p-3 sm:p-4 min-h-[105px] sm:min-h-[135px] flex flex-wrap items-center justify-center content-center gap-1.5 sm:gap-2">
@@ -487,7 +564,7 @@
                 if (ansSlot) ansSlot.textContent = val;
                 if (problemBox) problemBox.classList.add('bounce');
                 if (btn) {
-                    btn.className = "py-2.5 sm:py-3.5 bg-emerald-500 text-white rounded-2xl font-black text-2xl sm:text-3xl shadow-md border-b-4 border-emerald-700 transform scale-105 bounce";
+                    btn.className = "py-3.5 sm:py-4 bg-green-500 text-white rounded-2xl font-black text-3xl sm:text-4xl shadow-md border-b-4 border-green-700 transform scale-105 bounce";
                 }
                 const praise = getRandomElement(PRAISE_WORDS);
                 feedback.innerHTML = `<span>${_col(praise)} 🌟</span>`;
@@ -500,7 +577,7 @@
                 playSound('wrong');
                 if (btn) {
                     btn.disabled = true;
-                    btn.className = "py-2.5 sm:py-3.5 bg-red-100 dark:bg-red-950 text-red-400 border-red-300 border-2 rounded-2xl font-bold text-2xl sm:text-3xl line-through opacity-50 shake cursor-not-allowed";
+                    btn.className = "py-3.5 sm:py-4 bg-red-100 dark:bg-red-950 text-red-400 border-red-300 border-2 rounded-2xl font-bold text-3xl sm:text-4xl line-through opacity-50 shake cursor-not-allowed";
                 }
                 feedback.innerHTML = `<span>${_col('Bandyk dar kartą! Paspausk daiktus ir suskaičiuok.')} 🤔</span>`;
                 feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-xs sm:text-base text-rose-500 opacity-100";
@@ -556,7 +633,7 @@
         function renderScaleScreen() {
             const leftLabel = state.leftHasSum ? `${state.leftA} + ${state.leftB}` : `${state.leftTotal}`;
             const numButtons = [1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => `
-                <button id="num-blk-${n}" onclick="setScaleGuess(${n})" class="opt-btn py-2.5 sm:py-3 px-2 sm:px-3.5 rounded-xl font-black text-lg sm:text-xl border-b-4 shadow-sm transition transform active:scale-90">
+                <button id="num-blk-${n}" onclick="setScaleGuess(${n})" class="opt-btn py-2 sm:py-3 px-2 sm:px-3.5 rounded-xl font-black text-lg sm:text-xl border-b-4 shadow-sm transition transform active:scale-90">
                     ${n}
                 </button>
             `).join('');
@@ -575,14 +652,14 @@
                     </div>
 
                     <!-- Svarstyklių vizualizacija -->
-                    <div id="scale-area" class="panel-box rounded-2xl p-3 sm:p-4 flex flex-col items-center justify-center min-h-[145px] sm:min-h-[175px] relative overflow-hidden">
+                    <div id="scale-area" class="panel-box rounded-2xl p-3 sm:p-4 flex flex-col items-center justify-center min-h-[140px] sm:min-h-[175px] relative overflow-hidden">
                         <div id="scale-status" class="text-xs sm:text-sm font-black mb-2 px-3 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300 ${state.hintUsed ? '' : 'hidden'}">
                         </div>
 
                         <!-- Svarstyklių sija -->
                         <div id="scale-beam" class="scale-beam w-full max-w-md flex items-center justify-between px-2 sm:px-6 relative my-2">
                             <!-- Kairė lėkštė -->
-                            <div class="scale-pan rounded-2xl px-3 sm:px-4 py-2 sm:py-3 shadow-md flex flex-col items-center min-w-[110px] sm:min-w-[135px]">
+                            <div class="scale-pan rounded-2xl px-3 sm:px-4 py-2 sm:py-3 shadow-md flex flex-col items-center min-w-[105px] sm:min-w-[135px]">
                                 <span class="text-[11px] sm:text-xs font-bold text-slate-400">${_col('Kairė pusė')}</span>
                                 <span class="text-xl sm:text-3xl font-black text-sky-600 dark:text-sky-400">${leftLabel}</span>
                                 <span id="left-sum-label" class="text-xs font-extrabold text-slate-500 ${state.hintUsed ? '' : 'hidden'}">(${_col('Svoris:')} ${state.leftTotal})</span>
@@ -594,7 +671,7 @@
                             </div>
 
                             <!-- Dešinė lėkštė -->
-                            <div class="scale-pan rounded-2xl px-3 sm:px-4 py-2 sm:py-3 shadow-md flex flex-col items-center min-w-[110px] sm:min-w-[135px]">
+                            <div class="scale-pan rounded-2xl px-3 sm:px-4 py-2 sm:py-3 shadow-md flex flex-col items-center min-w-[105px] sm:min-w-[135px]">
                                 <span class="text-[11px] sm:text-xs font-bold text-slate-400">${_col('Dešinė pusė')}</span>
                                 <div class="text-xl sm:text-3xl font-black text-amber-600 dark:text-amber-400 flex items-center gap-1">
                                     <span>${state.rightBase} +</span>
@@ -614,21 +691,22 @@
                     <!-- Valdymo mygtukai: -1 / +1 ir skaičių kaladėlės 1..9 -->
                     <div class="sub-panel rounded-2xl p-2 sm:p-3 flex flex-col gap-2">
                         <div class="flex items-center justify-center gap-3">
-                            <button onclick="adjustScaleGuess(-1)" class="px-4 py-1.5 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-black text-base sm:text-lg shadow border-b-4 border-rose-700 active:scale-95">
+                            <button onclick="adjustScaleGuess(-1)" class="px-4 py-1.5 rounded-xl bg-rose-500 text-white font-black text-base sm:text-lg shadow border-b-4 border-rose-700 active:scale-95">
                                 -1
                             </button>
-                            <span class="text-base font-black">❓</span>
-                            <button onclick="adjustScaleGuess(1)" class="px-4 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-black text-base sm:text-lg shadow border-b-4 border-emerald-700 active:scale-95">
+                            <span class="text-xs sm:text-sm font-extrabold text-sub-title">${_col('Pasirink skaičių:')}</span>
+                            <button onclick="adjustScaleGuess(1)" class="px-4 py-1.5 rounded-xl bg-emerald-500 text-white font-black text-base sm:text-lg shadow border-b-4 border-emerald-700 active:scale-95">
                                 +1
                             </button>
                         </div>
-                        <div class="grid grid-cols-9 gap-1 sm:gap-1.5">
+                        <div class="grid grid-cols-5 sm:grid-cols-9 gap-1.5 sm:gap-2">
                             ${numButtons}
                         </div>
                     </div>
 
-                    <button onclick="checkScaleAnswer()" class="btn-tinted w-full py-3 sm:py-3.5 rounded-2xl bg-green-100 hover:bg-green-200 text-slate-800 font-black text-xl sm:text-3xl shadow-md border-2 border-b-4 border-green-400 transition transform active:scale-95">
-                        ✅
+                    <button onclick="checkScaleAnswer()" class="btn-tinted w-full py-3 sm:py-3.5 rounded-2xl bg-green-100 text-slate-800 font-black text-lg sm:text-2xl shadow-md border-2 border-b-4 border-green-400 transition transform active:scale-95 flex items-center justify-center gap-2">
+                        <span>✅</span>
+                        <span>${_col('Patikrinti')}</span>
                     </button>
                 </div>
             `;
@@ -663,9 +741,9 @@
                 const b = document.getElementById(`num-blk-${n}`);
                 if (b) {
                     if (n === state.rightGuess) {
-                        b.className = "py-2 sm:py-2.5 px-2.5 sm:px-3.5 rounded-xl font-black text-lg sm:text-xl border-b-4 bg-amber-400 text-slate-900 border-amber-600 shadow-md scale-105 transition";
+                        b.className = "py-2 sm:py-2.5 px-2 sm:px-3.5 rounded-xl font-black text-lg sm:text-xl border-b-4 bg-amber-400 text-slate-900 border-amber-600 shadow-md scale-105 transition";
                     } else {
-                        b.className = "opt-btn py-2 sm:py-2.5 px-2.5 sm:px-3.5 rounded-xl font-black text-lg sm:text-xl border-b-4 shadow-sm transition transform active:scale-90";
+                        b.className = "opt-btn py-2 sm:py-2.5 px-2 sm:px-3.5 rounded-xl font-black text-lg sm:text-xl border-b-4 shadow-sm transition transform active:scale-90";
                     }
                 }
             }
@@ -732,22 +810,27 @@
         // 3 REŽIMAS: BALIONŲ SPROGDINIMAS
         // ==========================================
         const BALLOON_STYLES = [
-            'bg-gradient-to-br from-rose-400 to-rose-600 border-rose-700',
-            'bg-gradient-to-br from-sky-400 to-blue-600 border-blue-700',
-            'bg-gradient-to-br from-amber-400 to-orange-500 border-orange-700',
-            'bg-gradient-to-br from-emerald-400 to-green-600 border-green-700',
-            'bg-gradient-to-br from-purple-400 to-indigo-600 border-indigo-700',
-            'bg-gradient-to-br from-pink-400 to-fuchsia-600 border-fuchsia-700'
+            { body: 'bg-gradient-to-br from-rose-400 to-rose-600 border-rose-700', knot: 'text-rose-600' },
+            { body: 'bg-gradient-to-br from-sky-400 to-blue-600 border-blue-700', knot: 'text-blue-600' },
+            { body: 'bg-gradient-to-br from-amber-400 to-orange-500 border-orange-700', knot: 'text-orange-500' },
+            { body: 'bg-gradient-to-br from-emerald-400 to-green-600 border-green-700', knot: 'text-green-600' },
+            { body: 'bg-gradient-to-br from-purple-400 to-indigo-600 border-indigo-700', knot: 'text-indigo-600' },
+            { body: 'bg-gradient-to-br from-pink-400 to-fuchsia-600 border-fuchsia-700', knot: 'text-fuchsia-600' }
         ];
 
         function makeExprWithValue(targetVal) {
-            const useAdd = Math.random() > 0.4;
+            const isEarly = state.question <= 5;
+            const maxMinuend = isEarly ? 12 : 18;
+            const maxSub = Math.max(1, Math.min(isEarly ? 4 : 6, maxMinuend - targetVal));
+            const canSub = targetVal + 1 <= maxMinuend;
+            const useAdd = !canSub || Math.random() > 0.42;
+
             if (useAdd && targetVal >= 1) {
                 const a = randomInt(0, targetVal);
                 const b = targetVal - a;
                 return { label: `${a} + ${b}`, value: targetVal };
             } else {
-                const sub = randomInt(1, 6);
+                const sub = randomInt(1, maxSub);
                 const a = targetVal + sub;
                 return { label: `${a} - ${sub}`, value: targetVal };
             }
@@ -762,7 +845,9 @@
             const list = [];
 
             // 3 teisingi balionai
-            while (list.length < 3) {
+            let guard = 0;
+            while (list.length < 3 && guard < 60) {
+                guard++;
                 const expr = makeExprWithValue(state.balloonTarget);
                 if (!usedLabels.has(expr.label)) {
                     usedLabels.add(expr.label);
@@ -771,10 +856,11 @@
             }
 
             // 3 neteisingi balionai
-            while (list.length < 6) {
+            while (list.length < 6 && guard < 120) {
+                guard++;
                 let wrongVal = state.balloonTarget + randomInt(-4, 4);
                 if (wrongVal < 1 || wrongVal === state.balloonTarget) {
-                    wrongVal = state.balloonTarget + randomInt(1, 4);
+                    wrongVal = state.balloonTarget + randomInt(1, 3);
                 }
                 const expr = makeExprWithValue(wrongVal);
                 if (!usedLabels.has(expr.label)) {
@@ -785,9 +871,25 @@
 
             list.sort(() => Math.random() - 0.5);
             list.forEach((b, i) => {
-                b.colorClass = BALLOON_STYLES[i % BALLOON_STYLES.length];
+                const st = BALLOON_STYLES[i % BALLOON_STYLES.length];
+                b.colorClass = st.body;
+                b.knotClass = st.knot;
             });
             state.balloons = list;
+            renderBalloonsScreen();
+        }
+
+        function showBalloonsHint() {
+            if (state.waiting || state.hintUsed) return;
+            state.hintUsed = true;
+            playHintSound();
+            let revealed = 0;
+            state.balloons.forEach(b => {
+                if (!b.isTarget && !b.wrongTried && revealed < 2) {
+                    b.wrongTried = true;
+                    revealed++;
+                }
+            });
             renderBalloonsScreen();
         }
 
@@ -795,40 +897,53 @@
             const balloonsHtml = state.balloons.map((b, idx) => {
                 if (b.popped) {
                     return `
-                        <div class="w-full h-full min-h-[85px] sm:min-h-[110px] rounded-3xl border-2 border-dashed border-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 flex flex-col items-center justify-center pop-in p-2">
-                            <span class="text-2xl sm:text-3xl">💥</span>
-                            <span class="text-xs sm:text-sm font-black text-emerald-600 dark:text-emerald-400 mt-1">${b.label} = ${b.value}</span>
+                        <div class="balloon-wrap pop-in">
+                            <div class="balloon-popped border-3 border-dashed border-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 flex flex-col items-center justify-center p-2 shadow-inner">
+                                <span class="text-2xl sm:text-3xl leading-none">💥</span>
+                                <span class="text-sm sm:text-base font-black text-emerald-700 dark:text-emerald-300 mt-1">${b.label} = ${b.value}</span>
+                                <span class="text-[11px] font-extrabold text-emerald-600 dark:text-emerald-400">✅ ${_col('Puiku!')}</span>
+                            </div>
                         </div>
                     `;
                 }
                 return `
-                    <button id="bal-${idx}" onclick="tapBalloon(${idx})" class="float-anim w-full h-full min-h-[85px] sm:min-h-[110px] rounded-3xl ${b.colorClass} text-white border-b-4 shadow-lg flex flex-col items-center justify-center relative transition transform active:scale-95 ${b.wrongTried ? 'opacity-50' : ''} p-2" style="animation-delay: ${idx * 0.18}s">
-                        <span class="text-xs sm:text-sm opacity-90 mb-0.5">🎈</span>
-                        <span class="text-xl sm:text-3xl font-black tracking-wide drop-shadow">${b.label}</span>
+                    <button id="bal-${idx}" onclick="tapBalloon(${idx})" class="balloon-wrap float-anim group focus:outline-none ${b.wrongTried ? 'opacity-45' : ''}" style="animation-delay: ${idx * 0.18}s">
+                        <div class="balloon-body ${b.colorClass} text-white border-b-4 px-2 text-center group-active:scale-90">
+                            <span class="text-xl sm:text-2xl font-black tracking-wide drop-shadow-md leading-tight">${b.label}</span>
+                            ${b.wrongTried ? `<span class="mt-1 px-2 py-0.5 rounded-full bg-black/35 text-[11px] sm:text-xs font-extrabold leading-none">= ${b.value} ❌</span>` : ''}
+                        </div>
+                        <div class="balloon-knot ${b.knotClass}"></div>
+                        <div class="balloon-string"></div>
                     </button>
                 `;
             }).join('');
 
             app.innerHTML = `
                 ${renderGameTopBar()}
-                <div class="flex-1 flex flex-col p-3 sm:p-5 justify-between overflow-hidden fade-in min-h-0">
-                    <div class="text-center shrink-0">
-                        <h2 class="text-base sm:text-xl font-black text-slate-800 text-main-title mb-1 sm:mb-2">
-                            🎈 ${_col('Susprogdink 3 balionus su skaičiumi')} <span class="text-rose-500 dark:text-rose-400 font-black text-lg sm:text-2xl">${state.balloonTarget}</span>!
+                <div class="flex-1 flex flex-col px-3 py-2 sm:p-5 justify-between overflow-hidden fade-in min-h-0">
+                    <div class="text-center shrink-0 flex flex-col items-center gap-1.5">
+                        <h2 class="text-sm sm:text-xl font-black text-slate-800 text-main-title leading-snug">
+                            🎈 ${_col('Susprogdink 3 balionus su atsakymu')} <span class="text-rose-500 dark:text-rose-400 font-black text-lg sm:text-2xl">${state.balloonTarget}</span>!
                         </h2>
-                        <div class="inline-flex items-center gap-2.5 sm:gap-3 px-4 sm:px-5 py-1.5 sm:py-2 rounded-2xl bg-rose-100 dark:bg-rose-950 border-2 border-rose-400 text-rose-700 dark:text-rose-200 font-black text-xl sm:text-3xl shadow-sm">
-                            <span>🎈 ${state.balloonTarget}</span>
-                            <span id="pop-progress" class="text-xs sm:text-base px-2.5 sm:px-3 py-1 rounded-xl bg-white text-slate-700 font-extrabold shadow-inner">
-                                💥 ${state.poppedCount} / 3
-                            </span>
+                        <div class="flex items-center justify-center gap-2 flex-wrap">
+                            <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-2xl bg-rose-100 dark:bg-rose-950 border-2 border-rose-400 text-rose-700 dark:text-rose-200 font-black text-lg sm:text-2xl shadow-sm">
+                                <span>🎯 ${state.balloonTarget}</span>
+                                <span id="pop-progress" class="text-xs sm:text-sm px-2 py-0.5 rounded-xl bg-white text-slate-700 font-extrabold shadow-inner">
+                                    💥 ${state.poppedCount} / 3
+                                </span>
+                            </div>
+                            <button id="hint-btn" onclick="showBalloonsHint()" class="hint-btn py-1 px-3 text-xs sm:text-sm min-h-[34px] ${state.hintUsed ? 'hidden' : ''}">
+                                <span>💡</span>
+                                <span>${_col('Užuomina')}</span>
+                            </button>
                         </div>
                     </div>
 
-                    <div id="balloons-grid" class="flex-1 grid grid-cols-3 grid-rows-2 gap-2.5 sm:gap-4 my-2 content-stretch items-stretch min-h-0">
+                    <div id="balloons-grid" class="flex-1 grid grid-cols-2 sm:grid-cols-3 gap-x-5 gap-y-2.5 sm:gap-6 my-auto place-items-center content-center min-h-0">
                         ${balloonsHtml}
                     </div>
 
-                    <div id="feedback" class="min-h-[2.75rem] sm:min-h-[3.25rem] flex flex-col items-center justify-center font-black text-center opacity-0 transition-opacity shrink-0"></div>
+                    <div id="feedback" class="min-h-[2.4rem] sm:min-h-[3rem] flex flex-col items-center justify-center font-black text-center opacity-0 transition-opacity shrink-0"></div>
                 </div>
             `;
         }
@@ -837,8 +952,6 @@
             if (state.waiting) return;
             const b = state.balloons[idx];
             if (!b || b.popped) return;
-
-            const feedback = document.getElementById('feedback');
 
             if (b.isTarget) {
                 b.popped = true;
@@ -856,20 +969,18 @@
                     }
                     if (newFeedback) {
                         newFeedback.innerHTML = `
-                            <span class="text-base sm:text-xl font-black leading-tight">🎉 ${_col('Valio!')}</span>
-                            <span class="text-xs sm:text-sm font-extrabold text-emerald-600 dark:text-emerald-400 leading-tight">${_col('Susprogdinai visus 3 teisingus balionus!')}</span>
+                            <span class="text-sm sm:text-lg font-black leading-tight">🎉 ${_col('Valio! Susprogdinai visus 3 teisingus balionus!')}</span>
                         `;
-                        newFeedback.className = "min-h-[2.75rem] sm:min-h-[3.25rem] flex flex-col items-center justify-center font-black text-center text-emerald-500 opacity-100 shrink-0";
+                        newFeedback.className = "min-h-[2.4rem] sm:min-h-[3rem] flex flex-col items-center justify-center font-black text-center text-emerald-500 opacity-100 shrink-0";
                     }
                     fireConfetti();
                     setTimeout(advanceQuestion, 1250);
                 } else {
                     if (newFeedback) {
                         newFeedback.innerHTML = `
-                            <span class="text-base sm:text-xl font-black leading-tight">💥 ${_col('Puiku!')}</span>
-                            <span class="text-xs sm:text-sm font-extrabold text-emerald-600 dark:text-emerald-400 leading-tight">${_col('Ieškok dar!')} (${state.poppedCount} / 3)</span>
+                            <span class="text-sm sm:text-lg font-black leading-tight">💥 ${_col('Puiku! Ieškok dar!')} (${state.poppedCount} / 3)</span>
                         `;
-                        newFeedback.className = "min-h-[2.75rem] sm:min-h-[3.25rem] flex flex-col items-center justify-center font-black text-center text-emerald-500 opacity-100 shrink-0";
+                        newFeedback.className = "min-h-[2.4rem] sm:min-h-[3rem] flex flex-col items-center justify-center font-black text-center text-emerald-500 opacity-100 shrink-0";
                     }
                 }
             } else {
@@ -877,18 +988,23 @@
                 state.streak = 0;
                 b.wrongTried = true;
                 playSound('wrong');
+                renderBalloonsScreen();
+
                 const btn = document.getElementById(`bal-${idx}`);
                 if (btn) {
                     btn.classList.remove('shake');
                     void btn.offsetWidth;
-                    btn.classList.add('shake', 'opacity-50');
+                    btn.classList.add('shake');
                 }
-                if (feedback) {
-                    feedback.innerHTML = `
-                        <span class="text-xs sm:text-base font-black leading-tight">🤔 ${_col('Oho!')} ${b.label} = ${b.value}</span>
-                        <span class="text-[11px] sm:text-xs font-extrabold text-rose-600 dark:text-rose-400 leading-tight">${_col('Ieškok skaičiaus')} ${state.balloonTarget}!</span>
+                const hBtn = document.getElementById('hint-btn');
+                if (hBtn) hBtn.classList.add('hint-btn-pulse');
+
+                const newFeedback = document.getElementById('feedback');
+                if (newFeedback) {
+                    newFeedback.innerHTML = `
+                        <span class="text-xs sm:text-base font-black leading-tight">🤔 ${b.label} = ${b.value}. ${_col('Ieškok skaičiaus')} ${state.balloonTarget}!</span>
                     `;
-                    feedback.className = "min-h-[2.75rem] sm:min-h-[3.25rem] flex flex-col items-center justify-center font-black text-center text-rose-500 opacity-100 shrink-0";
+                    newFeedback.className = "min-h-[2.4rem] sm:min-h-[3rem] flex flex-col items-center justify-center font-black text-center text-rose-500 opacity-100 shrink-0";
                 }
             }
         }
