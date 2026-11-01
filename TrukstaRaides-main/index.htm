@@ -8,9 +8,10 @@
     <meta http-equiv="Expires" content="0">
     <title>Žodžių Žaidimas</title>
     <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../shared/tailwind.min.css">
     <link rel="stylesheet" href="../shared/common.css?v=2">
     <script src="../shared/common.js?v=2"></script>
+    <script src="../shared/vocabulary.js"></script>
     <script src="../shared/words.js?v=2"></script>
     <style>
         @media (prefers-color-scheme: dark) {
@@ -172,42 +173,7 @@
 
     <!-- ŽAIDIMO LOGIKA -->
     <script>
-        const ZODZIU_SARASAS = [
-            { word: 'KATĖ', emoji: '🐱' }, { word: 'ŠUO', emoji: '🐶' }, { word: 'ŽUVIS', emoji: '🐟' }, { word: 'KROKODILAS', emoji: '🐊' },
-            { word: 'KARVĖ', emoji: '🐄' }, { word: 'VILKAS', emoji: '🐺' }, { word: 'TIGRAS', emoji: '🐯' }, { word: 'LIŪTAS', emoji: '🦁' },
-            { word: 'PELĖDA', emoji: '🦉' }, { word: 'GYVATĖ', emoji: '🐍' }, { word: 'LOKYS', emoji: '🐻' }, { word: 'KIAULĖ', emoji: '🐷' },
-            { word: 'ARKLYS', emoji: '🐴' }, { word: 'VARLĖ', emoji: '🐸' }, { word: 'PELĖ', emoji: '🐭' }, { word: 'BITĖ', emoji: '🐝' },
-            { word: 'DRUGELIS', emoji: '🦋' }, { word: 'ZUIKIS', emoji: '🐰' }, { word: 'DRAMBLYS', emoji: '🐘' }, { word: 'BEŽDŽIONĖ', emoji: '🐒' },
-            { word: 'VĖŽLYS', emoji: '🐢' }, { word: 'PINGVINAS', emoji: '🐧' }, { word: 'VORAS', emoji: '🕷️' }, { word: 'SRAIGĖ', emoji: '🐌' },
-            { word: 'VIŠTA', emoji: '🐔' }, { word: 'ANTIS', emoji: '🦆' },
-            
-            { word: 'SAULĖ', emoji: '☀️' }, { word: 'MEDIS', emoji: '🌳' }, { word: 'GĖLĖ', emoji: '🌸' }, { word: 'MĖNULIS', emoji: '🌙' },
-            { word: 'UGNIS', emoji: '🔥' }, { word: 'SNIEGAS', emoji: '❄️' }, { word: 'LIETUS', emoji: '🌧️' }, { word: 'DEBESIS', emoji: '☁️' },
-            { word: 'ŽAIBAS', emoji: '⚡' }, { word: 'ŽVAIGŽDĖ', emoji: '⭐' }, { word: 'LAŠAS', emoji: '💧' }, { word: 'AKMUO', emoji: '🪨' },
-            { word: 'LAPAI', emoji: '🍃' }, { word: 'LAPAS', emoji: '🍁' }, { word: 'KALNAS', emoji: '⛰️' }, { word: 'ŽEMĖ', emoji: '🌍' },
-
-            { word: 'LEDAI', emoji: '🍦' }, { word: 'LEDAS', emoji: '🧊' }, { word: 'PIENAS', emoji: '🥛' }, { word: 'OBUOLYS', emoji: '🍎' },
-            { word: 'TORTAS', emoji: '🎂' }, { word: 'MORKA', emoji: '🥕' }, { word: 'DUONA', emoji: '🍞' }, { word: 'SŪRIS', emoji: '🧀' },
-            { word: 'ARBATA', emoji: '☕' }, { word: 'CITRINA', emoji: '🍋' }, { word: 'BRAŠKĖ', emoji: '🍓' }, { word: 'BANANAS', emoji: '🍌' },
-            { word: 'VYNUOGĖS', emoji: '🍇' }, { word: 'ARBŪZAS', emoji: '🍉' }, { word: 'VYŠNIA', emoji: '🍒' }, { word: 'KRIAUŠĖ', emoji: '🍐' },
-            { word: 'BULVĖ', emoji: '🥔' }, { word: 'POMIDORAS', emoji: '🍅' }, { word: 'AGURKAS', emoji: '🥒' }, { word: 'SALDAINIS', emoji: '🍬' },
-            { word: 'ŠOKOLADAS', emoji: '🍫' }, { word: 'SAUSAINIS', emoji: '🍪' }, { word: 'PICA', emoji: '🍕' }, { word: 'MĖSA', emoji: '🥩' },
-            { word: 'KIAUŠINIS', emoji: '🥚' }, { word: 'SRIUBA', emoji: '🥣' },
-
-            { word: 'NAMAS', emoji: '🏠' }, { word: 'KNYGA', emoji: '📖' }, { word: 'SUKNELĖ', emoji: '👗' }, { word: 'KĖDĖ', emoji: '🪑' },
-            { word: 'DURYS', emoji: '🚪' }, { word: 'LOVA', emoji: '🛏️' }, { word: 'LANGAS', emoji: '🪟' },
-            { word: 'LAIKRODIS', emoji: '⌚' }, { word: 'RAKTAS', emoji: '🔑' }, { word: 'KELNĖS', emoji: '👖' }, { word: 'BATAS', emoji: '👞' },
-            { word: 'KEPURĖ', emoji: '🧢' }, { word: 'PIEŠTUKAS', emoji: '✏️' }, { word: 'KUPRINĖ', emoji: '🎒' }, { word: 'KAMUOLYS', emoji: '⚽' },
-            { word: 'ŽAISLAS', emoji: '🧸' }, { word: 'TELEFONAS', emoji: '📱' }, { word: 'ŠAUKŠTAS', emoji: '🥄' },
-            { word: 'PEILIS', emoji: '🔪' }, { word: 'DOVANA', emoji: '🎁' }, { word: 'BALIONAS', emoji: '🎈' }, { word: 'VĖLIAVA', emoji: '🇱🇹' },
-
-            { word: 'MAŠINA', emoji: '🚗' }, { word: 'DVIRATIS', emoji: '🚲' }, { word: 'TRAUKINYS', emoji: '🚂' }, { word: 'LĖKTUVAS', emoji: '✈️' },
-            { word: 'LAIVAS', emoji: '🚢' }, { word: 'AUTOBUSAS', emoji: '🚌' }, { word: 'RAKETA', emoji: '🚀' }, { word: 'SRAIGTASPARNIS', emoji: '🚁' },
-
-            { word: 'MAMA', emoji: '👩' }, { word: 'TĖTIS', emoji: '👨' }, { word: 'PĖDA', emoji: '🦶' }, { word: 'AKIS', emoji: '👁️' },
-            { word: 'AUSIS', emoji: '👂' }, { word: 'NOSIS', emoji: '👃' }, { word: 'BURNA', emoji: '👄' }, { word: 'RANKA', emoji: '✋' },
-            { word: 'KOJA', emoji: '🦵' }, { word: 'VAIKAS', emoji: '🧒' }
-        ];
+        const ZODZIU_SARASAS = VOCABULARY;
 
         const LIETUVISKA_ABECELE = LITHUANIAN_ALPHABET;
 

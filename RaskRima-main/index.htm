@@ -7,10 +7,12 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>🎵 Rask Rimą ir Skiemenį</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../shared/tailwind.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../shared/common.css?v=2">
+    <link rel="stylesheet" href="../shared/quiz.css">
     <script src="../shared/common.js?v=2"></script>
+    <script src="../shared/quiz.js"></script>
     <style>
         body {
             font-family: 'Nunito', sans-serif;
@@ -472,18 +474,7 @@
             if (hintBadge) hintBadge.classList.remove('hidden');
             document.querySelectorAll('.opt-hint-emoji').forEach(el => el.classList.remove('hidden'));
             const q = state.questions[state.currentIndex];
-            const wrongIdxs = [];
-            (state.currentOptions || []).forEach((opt, idx) => {
-                const btn = document.getElementById(`btn-${idx}`);
-                if (opt.word !== q.correct.word && btn && !btn.disabled) wrongIdxs.push(idx);
-            });
-            shuffle(wrongIdxs).slice(0, 1).forEach(idx => {
-                const btn = document.getElementById(`btn-${idx}`);
-                if (btn) {
-                    btn.disabled = true;
-                    btn.classList.add('opacity-35', 'line-through', 'pointer-events-none');
-                }
-            });
+            eliminateWrongQuizOptions('[id^="btn-"]', (btn, idx) => (state.currentOptions[idx] && state.currentOptions[idx].word === q.correct.word), 1);
         }
 
         function handleChoiceAnswer(idx) {
@@ -504,8 +495,7 @@
 
                 const emojiSpan = btn.querySelector('.opt-hint-emoji');
                 if (emojiSpan) emojiSpan.classList.remove('hidden');
-                btn.classList.remove('bg-pink-50', 'hover:bg-pink-100', 'text-slate-900', 'border-pink-300');
-                btn.classList.add('bg-green-500', 'text-white', 'border-green-600', 'shadow-[0_5px_0_#15803d]', 'bounce-anim');
+                markAnswerCorrect(btn, 'bounce-anim');
 
                 if (feedback) {
                     feedback.innerHTML = `<span>${_col('Puiku!')} ${_col(q.word)} — ${_col(q.correct.word)}! 🎉</span>`;
@@ -524,8 +514,7 @@
                 state.streak = 0;
                 playWrongSound();
 
-                btn.classList.add('bg-red-100', 'text-red-400', 'line-through', 'border-red-300', 'opacity-60', 'shake-anim');
-                btn.disabled = true;
+                markAnswerWrong(btn, 'shake-anim');
 
                 if (feedback) {
                     feedback.innerHTML = `<span>${_col('Paklausyk dar kartą!')} 🤔</span>`;
@@ -621,8 +610,7 @@
                     state.streak++;
                 }
 
-                btn.classList.remove('bg-amber-50', 'hover:bg-amber-100', 'text-slate-900', 'border-amber-300');
-                btn.classList.add('bg-green-500', 'text-white', 'border-green-600', 'shadow-[0_5px_0_#15803d]', 'bounce-anim');
+                markAnswerCorrect(btn, 'bounce-anim');
 
                 const container = document.getElementById('syllable-boxes');
                 if (container) {
@@ -651,8 +639,7 @@
                 state.streak = 0;
                 playWrongSound();
 
-                btn.classList.add('bg-red-100', 'text-red-400', 'border-red-300', 'opacity-60', 'shake-anim');
-                btn.disabled = true;
+                markAnswerWrong(btn, 'shake-anim');
 
                 if (feedback) {
                     feedback.innerHTML = `<span>${_col('Suplok žodį lėtai ir suskaičiuok!')} 👏</span>`;

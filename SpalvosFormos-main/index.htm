@@ -7,10 +7,12 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>🟡 Spalvos ir Formos</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../shared/tailwind.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../shared/common.css?v=2">
+    <link rel="stylesheet" href="../shared/quiz.css">
     <script src="../shared/common.js?v=2"></script>
+    <script src="../shared/quiz.js"></script>
     <style>
         body {
             font-family: 'Nunito', sans-serif;
@@ -292,18 +294,7 @@
             const hintBtn = document.getElementById('hint-btn');
             if (hintBtn) hintBtn.classList.add('hidden');
             const q = gameState.currentQuestion;
-            const wrongIdxs = [];
-            q.options.forEach((opt, idx) => {
-                const btn = document.getElementById(`rec-btn-${idx}`);
-                if (opt !== q.correctAnswerStr && btn && !btn.disabled) wrongIdxs.push(idx);
-            });
-            shuffle(wrongIdxs).slice(0, 2).forEach(idx => {
-                const btn = document.getElementById(`rec-btn-${idx}`);
-                if (btn) {
-                    btn.disabled = true;
-                    btn.classList.add('opacity-35', 'line-through', 'pointer-events-none');
-                }
-            });
+            eliminateWrongQuizOptions('[id^="rec-btn-"]', (btn, idx) => q.options[idx] === q.correctAnswerStr, 2);
         }
 
         function handleRecognizeAnswer(selectedOption, btnEl) {
@@ -319,8 +310,7 @@
                     gameState.streak++;
                 }
                 playCorrectSound();
-                btnEl.classList.remove('bg-white', 'dark-btn', 'border-amber-300');
-                btnEl.classList.add('bg-green-500', 'text-white', 'border-green-600');
+                markAnswerCorrect(btnEl, 'bounce-anim');
                 shapeDisplay.classList.remove('animate-bounce-sm');
                 void shapeDisplay.offsetWidth;
                 shapeDisplay.classList.add('animate-bounce-sm');
@@ -329,13 +319,12 @@
                 feedbackEl.className = 'h-6 text-base sm:text-lg font-black text-center text-green-600 opacity-100';
 
                 gameState.questionIndex++;
-                setTimeout(nextQuestion, 1000);
+                setGameTimeout(nextQuestion, 1000);
             } else {
                 gameState.firstTry = false;
                 gameState.streak = 0;
                 playWrongSound();
-                btnEl.disabled = true;
-                btnEl.classList.add('opacity-50', 'line-through', 'border-red-400');
+                markAnswerWrong(btnEl, 'shake-anim');
                 shapeDisplay.classList.remove('animate-bounce-sm');
                 shapeDisplay.classList.remove('animate-shake');
                 void shapeDisplay.offsetWidth;

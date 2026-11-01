@@ -7,10 +7,11 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>Atminties Žaidimas</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../shared/tailwind.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../shared/common.css?v=2">
     <script src="../shared/common.js?v=2"></script>
+    <script src="../shared/vocabulary.js"></script>
     <style>
         body {
             font-family: 'Nunito', sans-serif;
@@ -252,15 +253,7 @@
     <div id="feedback" class="feedback-popup">Puiku!</div>
 
     <script>
-        const ALL_PAIRS = [
-            { emoji: "🐱", word: "KATĖ" }, { emoji: "🐶", word: "ŠUO" }, { emoji: "🐸", word: "VARLĖ" },
-            { emoji: "🌞", word: "SAULĖ" }, { emoji: "🌳", word: "MEDIS" }, { emoji: "🌸", word: "GĖLĖ" },
-            { emoji: "🏠", word: "NAMAS" }, { emoji: "🐭", word: "PELĖ" }, { emoji: "🐝", word: "BITĖ" },
-            { emoji: "📖", word: "KNYGA" }, { emoji: "☕", word: "ARBATA" }, { emoji: "🍎", word: "OBUOLYS" },
-            { emoji: "🚗", word: "MAŠINA" }, { emoji: "🚀", word: "RAKETA" }, { emoji: "⭐", word: "ŽVAIGŽDĖ" },
-            { emoji: "🍓", word: "BRAŠKĖ" }, { emoji: "🧀", word: "SŪRIS" }, { emoji: "🍞", word: "DUONA" },
-            { emoji: "🥛", word: "PIENAS" }, { emoji: "🚢", word: "LAIVAS" }
-        ];
+        const ALL_PAIRS = VOCABULARY;
 
         let currentPairs = 0;
         let pairsFound = 0;

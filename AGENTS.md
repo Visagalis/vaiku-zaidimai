@@ -57,7 +57,7 @@ For anything beyond trivial text edits, also do a **manual browser check** (see 
 | --- | --- |
 | Purpose | Educational mini-games for Lithuanian pre-school and early-primary children (math, reading, money, logic). |
 | Hosting | GitHub Pages: <https://visagalis.github.io/vaiku-zaidimai/>. Pushing to the default branch deploys. |
-| Stack | Plain HTML + vanilla JS (ES2015+) + **Tailwind CSS Play CDN** (`https://cdn.tailwindcss.com`) + Google Fonts (Nunito, plus Fredoka/Quicksand in RaidziuDelione). |
+| Stack | Plain HTML + vanilla JS (ES2015+) + **Compiled static Tailwind CSS** (`shared/tailwind.min.css`, offline-ready) + Google Fonts (Nunito, plus Fredoka/Quicksand in RaidziuDelione). |
 | React games | `SkaitymoZaidimas` and `MokomesRasyti` use **React 18 UMD + Babel Standalone** from unpkg (`<script type="text/babel">`). |
 | Build / deps | **None.** Don't add bundlers, npm packages, TypeScript, or ES modules. Node.js is only needed for `scripts/verify.js`. |
 | Persistence | `localStorage` only (see §4.3). There is no backend. |
@@ -78,6 +78,8 @@ For anything beyond trivial text edits, also do a **manual browser check** (see 
 │   ├── money.js            # Euro currency data (MONEY, allCoins, c1..e20), formatMoneyCents, formatMoneyDiffHint, sumCoins
 │   ├── quiz.css            # Quiz buttons (.quiz-opt-btn, .quiz-opt-correct, .quiz-opt-wrong, .quiz-eliminated)
 │   ├── quiz.js             # VZQuizEngine (createQuizController), markAnswerCorrect/Wrong
+│   ├── tailwind.min.css    # Compiled offline static Tailwind CSS utility styles
+│   ├── vocabulary.js       # Canonical Lithuanian children's vocabulary (VOCABULARY, getVocabulary, getRandomWords)
 │   └── words.js            # LITHUANIAN_ALPHABET (32 letters), renderVirtualKeyboard
 ├── scripts/
 │   └── verify.js           # Pre-commit verification (run with Node)
@@ -218,8 +220,8 @@ New keys must use the **`vz-` prefix**. The `storage` event listener in `common.
 2. It also **rewrites `@media (prefers-color-scheme: dark)` rules in place** in every same-origin stylesheet. In `dark` mode they become `all`; in `light` mode they become `not all`. So a game's own dark CSS only needs to live in `@media (prefers-color-scheme: dark) { … }` inside its `<style>` block.
 3. For portal-level or shared CSS, also add the class-based selectors (`html.dark …, html.dark-theme …, .dark-mode …`), the way `index.html` and `common.css` do.
 
-> [!WARNING]
-> Tailwind `dark:` utilities (used in some games) follow the **media** strategy, because no `tailwind.config` sets `darkMode: 'class'`. The Tailwind CDN regenerates its `<style>` tag whenever it sees new classes, which can **reset** the in-place media rewrite. That means `dark:` utilities may ignore the manual theme toggle. For anything important, put the dark override in the game's `<style>` block instead.
+> [!NOTE]
+> Tailwind CSS is compiled statically into `shared/tailwind.min.css` with `darkMode: ['class', ':is(.dark, .dark-mode, .dark-theme)']`. This means all `dark:` utility classes activate automatically when `applyTheme()` toggles `.dark` / `.dark-mode` on `<html>` and `<body>`, and games are completely self-contained and offline-ready.
 
 ---
 
@@ -238,7 +240,7 @@ New games should follow this structure. The closest references are [`Priesingybe
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>🎲 Žaidimo Pavadinimas</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../shared/tailwind.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../shared/common.css">
     <script src="../shared/common.js"></script>

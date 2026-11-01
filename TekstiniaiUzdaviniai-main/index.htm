@@ -7,10 +7,12 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>🍎 Tekstiniai Uždavinukai</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../shared/tailwind.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../shared/common.css?v=2">
+    <link rel="stylesheet" href="../shared/quiz.css">
     <script src="../shared/common.js?v=2"></script>
+    <script src="../shared/quiz.js"></script>
     <style>
         body {
             font-family: 'Nunito', sans-serif;
@@ -329,6 +331,12 @@
                     </div>
                 `;
             }
+            if (q) {
+                eliminateWrongQuizOptions('[id^="btn-"]', (b) => {
+                    const onclick = b.getAttribute('onclick') || '';
+                    return onclick.indexOf(String(q.correct)) !== -1;
+                }, 1);
+            }
         }
 
         function speakStory() {
@@ -504,13 +512,12 @@
                     state.streak++;
                 }
 
-                btn.classList.remove('bg-rose-50', 'text-rose-950', 'border-rose-300');
-                btn.classList.add('bg-green-500', 'text-white', 'border-green-600', 'shadow-[0_5px_0_#15803d]', 'bounce-anim');
+                markAnswerCorrect(btn, 'bounce-anim');
 
                 feedback.innerHTML = `<span>Teisingai! ${q.equation} 🎉</span>`;
                 feedback.className = "h-6 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black my-1 text-green-600 opacity-100";
 
-                setTimeout(() => {
+                setGameTimeout(() => {
                     state.currentIndex++;
                     renderQuestion();
                 }, 1300);
@@ -522,18 +529,12 @@
                 state.streak = 0;
                 playWrongSound();
 
-                btn.classList.remove('bg-rose-50', 'text-rose-950');
-                btn.classList.add('bg-red-100', 'text-red-400', 'line-through', 'border-red-300', 'opacity-60', 'shake-anim');
-                btn.disabled = true;
+                markAnswerWrong(btn, 'shake-anim');
 
                 feedback.innerHTML = `<span>${_col("Bandyk dar kartą!")} 🤔</span>`;
                 feedback.className = "h-7 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black my-1 text-red-500 opacity-100";
                 const hBtn = document.getElementById('hint-btn');
                 if (hBtn) hBtn.classList.add('hint-btn-pulse');
-
-                setTimeout(() => {
-                    btn.classList.remove('shake-anim');
-                }, 400);
             }
         }
 

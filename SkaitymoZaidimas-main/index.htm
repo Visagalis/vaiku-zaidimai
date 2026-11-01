@@ -9,7 +9,7 @@
   <title>Skaitymo Žaidimas Vaikams</title>
   
   <!-- Tailwind CSS stiliams -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../shared/tailwind.min.css">
   
   <!-- React ir Babel bibliotekos, kad kodas veiktų tiesiai naršyklėje -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
@@ -17,6 +17,7 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <link rel="stylesheet" href="../shared/common.css?v=2">
   <script src="../shared/common.js?v=2"></script>
+  <script src="../shared/vocabulary.js"></script>
 
   <style>
     body {
@@ -95,74 +96,7 @@
     const { useState, useEffect, useCallback, useRef } = React;
 
     // Pilnas žodžių sąrašas su tiksliais skiemenimis
-    const WORDS_DATA = [
-      { word: "TELEFONAS", syllables: ["TE", "LE", "FO", "NAS"], emoji: "📱" },
-      { word: "DRUGELIS", syllables: ["DRU", "GE", "LIS"], emoji: "🦋" },
-      { word: "AGURKAS", syllables: ["A", "GUR", "KAS"], emoji: "🥒" },
-      { word: "ŠUO", syllables: ["ŠUO"], emoji: "🐶" },
-      { word: "PICA", syllables: ["PI", "CA"], emoji: "🍕" },
-      { word: "PASPIRTUKAS", syllables: ["PAS", "PIR", "TU", "KAS"], emoji: "🛴" },
-      { word: "TRAUKINYS", syllables: ["TRAU", "KI", "NYS"], emoji: "🚂" },
-      { word: "VAIVORYKŠTĖ", syllables: ["VAI", "VO", "RYKŠ", "TĖ"], emoji: "🌈" },
-      { word: "KATĖ", syllables: ["KA", "TĖ"], emoji: "🐱" },
-      { word: "RANKA", syllables: ["RAN", "KA"], emoji: "✋" },
-      { word: "EŽYS", syllables: ["E", "ŽYS"], emoji: "🦔" },
-      { word: "LANGAS", syllables: ["LAN", "GAS"], emoji: "🪟" },
-      { word: "MEDIS", syllables: ["ME", "DIS"], emoji: "🌳" },
-      { word: "APELSINAS", syllables: ["A", "PEL", "SI", "NAS"], emoji: "🍊" },
-      { word: "AKIS", syllables: ["A", "KIS"], emoji: "👁️" },
-      { word: "ŽIRAFA", syllables: ["ŽI", "RA", "FA"], emoji: "🦒" },
-      { word: "MAŠINA", syllables: ["MA", "ŠI", "NA"], emoji: "🚗" },
-      { word: "OŽYS", syllables: ["O", "ŽYS"], emoji: "🐐" },
-      { word: "KOJA", syllables: ["KO", "JA"], emoji: "🦵" },
-      { word: "PILIS", syllables: ["PI", "LIS"], emoji: "🏰" },
-      { word: "POMIDORAS", syllables: ["PO", "MI", "DO", "RAS"], emoji: "🍅" },
-      { word: "MEŠKA", syllables: ["MEŠ", "KA"], emoji: "🐻" },
-      { word: "PELĖ", syllables: ["PE", "LĖ"], emoji: "🐭" },
-      { word: "SNIEGAS", syllables: ["SNIE", "GAS"], emoji: "🌨️" },
-      { word: "LŪPA", syllables: ["LŪ", "PA"], emoji: "👄" },
-      { word: "BATAI", syllables: ["BA", "TAI"], emoji: "👟" },
-      { word: "ŽĄSIS", syllables: ["ŽĄ", "SIS"], emoji: "🪿" },
-      { word: "UOGA", syllables: ["UO", "GA"], emoji: "🫐" },
-      { word: "BEŽDŽIONĖ", syllables: ["BEŽ", "DŽIO", "NĖ"], emoji: "🐒" },
-      { word: "VAIKAS", syllables: ["VAI", "KAS"], emoji: "👶" },
-      { word: "VARLĖ", syllables: ["VAR", "LĖ"], emoji: "🐸" },
-      { word: "NAMAS", syllables: ["NA", "MAS"], emoji: "🏠" },
-      { word: "SAULĖ", syllables: ["SAU", "LĖ"], emoji: "☀️" },
-      { word: "SŪRIS", syllables: ["SŪ", "RIS"], emoji: "🧀" },
-      { word: "LEDAI", syllables: ["LE", "DAI"], emoji: "🍦" },
-      { word: "LĖKTUVAS", syllables: ["LĖK", "TU", "VAS"], emoji: "✈️" },
-      { word: "ŽVAIGŽDĖ", syllables: ["ŽVAIGŽ", "DĖ"], emoji: "⭐" },
-      { word: "DUONA", syllables: ["DUO", "NA"], emoji: "🍞" },
-      { word: "KĖDĖ", syllables: ["KĖ", "DĖ"], emoji: "🪑" },
-      { word: "PIENAS", syllables: ["PIE", "NAS"], emoji: "🥛" },
-      { word: "MUSĖ", syllables: ["MU", "SĖ"], emoji: "🪰" },
-      { word: "ROŽĖ", syllables: ["RO", "ŽĖ"], emoji: "🌹" },
-      { word: "ORAS", syllables: ["O", "RAS"], emoji: "💨" },
-      { word: "BITĖ", syllables: ["BI", "TĖ"], emoji: "🐝" },
-      { word: "JŪRA", syllables: ["JŪ", "RA"], emoji: "🌊" },
-      { word: "ŽUVIS", syllables: ["ŽU", "VIS"], emoji: "🐟" },
-      { word: "LOVA", syllables: ["LO", "VA"], emoji: "🛌" },
-      { word: "NOSIS", syllables: ["NO", "SIS"], emoji: "👃" },
-      { word: "LAMA", syllables: ["LA", "MA"], emoji: "🦙" },
-      { word: "ŠOKOLADAS", syllables: ["ŠO", "KO", "LA", "DAS"], emoji: "🍫" },
-      { word: "VILKAS", syllables: ["VIL", "KAS"], emoji: "🐺" },
-      { word: "DVIRATIS", syllables: ["DVI", "RA", "TIS"], emoji: "🚲" },
-      { word: "MORKA", syllables: ["MOR", "KA"], emoji: "🥕" },
-      { word: "UPĖ", syllables: ["U", "PĖ"], emoji: "🏞️" },
-      { word: "MAMA", syllables: ["MA", "MA"], emoji: "👩" },
-      { word: "LĖLĖ", syllables: ["LĖ", "LĖ"], emoji: "🎎" },
-      { word: "DURYS", syllables: ["DU", "RYS"], emoji: "🚪" },
-      { word: "BANANAS", syllables: ["BA", "NA", "NAS"], emoji: "🍌" },
-      { word: "CITRINA", syllables: ["CIT", "RI", "NA"], emoji: "🍋" },
-      { word: "OBUOLYS", syllables: ["O", "BUO", "LYS"], emoji: "🍎" },
-      { word: "KROKODILAS", syllables: ["KRO", "KO", "DI", "LAS"], emoji: "🐊" },
-      { word: "DRAMBLYS", syllables: ["DRAM", "BLYS"], emoji: "🐘" },
-      { word: "RAKETA", syllables: ["RA", "KE", "TA"], emoji: "🚀" },
-      { word: "BRAŠKĖ", syllables: ["BRAŠ", "KĖ"], emoji: "🍓" },
-      { word: "TIGRAS", syllables: ["TIG", "RAS"], emoji: "🐅" },
-      { word: "ZEBRAS", syllables: ["ZEB", "RAS"], emoji: "🦓" }
-    ];
+    const WORDS_DATA = VOCABULARY;
 
     const PRAISE_WORDS = ["Puiku!", "Šaunuolis!", "Teisingai!", "Nuostabu!", "Labai gerai!"];
 
