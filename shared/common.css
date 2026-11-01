@@ -414,10 +414,15 @@ button.coin:active, button.bill:active {
         flex-direction: column !important;
     }
 
-    /* Užtikriname, kad viršutinė juosta nesusitrauktų */
+    /* Užtikriname, kad viršutinė juosta nesusitrauktų ir jos elementai nelūžtų į dvi eilutes */
     .top-bar,
     #app > div:first-child:not(:only-child) {
         flex-shrink: 0 !important;
+    }
+
+    .top-bar,
+    .top-badge {
+        white-space: nowrap;
     }
 
     /* Saugi zona (Safe area) apačioje telefonams su gestų linija (iPhone home indicator) */

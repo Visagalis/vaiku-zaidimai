@@ -318,7 +318,43 @@
         ];
 
         // 3 REŽIMAS: 🐾 Šuniuko kelias (dinaminis kelio generavimas)
-        function generatePuppyLevel(gridSize, targetSteps) {
+        const PUPPY_DEFAULT_CONTROLS = [
+            { dir: 'up', label: 'Viršus', icon: '⬆️' },
+            { dir: 'left', label: 'Kairė', icon: '⬅️' },
+            { dir: 'right', label: 'Dešinė', icon: '➡️' },
+            { dir: 'down', label: 'Apačia', icon: '⬇️' }
+        ];
+
+        function shufflePuppyControls() {
+            const prevOrder = (state.puppyControls || []).map(c => c.dir).join(',');
+            let next = shuffle(PUPPY_DEFAULT_CONTROLS);
+            for (let i = 0; i < 5 && next.map(c => c.dir).join(',') === prevOrder; i++) {
+                next = shuffle(PUPPY_DEFAULT_CONTROLS);
+            }
+            state.puppyControls = next;
+        }
+
+        function bfsShortestPath(gridSize, start, goal, obstacleSet) {
+            const queue = [[start[0], start[1], 0]];
+            const vis = new Set([`${start[0]},${start[1]}`]);
+            const dirs = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+            while (queue.length > 0) {
+                const [r, c, d] = queue.shift();
+                if (r === goal[0] && c === goal[1]) return d;
+                for (let i = 0; i < dirs.length; i++) {
+                    const nr = r + dirs[i][0];
+                    const nc = c + dirs[i][1];
+                    const key = `${nr},${nc}`;
+                    if (nr >= 0 && nr < gridSize && nc >= 0 && nc < gridSize && !vis.has(key) && !obstacleSet.has(key)) {
+                        vis.add(key);
+                        queue.push([nr, nc, d + 1]);
+                    }
+                }
+            }
+            return -1;
+        }
+
+        function generatePuppyLevel(gridSize, minSteps, maxSteps) {
             const GOAL_EMOJIS = [
                 { emoji: '🦴', prompt: 'Nuvesk šuniuką prie kauliuko! 🐶 ➔ 🦴' },
                 { emoji: '🏠', prompt: 'Padėk šuniukui grįžti į namelį! 🐶 ➔ 🏠' },
@@ -335,10 +371,13 @@
                 { dr: 0, dc: -1, dir: 'left' },
                 { dr: 0, dc: 1, dir: 'right' }
             ];
+            const OBS_ICONS = ['🌳', '🪨', '🪵', '🍄'];
 
-            let bestPath = null;
-            // Generuojame kelią su posūkiais (susimaišiusios kryptys!)
-            for (let attempt = 0; attempt < 200; attempt++) {
+            let fallbackLevel = null;
+
+            // Generuojame kelią su posūkiais ir patikriname trumpiausią atstumą per BFS
+            for (let attempt = 0; attempt < 300; attempt++) {
+                const targetLen = Math.floor(Math.random() * (maxSteps - minSteps + 1)) + minSteps;
                 const startR = Math.floor(Math.random() * gridSize);
                 const startC = Math.floor(Math.random() * gridSize);
                 const path = [[startR, startC]];
@@ -349,26 +388,29 @@
                 let lastDir = null;
                 let turns = 0;
 
-                for (let step = 0; step < targetSteps; step++) {
+                for (let step = 0; step < targetLen; step++) {
                     const validMoves = [];
                     for (let i = 0; i < DIRS.length; i++) {
                         const d = DIRS[i];
                         const nr = currR + d.dr;
                         const nc = currC + d.dc;
-                        if (nr >= 0 && nr < gridSize && nc >= 0 && nc < gridSize && !visited.has(`${nr},${nc}`)) {
+                        if (nr < 0 || nr >= gridSize || nc < 0 || nc >= gridSize || visited.has(`${nr},${nc}`)) continue;
+                        // Neleidžiame keliui prisispausti prie ankstesnių savo langelių, kad nesusidarytų trumpesnis kelias
+                        let adjVisited = 0;
+                        for (let j = 0; j < DIRS.length; j++) {
+                            if (visited.has(`${nr + DIRS[j].dr},${nc + DIRS[j].dc}`)) adjVisited++;
+                        }
+                        if (adjVisited === 1) {
                             validMoves.push(d);
                         }
                     }
 
                     if (validMoves.length === 0) break;
 
-                    let chosenMove = null;
-                    const turnMoves = validMoves.filter(m => m.dir !== lastDir);
-                    if (turnMoves.length > 0 && Math.random() < 0.75) {
-                        chosenMove = pickRandom(turnMoves);
-                    } else {
-                        chosenMove = pickRandom(validMoves);
-                    }
+                    const turnMoves = validMoves.filter(m => lastDir !== null && m.dir !== lastDir);
+                    const chosenMove = (turnMoves.length > 0 && Math.random() < 0.75)
+                        ? pickRandom(turnMoves)
+                        : pickRandom(validMoves);
 
                     if (lastDir !== null && chosenMove.dir !== lastDir) {
                         turns++;
@@ -380,53 +422,62 @@
                     visited.add(`${currR},${currC}`);
                 }
 
-                const minTurns = targetSteps <= 3 ? 1 : (targetSteps <= 5 ? 2 : 3);
-                if (path.length - 1 >= targetSteps && turns >= minTurns) {
-                    bestPath = path;
-                    break;
-                } else if (!bestPath || path.length > bestPath.length) {
-                    bestPath = path;
-                }
-            }
+                const minReqTurns = gridSize === 3 ? 1 : 2;
+                if (path.length - 1 < minSteps || turns < minReqTurns) continue;
 
-            const start = bestPath[0];
-            const goal = bestPath[bestPath.length - 1];
-            const pathSet = new Set(bestPath.map(p => `${p[0]},${p[1]}`));
-
-            const emptyCells = [];
-            for (let r = 0; r < gridSize; r++) {
-                for (let c = 0; c < gridSize; c++) {
-                    if (!pathSet.has(`${r},${c}`)) {
-                        emptyCells.push([r, c]);
+                const start = path[0];
+                const goal = path[path.length - 1];
+                const emptyCells = [];
+                for (let r = 0; r < gridSize; r++) {
+                    for (let c = 0; c < gridSize; c++) {
+                        if (!visited.has(`${r},${c}`)) {
+                            emptyCells.push([r, c]);
+                        }
                     }
                 }
-            }
 
-            const OBS_ICONS = ['🌳', '🪨', '🪵', '🍄'];
-            const numObstacles = Math.min(
-                emptyCells.length,
-                gridSize === 3 ? Math.floor(Math.random() * 2) + 1 :
-                gridSize === 4 ? Math.floor(Math.random() * 2) + 2 :
-                Math.floor(Math.random() * 3) + 3
-            );
-
-            const obstacles = [];
-            const shuffledEmpty = shuffle(emptyCells);
-            for (let i = 0; i < numObstacles; i++) {
-                obstacles.push({
-                    pos: shuffledEmpty[i],
-                    emoji: pickRandom(OBS_ICONS)
+                // Pirmenybę kliūtims teikiame langeliams, kurie ribojasi su keliais kelio langeliais (kad užblokuotų santrumpas)
+                const scoredEmpty = shuffle(emptyCells).sort((a, b) => {
+                    const countAdj = ([pr, pc]) => DIRS.reduce((acc, d) => acc + (visited.has(`${pr + d.dr},${pc + d.dc}`) ? 1 : 0), 0);
+                    return countAdj(b) - countAdj(a);
                 });
+
+                const maxObstacles = gridSize === 3 ? 2 : (gridSize === 4 ? 4 : 7);
+                const chosenObsCells = scoredEmpty.slice(0, Math.min(maxObstacles, scoredEmpty.length));
+                const obsSet = new Set(chosenObsCells.map(p => `${p[0]},${p[1]}`));
+                const shortestDist = bfsShortestPath(gridSize, start, goal, obsSet);
+
+                const obstacles = chosenObsCells.map(pos => ({
+                    pos: pos,
+                    emoji: pickRandom(OBS_ICONS)
+                }));
+
+                const candidate = {
+                    prompt: goalInfo.prompt,
+                    gridSize: gridSize,
+                    start: start,
+                    goal: goal,
+                    goalEmoji: goalInfo.emoji,
+                    obstacles: obstacles,
+                    pathLength: shortestDist
+                };
+
+                if (shortestDist >= minSteps) {
+                    return candidate;
+                }
+                if (!fallbackLevel || shortestDist > fallbackLevel.pathLength) {
+                    fallbackLevel = candidate;
+                }
             }
 
-            return {
+            return fallbackLevel || {
                 prompt: goalInfo.prompt,
                 gridSize: gridSize,
-                start: start,
-                goal: goal,
+                start: [0, 0],
+                goal: [gridSize - 1, gridSize - 1],
                 goalEmoji: goalInfo.emoji,
-                obstacles: obstacles,
-                pathLength: bestPath.length - 1
+                obstacles: [{ pos: [0, 1], emoji: '🌳' }],
+                pathLength: (gridSize - 1) * 2
             };
         }
 
@@ -457,6 +508,7 @@
         }
 
         function renderStartScreen() {
+            clearGameTimers();
             appEl.innerHTML = `
                 <div class="p-5 sm:p-7 flex flex-col items-center justify-center text-center">
                     <div class="text-5xl sm:text-6xl mb-2 animate-bounce">🧭</div>
@@ -472,7 +524,7 @@
                             <span class="text-2xl">📦</span>
                             <span>${_col('Padėtis erdvėje')}</span>
                         </button>
-                        <button onclick="showPuppyLengthSelect()" class="btn-3d py-3.5 px-5 bg-amber-100 hover:bg-amber-200 border-2 border-amber-400 rounded-2xl text-lg sm:text-xl font-black shadow-[0_5px_0_#f59e0b] active:shadow-[0_0px_0_#f59e0b] transition-all flex items-center justify-center gap-2.5">
+                        <button onclick="startGame('puppy')" class="btn-3d py-3.5 px-5 bg-amber-100 hover:bg-amber-200 border-2 border-amber-400 rounded-2xl text-lg sm:text-xl font-black shadow-[0_5px_0_#f59e0b] active:shadow-[0_0px_0_#f59e0b] transition-all flex items-center justify-center gap-2.5">
                             <span class="text-2xl">🐾</span>
                             <span>${_col('Šuniuko kelias')}</span>
                         </button>
@@ -484,35 +536,35 @@
         function showPuppyLengthSelect() {
             clearGameTimers();
             appEl.innerHTML = `
-                <div class="p-5 sm:p-7 flex flex-col items-center justify-center text-center">
-                    <button onclick="renderStartScreen()" class="self-start top-badge bg-white/90 border border-fuchsia-300 px-3 py-1 rounded-xl text-sm sm:text-base mb-3 transition active:scale-95 font-black text-fuchsia-800">🏠 ${_col('Meniu')}</button>
+                <div class="p-4 sm:p-7 flex flex-col items-center justify-center text-center">
+                    <button onclick="renderStartScreen()" class="self-start top-badge bg-white/90 border border-fuchsia-300 px-3 py-1 rounded-xl text-sm sm:text-base mb-3 transition active:scale-95 font-black text-fuchsia-800">⬅️ ${_col('Atgal')}</button>
                     <div class="text-5xl sm:text-6xl mb-2 animate-bounce">🐾</div>
                     <h2 class="text-2xl sm:text-3xl font-black text-fuchsia-800 mb-2">${_col('Pasirink kelio ilgį')}</h2>
-                    <p class="text-slate-600 dark:text-slate-300 font-bold text-sm sm:text-base mb-5 max-w-md">
+                    <p class="text-slate-600 dark:text-slate-300 font-bold text-xs sm:text-base mb-4 sm:mb-5 max-w-md">
                         ${_col('Kuo ilgesnis kelias, tuo didesnis tinklelis ir daugiau posūkių šuniukui!')}
                     </p>
 
                     <div class="flex flex-col gap-3 w-full max-w-sm">
-                        <button onclick="startGame('puppy-short')" class="btn-3d py-3.5 px-5 bg-emerald-100 hover:bg-emerald-200 border-2 border-emerald-400 rounded-2xl text-lg sm:text-xl font-black shadow-[0_5px_0_#059669] active:shadow-[0_0px_0_#059669] transition-all flex items-center justify-between text-emerald-950">
-                            <span class="flex items-center gap-2">
-                                <span class="text-2xl">🟢</span>
-                                <span>${_col('Trumpas kelias')}</span>
+                        <button onclick="startGame('puppy-short')" class="btn-3d py-3 px-4 sm:px-5 bg-emerald-100 hover:bg-emerald-200 border-2 border-emerald-400 rounded-2xl text-base sm:text-lg font-black shadow-[0_5px_0_#059669] active:shadow-[0_0px_0_#059669] transition-all flex items-center gap-3 text-left text-emerald-950">
+                            <span class="text-2xl shrink-0">🟢</span>
+                            <span class="flex flex-col leading-tight">
+                                <span class="text-base sm:text-lg font-black">${_col('Trumpas kelias')}</span>
+                                <span class="text-xs sm:text-sm font-bold opacity-75">3 × 3 • 3–4 ${_col('žingsniai')}</span>
                             </span>
-                            <span class="text-xs sm:text-sm font-black bg-white/80 px-2.5 py-1 rounded-xl text-emerald-800 border border-emerald-300">3 × 3 (2–3 žingsniai)</span>
                         </button>
-                        <button onclick="startGame('puppy-medium')" class="btn-3d py-3.5 px-5 bg-amber-100 hover:bg-amber-200 border-2 border-amber-400 rounded-2xl text-lg sm:text-xl font-black shadow-[0_5px_0_#d97706] active:shadow-[0_0px_0_#d97706] transition-all flex items-center justify-between text-amber-950">
-                            <span class="flex items-center gap-2">
-                                <span class="text-2xl">🟡</span>
-                                <span>${_col('Vidutinis kelias')}</span>
+                        <button onclick="startGame('puppy-medium')" class="btn-3d py-3 px-4 sm:px-5 bg-amber-100 hover:bg-amber-200 border-2 border-amber-400 rounded-2xl text-base sm:text-lg font-black shadow-[0_5px_0_#d97706] active:shadow-[0_0px_0_#d97706] transition-all flex items-center gap-3 text-left text-amber-950">
+                            <span class="text-2xl shrink-0">🟡</span>
+                            <span class="flex flex-col leading-tight">
+                                <span class="text-base sm:text-lg font-black">${_col('Vidutinis kelias')}</span>
+                                <span class="text-xs sm:text-sm font-bold opacity-75">4 × 4 • 5–6 ${_col('žingsniai')}</span>
                             </span>
-                            <span class="text-xs sm:text-sm font-black bg-white/80 px-2.5 py-1 rounded-xl text-amber-800 border border-amber-300">4 × 4 (4–5 žingsniai)</span>
                         </button>
-                        <button onclick="startGame('puppy-long')" class="btn-3d py-3.5 px-5 bg-rose-100 hover:bg-rose-200 border-2 border-rose-400 rounded-2xl text-lg sm:text-xl font-black shadow-[0_5px_0_#e11d48] active:shadow-[0_0px_0_#e11d48] transition-all flex items-center justify-between text-rose-950">
-                            <span class="flex items-center gap-2">
-                                <span class="text-2xl">🔴</span>
-                                <span>${_col('Ilgas kelias')}</span>
+                        <button onclick="startGame('puppy-long')" class="btn-3d py-3 px-4 sm:px-5 bg-rose-100 hover:bg-rose-200 border-2 border-rose-400 rounded-2xl text-base sm:text-lg font-black shadow-[0_5px_0_#e11d48] active:shadow-[0_0px_0_#e11d48] transition-all flex items-center gap-3 text-left text-rose-950">
+                            <span class="text-2xl shrink-0">🔴</span>
+                            <span class="flex flex-col leading-tight">
+                                <span class="text-base sm:text-lg font-black">${_col('Ilgas kelias')}</span>
+                                <span class="text-xs sm:text-sm font-bold opacity-75">5 × 5 • 7–9 ${_col('žingsniai')}</span>
                             </span>
-                            <span class="text-xs sm:text-sm font-black bg-white/80 px-2.5 py-1 rounded-xl text-rose-800 border border-rose-300">5 × 5 (6–8 žingsniai)</span>
                         </button>
                     </div>
                 </div>
@@ -521,6 +573,11 @@
 
         function startGame(mode) {
             getAudioCtx();
+            clearGameTimers();
+            if (mode === 'puppy') {
+                showPuppyLengthSelect();
+                return;
+            }
             state.mode = mode;
             state.score = 0;
             state.streak = 0;
@@ -532,13 +589,12 @@
             } else if (mode === 'spatial') {
                 state.questions = shuffle(SPATIAL_TASKS).slice(0, 10);
             } else {
-                const subMode = mode === 'puppy' ? 'puppy-short' : mode;
-                state.mode = subMode;
-                const gridSize = subMode === 'puppy-long' ? 5 : (subMode === 'puppy-medium' ? 4 : 3);
-                const steps = subMode === 'puppy-long' ? 7 : (subMode === 'puppy-medium' ? 5 : 3);
+                const gridSize = mode === 'puppy-long' ? 5 : (mode === 'puppy-medium' ? 4 : 3);
+                const minSteps = mode === 'puppy-long' ? 7 : (mode === 'puppy-medium' ? 5 : 3);
+                const maxSteps = mode === 'puppy-long' ? 9 : (mode === 'puppy-medium' ? 6 : 4);
                 state.questions = [];
                 for (let i = 0; i < 10; i++) {
-                    state.questions.push(generatePuppyLevel(gridSize, steps));
+                    state.questions.push(generatePuppyLevel(gridSize, minSteps, maxSteps));
                 }
             }
 
@@ -551,6 +607,7 @@
                 return;
             }
             getAudioCtx();
+            clearGameTimers();
             state.questions = shuffle(state.missedQuestions);
             state.missedQuestions = [];
             state.score = 0;
@@ -572,12 +629,7 @@
                 const lvl = state.questions[state.currentIndex];
                 state.dogPos = [lvl.start[0], lvl.start[1]];
                 state.visited = [`${lvl.start[0]},${lvl.start[1]}`];
-                state.puppyControls = shuffle([
-                    { dir: 'up', label: 'Viršus', icon: '⬆️' },
-                    { dir: 'left', label: 'Kairė', icon: '⬅️' },
-                    { dir: 'right', label: 'Dešinė', icon: '➡️' },
-                    { dir: 'down', label: 'Apačia', icon: '⬇️' }
-                ]);
+                shufflePuppyControls();
                 renderPuppyQuestion();
             } else {
                 renderQuizQuestion();
@@ -683,7 +735,7 @@
                 feedback.innerHTML = `<span>${_col("Puiku! Teisingai! 🎉")}</span>`;
                 feedback.className = "h-6 sm:h-7 flex items-center justify-center text-base sm:text-lg font-black my-1 text-green-600 opacity-100";
 
-                setTimeout(() => {
+                setGameTimeout(() => {
                     state.currentIndex++;
                     loadQuestion();
                 }, 1050);
@@ -705,7 +757,7 @@
                 const hintBtn = document.getElementById('hint-btn');
                 if (hintBtn && !state.hintUsed) hintBtn.classList.add('hint-btn-pulse');
 
-                setTimeout(() => {
+                setGameTimeout(() => {
                     btn.classList.remove('shake-anim');
                 }, 400);
             }
@@ -729,7 +781,7 @@
 
             const isSmall = gridSize >= 5;
             const isMed = gridSize === 4;
-            const emojiSize = isSmall ? 'text-2xl sm:text-3xl' : (isMed ? 'text-3xl sm:text-4xl' : 'text-3xl sm:text-5xl');
+            const emojiSize = isSmall ? 'text-xl min-[380px]:text-2xl sm:text-3xl' : (isMed ? 'text-2xl min-[380px]:text-3xl sm:text-4xl' : 'text-3xl sm:text-5xl');
 
             let cellsHtml = '';
             for (let r = 0; r < gridSize; r++) {
@@ -744,22 +796,22 @@
 
                     if (isDog && isGoal) {
                         cellClass = 'grid-cell-goal bg-green-200 border-2 sm:border-4 border-green-500 bounce-anim';
-                        content = `<span class="${emojiSize}">🐶${lvl.goalEmoji}</span>`;
+                        content = `<span class="${emojiSize} leading-none">🐶</span><span class="absolute bottom-0.5 right-0.5 text-xs sm:text-sm leading-none">${lvl.goalEmoji}</span>`;
                     } else if (isDog) {
                         cellClass = 'grid-cell-dog bg-amber-100 border-2 sm:border-4 border-amber-400 bounce-anim';
-                        content = `<span class="${emojiSize}">🐶</span>`;
+                        content = `<span class="${emojiSize} leading-none">🐶</span>`;
                     } else if (isGoal) {
                         cellClass = 'grid-cell-goal bg-emerald-100 border-2 border-emerald-400';
-                        content = `<span class="${emojiSize} animate-pulse">${lvl.goalEmoji}</span>`;
+                        content = `<span class="${emojiSize} leading-none animate-pulse">${lvl.goalEmoji}</span>`;
                     } else if (obs) {
                         cellClass = 'grid-cell bg-slate-100 border-2 border-slate-300';
-                        content = `<span class="${emojiSize}">${obs.emoji}</span>`;
+                        content = `<span class="${emojiSize} leading-none">${obs.emoji}</span>`;
                     } else if (wasVisited) {
-                        content = `<span class="${isSmall ? 'text-base sm:text-lg' : 'text-xl sm:text-2xl'} opacity-45">🐾</span>`;
+                        content = `<span class="${isSmall ? 'text-sm sm:text-lg' : 'text-lg sm:text-2xl'} leading-none opacity-45">🐾</span>`;
                     }
 
                     cellsHtml += `
-                        <div id="cell-${r}-${c}" class="aspect-square rounded-xl sm:rounded-2xl ${cellClass} flex items-center justify-center shadow-sm transition-all">
+                        <div id="cell-${r}-${c}" class="aspect-square overflow-hidden relative rounded-xl sm:rounded-2xl ${cellClass} flex items-center justify-center shadow-sm transition-all">
                             ${content}
                         </div>
                     `;
@@ -782,8 +834,8 @@
             `).join('');
 
             const gridMaxW = gridSize === 5
-                ? 'max-w-[270px] min-[400px]:max-w-[310px] sm:max-w-[350px]'
-                : (gridSize === 4 ? 'max-w-[250px] min-[400px]:max-w-[280px] sm:max-w-[320px]' : 'max-w-[230px] min-[400px]:max-w-[260px] sm:max-w-[290px]');
+                ? 'max-w-[260px] min-[380px]:max-w-[295px] sm:max-w-[340px]'
+                : (gridSize === 4 ? 'max-w-[245px] min-[380px]:max-w-[275px] sm:max-w-[315px]' : 'max-w-[225px] min-[380px]:max-w-[255px] sm:max-w-[285px]');
             const gridColsClass = gridSize === 5 ? 'grid-cols-5' : (gridSize === 4 ? 'grid-cols-4' : 'grid-cols-3');
 
             appEl.innerHTML = `
@@ -801,7 +853,7 @@
                         </button>
                     </div>
 
-                    <div id="puppy-grid" class="grid ${gridColsClass} gap-1.5 sm:gap-2 w-full ${gridMaxW} p-2 sm:p-2.5 bg-white/80 dark-panel rounded-3xl border-2 border-fuchsia-200 shadow-inner">
+                    <div id="puppy-grid" class="grid ${gridColsClass} gap-1 min-[380px]:gap-1.5 sm:gap-2 w-full ${gridMaxW} p-1.5 sm:p-2.5 bg-white/80 dark-panel rounded-3xl border-2 border-fuchsia-200 shadow-inner">
                         ${cellsHtml}
                     </div>
 
@@ -872,12 +924,13 @@
                 fb.innerHTML = `<span>${_col('Valio! Šuniukas pasiekė tikslą! 🎉')}</span>`;
                 fb.className = 'h-5 sm:h-6 flex items-center justify-center text-xs sm:text-base font-black text-green-600 opacity-100';
 
-                setTimeout(() => {
+                setGameTimeout(() => {
                     state.currentIndex++;
                     loadQuestion();
                 }, 1050);
             } else {
                 playStepSound();
+                shufflePuppyControls();
                 renderPuppyQuestion();
                 const fb = document.getElementById('feedback');
                 fb.innerHTML = `<span>${_col('Puiku! Eik toliau! 🐾')}</span>`;
@@ -890,6 +943,7 @@
             appEl.innerHTML = renderEndScreenHelper({
                 score: state.score,
                 total: state.questions.length || 10,
+                mode: state.mode,
                 restartFn: "startGame(state.mode)",
                 retryFn: "retryMistakes()",
                 mistakesCount: state.missedQuestions.length,

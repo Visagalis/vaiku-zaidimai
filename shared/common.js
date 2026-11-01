@@ -531,6 +531,7 @@
                 .replace(/<[^>]+>/g, ' ')
                 .replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, ' ')
                 .replace(/[\u2600-\u27BF\uFE0F\u20E3❓❔➕➖✖️➗➔⬅️➡️⬆️⬇️🔗]/g, ' ')
+                .replace(/\s+([.,!?;:])/g, '$1')
                 .replace(/\s+/g, ' ')
                 .trim()
                 .toLowerCase();
@@ -549,11 +550,11 @@
         } catch (e) {}
     }
 
-    function renderSpeakBtn(text, extraClass) {
+    function renderSpeakBtn(text, label) {
         if (!text) return '';
         var safe = String(text).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
-        var cls = 'speak-btn' + (extraClass ? ' ' + extraClass : '');
-        return '<button type="button" onclick="speakLT(\'' + safe + '\')" class="' + cls + '" title="Klausyti">🔊</button>';
+        var titleAttr = String(label || 'Klausyti').replace(/"/g, '&quot;');
+        return '<button type="button" onclick="speakLT(\'' + safe + '\')" class="speak-btn" title="' + titleAttr + '" aria-label="' + titleAttr + '">🔊</button>';
     }
 
     // Saugūs žaidimo laikmačiai (automatiškai išvalomi grįžtant į meniu)
@@ -746,6 +747,15 @@
         var req = GAME_MODES[id];
         if (req && req.length) {
             var modes = e.modes || {};
+            var mKey;
+            for (mKey in modes) {
+                if (Object.prototype.hasOwnProperty.call(modes, mKey) && mKey.indexOf('-') !== -1) {
+                    var baseKey = mKey.split('-')[0];
+                    if (req.indexOf(baseKey) !== -1 && req.indexOf(mKey) === -1) {
+                        modes[baseKey] = Math.max(modes[baseKey] || 0, modes[mKey] || 0);
+                    }
+                }
+            }
             var completed = 0;
             for (var i = 0; i < req.length; i++) {
                 if ((modes[req[i]] || 0) > 0) completed++;
@@ -788,6 +798,12 @@
             if (curMode !== null && curMode !== undefined && String(curMode) !== '') {
                 var mKey = String(curMode);
                 modes[mKey] = Math.max(modes[mKey] || 0, roundStars);
+                if (mKey.indexOf('-') !== -1 && GAME_MODES[id]) {
+                    var baseMode = mKey.split('-')[0];
+                    if (GAME_MODES[id].indexOf(baseMode) !== -1 && GAME_MODES[id].indexOf(mKey) === -1) {
+                        modes[baseMode] = Math.max(modes[baseMode] || 0, roundStars);
+                    }
+                }
             }
             var overallStars;
             if (GAME_MODES[id]) {
@@ -835,8 +851,11 @@
                 var m = onclick.match(/^startGame\(\s*(?:'([^']+)'|"([^"]+)"|(\d+))\s*\)$/);
                 if (!m) continue;
                 var modeKey = m[1] || m[2] || m[3];
-                if (req.indexOf(modeKey) === -1) continue;
-                matchedBtns.push(btn);
+                var baseKey = modeKey.indexOf('-') !== -1 ? modeKey.split('-')[0] : null;
+                var isMainMode = req.indexOf(modeKey) !== -1;
+                var isSubMode = !isMainMode && baseKey && req.indexOf(baseKey) !== -1;
+                if (!isMainMode && !isSubMode) continue;
+                if (isMainMode) matchedBtns.push(btn);
 
                 var mStars = modes[modeKey] || 0;
                 if (btn.getAttribute('data-vz-stars') === String(mStars) && btn.querySelector('.vz-mode-stars')) {
@@ -964,22 +983,22 @@
         try { inIframe = (global.self !== global.top); } catch (e) { inIframe = true; }
         var homeIcon = opts.homeIcon || (inIframe ? '🔙' : '🏠');
 
-        var html = '<div class="top-bar bg-' + theme + '-100 border-b-2 border-' + theme + '-300 text-slate-800 px-3 sm:px-5 py-2 sm:py-2.5 flex justify-between items-center font-black text-sm sm:text-base shadow-sm shrink-0">';
+        var html = '<div class="top-bar bg-' + theme + '-100 border-b-2 border-' + theme + '-300 text-slate-800 px-3 sm:px-5 py-2 sm:py-2.5 flex justify-between items-center gap-2 font-black text-sm sm:text-base shadow-sm shrink-0">';
         
         // Kairė: Pradžios mygtukas ir taškai
-        html += '<div class="flex items-center gap-2 sm:gap-3">';
-        html += '<button onclick="' + safeHomeFn + '" class="top-badge bg-white/90 hover:bg-' + theme + '-200 border border-' + theme + '-300 px-2.5 py-1 rounded-xl text-base sm:text-xl transition active:scale-95" title="' + homeTitle + '">' + homeIcon + '</button>';
-        html += '<span class="flex items-center gap-1.5 text-base sm:text-lg">⭐ <span class="text-' + theme + '-700 dark:text-amber-300 font-black text-lg sm:text-xl">' + score + '</span></span>';
+        html += '<div class="flex items-center gap-2 sm:gap-3 shrink-0 whitespace-nowrap">';
+        html += '<button onclick="' + safeHomeFn + '" class="top-badge bg-white/90 hover:bg-' + theme + '-200 border border-' + theme + '-300 px-2.5 py-1 rounded-xl text-base sm:text-xl transition active:scale-95 shrink-0" title="' + homeTitle + '">' + homeIcon + '</button>';
+        html += '<span class="flex items-center gap-1.5 text-base sm:text-lg whitespace-nowrap shrink-0">⭐ <span class="text-' + theme + '-700 dark:text-amber-300 font-black text-lg sm:text-xl">' + score + '</span></span>';
         html += '</div>';
 
         // Centras: Klausimo progresas
         if (current !== undefined && total !== undefined) {
-            html += '<div class="top-badge bg-white/90 border border-' + theme + '-300 px-3 py-1 rounded-xl font-black text-' + theme + '-700 dark:text-amber-300 text-sm sm:text-base">🎯 ' + current + ' / ' + total + '</div>';
+            html += '<div class="top-badge bg-white/90 border border-' + theme + '-300 px-2.5 sm:px-3 py-1 rounded-xl font-black text-' + theme + '-700 dark:text-amber-300 text-xs sm:text-base whitespace-nowrap shrink-0">🎯 ' + current + ' / ' + total + '</div>';
         }
 
         // Dešinė: Streak (jei pateiktas)
         if (streak !== null && streak !== undefined) {
-            html += '<div class="flex items-center gap-1.5 text-base sm:text-lg">🔥 <span class="text-' + theme + '-700 dark:text-amber-300 font-black text-lg sm:text-xl">' + streak + '</span></div>';
+            html += '<div class="flex items-center gap-1.5 text-base sm:text-lg whitespace-nowrap shrink-0">🔥 <span class="text-' + theme + '-700 dark:text-amber-300 font-black text-lg sm:text-xl">' + streak + '</span></div>';
         } else {
             html += '<div></div>';
         }

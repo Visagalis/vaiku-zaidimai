@@ -442,7 +442,7 @@
                             <span class="text-2xl">🚂</span>
                             <span>${_col('Pratęsk seką')}</span>
                         </button>
-                        <button onclick="showMirrorDifficultySelect()" class="btn-3d py-3 sm:py-3.5 px-5 bg-violet-100 hover:bg-violet-200 border-2 border-violet-400 rounded-2xl text-lg sm:text-xl font-black shadow-[0_5px_0_#6d28d9] active:shadow-[0_0px_0_#6d28d9] transition-all flex items-center justify-center gap-2.5 text-violet-950">
+                        <button onclick="startGame('mirror')" class="btn-3d py-3 sm:py-3.5 px-5 bg-violet-100 hover:bg-violet-200 border-2 border-violet-400 rounded-2xl text-lg sm:text-xl font-black shadow-[0_5px_0_#6d28d9] active:shadow-[0_0px_0_#6d28d9] transition-all flex items-center justify-center gap-2.5 text-violet-950">
                             <span class="text-2xl">🪞</span>
                             <span>${_col('Veidrodėlis')}</span>
                         </button>
@@ -454,28 +454,28 @@
         function showMirrorDifficultySelect() {
             clearGameTimers();
             appEl.innerHTML = `
-                <div class="p-5 sm:p-8 flex flex-col items-center justify-center text-center">
-                    <button onclick="renderStartScreen()" class="self-start top-badge bg-white/90 border border-violet-300 px-3 py-1 rounded-xl text-sm sm:text-base mb-3 transition active:scale-95 font-black text-violet-800">🏠 ${_col('Meniu')}</button>
+                <div class="p-4 sm:p-8 flex flex-col items-center justify-center text-center">
+                    <button onclick="renderStartScreen()" class="self-start top-badge bg-white/90 border border-violet-300 px-3 py-1 rounded-xl text-sm sm:text-base mb-3 transition active:scale-95 font-black text-violet-800">⬅️ ${_col('Atgal')}</button>
                     <div class="text-5xl sm:text-7xl mb-2 animate-bounce">🪞</div>
                     <h2 class="text-2xl sm:text-3xl font-black text-violet-800 mb-2">${_col('Pasirink veidrodėlio lygį')}</h2>
-                    <p class="text-slate-600 dark:text-slate-300 font-bold text-sm sm:text-base mb-6 max-w-md">
+                    <p class="text-slate-600 dark:text-slate-300 font-bold text-xs sm:text-base mb-5 max-w-md">
                         ${_col('Lengvesnis lygis turi didesnius kvadratėlius, o sunkesnis – daugiau mažesnių langelių!')}
                     </p>
 
                     <div class="flex flex-col gap-3.5 w-full max-w-sm">
-                        <button onclick="startGame('mirror-easy')" class="btn-3d py-4 px-5 bg-emerald-100 hover:bg-emerald-200 border-2 border-emerald-400 rounded-2xl text-lg sm:text-xl font-black shadow-[0_5px_0_#059669] active:shadow-[0_0px_0_#059669] transition-all flex items-center justify-between text-emerald-950">
-                            <span class="flex items-center gap-2.5">
-                                <span class="text-2xl">🟢</span>
-                                <span>${_col('Lengvas')}</span>
+                        <button onclick="startGame('mirror-easy')" class="btn-3d py-3.5 px-4 sm:px-5 bg-emerald-100 hover:bg-emerald-200 border-2 border-emerald-400 rounded-2xl text-base sm:text-xl font-black shadow-[0_5px_0_#059669] active:shadow-[0_0px_0_#059669] transition-all flex items-center gap-3 text-left text-emerald-950">
+                            <span class="text-2xl shrink-0">🟢</span>
+                            <span class="flex flex-col leading-tight">
+                                <span class="text-base sm:text-lg font-black">${_col('Lengvas lygis')}</span>
+                                <span class="text-xs sm:text-sm font-bold opacity-75">4 × 3 • ${_col('didesni langeliai')}</span>
                             </span>
-                            <span class="text-xs sm:text-sm font-black bg-white/80 px-2.5 py-1 rounded-xl text-emerald-800 border border-emerald-300">4 × 3</span>
                         </button>
-                        <button onclick="startGame('mirror-hard')" class="btn-3d py-4 px-5 bg-rose-100 hover:bg-rose-200 border-2 border-rose-400 rounded-2xl text-lg sm:text-xl font-black shadow-[0_5px_0_#e11d48] active:shadow-[0_0px_0_#e11d48] transition-all flex items-center justify-between text-rose-950">
-                            <span class="flex items-center gap-2.5">
-                                <span class="text-2xl">🔴</span>
-                                <span>${_col('Sunkus')}</span>
+                        <button onclick="startGame('mirror-hard')" class="btn-3d py-3.5 px-4 sm:px-5 bg-rose-100 hover:bg-rose-200 border-2 border-rose-400 rounded-2xl text-base sm:text-xl font-black shadow-[0_5px_0_#e11d48] active:shadow-[0_0px_0_#e11d48] transition-all flex items-center gap-3 text-left text-rose-950">
+                            <span class="text-2xl shrink-0">🔴</span>
+                            <span class="flex flex-col leading-tight">
+                                <span class="text-base sm:text-lg font-black">${_col('Sunkus lygis')}</span>
+                                <span class="text-xs sm:text-sm font-bold opacity-75">6 × 4 • ${_col('mažesni langeliai')}</span>
                             </span>
-                            <span class="text-xs sm:text-sm font-black bg-white/80 px-2.5 py-1 rounded-xl text-rose-800 border border-rose-300">6 × 4</span>
                         </button>
                     </div>
                 </div>
@@ -485,6 +485,10 @@
         function startGame(mode) {
             getAudioCtx();
             clearGameTimers();
+            if (mode === 'mirror') {
+                showMirrorDifficultySelect();
+                return;
+            }
             state.mode = mode;
             state.score = 0;
             state.streak = 0;
@@ -493,7 +497,7 @@
 
             let pool = HOUSE_QUESTIONS;
             if (mode === 'sequences') pool = SEQUENCE_QUESTIONS;
-            if (mode === 'mirror' || mode === 'mirror-easy') pool = MIRROR_PATTERNS;
+            if (mode === 'mirror-easy') pool = MIRROR_PATTERNS;
             if (mode === 'mirror-hard') pool = MIRROR_PATTERNS_HARD;
 
             state.questions = shuffle(pool).slice(0, 10);
@@ -799,6 +803,9 @@
             const cellClass = isHard
                 ? 'w-7 h-7 min-[380px]:w-8 min-[380px]:h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl'
                 : 'w-10 h-10 sm:w-12 sm:h-12 rounded-xl';
+            const axisHeightClass = isHard
+                ? 'h-7 min-[380px]:h-8 sm:h-9'
+                : 'h-10 sm:h-12';
 
             let rowsHtml = '';
             for (let r = 0; r < rows; r++) {
@@ -827,7 +834,7 @@
                 rowsHtml += `
                     <div class="flex items-center justify-center gap-1 sm:gap-2">
                         <div class="flex gap-0.5 sm:gap-1.5">${leftCells}</div>
-                        <div class="w-1.5 h-full rounded-full bg-indigo-500/80 mx-0.5 self-stretch min-h-[26px]"></div>
+                        <div class="w-1.5 ${axisHeightClass} rounded-full bg-indigo-500/80 mx-0.5"></div>
                         <div class="flex gap-0.5 sm:gap-1.5">${rightCells}</div>
                     </div>
                 `;
@@ -842,6 +849,7 @@
                         <h2 class="text-sm sm:text-xl font-black text-slate-800 text-center">
                             ${_col('Atspindėk dešinėje:')} ${_col(q.name)}
                         </h2>
+                        ${renderSpeakBtn('Atspindėk dešinėje: ' + q.name, 'Išklausyti užduotį')}
                     </div>
 
                     <div class="panel-box p-2.5 sm:p-4 bg-indigo-50/70 rounded-3xl border-2 border-indigo-200 flex flex-col items-center gap-1.5 shadow-inner">
@@ -949,6 +957,7 @@
             appEl.innerHTML = renderEndScreenHelper({
                 score: state.score,
                 total: state.totalPossible,
+                mode: state.mode,
                 restartFn: "startGame(state.mode)",
                 retryFn: "retryMistakes()",
                 mistakesCount: state.missedQuestions.length,
