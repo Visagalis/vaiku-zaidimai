@@ -254,6 +254,11 @@
             document.getElementById('start-screen').classList.remove('hidden');
         }
 
+        function renderStartScreen() {
+            showStartScreen();
+        }
+        window.renderStartScreen = renderStartScreen;
+
         function startGame() {
             getAudioCtx();
             score = 0;
@@ -308,7 +313,9 @@
                 total: roundDeck.length || 10,
                 restartFn: "startGame()",
                 retryFn: "retryMistakes()",
-                mistakesCount: missedWords.length
+                mistakesCount: missedWords.length,
+                menuFn: "renderStartScreen()",
+                menuText: "Meniu"
             });
             endScreen.classList.remove('hidden');
             endScreen.classList.add('flex');

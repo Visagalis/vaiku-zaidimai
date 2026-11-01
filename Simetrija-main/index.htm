@@ -266,6 +266,142 @@
             }
         ];
 
+        // 3 REŽIMAS (Sunkus lygis): 6 eilutės x 4 stulpeliai kairėje pusėje (daugiau mažesnių kvadratėlių)
+        const MIRROR_PATTERNS_HARD = [
+            {
+                name: "ŠIRDELĖ", emoji: "❤️", color: "bg-rose-500 border-rose-600",
+                left: [
+                    [0, 1, 1, 0],
+                    [1, 1, 1, 1],
+                    [1, 1, 1, 1],
+                    [0, 1, 1, 1],
+                    [0, 0, 1, 1],
+                    [0, 0, 0, 1]
+                ]
+            },
+            {
+                name: "DRUGELIS", emoji: "🦋", color: "bg-indigo-500 border-indigo-600",
+                left: [
+                    [1, 0, 0, 1],
+                    [1, 1, 1, 1],
+                    [1, 1, 1, 1],
+                    [0, 1, 1, 1],
+                    [1, 1, 1, 1],
+                    [0, 1, 0, 1]
+                ]
+            },
+            {
+                name: "EGLUTĖ", emoji: "🌲", color: "bg-emerald-500 border-emerald-600",
+                left: [
+                    [0, 0, 0, 1],
+                    [0, 0, 1, 1],
+                    [0, 1, 1, 1],
+                    [1, 1, 1, 1],
+                    [0, 1, 1, 1],
+                    [0, 0, 1, 1]
+                ]
+            },
+            {
+                name: "RAKETA", emoji: "🚀", color: "bg-sky-500 border-sky-600",
+                left: [
+                    [0, 0, 0, 1],
+                    [0, 0, 1, 1],
+                    [0, 1, 1, 1],
+                    [0, 1, 1, 1],
+                    [1, 1, 1, 1],
+                    [1, 0, 0, 1]
+                ]
+            },
+            {
+                name: "PILIS", emoji: "🏰", color: "bg-amber-500 border-amber-600",
+                left: [
+                    [1, 0, 1, 0],
+                    [1, 1, 1, 1],
+                    [1, 0, 1, 1],
+                    [1, 1, 1, 1],
+                    [1, 1, 0, 0],
+                    [1, 1, 0, 0]
+                ]
+            },
+            {
+                name: "LAIVELIS", emoji: "⛵", color: "bg-blue-500 border-blue-600",
+                left: [
+                    [0, 0, 0, 1],
+                    [0, 1, 1, 1],
+                    [1, 1, 1, 1],
+                    [0, 0, 0, 1],
+                    [1, 1, 1, 1],
+                    [0, 1, 1, 1]
+                ]
+            },
+            {
+                name: "ŽVAIGŽDĖ", emoji: "⭐", color: "bg-yellow-400 border-yellow-500",
+                left: [
+                    [0, 0, 0, 1],
+                    [0, 0, 1, 1],
+                    [1, 1, 1, 1],
+                    [0, 1, 1, 1],
+                    [0, 1, 1, 1],
+                    [1, 0, 0, 1]
+                ]
+            },
+            {
+                name: "GRYBAS", emoji: "🍄", color: "bg-red-500 border-red-600",
+                left: [
+                    [0, 1, 1, 1],
+                    [1, 1, 1, 1],
+                    [1, 1, 1, 1],
+                    [0, 0, 1, 1],
+                    [0, 0, 1, 1],
+                    [0, 1, 1, 1]
+                ]
+            },
+            {
+                name: "ROBOTAS", emoji: "🤖", color: "bg-cyan-500 border-cyan-600",
+                left: [
+                    [0, 1, 0, 0],
+                    [1, 1, 1, 1],
+                    [1, 0, 1, 1],
+                    [0, 1, 1, 1],
+                    [1, 1, 1, 1],
+                    [0, 1, 0, 1]
+                ]
+            },
+            {
+                name: "AUTOMOBILIS", emoji: "🚗", color: "bg-violet-500 border-violet-600",
+                left: [
+                    [0, 0, 1, 1],
+                    [0, 1, 1, 1],
+                    [1, 1, 1, 1],
+                    [1, 1, 1, 1],
+                    [0, 1, 0, 1],
+                    [0, 1, 0, 0]
+                ]
+            },
+            {
+                name: "KARŪNA", emoji: "👑", color: "bg-amber-400 border-amber-500",
+                left: [
+                    [1, 0, 1, 0],
+                    [1, 0, 1, 1],
+                    [1, 1, 1, 1],
+                    [1, 0, 1, 1],
+                    [1, 1, 1, 1],
+                    [1, 1, 1, 1]
+                ]
+            },
+            {
+                name: "GĖLĖ", emoji: "🌸", color: "bg-pink-500 border-pink-600",
+                left: [
+                    [0, 1, 1, 0],
+                    [1, 1, 1, 1],
+                    [1, 1, 0, 1],
+                    [0, 1, 1, 1],
+                    [0, 0, 1, 1],
+                    [0, 0, 0, 1]
+                ]
+            }
+        ];
+
         let state = {
             mode: 'houses',
             questions: [],
@@ -306,9 +442,40 @@
                             <span class="text-2xl">🚂</span>
                             <span>${_col('Pratęsk seką')}</span>
                         </button>
-                        <button onclick="startGame('mirror')" class="btn-3d py-3 sm:py-3.5 px-5 bg-violet-100 hover:bg-violet-200 border-2 border-violet-400 rounded-2xl text-lg sm:text-xl font-black shadow-[0_5px_0_#6d28d9] active:shadow-[0_0px_0_#6d28d9] transition-all flex items-center justify-center gap-2.5 text-violet-950">
+                        <button onclick="showMirrorDifficultySelect()" class="btn-3d py-3 sm:py-3.5 px-5 bg-violet-100 hover:bg-violet-200 border-2 border-violet-400 rounded-2xl text-lg sm:text-xl font-black shadow-[0_5px_0_#6d28d9] active:shadow-[0_0px_0_#6d28d9] transition-all flex items-center justify-center gap-2.5 text-violet-950">
                             <span class="text-2xl">🪞</span>
                             <span>${_col('Veidrodėlis')}</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showMirrorDifficultySelect() {
+            clearGameTimers();
+            appEl.innerHTML = `
+                <div class="p-5 sm:p-8 flex flex-col items-center justify-center text-center">
+                    <button onclick="renderStartScreen()" class="self-start top-badge bg-white/90 border border-violet-300 px-3 py-1 rounded-xl text-sm sm:text-base mb-3 transition active:scale-95 font-black text-violet-800">🏠 ${_col('Meniu')}</button>
+                    <div class="text-5xl sm:text-7xl mb-2 animate-bounce">🪞</div>
+                    <h2 class="text-2xl sm:text-3xl font-black text-violet-800 mb-2">${_col('Pasirink veidrodėlio lygį')}</h2>
+                    <p class="text-slate-600 dark:text-slate-300 font-bold text-sm sm:text-base mb-6 max-w-md">
+                        ${_col('Lengvesnis lygis turi didesnius kvadratėlius, o sunkesnis – daugiau mažesnių langelių!')}
+                    </p>
+
+                    <div class="flex flex-col gap-3.5 w-full max-w-sm">
+                        <button onclick="startGame('mirror-easy')" class="btn-3d py-4 px-5 bg-emerald-100 hover:bg-emerald-200 border-2 border-emerald-400 rounded-2xl text-lg sm:text-xl font-black shadow-[0_5px_0_#059669] active:shadow-[0_0px_0_#059669] transition-all flex items-center justify-between text-emerald-950">
+                            <span class="flex items-center gap-2.5">
+                                <span class="text-2xl">🟢</span>
+                                <span>${_col('Lengvas')}</span>
+                            </span>
+                            <span class="text-xs sm:text-sm font-black bg-white/80 px-2.5 py-1 rounded-xl text-emerald-800 border border-emerald-300">4 × 3</span>
+                        </button>
+                        <button onclick="startGame('mirror-hard')" class="btn-3d py-4 px-5 bg-rose-100 hover:bg-rose-200 border-2 border-rose-400 rounded-2xl text-lg sm:text-xl font-black shadow-[0_5px_0_#e11d48] active:shadow-[0_0px_0_#e11d48] transition-all flex items-center justify-between text-rose-950">
+                            <span class="flex items-center gap-2.5">
+                                <span class="text-2xl">🔴</span>
+                                <span>${_col('Sunkus')}</span>
+                            </span>
+                            <span class="text-xs sm:text-sm font-black bg-white/80 px-2.5 py-1 rounded-xl text-rose-800 border border-rose-300">6 × 4</span>
                         </button>
                     </div>
                 </div>
@@ -326,7 +493,8 @@
 
             let pool = HOUSE_QUESTIONS;
             if (mode === 'sequences') pool = SEQUENCE_QUESTIONS;
-            if (mode === 'mirror') pool = MIRROR_PATTERNS;
+            if (mode === 'mirror' || mode === 'mirror-easy') pool = MIRROR_PATTERNS;
+            if (mode === 'mirror-hard') pool = MIRROR_PATTERNS_HARD;
 
             state.questions = shuffle(pool).slice(0, 10);
             state.totalPossible = state.questions.length;
@@ -613,47 +781,54 @@
 
         // --- 3 REŽIMAS: SIMETRIJOS VEIDRODIS ---
         function initMirrorBoard() {
-            state.userGrid = [
-                [0, 0, 0],
-                [0, 0, 0],
-                [0, 0, 0],
-                [0, 0, 0]
-            ];
+            const q = state.questions[state.currentIndex];
+            const rows = q.left.length;
+            const cols = q.left[0].length;
+            state.userGrid = [];
+            for (let r = 0; r < rows; r++) {
+                state.userGrid.push(new Array(cols).fill(0));
+            }
             renderMirrorBoard();
         }
 
         function renderMirrorBoard() {
             const q = state.questions[state.currentIndex];
+            const rows = q.left.length;
+            const cols = q.left[0].length;
+            const isHard = cols >= 4 || rows >= 6;
+            const cellClass = isHard
+                ? 'w-7 h-7 min-[380px]:w-8 min-[380px]:h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl'
+                : 'w-10 h-10 sm:w-12 sm:h-12 rounded-xl';
 
             let rowsHtml = '';
-            for (let r = 0; r < 4; r++) {
+            for (let r = 0; r < rows; r++) {
                 let leftCells = '';
-                for (let c = 0; c < 3; c++) {
+                for (let c = 0; c < cols; c++) {
                     const active = q.left[r][c] === 1;
                     const cls = active
                         ? `${q.color} shadow-sm`
                         : 'cell-empty bg-slate-100 border-slate-200';
-                    leftCells += `<div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl border-2 ${cls}"></div>`;
+                    leftCells += `<div class="${cellClass} border-2 ${cls}"></div>`;
                 }
 
                 let rightCells = '';
-                for (let c = 0; c < 3; c++) {
+                for (let c = 0; c < cols; c++) {
                     const active = state.userGrid[r][c] === 1;
                     const cls = active
                         ? `${q.color} shadow-sm scale-100`
                         : 'cell-empty bg-white hover:bg-indigo-50 border-indigo-200';
                     rightCells += `
                         <button type="button" onclick="toggleMirrorCell(${r}, ${c})"
-                            class="mirror-cell w-10 h-10 sm:w-12 sm:h-12 rounded-xl border-2 ${cls} cursor-pointer">
+                            class="mirror-cell ${cellClass} border-2 ${cls} cursor-pointer">
                         </button>
                     `;
                 }
 
                 rowsHtml += `
-                    <div class="flex items-center justify-center gap-1.5 sm:gap-2">
-                        <div class="flex gap-1 sm:gap-1.5">${leftCells}</div>
-                        <div class="w-1.5 h-10 sm:h-12 rounded-full bg-indigo-500/80 mx-0.5"></div>
-                        <div class="flex gap-1 sm:gap-1.5">${rightCells}</div>
+                    <div class="flex items-center justify-center gap-1 sm:gap-2">
+                        <div class="flex gap-0.5 sm:gap-1.5">${leftCells}</div>
+                        <div class="w-1.5 h-full rounded-full bg-indigo-500/80 mx-0.5 self-stretch min-h-[26px]"></div>
+                        <div class="flex gap-0.5 sm:gap-1.5">${rightCells}</div>
                     </div>
                 `;
             }
@@ -661,34 +836,34 @@
             appEl.innerHTML = `
                 ${renderTopBar({ score: state.score, current: state.currentIndex + 1, total: state.questions.length, streak: state.streak, theme: 'violet' })}
 
-                <div class="p-3 sm:p-5 flex-1 flex flex-col justify-evenly items-center gap-2">
+                <div class="p-2 sm:p-5 flex-1 flex flex-col justify-evenly items-center gap-1.5 sm:gap-2">
                     <div class="flex items-center gap-2">
                         <span class="text-2xl sm:text-3xl">${q.emoji}</span>
-                        <h2 class="text-base sm:text-xl font-black text-slate-800 text-center">
+                        <h2 class="text-sm sm:text-xl font-black text-slate-800 text-center">
                             ${_col('Atspindėk dešinėje:')} ${_col(q.name)}
                         </h2>
                     </div>
 
-                    <div class="panel-box p-3 sm:p-4 bg-indigo-50/70 rounded-3xl border-2 border-indigo-200 flex flex-col items-center gap-1.5 shadow-inner">
-                        <div class="flex items-center justify-between w-full px-3 text-[11px] sm:text-xs font-extrabold text-indigo-700 dark:text-indigo-300 uppercase tracking-wider">
+                    <div class="panel-box p-2.5 sm:p-4 bg-indigo-50/70 rounded-3xl border-2 border-indigo-200 flex flex-col items-center gap-1.5 shadow-inner">
+                        <div class="flex items-center justify-between w-full px-3 text-[10px] sm:text-xs font-extrabold text-indigo-700 dark:text-indigo-300 uppercase tracking-wider">
                             <span>${_col('Pavyzdys')}</span>
                             <span>🪞 ${_col('Ašis')}</span>
                             <span>${_col('Tavo pusė')}</span>
                         </div>
-                        <div class="flex flex-col gap-1 sm:gap-1.5 mt-1">
+                        <div class="flex flex-col gap-0.5 sm:gap-1.5 mt-1">
                             ${rowsHtml}
                         </div>
                     </div>
 
-                    <div id="feedback" class="h-6 sm:h-8 flex items-center justify-center text-sm sm:text-lg font-black opacity-0 transition-opacity">
+                    <div id="feedback" class="h-6 sm:h-8 flex items-center justify-center text-xs sm:text-lg font-black opacity-0 transition-opacity">
                         <span>&nbsp;</span>
                     </div>
 
                     <div class="flex items-center justify-center gap-3 w-full max-w-sm">
-                        <button id="hint-btn" onclick="showMirrorHint()" class="hint-btn py-2.5 px-4 text-sm">
+                        <button id="hint-btn" onclick="showMirrorHint()" class="hint-btn py-2 px-3 sm:px-4 text-xs sm:text-sm">
                             <span>💡</span> <span>${_col('Užuomina')}</span>
                         </button>
-                        <button onclick="checkMirrorAnswer()" class="btn-3d flex-1 py-3 px-5 bg-green-500 hover:bg-green-600 text-white border-2 border-green-600 rounded-2xl text-base sm:text-lg font-black shadow-[0_5px_0_#15803d] active:shadow-[0_0px_0_#15803d] transition-all">
+                        <button onclick="checkMirrorAnswer()" class="btn-3d flex-1 py-2.5 sm:py-3 px-5 bg-green-500 hover:bg-green-600 text-white border-2 border-green-600 rounded-2xl text-base sm:text-lg font-black shadow-[0_5px_0_#15803d] active:shadow-[0_0px_0_#15803d] transition-all">
                             ✔️ ${_col('Patikrinti')}
                         </button>
                     </div>
@@ -707,9 +882,11 @@
             if (state.waiting) return;
             playHintSound();
             const q = state.questions[state.currentIndex];
-            for (let r = 0; r < 4; r++) {
-                for (let c = 0; c < 3; c++) {
-                    const expected = q.left[r][2 - c];
+            const rows = q.left.length;
+            const cols = q.left[0].length;
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    const expected = q.left[r][(cols - 1) - c];
                     if (state.userGrid[r][c] !== expected) {
                         state.userGrid[r][c] = expected;
                         renderMirrorBoard();
@@ -722,11 +899,13 @@
         function checkMirrorAnswer() {
             if (state.waiting) return;
             const q = state.questions[state.currentIndex];
+            const rows = q.left.length;
+            const cols = q.left[0].length;
             let allMatch = true;
 
-            for (let r = 0; r < 4; r++) {
-                for (let c = 0; c < 3; c++) {
-                    const expected = q.left[r][2 - c];
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    const expected = q.left[r][(cols - 1) - c];
                     if (state.userGrid[r][c] !== expected) {
                         allMatch = false;
                     }

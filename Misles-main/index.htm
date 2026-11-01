@@ -485,7 +485,8 @@
 
             let bodyContent = '';
             if (state.mode === 'detective') {
-                const speakText = q.clues.join('. ');
+                const cleanClues = q.clues.map(c => c.replace(/^\d+[\.\)]\s*/, '').trim());
+                const speakText = 'Kas aš esu? ' + cleanClues.join('. ');
                 const cluesHtml = q.clues.map(c => `
                     <div class="clue-pill px-3.5 py-1.5 rounded-2xl bg-white border-2 border-sky-300 font-extrabold text-sm sm:text-lg text-slate-800 shadow-sm w-full text-left">
                         ${_col(c)}

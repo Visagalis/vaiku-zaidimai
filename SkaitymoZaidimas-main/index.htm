@@ -178,31 +178,22 @@
       const [hasExtraChance, setHasExtraChance] = useState(true);
       const [hintUsed, setHintUsed] = useState(false);
       
-      const [wordPool, setWordPool] = useState([]);
+      const [roundDeck, setRoundDeck] = useState([]);
+      const [roundIndex, setRoundIndex] = useState(0);
+      const [totalQuestions, setTotalQuestions] = useState(10);
+      const [firstTry, setFirstTry] = useState(true);
+      const [firstTryScore, setFirstTryScore] = useState(0);
+      const [missedWords, setMissedWords] = useState([]);
 
       const playIncorrectSound = playWrongSound;
       const isInIframe = typeof window !== 'undefined' && window.self !== window.top;
 
-      const getNextWord = useCallback(() => {
-        let currentPool = [...wordPool];
-        
-        if (currentPool.length === 0) {
-          currentPool = shuffleArray(WORDS_DATA);
-        }
-        
-        const nextItem = currentPool.pop();
-        setWordPool(currentPool);
-        
-        return nextItem;
-      }, [wordPool]);
-
-      const generateRound = useCallback(() => {
-        const correctItem = getNextWord();
-        
+      const loadQuestion = useCallback((idx, deck) => {
+        if (!deck || idx >= deck.length) return;
+        const correctItem = deck[idx];
         const otherItems = WORDS_DATA.filter(item => item.word !== correctItem.word);
         const shuffledOthers = shuffleArray(otherItems);
         const wrongOptions = shuffledOthers.slice(0, 9).map(item => item.emoji);
-        
         const allOptions = shuffleArray([correctItem.emoji, ...wrongOptions]);
         
         setCurrentWord(correctItem);
@@ -210,24 +201,56 @@
         setSelectedEmoji(null);
         setFeedback(null);
         setWrongAnswers(new Set());
-        setHasExtraChance(true); 
+        setHasExtraChance(true);
         setHintUsed(false);
+        setFirstTry(true);
+      }, []);
 
-      }, [getNextWord]);
-
-      const startGame = () => {
+      const startGame = useCallback(() => {
         initAudio();
+        const deck = shuffleArray(WORDS_DATA).slice(0, 10);
+        setRoundDeck(deck);
+        setTotalQuestions(deck.length);
+        setRoundIndex(0);
         setScore(0);
         setStreak(0);
-        setWordPool(shuffleArray(WORDS_DATA));
+        setFirstTryScore(0);
+        setMissedWords([]);
         setGameState('playing');
-      };
+        loadQuestion(0, deck);
+      }, [loadQuestion]);
+
+      const retryMistakes = useCallback(() => {
+        initAudio();
+        if (!missedWords || missedWords.length === 0) {
+          startGame();
+          return;
+        }
+        const deck = shuffleArray([...missedWords]);
+        setRoundDeck(deck);
+        setTotalQuestions(deck.length);
+        setRoundIndex(0);
+        setScore(0);
+        setStreak(0);
+        setFirstTryScore(0);
+        setMissedWords([]);
+        setGameState('playing');
+        loadQuestion(0, deck);
+      }, [missedWords, startGame, loadQuestion]);
 
       useEffect(() => {
-        if (gameState === 'playing' && currentWord === null) {
-          generateRound();
-        }
-      }, [gameState, currentWord, generateRound]);
+        window.__restartSkaitymas = startGame;
+        window.__retrySkaitymas = retryMistakes;
+        window.__menuSkaitymas = () => {
+          clearGameTimers();
+          setGameState('start');
+        };
+        return () => {
+          delete window.__restartSkaitymas;
+          delete window.__retrySkaitymas;
+          delete window.__menuSkaitymas;
+        };
+      }, [startGame, retryMistakes]);
 
       const handleEmojiClick = (emoji) => {
         if (feedback?.type === 'success' || wrongAnswers.has(emoji)) return;
@@ -253,27 +276,40 @@
         if (selectedEmoji === currentWord.emoji) {
           playCorrectSound();
           
+          const isFirstTry = firstTry;
           const newStreak = streak + 1;
           const pointsEarned = 10 + (Math.floor(newStreak / 5) * 5);
           const nextScore = score + pointsEarned;
           
           setScore(nextScore);
           setStreak(newStreak);
-          if (typeof saveGameProgress === 'function') {
-            const starsEarned = nextScore >= 80 ? 3 : nextScore >= 40 ? 2 : 1;
-            saveGameProgress('SkaitymoZaidimas-main', starsEarned, nextScore, 100);
+          if (isFirstTry) {
+            setFirstTryScore(prev => prev + 1);
           }
           
           const praise = PRAISE_WORDS[Math.floor(Math.random() * PRAISE_WORDS.length)];
           setFeedback({ text: `${praise} +${pointsEarned}`, type: 'success' });
           
           setTimeout(() => {
-            generateRound();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            const nextIdx = roundIndex + 1;
+            if (nextIdx >= roundDeck.length) {
+              setGameState('end');
+            } else {
+              setRoundIndex(nextIdx);
+              loadQuestion(nextIdx, roundDeck);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
           }, 1500);
 
         } else {
           playIncorrectSound();
+          setFirstTry(false);
+          setMissedWords(prev => {
+            if (currentWord && !prev.some(w => w.word === currentWord.word)) {
+              return [...prev, currentWord];
+            }
+            return prev;
+          });
           
           if (hasExtraChance) {
             setHasExtraChance(false);
@@ -313,16 +349,43 @@
         );
       }
 
+      if (gameState === 'end') {
+        const endHtml = typeof renderEndScreenHelper === 'function' ? renderEndScreenHelper({
+          score: firstTryScore,
+          total: totalQuestions,
+          restartFn: 'window.__restartSkaitymas && window.__restartSkaitymas()',
+          retryFn: missedWords.length > 0 ? 'window.__retrySkaitymas && window.__retrySkaitymas()' : null,
+          mistakesCount: missedWords.length,
+          menuFn: 'window.__menuSkaitymas && window.__menuSkaitymas()',
+          menuText: 'Meniu'
+        }) : '';
+
+        return (
+          <div className="min-h-screen bg-blue-100 flex items-center justify-center p-4 font-sans select-none">
+            <div
+              className="w-full max-w-md bg-white rounded-3xl shadow-xl overflow-hidden border-2 border-blue-200"
+              dangerouslySetInnerHTML={{ __html: endHtml }}
+            />
+          </div>
+        );
+      }
+
       return (
         <div className="h-screen max-h-screen overflow-hidden bg-yellow-50 flex flex-col items-center justify-between p-2.5 sm:p-5 font-sans selection:bg-transparent select-none">
           
           {/* Informacinė juosta */}
           <div className="w-full max-w-4xl flex justify-between items-center bg-white px-3 sm:px-4 py-2 rounded-2xl sm:rounded-3xl shadow-md border-2 sm:border-4 border-yellow-200 shrink-0">
             <div className="flex items-center gap-2">
-              <button onClick={() => setGameState('start')} className="p-1.5 sm:p-2 bg-slate-100 hover:bg-slate-200 active:scale-95 rounded-xl sm:rounded-2xl text-lg sm:text-xl transition-all" title="Atgal">{isInIframe ? '🔙' : '🏠'}</button>
+              <button onClick={() => { clearGameTimers(); setGameState('start'); }} className="p-1.5 sm:p-2 bg-slate-100 hover:bg-slate-200 active:scale-95 rounded-xl sm:rounded-2xl text-lg sm:text-xl transition-all" title="Atgal">{isInIframe ? '🔙' : '🏠'}</button>
               <span className="text-lg sm:text-2xl font-black text-blue-600 flex items-center gap-1">⭐ {score}</span>
             </div>
             
+            {/* Progresas */}
+            <div className="top-badge flex items-center gap-1 bg-amber-50 px-2.5 sm:px-3 py-1 rounded-full text-amber-800 font-extrabold shadow-sm border border-amber-300 text-sm sm:text-base" title="Progresas">
+              <span>🎯</span>
+              <span>{Math.min(roundIndex + 1, totalQuestions)} / {totalQuestions}</span>
+            </div>
+
             {/* Papildomas šansas */}
             <div className="flex items-center justify-center gap-2">
               <span className={`text-2xl sm:text-3xl transition-all duration-300 ${hasExtraChance ? 'opacity-100 scale-100' : 'opacity-20 scale-75 grayscale'}`} title="Šansas">
