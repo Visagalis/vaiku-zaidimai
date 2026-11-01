@@ -395,16 +395,16 @@ button.coin:active, button.bill:active {
         align-content: center;
     }
 
-    /* Monetų padėklai — kompaktiški, kad neperpildytų ekrano ir paliktų vietos prekių kortelei bei piniginei */
+    /* Monetų padėklai — kompaktiški, bet leidžiantys sutalpinti kelias monetų eilutes */
     .counter-tray,
     .money-tray,
     .change-tray,
-    #ex-tray {
-        min-height: 100px;
-        max-height: 145px;
-    }
+    #ex-tray,
     .piggy-box {
-        min-height: 110px;
+        min-height: 115px;
+        max-height: 180px;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     /* Užtikriname, kad pradžios ir pabaigos ekranai užpildytų visą aukštį */

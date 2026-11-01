@@ -495,7 +495,7 @@
                                 <button onclick="clearCounter()" class="text-rose-500 hover:scale-110 active:scale-95 text-2xl p-1.5 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/30 transition" title="Išvalyti">🗑️</button>
                             </div>
                         </div>
-                        <div id="counter-tray" class="counter-tray flex flex-wrap items-center justify-center content-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-2xl h-28 sm:h-36">
+                        <div id="counter-tray" class="counter-tray flex flex-wrap items-center justify-center content-center gap-1.5 sm:gap-2.5 p-2.5 pt-3 sm:p-4 rounded-2xl min-h-[7.25rem] max-h-[11rem] sm:min-h-[9rem] sm:max-h-[13rem] overflow-y-auto">
                         </div>
                     </div>
 
@@ -532,7 +532,7 @@
             if (state.initialCoin) {
                 const init = state.initialCoin;
                 initialHtml = `
-                    <div class="relative inline-flex items-center justify-center shrink-0 pop-in">
+                    <div class="relative inline-flex items-center justify-center shrink-0 pop-in m-0.5">
                         <button type="button" onclick="touchLockedCoin(this)" class="${init.class} locked-coin select-none transition-transform active:scale-95" title="Jau padėtas pinigėlis (neliečiamas)">
                             ${init.label}
                         </button>
@@ -542,7 +542,7 @@
             }
 
             const userCoinsHtml = state.collectedItems.map((item, idx) => `
-                <button type="button" onclick="removeCoin(${idx})" class="${item.class} pop-in cursor-pointer hover:opacity-80 transition transform active:scale-95" title="Nuimti">
+                <button type="button" onclick="removeCoin(${idx})" class="${item.class} pop-in cursor-pointer hover:opacity-80 transition transform active:scale-95 m-0.5" title="Nuimti">
                     ${item.label}
                 </button>
             `).join('');

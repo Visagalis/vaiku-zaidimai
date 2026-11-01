@@ -92,10 +92,15 @@ button.coin:active, button.bill:active {
 /* Padėklų ir piniginių baziniai stiliai */
 .money-tray,
 .counter-tray,
-.change-tray {
+.change-tray,
+.piggy-box {
     background-color: rgba(240, 253, 244, 0.9);
     border: 2px dashed #4ade80;
     transition: background-color 0.2s ease, border-color 0.2s ease;
+    min-height: 115px;
+    max-height: 180px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .wallet-box {

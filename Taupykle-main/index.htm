@@ -144,10 +144,45 @@
             collectedItems: [],
             waiting: false,
             firstTry: true,
-            hintUsed: false
+            hintUsed: false,
+            initialCoin: null
         };
 
         const app = document.getElementById('app');
+
+        function touchLockedCoin(btn) {
+            if (state.waiting) return;
+            playSound('tap');
+            if (btn) {
+                btn.classList.remove('shake-anim');
+                void btn.offsetWidth;
+                btn.classList.add('shake-anim');
+            }
+            const feedback = document.getElementById('feedback');
+            if (feedback) {
+                feedback.innerHTML = `<span>${_col('Šis pinigėlis jau padėtas iškeitimui! 🔒')}</span>`;
+                feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-xs sm:text-sm text-amber-600 dark:text-amber-400 opacity-100 transition-opacity shrink-0";
+                setGameTimeout(() => {
+                    if (!state.waiting && feedback) {
+                        feedback.classList.add('opacity-0');
+                    }
+                }, 1800);
+            }
+        }
+
+        function pickInitialExCoin() {
+            if (!state.currentTask || !state.currentTask.pool) {
+                state.initialCoin = null;
+                return;
+            }
+            const candidates = state.currentTask.pool.filter(c => c.cents < state.currentTask.target.cents);
+            state.initialCoin = candidates.length > 0 ? pickRandom(candidates) : null;
+        }
+
+        function getExchangeSum() {
+            const initial = state.initialCoin ? state.initialCoin.cents : 0;
+            return initial + sumCoins(state.collectedItems);
+        }
 
         function showCompareHint() {
             if (state.waiting || state.hintUsed) return;
@@ -165,7 +200,7 @@
             if (!state.hintUsed || !state.currentTask || !state.currentTask.target) return;
             const slot = document.getElementById('exchange-hint-slot');
             if (!slot) return;
-            const currentSum = sumCoins(state.collectedItems);
+            const currentSum = getExchangeSum();
             const target = state.currentTask.target.cents;
             slot.innerHTML = formatMoneyDiffHint(currentSum, target).html;
         }
@@ -250,6 +285,7 @@
                     nextEx = getRandomElement(EXCHANGE_TASKS);
                 } while (state.currentTask && nextEx.target.cents === state.currentTask.target?.cents);
                 state.currentTask = nextEx;
+                pickInitialExCoin();
                 renderExchangeScreen();
             } else {
                 let nextPiggy;
@@ -411,7 +447,7 @@
                                 <button onclick="clearExchange()" class="text-rose-500 hover:scale-110 active:scale-95 text-2xl p-1.5 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/30 transition" title="Išvalyti">🗑️</button>
                             </div>
                         </div>
-                        <div id="ex-tray" class="piggy-box flex flex-wrap items-center justify-center content-center gap-2 sm:gap-3 p-3 sm:p-4 rounded-2xl h-28 sm:h-36">
+                        <div id="ex-tray" class="piggy-box flex flex-wrap items-center justify-center content-center gap-1.5 sm:gap-2.5 p-2.5 pt-3 sm:p-4 rounded-2xl min-h-[7.25rem] max-h-[11rem] sm:min-h-[9rem] sm:max-h-[13rem] overflow-y-auto">
                         </div>
                     </div>
 
@@ -440,27 +476,52 @@
             const sumEl = document.getElementById('ex-sum');
             if (!tray || !sumEl) return;
 
-            sumEl.textContent = formatMoneyCents(sumCoins(state.collectedItems));
+            const currentSum = getExchangeSum();
+            sumEl.textContent = formatMoneyCents(currentSum);
             updateExchangeHintUI();
-            if (state.collectedItems.length === 0) {
+
+            let initialHtml = '';
+            if (state.initialCoin) {
+                const init = state.initialCoin;
+                initialHtml = `
+                    <div class="relative inline-flex items-center justify-center shrink-0 pop-in m-0.5">
+                        <button type="button" onclick="touchLockedCoin(this)" class="${init.class} locked-coin select-none transition-transform active:scale-95" title="Jau padėtas pinigėlis (neliečiamas)">
+                            ${init.label}
+                        </button>
+                        <span class="absolute -top-1.5 -right-1.5 bg-amber-400 text-amber-950 font-black text-[10px] sm:text-xs rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center shadow pointer-events-none select-none z-10" title="Neliečiamas">🔒</span>
+                    </div>
+                `;
+            }
+
+            const userCoinsHtml = state.collectedItems.map((item, idx) => `
+                <button type="button" onclick="removeExCoin(${idx})" class="${item.class} pop-in cursor-pointer hover:opacity-80 transition transform active:scale-95 m-0.5" title="Nuimti">
+                    ${item.label}
+                </button>
+            `).join('');
+
+            if (!state.initialCoin && state.collectedItems.length === 0) {
                 tray.innerHTML = `
                     <div class="flex items-center justify-center gap-2 text-slate-400 dark:text-slate-500 select-none pointer-events-none">
                         <span class="text-2xl animate-bounce">🪙</span>
-                        <span class="font-black text-base sm:text-lg text-slate-500 dark:text-slate-400">Padėk monetas čia</span>
+                        <span class="font-black text-base sm:text-lg text-slate-500 dark:text-slate-400">${_col('Padėk monetas čia')}</span>
+                    </div>
+                `;
+            } else if (state.collectedItems.length === 0) {
+                tray.innerHTML = `
+                    ${initialHtml}
+                    <div class="flex items-center gap-1.5 text-slate-400 dark:text-slate-500 select-none pointer-events-none text-xs sm:text-sm font-extrabold border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-xl px-2.5 py-1.5">
+                        <span class="animate-bounce">➕</span>
+                        <span>${_col('Pridėk trūkstamus')}</span>
                     </div>
                 `;
             } else {
-                tray.innerHTML = state.collectedItems.map((item, idx) => `
-                    <button onclick="removeExCoin(${idx})" class="${item.class} pop-in cursor-pointer hover:opacity-80" title="Nuimti">
-                        ${item.label}
-                    </button>
-                `).join('');
+                tray.innerHTML = initialHtml + userCoinsHtml;
             }
         }
 
         function checkExchangeAnswer() {
             if (state.waiting) return;
-            const currentSum = sumCoins(state.collectedItems);
+            const currentSum = getExchangeSum();
             const targetSum = state.currentTask.target.cents;
             const feedback = document.getElementById('feedback');
             const tray = document.getElementById('ex-tray');
@@ -476,7 +537,7 @@
                 feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-sm sm:text-lg text-green-500 opacity-100";
                 tray.classList.add('bounce');
 
-                setTimeout(() => {
+                setGameTimeout(() => {
                     if (state.question >= state.maxQuestions) renderEndScreen();
                     else { state.question++; generateQuestion(); }
                 }, 1200);
