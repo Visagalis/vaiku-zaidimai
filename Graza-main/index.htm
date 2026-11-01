@@ -193,14 +193,32 @@
             return pickRandom(arr);
         }
 
+        function updateCashierHintUI() {
+            if (!state.hintUsed) return;
+            const hintSlot = document.getElementById('cashier-hint-slot');
+            if (!hintSlot) return;
+            const currentSum = getChangeSum();
+            const diff = state.targetChange - currentSum;
+            let text = '';
+            if (diff > 0) {
+                if (currentSum === 0) {
+                    text = `${_col('Reikia grąžos:')} ${formatMoneyCents(state.targetChange)}`;
+                } else {
+                    text = `${_col('Dar trūksta:')} ${formatMoneyCents(diff)}`;
+                }
+            } else if (diff === 0) {
+                text = `${_col('Jau pakanka!')} ✔️`;
+            } else {
+                text = `${_col('Per daug:')} +${formatMoneyCents(Math.abs(diff))}`;
+            }
+            hintSlot.innerHTML = `<span class="hint-box py-1 px-2.5 text-xs sm:text-sm">💡 ${text}</span>`;
+        }
+
         function showCashierHint() {
             if (state.waiting || state.hintUsed) return;
             state.hintUsed = true;
             playHintSound();
-            const hintSlot = document.getElementById('cashier-hint-slot');
-            if (hintSlot) {
-                hintSlot.innerHTML = `<span class="hint-box py-1 px-2.5 text-xs sm:text-sm">💡 ${_col('Reikia:')} ${formatMoneyCents(state.targetChange)}</span>`;
-            }
+            updateCashierHintUI();
         }
 
         function showQuizHint() {
@@ -414,6 +432,7 @@
             if (!tray || !sumEl) return;
 
             sumEl.textContent = formatMoneyCents(getChangeSum());
+            updateCashierHintUI();
 
             if (state.collectedChange.length === 0) {
                 tray.innerHTML = `

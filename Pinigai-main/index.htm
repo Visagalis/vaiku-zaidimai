@@ -151,15 +151,28 @@
             renderGameScreen();
         }
 
+        function updateCollectHintUI() {
+            if (!state.hintUsed) return;
+            const slot = document.getElementById('collect-hint-slot');
+            if (!slot) return;
+            const currentSum = getCollectedSum();
+            const diff = state.targetCents - currentSum;
+            let text = '';
+            if (diff > 0) {
+                text = `${_col('Dar trūksta:')} ${formatMoneyCents(diff)}`;
+            } else if (diff === 0) {
+                text = `${_col('Jau pakanka!')} ✔️`;
+            } else {
+                text = `${_col('Per daug:')} +${formatMoneyCents(Math.abs(diff))}`;
+            }
+            slot.innerHTML = `<span class="hint-box py-1 px-2.5 text-xs sm:text-sm">💡 ${text}</span>`;
+        }
+
         function showCollectHint() {
             if (state.waiting || state.hintUsed) return;
             state.hintUsed = true;
             playHintSound();
-            const rem = Math.max(0, state.targetCents - getCollectedSum());
-            const slot = document.getElementById('collect-hint-slot');
-            if (slot) {
-                slot.innerHTML = `<span class="hint-box py-1 px-2.5 text-xs sm:text-sm">💡 ${_col('Trūksta:')} ${formatMoneyCents(rem)}</span>`;
-            }
+            updateCollectHintUI();
         }
 
         function renderStartScreen() {
@@ -425,6 +438,7 @@
 
             const currentSum = getCollectedSum();
             sumLabel.textContent = formatMoneyCents(currentSum);
+            updateCollectHintUI();
 
             if (state.collectedItems.length === 0) {
                 tray.innerHTML = `

@@ -181,15 +181,29 @@
             }
         }
 
+        function updateExchangeHintUI() {
+            if (!state.hintUsed || !state.currentTask || !state.currentTask.target) return;
+            const slot = document.getElementById('exchange-hint-slot');
+            if (!slot) return;
+            const currentSum = sumCoins(state.collectedItems);
+            const target = state.currentTask.target.cents;
+            const diff = target - currentSum;
+            let text = '';
+            if (diff > 0) {
+                text = `${_col('Dar trūksta:')} ${formatMoneyCents(diff)}`;
+            } else if (diff === 0) {
+                text = `${_col('Jau pakanka!')} ✔️`;
+            } else {
+                text = `${_col('Per daug:')} +${formatMoneyCents(Math.abs(diff))}`;
+            }
+            slot.innerHTML = `<span class="hint-box py-1 px-2.5 text-xs sm:text-sm">💡 ${text}</span>`;
+        }
+
         function showExchangeHint() {
             if (state.waiting || state.hintUsed) return;
             state.hintUsed = true;
             playHintSound();
-            const rem = Math.max(0, state.currentTask.target.cents - sumCoins(state.collectedItems));
-            const slot = document.getElementById('exchange-hint-slot');
-            if (slot) {
-                slot.innerHTML = `<span class="hint-box py-1 px-2.5 text-xs sm:text-sm">💡 ${_col('Trūksta:')} ${formatMoneyCents(rem)}</span>`;
-            }
+            updateExchangeHintUI();
         }
 
         function showPiggyHint() {
@@ -456,6 +470,7 @@
             if (!tray || !sumEl) return;
 
             sumEl.textContent = formatMoneyCents(sumCoins(state.collectedItems));
+            updateExchangeHintUI();
             if (state.collectedItems.length === 0) {
                 tray.innerHTML = `
                     <div class="flex items-center justify-center gap-2 text-slate-400 dark:text-slate-500 select-none pointer-events-none">

@@ -281,18 +281,32 @@
             return pickRandom(arr);
         }
 
+        function updateShopHintUI() {
+            if (!state.hintUsed) return;
+            const slot = document.getElementById('shop-hint-slot');
+            if (!slot) return;
+            const currentSum = getCollectedSum();
+            const diff = state.targetCents - currentSum;
+            let text = '';
+            if (diff > 0) {
+                if (state.mode === 'basket' && currentSum === 0) {
+                    text = `${_col('Iš viso:')} ${formatMoneyCents(state.targetCents)}`;
+                } else {
+                    text = `${_col('Dar trūksta:')} ${formatMoneyCents(diff)}`;
+                }
+            } else if (diff === 0) {
+                text = `${_col('Jau pakanka!')} ✔️`;
+            } else {
+                text = `${_col('Per daug:')} +${formatMoneyCents(Math.abs(diff))}`;
+            }
+            slot.innerHTML = `<span class="hint-box py-1 px-2.5 text-xs sm:text-sm">💡 ${text}</span>`;
+        }
+
         function showShopHint() {
             if (state.waiting || state.hintUsed) return;
             state.hintUsed = true;
             playHintSound();
-            const slot = document.getElementById('shop-hint-slot');
-            if (slot) {
-                const rem = Math.max(0, state.targetCents - getCollectedSum());
-                const text = state.mode === 'basket'
-                    ? `${_col('Iš viso:')} ${formatMoneyCents(state.targetCents)}`
-                    : `${_col('Dar trūksta:')} ${formatMoneyCents(rem)}`;
-                slot.innerHTML = `<span class="hint-box py-1 px-2.5 text-xs sm:text-sm">💡 ${text}</span>`;
-            }
+            updateShopHintUI();
         }
 
         function showAffordHint() {
@@ -306,6 +320,7 @@
         }
 
         function renderStartScreen() {
+            clearGameTimers();
             app.innerHTML = `
                 <div class="flex-1 flex flex-col items-center justify-center p-5 sm:p-8 text-center fade-in">
                     <div class="text-5xl sm:text-6xl mb-2 bounce">🛒</div>
@@ -503,6 +518,7 @@
             if (!tray || !sumEl) return;
 
             sumEl.textContent = formatMoneyCents(getCollectedSum());
+            updateShopHintUI();
 
             if (state.collectedItems.length === 0) {
                 tray.innerHTML = `
@@ -537,7 +553,7 @@
                 feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-sm sm:text-lg text-green-500 opacity-100";
                 tray.classList.add('bounce');
 
-                setTimeout(() => {
+                setGameTimeout(() => {
                     if (state.question >= state.maxQuestions) {
                         renderEndScreen();
                     } else {
@@ -624,7 +640,7 @@
                 feedback.innerHTML = `<span>${_col('Teisingai! Pinigų užtenka lygiai šiai prekei!')} 🎉</span>`;
                 feedback.className = "h-6 sm:h-7 flex items-center justify-center font-black text-sm sm:text-lg text-green-500 opacity-100";
 
-                setTimeout(() => {
+                setGameTimeout(() => {
                     if (state.question >= state.maxQuestions) {
                         renderEndScreen();
                     } else {

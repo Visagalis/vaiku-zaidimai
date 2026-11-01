@@ -258,7 +258,20 @@ New games should follow this structure. The closest references are [`Priesingybe
 - **Wrong answer**: `playWrongSound()`, add `shake-anim` + red classes, often `btn.disabled = true`. Let the child retry; don't reveal the answer immediately.
 - **Correct answer**: `playCorrectSound()`, green classes (`bg-green-500 text-white`) + `bounce-anim`, then `setTimeout(next, ~1000–1200ms)`.
 - **Feedback line**: `<div id="feedback">`. Set `feedback.innerHTML = \`<span>${_col('Puiku!')} 🎉</span>\`` and toggle `opacity-0` / `opacity-100`. Always wrap the message in a single `<span>` so spaces survive inside the flex container.
-- **Stars on the end screen**: `ratio = score / totalPossible`. ⭐⭐⭐ if `≥ 0.8`, ⭐⭐ if `≥ 0.5`, otherwise ⭐.
+- **Hints (`.hint-btn`, `.hint-box`)**:
+  - Reveal hints with amber `.hint-btn` (`💡 Užuomina`) and `.hint-box`.
+  - In counting or tray-based games (e.g. `Parduotuve`, `Pinigai`, `Graza`, `Taupykle`), **hints must update in real time** as the user adds, removes, or clears items:
+    - *Trūksta*: `💡 ${_col('Dar trūksta:')} ${formatMoneyCents(diff)}`
+    - *Lygiai*: `💡 ${_col('Jau pakanka!')} ✔️` (arba `Lygiai tiek! ✔️`)
+    - *Per daug*: `💡 ${_col('Per daug:')} +${formatMoneyCents(Math.abs(diff))}`
+  - Keep the hint update call inside the tray's `updateUI()` function so it refreshes on every coin or item change.
+  - If the top bar is crowded, place the hint button in the main content area (under the word or prompt) rather than squeezing it into the header.
+- **Timers**: Use `setGameTimeout(fn, ms)` instead of raw `setTimeout(...)`. Always call `clearGameTimers()` in `renderStartScreen()` so navigating back to the menu cancels pending delays.
+- **Sub-modes and `GAME_MODES`**:
+  - If a game offers sub-levels (e.g. `puppy-short`, `puppy-medium`, `puppy-long` or `mirror-easy`, `mirror-hard`), keep `startGame('puppy')` / `startGame('mirror')` on the start screen button.
+  - The start button delegates to the difficulty selector. `shared/common.js` maps `subMode.split('-')[0]` back to the parent mode so `decorateModeButtons()` and progress tracking show stars on both the start screen and the difficulty cards.
+  - Pass `mode: state.mode` to `renderEndScreenHelper` so progress saves per specific sub-mode.
+- **Stars on the end screen**: `ratio = score / totalPossible`. ⭐⭐⭐ if `≥ 0.8`, ⭐⭐ if `≥ 0.5`, otherwise ⭐. Use `renderEndScreenHelper({ score, total, mode: state.mode, restartFn, retryFn, mistakesCount, menuFn: 'renderStartScreen()' })`.
 - **Rounds**: typically **10 questions per round**, each with 2–4 answer options shuffled with `shuffle()`.
 - **Audio**: call `getAudioCtx()` inside the first click handler (`startGame`), because browsers block audio until a user gesture.
 
@@ -321,7 +334,11 @@ New games should follow this structure. The closest references are [`Priesingybe
   - Don't hard-code syllable colors. Always go through `--sc-N` variables, `_col`, `SYLLABLE_COLORS`, or `getWordLetterColors`, so dark mode and the `syl-off` setting keep working.
 - **Touch targets**: interactive elements should be at least **~48px** tall (`min-h-[48px]`) with enough spacing for small fingers. No hover-only interactions.
 - **No failure states that punish**: no timers that end the game, no lost lives. Mistakes give gentle feedback and allow a retry.
-- **Small screens**: nothing important may overflow on a 360×640 phone or in landscape (≤520px height). The game must fit without page-level scrolling where possible. Inner areas may scroll.
+- **Small screens (360×640 / 360×800)**:
+  - Nothing important may overflow on a 360px phone or in landscape (≤520px height). The game must fit without page-level scrolling where possible.
+  - Top bar items must use `whitespace-nowrap shrink-0` to prevent numbers and badges from wrapping into two lines.
+  - Multi-option buttons should structure text cleanly in 2 lines (`text-base sm:text-lg font-black` + `text-xs sm:text-sm font-bold opacity-75`) instead of long single lines that break awkwardly.
+  - Tiled boards (e.g. 4×4 or 5×5) must use `aspect-square`, `overflow-hidden`, and max-widths (`max-w-[260px] min-[380px]:max-w-[295px]`) so cells don't get cropped.
 - **Parent-only areas** (e.g. the PIN-protected setup in `MokomesRasyti`) may use normal text, because adults use them.
 
 ---
@@ -363,6 +380,9 @@ New games should follow this structure. The closest references are [`Priesingybe
 | Mobile layout broken after refactor | Keep the `#app`, `.top-bar`, `.top-badge`, `#feedback`, and tray class hooks (§4.2). |
 | Hard-coded portal category counts out of date | Update the pill labels whenever the game list changes. |
 | `RaidziuDelione` has its own `#dark-toggle` button | `applyTheme()` updates that button's label and classes too. Keep the id if you edit it. |
+| Static hint values (`Dar trūksta: X c`) in counting games | Always update revealed hints dynamically inside `updateUI()` whenever items or coins change. |
+| Top-bar counters wrapping under icons on 360px screens | Add `whitespace-nowrap shrink-0` to badges, counters, and top-bar item wrappers. |
+| Sub-mode start screen button losing star badges | Keep `onclick="startGame('parentMode')"` on the start screen; let it open the difficulty modal. |
 
 ---
 
