@@ -10,7 +10,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../shared/common.css?v=2">
+    <link rel="stylesheet" href="../shared/quiz.css?v=2">
     <script src="../shared/common.js?v=2"></script>
+    <script src="../shared/quiz.js?v=2"></script>
     <style>
         body {
             font-family: 'Nunito', sans-serif;
@@ -437,18 +439,7 @@
             const hintBtn = document.getElementById('hint-btn');
             if (hintBtn) hintBtn.classList.add('hidden');
             const q = state.questions[state.currentIndex];
-            const wrongIdxs = [];
-            (state.currentOptions || []).forEach((opt, idx) => {
-                const btn = document.getElementById(`btn-${idx}`);
-                if (opt !== q.correct && btn && !btn.disabled) wrongIdxs.push(idx);
-            });
-            shuffle(wrongIdxs).slice(0, 2).forEach(idx => {
-                const btn = document.getElementById(`btn-${idx}`);
-                if (btn) {
-                    btn.disabled = true;
-                    btn.classList.add('opacity-35', 'line-through', 'pointer-events-none');
-                }
-            });
+            eliminateWrongQuizOptions('[id^="btn-"]', (btn, idx) => state.currentOptions[idx] === q.correct, 2);
         }
 
         function handleAnswer(selected, btn) {
@@ -465,13 +456,12 @@
                     state.streak++;
                 }
 
-                btn.classList.remove('bg-blue-50', 'text-blue-950', 'border-blue-300');
-                btn.classList.add('bg-green-500', 'text-white', 'border-green-600', 'shadow-[0_5px_0_#15803d]', 'bounce-anim');
+                markAnswerCorrect(btn, 'bounce-anim');
 
                 feedback.innerHTML = `<span>${_col('Puiku!')} ${_col(q.word)} ➔ ${_col(q.correct)}! 🎉</span>`;
                 feedback.className = "h-6 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black my-1 text-green-600 opacity-100";
 
-                setTimeout(() => {
+                setGameTimeout(() => {
                     state.currentIndex++;
                     renderQuestion();
                 }, 1200);
@@ -483,9 +473,7 @@
                 state.streak = 0;
                 playWrongSound();
 
-                btn.classList.remove('bg-blue-50', 'text-blue-950');
-                btn.classList.add('bg-red-100', 'text-red-400', 'line-through', 'border-red-300', 'opacity-60', 'shake-anim');
-                btn.disabled = true;
+                markAnswerWrong(btn, 'shake-anim');
 
                 feedback.innerHTML = `<span>${_col("Bandyk dar kartą!")} 🤔</span>`;
                 feedback.className = "h-6 sm:h-8 flex items-center justify-center text-base sm:text-xl font-black my-1 text-red-500 opacity-100";
@@ -493,7 +481,7 @@
                 const hintBtn = document.getElementById('hint-btn');
                 if (hintBtn && !state.hintUsed) hintBtn.classList.add('hint-btn-pulse');
 
-                setTimeout(() => {
+                setGameTimeout(() => {
                     btn.classList.remove('shake-anim');
                 }, 400);
             }

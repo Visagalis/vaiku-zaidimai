@@ -10,7 +10,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../shared/common.css?v=2">
+    <link rel="stylesheet" href="../shared/money.css?v=2">
     <script src="../shared/common.js?v=2"></script>
+    <script src="../shared/money.js?v=2"></script>
     <style>
         body {
             font-family: 'Nunito', sans-serif;
@@ -114,27 +116,7 @@
     </div>
 
     <script>
-        const MONEY = {
-            centCoins: [
-                { cents: 1, label: '1c', class: 'coin coin-copper coin-1c' },
-                { cents: 2, label: '2c', class: 'coin coin-copper coin-2c' },
-                { cents: 5, label: '5c', class: 'coin coin-copper coin-5c' },
-                { cents: 10, label: '10c', class: 'coin coin-gold coin-10c' },
-                { cents: 20, label: '20c', class: 'coin coin-gold coin-20c' },
-                { cents: 50, label: '50c', class: 'coin coin-gold coin-50c' }
-            ],
-            euroCoins: [
-                { cents: 100, label: '1€', class: 'coin coin-1e' },
-                { cents: 200, label: '2€', class: 'coin coin-2e' }
-            ],
-            bills: [
-                { cents: 500, label: '5€', class: 'bill bill-5e' },
-                { cents: 1000, label: '10€', class: 'bill bill-10e' },
-                { cents: 2000, label: '20€', class: 'bill bill-20e' }
-            ]
-        };
-
-        const ALL_COINS = [...MONEY.centCoins, ...MONEY.euroCoins];
+        const ALL_COINS = MONEY.allCoins;
         const EURO_POOL = [...MONEY.euroCoins, ...MONEY.bills];
 
         // Parduotuvės prekės (centais ir eurais)
@@ -285,29 +267,17 @@
 
         const app = document.getElementById('app');
 
-        function getRandomElement(arr) {
-            return pickRandom(arr);
-        }
-
         function updateShopHintUI() {
             if (!state.hintUsed) return;
             const slot = document.getElementById('shop-hint-slot');
             if (!slot) return;
             const currentSum = getCollectedSum();
-            const diff = state.targetCents - currentSum;
-            let text = '';
-            if (diff > 0) {
-                if (state.mode === 'basket' && state.collectedItems.length === 0) {
-                    text = `${_col('Iš viso:')} ${formatMoneyCents(state.targetCents)} (${_col('trūksta:')} ${formatMoneyCents(diff)})`;
-                } else {
-                    text = `${_col('Dar trūksta:')} ${formatMoneyCents(diff)}`;
-                }
-            } else if (diff === 0) {
-                text = `${_col('Jau pakanka!')} ✔️`;
-            } else {
-                text = `${_col('Per daug:')} +${formatMoneyCents(Math.abs(diff))}`;
+            if (state.mode === 'basket' && state.collectedItems.length === 0) {
+                const diff = state.targetCents - currentSum;
+                slot.innerHTML = `<span class="hint-box py-1 px-2.5 text-xs sm:text-sm">💡 ${_col('Iš viso:')} ${formatMoneyCents(state.targetCents)} (${_col('trūksta:')} ${formatMoneyCents(diff)})</span>`;
+                return;
             }
-            slot.innerHTML = `<span class="hint-box py-1 px-2.5 text-xs sm:text-sm">💡 ${text}</span>`;
+            slot.innerHTML = formatMoneyDiffHint(currentSum, state.targetCents).html;
         }
 
         function touchLockedCoin(btn) {

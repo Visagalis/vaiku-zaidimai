@@ -11,6 +11,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="../shared/common.css?v=2">
     <script src="../shared/common.js?v=2"></script>
+    <script src="../shared/words.js?v=2"></script>
     <style>
         @media (prefers-color-scheme: dark) {
             body {
@@ -208,12 +209,7 @@
             { word: 'KOJA', emoji: '🦵' }, { word: 'VAIKAS', emoji: '🧒' }
         ];
 
-        const LIETUVISKA_ABECELE = [
-            'A', 'Ą', 'B', 'C', 'Č', 'D', 'E', 'Ę', 'Ė', 'F',
-            'G', 'H', 'I', 'Į', 'Y', 'J', 'K', 'L', 'M', 'N',
-            'O', 'P', 'R', 'S', 'Š', 'T', 'U', 'Ų', 'Ū', 'V',
-            'Z', 'Ž'
-        ];
+        const LIETUVISKA_ABECELE = LITHUANIAN_ALPHABET;
 
         let currentWord = null;
         let roundDeck = [];

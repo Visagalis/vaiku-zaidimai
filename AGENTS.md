@@ -72,8 +72,13 @@ For anything beyond trivial text edits, also do a **manual browser check** (see 
 /
 ├── index.html              # Portal: categorized game grid + settings modal + iframe game host
 ├── shared/
-│   ├── common.css          # Syllable color vars, dark mode, animations, coins/bills, mobile layout
-│   └── common.js           # Syllables, coloring, theme, sounds, zoom guard, array helpers
+│   ├── common.css          # Syllable color vars, dark mode, animations, mobile layout
+│   ├── common.js           # Syllables, coloring, theme, sounds, zoom guard, array helpers, praise
+│   ├── money.css           # Coins (.coin), bills (.bill), money trays (.money-tray, .wallet-box)
+│   ├── money.js            # Euro currency data (MONEY, allCoins, c1..e20), formatMoneyCents, formatMoneyDiffHint, sumCoins
+│   ├── quiz.css            # Quiz buttons (.quiz-opt-btn, .quiz-opt-correct, .quiz-opt-wrong, .quiz-eliminated)
+│   ├── quiz.js             # VZQuizEngine (createQuizController), markAnswerCorrect/Wrong
+│   └── words.js            # LITHUANIAN_ALPHABET (32 letters), renderVirtualKeyboard
 ├── scripts/
 │   └── verify.js           # Pre-commit verification (run with Node)
 ├── <GameName>-main/
@@ -83,34 +88,38 @@ For anything beyond trivial text edits, also do a **manual browser check** (see 
 ```
 
 - **Central portal**: [`index.html`](index.html), the categorized hub for all games.
-- **Games (21 mini-games)**: each game lives in its own `<GameName>-main/` folder with one entry HTML file.
+- **Games (25 mini-games)**: each game lives in its own `<GameName>-main/` folder with one entry HTML file.
 - **Casing note**: `RaidziuDelione-main/Index.htm` uses a capital `Index.htm`. All other games use lowercase `index.htm`. **Always keep the exact casing.** macOS is case-insensitive but GitHub Pages is not, so a wrong case breaks only in production.
 
 ### 3.2 Game catalogue
 
 | Folder | Portal title | Category (`data-cat`) | Tech |
 | --- | --- | --- | --- |
-| `Pinigai-main` | 💰 Pinigėliai | `money` | Vanilla |
-| `Parduotuve-main` | 🛒 Mažoji Parduotuvė | `money` | Vanilla |
-| `Graza-main` | 🏧 Kasininkas ir Grąža | `money` | Vanilla |
-| `Taupykle-main` | 🐷 Taupyklė ir Piniginės | `money` | Vanilla |
+| `Pinigai-main` | 💰 Pinigėliai | `money` | Vanilla + money.js/css |
+| `Parduotuve-main` | 🛒 Mažoji Parduotuvė | `money` | Vanilla + money.js/css |
+| `Graza-main` | 🏧 Kasininkas ir Grąža | `money` | Vanilla + money.js/css |
+| `Taupykle-main` | 🐷 Taupyklė ir Piniginės | `money` | Vanilla + money.js/css |
 | `LinksmiSkaiciai-main` | 🔢 Linksmoji Matematika | `math` | Vanilla + canvas-confetti |
 | `LaikrodzioZaidimas-main` | 🕐 Laikrodžio Žaidimas | `math` | Vanilla |
 | `DidesnisMazesnis-main` | ⚖️ Didesnis ar Mažesnis | `math` | Vanilla |
 | `SkaiciuEilute-main` | 🔢 Skaičių Eilutė | `math` | Vanilla |
 | `TekstiniaiUzdaviniai-main` | 🍎 Tekstiniai Uždavinukai | `math` | Vanilla |
+| `Simetrija-main` | 🪞 Simetrija ir Sekos | `math` | Vanilla |
 | `MokomesRasyti-main` | ✍️ Mokomės Rašyti | `lang` | **React + Babel** |
 | `RaidziuDelione-main` (`Index.htm`) | 🧩 Raidžių Dėlionė | `lang` | Vanilla, own dark toggle |
 | `SkaitymoZaidimas-main` | 📖 Skaitymo Žaidimas | `lang` | **React + Babel** |
-| `TrukstaRaides-main` | 🔤 Trūksta Raidės | `lang` | Vanilla |
+| `TrukstaRaides-main` | 🔤 Trūksta Raidės | `lang` | Vanilla + words.js |
 | `AtmintiesZaidimas-main` | 🃏 Atminties Žaidimas | `lang` | Vanilla |
 | `ZodziuTvarka-main` | 📐 Žodžių Tvarka | `lang` | Vanilla |
-| `Priesingybes-main` | ⚖️ Priešingybės | `lang` | Vanilla |
+| `Priesingybes-main` | ⚖️ Priešingybės | `lang` | Vanilla + quiz.js/css |
+| `RaskRima-main` | 🎵 Rask Rimą ir Skiemenį | `lang` | Vanilla |
+| `Misles-main` | 🗝️ Mįslių Skrynelė | `lang` | Vanilla |
 | `SpalvosFormos-main` | 🟡 Spalvos ir Formos | `world` | Vanilla |
 | `KaireDesine-main` | 🧭 Kairė ar Dešinė? | `world` | Vanilla |
 | `GyvunaiVaikeliai-main` | 🐾 Gyvūnai ir Vaikeliai | `world` | Vanilla |
 | `MetuLaikai-main` | 🗓️ Metų Laikai ir Kalendorius | `world` | Vanilla |
 | `Rusiuotojas-main` | ♻️ Šiukšlių Rūšiuotojas | `world` | Vanilla |
+| `SaugusKelyje-main` | 🚦 Saugus Kelyje | `world` | Vanilla |
 
 ### 3.3 Running locally
 There is nothing to build. Serve the repo root over HTTP:
@@ -127,7 +136,7 @@ When you check by hand, open the game **through the portal** (iframe mode) *and*
 - Each card in `#games-grid` is a `<button data-cat="..." onclick="showGame('<Folder>/index.htm', '<emoji> <Title>')">`.
 - `showGame()` loads the game into `#game-frame` with a cache-busting `?_t=<timestamp>`. The portal header supplies 🏠 Meniu, ⚙️ settings, and 🔄 reload.
 - On iframe `load`, the portal calls `preventZoom(fDoc)`, `syncFrameTheme()`, and `syncFrameSyllableColoring()`.
-- The category pills show **hard-coded counts** (`🌟 Visi (21)`, `💰 Pinigai (4)`, …). **Update them** whenever you add, remove, or recategorize a game.
+- The category pills show **dynamically computed counts** based on cards in `#games-grid` (`🌟 Visi (25)`, `💰 Pinigai (4)`, …).
 - Every game must also work **standalone** (opened directly), so don't depend on anything from the parent window.
 
 ---
@@ -150,7 +159,8 @@ When you check by hand, open the game **through the portal** (iframe mode) *and*
 | Audio | `playSound(type)` | `'coin' 'remove' 'click' 'tap' 'tick' 'pop' 'hop' 'hint' 'correct' 'wrong'/'error' 'win'` |
 | Audio | `playCorrectSound()`, `playWrongSound()`, `playWinSound()`, `playSelectSound()`, `playPickSound()`, `playPopSound()`, `playStepSound(idx?)`, `playTapSound()`, `playReturnSound()`, `playHintSound()` | Preferred high-level feedback sounds. |
 | Speech (TTS) | `hasLithuanianTTS() → bool`, `speakLT(text, rate?)`, `renderSpeakBtn(text, label?) → htmlString` | Lithuanian speech synthesis (`lt-LT` voice detection, emoji stripping, and `.speak-btn` button renderer). |
-| Arrays | `shuffle(arr)` (alias `shuffleArray`), `pickRandom(arr)` | `shuffle` returns a **new** array (Fisher–Yates). It doesn't mutate the input. |
+| Arrays & Random | `shuffle(arr)` (alias `shuffleArray`), `pickRandom(arr)` (alias `getRandomElement`), `randomInt(min, max)` | `shuffle` returns a **new** array (Fisher–Yates). `randomInt` returns integer `[min, max]`. |
+| Praise | `PRAISE_WORDS`, `pickPraise() → string` | Canonical Lithuanian praise array and random praise picker. |
 | Money | `formatMoneyCents(cents) → string`, `MONEY` | Canonical euro coin/bill data (`centCoins`, `euroCoins`, `bills`) and money formatting (`10 c`, `1 €`, `1,50 €`). |
 | Timers | `setGameTimeout(fn, ms) → id`, `clearGameTimers()` | Tracked timeouts automatically cleared when returning to menu (`renderTopBar` home button). |
 | Progress | `detectGameId() → string`, `getGameProgress(gameId?)`, `saveGameProgress(gameId, stars, score?, total?)`, `clearGameProgress()` | Persists best star rating (`1..3`) and play count per game folder in `vz-progress`. |
@@ -158,6 +168,23 @@ When you check by hand, open the game **through the portal** (iframe mode) *and*
 | UI Components | `calculateStars(score, total) → number`, `renderEndScreen(opts) → htmlString` (alias `renderEndScreenHelper`) | Standard star rating (≥80% 3★, ≥50% 2★, else 1★), auto-saves progress, triggers confetti, and supports `retryFn`/`mistakesCount` (`🛠️ Pataisyti klaidas (N)`) + `menuFn` (`🎛️ Kitas lygis`). |
 | UI Helpers | `showFeedback(idOrEl, htmlText, isSuccess?)`, `eliminateWrongOptions(buttons, count?)`, `celebrateWin(stars?)` | Feedback line updater, 50/50 wrong option eliminator, and zero-dependency confetti burst. |
 | Input | `preventZoom(doc)` | Blocks pinch, gesture, and ctrl+wheel zoom. Runs automatically on load. |
+
+### 4.2 `shared/money.js` and `shared/money.css` (Money Domain)
+- `MONEY`: canonical data structure (`centCoins`, `euroCoins`, `bills`, `allCoins`, `allMoney`, plus shorthand keys `c1..c50`, `e1..e20`).
+- `formatMoneyCents(cents) → string`: formats cents into Lithuanian currency strings (`15 c`, `1 €`, `1,50 €`).
+- `formatMoneyDiffHint(currentCents, targetCents) → { status, diff, text, html }`: real-time tray hints (`Dar trūksta: X c`, `Jau pakanka! ✔️`, `Per daug: +X c`).
+- `sumCoins(items) → number`: safe integer summation of item cent values.
+- Styles: `.coin`, `.coin-copper`, `.coin-gold`, `.coin-1c ... .coin-50c`, `.coin-1e`, `.coin-2e`, `.bill`, `.bill-5e/10e/20e`, `.money-tray`, `.wallet-box`, `.locked-coin`.
+
+### 4.3 `shared/quiz.js` and `shared/quiz.css` (Quiz Domain)
+- `createQuizController(config)` (`VZQuizEngine`): reusable state machine managing question deck, option handling, first-try scoring, streaks, sound effects, mistakes recording, and end-screen generation.
+- `markAnswerCorrect(btn, extraClass)` and `markAnswerWrong(btn, extraClass)`: semantic state helpers for option buttons.
+- `eliminateWrongQuizOptions(selector, isCorrectFn, count)`: 50/50 hint elimination.
+- Styles: `.quiz-opt-btn`, `.quiz-opt-correct`, `.quiz-opt-wrong`, `.quiz-eliminated`.
+
+### 4.4 `shared/words.js` (Words & Letters Domain)
+- `LITHUANIAN_ALPHABET`: canonical 32-letter Lithuanian alphabet array (without Q, W, X).
+- `renderVirtualKeyboard(container, onLetterClick, options)`: responsive 32-key keyboard grid renderer for word games.
 
 **Rules for editing `common.js`:**
 - Keep the **ES5 IIFE style** (`var`, `function`, no arrow functions or template literals). It's loaded by every page, including old tablet browsers.

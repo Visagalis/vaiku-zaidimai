@@ -321,19 +321,19 @@
 
         <!-- Category Filter Bar -->
         <div class="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2.5 mb-4 sm:mb-8 w-full">
-            <button onclick="filterCategory('all', this)" class="cat-pill active-cat bg-white border-2 border-b-4 border-emerald-300 text-emerald-900 font-extrabold text-xs sm:text-base px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-2xl shadow-sm">
+            <button data-filter-cat="all" onclick="filterCategory('all', this)" class="cat-pill active-cat bg-white border-2 border-b-4 border-emerald-300 text-emerald-900 font-extrabold text-xs sm:text-base px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-2xl shadow-sm">
                 🌟 Visi (25)
             </button>
-            <button onclick="filterCategory('money', this)" class="cat-pill bg-white border-2 border-b-4 border-amber-300 text-amber-900 font-extrabold text-xs sm:text-base px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-2xl shadow-sm">
+            <button data-filter-cat="money" onclick="filterCategory('money', this)" class="cat-pill bg-white border-2 border-b-4 border-amber-300 text-amber-900 font-extrabold text-xs sm:text-base px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-2xl shadow-sm">
                 💰 Pinigai (4)
             </button>
-            <button onclick="filterCategory('math', this)" class="cat-pill bg-white border-2 border-b-4 border-sky-300 text-sky-900 font-extrabold text-xs sm:text-base px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-2xl shadow-sm">
+            <button data-filter-cat="math" onclick="filterCategory('math', this)" class="cat-pill bg-white border-2 border-b-4 border-sky-300 text-sky-900 font-extrabold text-xs sm:text-base px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-2xl shadow-sm">
                 🔢 Matematika (6)
             </button>
-            <button onclick="filterCategory('lang', this)" class="cat-pill bg-white border-2 border-b-4 border-rose-300 text-rose-900 font-extrabold text-xs sm:text-base px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-2xl shadow-sm">
+            <button data-filter-cat="lang" onclick="filterCategory('lang', this)" class="cat-pill bg-white border-2 border-b-4 border-rose-300 text-rose-900 font-extrabold text-xs sm:text-base px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-2xl shadow-sm">
                 📚 Skaitymas (9)
             </button>
-            <button onclick="filterCategory('world', this)" class="cat-pill bg-white border-2 border-b-4 border-purple-300 text-purple-900 font-extrabold text-xs sm:text-base px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-2xl shadow-sm">
+            <button data-filter-cat="world" onclick="filterCategory('world', this)" class="cat-pill bg-white border-2 border-b-4 border-purple-300 text-purple-900 font-extrabold text-xs sm:text-base px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-2xl shadow-sm">
                 🌍 Logika (6)
             </button>
         </div>
@@ -967,8 +967,31 @@
             }, 200);
         }
 
+        function updateCategoryPillsCount() {
+            const cards = document.querySelectorAll('#games-grid .card-3d');
+            const counts = { all: cards.length };
+            cards.forEach(card => {
+                const cat = card.getAttribute('data-cat');
+                if (cat) counts[cat] = (counts[cat] || 0) + 1;
+            });
+            const labels = {
+                all: '🌟 Visi',
+                money: '💰 Pinigai',
+                math: '🔢 Matematika',
+                lang: '📚 Skaitymas',
+                world: '🌍 Logika'
+            };
+            document.querySelectorAll('.cat-pill[data-filter-cat]').forEach(pill => {
+                const cat = pill.getAttribute('data-filter-cat');
+                const label = labels[cat] || cat;
+                const count = counts[cat] || 0;
+                pill.textContent = `${label} (${count})`;
+            });
+        }
+
         window.addEventListener('storage', renderPortalStars);
         renderPortalStars();
+        updateCategoryPillsCount();
     </script>
 </body>
 </html>

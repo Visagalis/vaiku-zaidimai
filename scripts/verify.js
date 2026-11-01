@@ -182,6 +182,16 @@ function checkInlineScripts(relPath, content) {
             const errLine = lineOffset + code.substring(0, selfMatch.index).split('\n').length - 1;
             logError(`${relPath}:${errLine} Funkcija "${fnName}" kviečia "window.${fnName}(...)" savo viduje — globaliam skripte tai sukelia begalinę rekursiją (RangeError)! Naudokite "${fnName}Helper(...)" arba pervadinkite vietinę funkciją.`);
         }
+
+        // Patikra dėl bendrų funkcijų ar konstantų dubliavimo žaidimuose (DRY)
+        if (!relPath.startsWith('shared/')) {
+            if (/const\s+MONEY\s*=\s*\{/i.test(code)) {
+                logError(`${relPath}: Nereikia deklaruoti "const MONEY = { ... }". Naudokite "shared/money.js" arba "shared/common.js" eksportuojamą MONEY objektą.`);
+            }
+            if (/function\s+getRandomElement\s*\(/i.test(code)) {
+                logError(`${relPath}: Nereikia deklaruoti "function getRandomElement(...)". Naudokite "pickRandom(...)" arba bendrą "getRandomElement(...)" iš shared/common.js.`);
+            }
+        }
     }
 }
 
@@ -273,21 +283,36 @@ function checkPortalMapping(gameFiles) {
             logError(`index.html nuoroda showGame('${target}') nerasta tarp disko žaidimų failų!`);
         }
     }
+
+    // Patikrinti, ar index.html kortelės naudoja leistinas kategorijas
+    const validCats = new Set(['math', 'lang', 'money', 'world']);
+    const cardCatRegex = /<button\b[^>]*\bdata-cat\s*=\s*["']([^"']+)["']/gi;
+    let catMatch;
+    while ((catMatch = cardCatRegex.exec(portalContent)) !== null) {
+        const cat = catMatch[1];
+        if (!validCats.has(cat)) {
+            logError(`index.html kortelė turi nežinomą kategoriją data-cat="${cat}". Leistinos: math, lang, money, world`);
+        }
+    }
 }
 
-// 8. Patikrinti standalone JS failus (shared/common.js)
+// 8. Patikrinti standalone JS failus (shared/*.js)
 function checkStandaloneScripts() {
-    const commonJsPath = path.join(ROOT_DIR, 'shared', 'common.js');
-    if (fs.existsSync(commonJsPath)) {
+    const sharedDir = path.join(ROOT_DIR, 'shared');
+    if (!fs.existsSync(sharedDir)) {
+        logError('Nerastas privalomas katalogas shared/!');
+        return;
+    }
+    const jsFiles = fs.readdirSync(sharedDir).filter(f => f.endsWith('.js'));
+    for (const f of jsFiles) {
+        const full = path.join(sharedDir, f);
         try {
-            const code = fs.readFileSync(commonJsPath, 'utf8');
-            new vm.Script(code, { filename: 'shared/common.js', displayErrors: true });
-            logSuccess('shared/common.js sintaksė teisinga.');
+            const code = fs.readFileSync(full, 'utf8');
+            new vm.Script(code, { filename: `shared/${f}`, displayErrors: true });
+            logSuccess(`shared/${f} sintaksė teisinga.`);
         } catch (err) {
-            logError(`shared/common.js sintaksės klaida: ${err.message}`);
+            logError(`shared/${f} sintaksės klaida: ${err.message}`);
         }
-    } else {
-        logError('Nerastas privalomas failas shared/common.js!');
     }
 }
 

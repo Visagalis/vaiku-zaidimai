@@ -590,6 +590,15 @@
         return arr[Math.floor(Math.random() * arr.length)];
     }
 
+    function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    var PRAISE_WORDS = ['Puiku!', 'Šaunuolis!', 'Teisingai!', 'Nuostabu!', 'Super!'];
+    function pickPraise() {
+        return pickRandom(PRAISE_WORDS);
+    }
+
     // Bendra atsiliepimo (#feedback) eilutės atvaizdavimo funkcija
     function showFeedback(text, type, elId) {
         if (typeof document === 'undefined') return;
@@ -953,11 +962,50 @@
             { cents: 2000, label: '20€', class: 'bill bill-20e' }
         ]
     };
+    MONEY.c1 = MONEY.centCoins[0];
+    MONEY.c2 = MONEY.centCoins[1];
+    MONEY.c5 = MONEY.centCoins[2];
+    MONEY.c10 = MONEY.centCoins[3];
+    MONEY.c20 = MONEY.centCoins[4];
+    MONEY.c50 = MONEY.centCoins[5];
+    MONEY.e1 = MONEY.euroCoins[0];
+    MONEY.e2 = MONEY.euroCoins[1];
+    MONEY.e5 = MONEY.bills[0];
+    MONEY.e10 = MONEY.bills[1];
+    MONEY.e20 = MONEY.bills[2];
 
     function formatMoneyCents(cents) {
+        if (typeof cents !== 'number' || isNaN(cents)) return '0 c';
         if (cents < 100) return cents + ' c';
         if (cents % 100 === 0) return (cents / 100) + ' €';
         return (cents / 100).toFixed(2).replace('.', ',') + ' €';
+    }
+
+    function formatMoneyDiffHint(currentCents, targetCents) {
+        if (typeof global.formatMoneyDiffHint === 'function' && global.formatMoneyDiffHint !== formatMoneyDiffHint) {
+            return global.formatMoneyDiffHint(currentCents, targetCents);
+        }
+        var cur = typeof currentCents === 'number' ? currentCents : 0;
+        var tar = typeof targetCents === 'number' ? targetCents : 0;
+        var diff = tar - cur;
+        var text = '';
+        var status = 'exact';
+        if (diff > 0) {
+            status = 'missing';
+            text = _col('Dar trūksta:') + ' ' + formatMoneyCents(diff);
+        } else if (diff === 0) {
+            status = 'exact';
+            text = _col('Jau pakanka!') + ' ✔️';
+        } else {
+            status = 'excess';
+            text = _col('Per daug:') + ' +' + formatMoneyCents(Math.abs(diff));
+        }
+        return {
+            status: status,
+            diff: diff,
+            text: text,
+            html: '<span class="hint-box py-1 px-2.5 text-xs sm:text-sm">💡 ' + text + '</span>'
+        };
     }
 
     // === 6. BENDRAS VIRŠUTINĖS JUOSTOS IR PABAIGOS EKRANO RENDERINIMAS ===
@@ -1186,9 +1234,14 @@
     global.shuffle = shuffle;
     global.shuffleArray = shuffle;
     global.pickRandom = pickRandom;
+    global.getRandomElement = pickRandom;
+    global.randomInt = randomInt;
+    global.PRAISE_WORDS = PRAISE_WORDS;
+    global.pickPraise = pickPraise;
     global.preventZoom = preventZoom;
     global.MONEY = MONEY;
     global.formatMoneyCents = formatMoneyCents;
+    global.formatMoneyDiffHint = formatMoneyDiffHint;
     global.calculateStars = calculateStars;
     global.renderTopBar = renderTopBar;
     global.renderTopBarHelper = renderTopBar;

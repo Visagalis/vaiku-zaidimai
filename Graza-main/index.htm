@@ -10,7 +10,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../shared/common.css?v=2">
+    <link rel="stylesheet" href="../shared/money.css?v=2">
     <script src="../shared/common.js?v=2"></script>
+    <script src="../shared/money.js?v=2"></script>
     <style>
         body {
             font-family: 'Nunito', sans-serif;
@@ -114,21 +116,7 @@
     </div>
 
     <script>
-        const MONEY = {
-            c1:  { cents: 1, label: '1c', class: 'coin coin-copper coin-1c' },
-            c2:  { cents: 2, label: '2c', class: 'coin coin-copper coin-2c' },
-            c5:  { cents: 5, label: '5c', class: 'coin coin-copper coin-5c' },
-            c10: { cents: 10, label: '10c', class: 'coin coin-gold coin-10c' },
-            c20: { cents: 20, label: '20c', class: 'coin coin-gold coin-20c' },
-            c50: { cents: 50, label: '50c', class: 'coin coin-gold coin-50c' },
-            e1:  { cents: 100, label: '1€', class: 'coin coin-1e' },
-            e2:  { cents: 200, label: '2€', class: 'coin coin-2e' },
-            e5:  { cents: 500, label: '5€', class: 'bill bill-5e' },
-            e10: { cents: 1000, label: '10€', class: 'bill bill-10e' },
-            e20: { cents: 2000, label: '20€', class: 'bill bill-20e' }
-        };
-
-        const CENT_DRAWER = [MONEY.c1, MONEY.c2, MONEY.c5, MONEY.c10, MONEY.c20, MONEY.c50];
+        const CENT_DRAWER = MONEY.centCoins;
         const EURO_DRAWER = [MONEY.e1, MONEY.e2, MONEY.e5, MONEY.e10];
 
         const CUSTOMERS = [
@@ -189,29 +177,16 @@
 
         const app = document.getElementById('app');
 
-        function getRandomElement(arr) {
-            return pickRandom(arr);
-        }
-
         function updateCashierHintUI() {
             if (!state.hintUsed) return;
             const hintSlot = document.getElementById('cashier-hint-slot');
             if (!hintSlot) return;
             const currentSum = getChangeSum();
-            const diff = state.targetChange - currentSum;
-            let text = '';
-            if (diff > 0) {
-                if (currentSum === 0) {
-                    text = `${_col('Reikia grąžos:')} ${formatMoneyCents(state.targetChange)}`;
-                } else {
-                    text = `${_col('Dar trūksta:')} ${formatMoneyCents(diff)}`;
-                }
-            } else if (diff === 0) {
-                text = `${_col('Jau pakanka!')} ✔️`;
-            } else {
-                text = `${_col('Per daug:')} +${formatMoneyCents(Math.abs(diff))}`;
+            if (currentSum === 0) {
+                hintSlot.innerHTML = `<span class="hint-box py-1 px-2.5 text-xs sm:text-sm">💡 ${_col('Reikia grąžos:')} ${formatMoneyCents(state.targetChange)}</span>`;
+                return;
             }
-            hintSlot.innerHTML = `<span class="hint-box py-1 px-2.5 text-xs sm:text-sm">💡 ${text}</span>`;
+            hintSlot.innerHTML = formatMoneyDiffHint(currentSum, state.targetChange).html;
         }
 
         function showCashierHint() {
